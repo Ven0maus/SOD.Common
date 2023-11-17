@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SyncDisksRebalanced", "SyncDisksRebalanced\SyncDisksRebalanced.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.SyncDisksRebalanced", "SOD.SyncDisksRebalanced\SOD.SyncDisksRebalanced.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.Common", "SOD.Common\SOD.Common.csproj", "{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{20529558-CA28-4AB9-B48C-7DA106D94DC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20529558-CA28-4AB9-B48C-7DA106D94DC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20529558-CA28-4AB9-B48C-7DA106D94DC2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

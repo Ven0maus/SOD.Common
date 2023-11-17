@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>SyncDisksRebalanced</AssemblyName>
+    <AssemblyName>SOD.SyncDisksRebalanced</AssemblyName>
     <Description>Sync Disks Rebalanced</Description>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -12,10 +12,14 @@
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
-    <RootNamespace>SyncDisksRebalanced</RootNamespace>
+    <RootNamespace>SOD.SyncDisksRebalanced</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SOD.Common\SOD.Common.csproj" />
   </ItemGroup>
 </Project>
