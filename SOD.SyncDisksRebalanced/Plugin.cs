@@ -3,13 +3,13 @@ using SOD.Common.BepInEx.Common;
 
 namespace SyncDisksRebalanced
 {
-    [BepInPlugin(Identifier, Name, Version)]
-    [BepInDependency(SOD.Common.Plugin.Identifier)]
+    [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
+    [BepInDependency(SOD.Common.Plugin.PLUGIN_GUID)]
     public class Plugin : PluginExt
     {
-        private const string Identifier = "Venomaus.Plugins.SOD.SyncDisksRebalanced";
-        private const string Name = "Sync Disks Rebalanced";
-        private const string Version = "1.0.0";
+        public const string PLUGIN_GUID = "Venomaus.Plugins.SOD.SyncDisksRebalanced";
+        public const string PLUGIN_NAME = "Sync Disks Rebalanced";
+        public const string PLUGIN_VERSION = "1.0.0";
 
         public Plugin()
         {
@@ -21,11 +21,11 @@ namespace SyncDisksRebalanced
         {
             if (!Config.Get<bool>(Constants.Configuration.PluginEnabled))
             {
-                Log.LogInfo($"Plugin is disabled in the configuration.");
+                Log.LogInfo($"Plugin \"{PLUGIN_GUID}\" is disabled in the configuration.");
                 return;
             }
 
-            Log.LogInfo($"Loaded Plugin {Identifier}");
+            Log.LogInfo($"Loaded Plugin \"{PLUGIN_GUID}\"");
         }
     }
 }

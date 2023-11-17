@@ -1,0 +1,7 @@
+{
+  "name": "Venomaus-SOD.Common",
+  "version_number": "1.0.0",
+  "website_url": "",
+  "description": "A common library for SOD mods.",
+  "dependencies": []
+}
