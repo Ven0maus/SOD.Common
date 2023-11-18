@@ -1,5 +1,8 @@
 ﻿using BepInEx;
+using BepInEx.Logging;
+using HarmonyLib;
 using SOD.Common.BepInEx.Common;
+using System.Reflection;
 
 namespace SyncDisksRebalanced
 {
@@ -11,6 +14,10 @@ namespace SyncDisksRebalanced
         public const string PLUGIN_NAME = "Sync Disks Rebalanced";
         public const string PLUGIN_VERSION = "1.0.0";
 
+        public new static ManualLogSource Log { get; private set; }
+
+        private Harmony _harmony;
+
         public Plugin()
         {
             // Init configuration
@@ -19,13 +26,25 @@ namespace SyncDisksRebalanced
 
         public override void Load()
         {
+            Log = base.Log;
+
             if (!Config.Get<bool>(Constants.Configuration.PluginEnabled))
             {
-                Log.LogInfo($"Plugin \"{PLUGIN_GUID}\" is disabled in the configuration.");
+                Log.LogInfo($"Plugin \"{PLUGIN_GUID}\" is disabled.");
                 return;
             }
 
-            Log.LogInfo($"Loaded Plugin \"{PLUGIN_GUID}\"");
+            Log.LogInfo($"Plugin \"{PLUGIN_GUID}\" is loaded.");
+
+            _harmony = Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+
+            Log.LogInfo($"Plugin \"{PLUGIN_GUID}\" is patched.");
+        }
+
+        public override bool Unload()
+        {
+            _harmony?.UnpatchSelf();
+            return true;
         }
     }
 }
