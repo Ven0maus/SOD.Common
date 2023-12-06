@@ -10,9 +10,16 @@ using System.Reflection;
 
 namespace SOD.Common.BepInEx
 {
+    /// <summary>
+    /// Base plugin controller with the default configuration bindings
+    /// </summary>
     public abstract class PluginController : PluginController<IConfigurationBindings>
     { }
 
+    /// <summary>
+    /// Base plugin controller with custom configuration bindings
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public abstract class PluginController<T> : BasePlugin
         where T : class, IConfigurationBindings
     {
@@ -46,22 +53,6 @@ namespace SOD.Common.BepInEx
         }
 
         /// <summary>
-        /// This method is used to setup configuration bindings.
-        /// <br>Set savebindings to true if you want the configuration to be stored in the plugin config file.</br>
-        /// </summary>
-        public virtual void OnConfigureBindings() 
-        {
-            ConfigBuilder.File.SaveOnConfigSet = false;
-            // This accesses the proxy of each property which binds the configuration of that property
-            var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
-            foreach (var property in properties)
-                _ = property.GetValue(Config);
-            // Do a save once after setting all config
-            ConfigBuilder.File.Save();
-            ConfigBuilder.File.SaveOnConfigSet = true;
-        }
-
-        /// <summary>
         /// This method is the entrypoint for the plugin.
         /// </summary>
         public override void Load()
@@ -82,6 +73,22 @@ namespace SOD.Common.BepInEx
             OnPatching();
 
             Log.LogInfo($"Plugin \"{PluginGUID}\" is loaded.");
+        }
+
+        /// <summary>
+        /// This method is used to setup configuration bindings.
+        /// <br>Set savebindings to true if you want the configuration to be stored in the plugin config file.</br>
+        /// </summary>
+        public virtual void OnConfigureBindings()
+        {
+            ConfigBuilder.File.SaveOnConfigSet = false;
+            // This accesses the proxy of each property which binds the configuration of that property
+            var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
+            foreach (var property in properties)
+                _ = property.GetValue(Config);
+            // Do a save once after setting all config
+            ConfigBuilder.File.Save();
+            ConfigBuilder.File.SaveOnConfigSet = true;
         }
 
         /// <summary>
