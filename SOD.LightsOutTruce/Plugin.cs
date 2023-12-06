@@ -5,7 +5,7 @@ namespace SOD.LightsOutTruce
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
-    public class Plugin : PluginExt
+    public class Plugin : PluginController
     {
         public const string PLUGIN_GUID = "Venomaus.Plugins.SOD.LightsOutTruce";
         public const string PLUGIN_NAME = "LightsOutTruce";

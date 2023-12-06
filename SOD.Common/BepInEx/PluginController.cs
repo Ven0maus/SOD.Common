@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace SOD.Common.BepInEx
 {
-    public abstract class PluginExt : BasePlugin
+    public abstract class PluginController : BasePlugin
     {
         private Harmony _harmony;
         protected Harmony Harmony { get { return _harmony ??= new Harmony(PluginGUID); } }
@@ -51,7 +51,7 @@ namespace SOD.Common.BepInEx
 
         public new static ManualLogSource Log { get; private set; }
 
-        public PluginExt()
+        public PluginController()
         {
             Log = base.Log;
             Config = new ConfigBuilder(base.Config);
