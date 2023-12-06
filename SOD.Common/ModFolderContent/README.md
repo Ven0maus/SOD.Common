@@ -30,9 +30,8 @@ You can also combine these configuration interfaces, so long as IConfigurationBi
 public interface IConfigBindings : ISomeOtherBindings, ISomeMoreBindings, IConfigurationBindings
 { }
 ```
-By default the base IConfigurationBindings interface provides a bool configuration property for Enabled
-
-to specify if the plugin is enabled or not. (Default: true)
+By default the base IConfigurationBindings interface provides a bool configuration property "Enabled"
+which specifies if the plugin is enabled or not. (Default: true)
 # Base functionality
 The PluginController provides some base setup methods for your config, hooks, etc..
 Following methods can be overriden and run in the given sequence:
