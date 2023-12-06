@@ -9,6 +9,6 @@ namespace SOD.Common.Game
     {
         internal SodHelpersLibrary() { }
 
-        public MurderComponent Murders { get; } = new MurderComponent();
+        public MurderComponent Murders => new();
     }
 }
