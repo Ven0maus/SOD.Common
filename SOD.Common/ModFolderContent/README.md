@@ -14,11 +14,12 @@ public interface IConfigBindings : IConfigurationBindings
     string SomeTextConfig { get; set; }
 }
 
+[BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
+[BepInDependency("Venomaus.SOD.Common")]
 public class Plugin : PluginController<IConfigBindings>
 {
-    public override void Load()
+    public override void OnBeforePatching()
     {
-        base.Load();
         Log.LogInfo("SyncDiskPrice: " + Config.SyncDiskPrice);
         Log.LogInfo("SomeTextConfig: " + Config.SomeTextConfig);
     }
