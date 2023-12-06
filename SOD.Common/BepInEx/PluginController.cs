@@ -3,7 +3,9 @@ using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using SOD.Common.BepInEx.Configuration;
+using SOD.Common.BepInEx.Extensions;
 using SOD.Common.BepInEx.Proxies;
+using System.Linq;
 using System.Reflection;
 
 namespace SOD.Common.BepInEx
@@ -44,10 +46,20 @@ namespace SOD.Common.BepInEx
         }
 
         /// <summary>
-        /// This method is used to setup configuration bindings, it happens before plugin enabled check.
+        /// This method is used to setup configuration bindings.
         /// <br>Set savebindings to true if you want the configuration to be stored in the plugin config file.</br>
         /// </summary>
-        public virtual void OnConfigureBindings(out bool savebindings) => savebindings = false;
+        public virtual void OnConfigureBindings() 
+        {
+            ConfigBuilder.File.SaveOnConfigSet = false;
+            // This accesses the proxy of each property which binds the configuration of that property
+            var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
+            foreach (var property in properties)
+                _ = property.GetValue(Config);
+            // Do a save once after setting all config
+            ConfigBuilder.File.Save();
+            ConfigBuilder.File.SaveOnConfigSet = true;
+        }
 
         /// <summary>
         /// This method is the entrypoint for the plugin.
@@ -60,13 +72,11 @@ namespace SOD.Common.BepInEx
                 return;
             }
 
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is loading.");
-
-            ConfigBuilder.File.SaveOnConfigSet = false;
             Log.LogInfo($"Plugin \"{PluginGUID}\" is setting up configuration bindings.");
-            OnConfigureBindings(out var saveBindings);
-            if (saveBindings) ConfigBuilder.File.Save();
-            ConfigBuilder.File.SaveOnConfigSet = true;
+            OnConfigureBindings();
+
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is loading.");
+            OnBeforePatching();
 
             Log.LogInfo($"Plugin \"{PluginGUID}\" is patching.");
             OnPatching();
@@ -75,8 +85,14 @@ namespace SOD.Common.BepInEx
         }
 
         /// <summary>
-        /// Used to patch harmony hooks, override to do manual patching.
-        /// <br>Use the Harmony property to do patching.</br>
+        /// This method is called right before patching happens.
+        /// </summary>
+        public virtual void OnBeforePatching()
+        { }
+
+        /// <summary>
+        /// This method is called after OnLoading to patch all hooks in the assembly.
+        /// <br>If overrriden you can use the Harmony property to do patching yourself.</br>
         /// </summary>
         public virtual void OnPatching()
         {
@@ -84,7 +100,7 @@ namespace SOD.Common.BepInEx
         }
 
         /// <summary>
-        /// Method called when plugin is unloaded.
+        /// Plugin exit point
         /// </summary>
         /// <returns></returns>
         public override bool Unload()
