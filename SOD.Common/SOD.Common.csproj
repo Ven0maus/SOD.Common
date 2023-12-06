@@ -11,7 +11,7 @@
       https://nuget.bepinex.dev/v3/index.json
     </RestoreAdditionalProjectSources>
     <RootNamespace>SOD.Common</RootNamespace>
-    <Configurations>Debug;Release</Configurations>
+	<BepInExPath>$(APPDATA)\r2modmanPlus-local\ShadowsofDoubt\profiles\Default\BepInEx\</BepInExPath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,14 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="UnityEngine">
-      <HintPath>References\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>References\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UI">
-      <HintPath>References\UnityEngine.UI.dll</HintPath>
-    </Reference>
+	<Reference Include="$(BepInExPath)/interop/*.dll" />
   </ItemGroup>
 </Project>

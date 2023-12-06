@@ -5,6 +5,7 @@ using HarmonyLib;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Extensions;
 using SOD.Common.BepInEx.Proxies;
+using SOD.Common.Game;
 using System.Linq;
 using System.Reflection;
 
@@ -24,9 +25,28 @@ namespace SOD.Common.BepInEx
         where T : class, IConfigurationBindings
     {
         private Harmony _harmony;
+        /// <summary>
+        /// A harmony instance
+        /// </summary>
         protected Harmony Harmony { get { return _harmony ??= new Harmony(PluginGUID); } }
+        /// <summary>
+        /// A model based configuration implementation
+        /// </summary>
         protected new T Config { get; }
+        /// <summary>
+        /// A builder for configuration, the original BepInEx config can be accessed on the ConfigBuilder.File property.
+        /// </summary>
         protected ConfigBuilder ConfigBuilder { get; }
+
+        /// <summary>
+        /// Static log source
+        /// </summary>
+        public new static ManualLogSource Log { get; private set; }
+
+        /// <summary>
+        /// Helper library to easily access game information and functions
+        /// </summary>
+        public static SodHelpersLibrary Helpers { get; private set; }
 
         private string _pluginGUID;
         private string PluginGUID
@@ -43,13 +63,12 @@ namespace SOD.Common.BepInEx
             }
         }
 
-        public new static ManualLogSource Log { get; private set; }
-
         public PluginController()
         {
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
             Config = ConfigurationProxy<T>.Create(ConfigBuilder);
+            Helpers = new SodHelpersLibrary();
         }
 
         /// <summary>
