@@ -1,4 +1,5 @@
-﻿using BepInEx.Logging;
+﻿using BepInEx;
+using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using System.Reflection;
@@ -8,7 +9,7 @@ namespace SOD.Plugins.Common.BepInEx
     public abstract class PluginExt : BasePlugin
     {
         private Harmony _harmony;
-        protected Harmony Harmony { get { return _harmony ??= new Harmony(Plugin_GUID); } }
+        protected Harmony Harmony { get { return _harmony ??= new Harmony(PluginGUID); } }
         protected new ConfigBuilder Config { get; }
         protected virtual bool Plugin_Enabled
         {
@@ -32,7 +33,21 @@ namespace SOD.Plugins.Common.BepInEx
                 Config["General.Enabled"].BoxedValue = value;
             }
         }
-        protected abstract string Plugin_GUID { get; }
+
+        private string _pluginGUID;
+        private string PluginGUID
+        {
+            get
+            {
+                if (_pluginGUID == null)
+                {
+                    var type = GetType();
+                    var pluginAttribute = type.GetCustomAttribute<BepInPlugin>();
+                    _pluginGUID = pluginAttribute.GUID;
+                }
+                return _pluginGUID;
+            }
+        }
 
         public new static ManualLogSource Log { get; private set; }
 
@@ -44,39 +59,42 @@ namespace SOD.Plugins.Common.BepInEx
 
         /// <summary>
         /// This method is used to setup configuration bindings, it happens before plugin enabled check.
+        /// <br>Set savebindings to true if you want the configuration to be stored in the plugin config file.</br>
         /// </summary>
-        public virtual void Configuration()
-        { }
+        public virtual void OnConfigureBindings(out bool savebindings) => savebindings = false;
 
         /// <summary>
         /// This method is the entrypoint for the plugin.
         /// </summary>
         public override void Load()
         {
-            Config.File.SaveOnConfigSet = false;
-            Configuration();
-            Config.File.Save();
-            Config.File.SaveOnConfigSet = true;
-
             if (!Plugin_Enabled)
             {
-                Log.LogInfo($"Plugin \"{Plugin_GUID}\" is disabled.");
+                Log.LogInfo($"Plugin \"{PluginGUID}\" is disabled.");
                 return;
             }
 
-            Log.LogInfo($"Plugin \"{Plugin_GUID}\" is loaded.");
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is loading.");
 
-            Patch();
+            Config.File.SaveOnConfigSet = false;
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is setting up configuration bindings.");
+            OnConfigureBindings(out var saveBindings);
+            if (saveBindings) Config.File.Save();
+            Config.File.SaveOnConfigSet = true;
+
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is patching.");
+            OnPatching();
+
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is loaded.");
         }
 
         /// <summary>
         /// Used to patch harmony hooks, override to do manual patching.
         /// <br>Use the Harmony property to do patching.</br>
         /// </summary>
-        public virtual void Patch()
+        public virtual void OnPatching()
         {
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Log.LogInfo($"Plugin \"{Plugin_GUID}\" is patched.");
         }
 
         /// <summary>
@@ -86,8 +104,7 @@ namespace SOD.Plugins.Common.BepInEx
         public override bool Unload()
         {
             Harmony.UnpatchSelf();
-            Log.LogInfo($"Plugin \"{Plugin_GUID}\" unpatched.");
-            Log.LogInfo($"Plugin \"{Plugin_GUID}\" unloaded.");
+            Log.LogInfo($"Plugin \"{PluginGUID}\" is unloaded.");
             return true;
         }
     }
