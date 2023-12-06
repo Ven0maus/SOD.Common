@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.Common.BepInEx.Extensions
+namespace SOD.Common.Extensions
 {
     internal static class TypeExtensions
     {

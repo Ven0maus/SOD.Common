@@ -9,6 +9,13 @@ namespace SOD.Common.Game
     {
         internal SodHelpersLibrary() { }
 
+        /// <summary>
+        /// Helper properties and methods related to murders.
+        /// </summary>
         public MurderComponent Murders => new();
+        /// <summary>
+        /// Helper properties and methods related to sync disks.
+        /// </summary>
+        public SyncDiskComponent SyncDisks = new();
     }
 }

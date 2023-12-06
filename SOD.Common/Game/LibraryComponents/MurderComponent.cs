@@ -3,8 +3,10 @@
     /// <summary>
     /// Component that handles things regarding the Murders.
     /// </summary>
-    public class MurderComponent
+    public sealed class MurderComponent
     {
+        internal MurderComponent() { }
+
         /// <summary>
         /// The murder controller.
         /// </summary>
