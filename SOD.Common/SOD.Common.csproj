@@ -16,6 +16,9 @@
 
   <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+    <PackageReference Include="Castle.Core" Version="5.1.1">
+      <IncludeAssets></IncludeAssets>
+    </PackageReference>
     <PackageReference Include="UniverseLib.IL2CPP.Interop" Version="1.5.1" />
   </ItemGroup>
 

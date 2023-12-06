@@ -2,42 +2,45 @@
 using System;
 using System.Collections.Generic;
 
-namespace SOD.Common.BepInEx
+namespace SOD.Common.BepInEx.Configuration
 {
-    public class ConfigBuilder
+    public sealed class ConfigBuilder
     {
         private readonly Dictionary<string, Dictionary<string, object>> _configuration = new(StringComparer.OrdinalIgnoreCase);
-
-        public ConfigEntryBase this[string section, string key]
-        {
-            get { return Get<ConfigEntryBase>(section, key); }
-        }
-
-        public ConfigEntryBase this[string identifier]
-        {
-            get
-            {
-                var (section, key) = SplitIdentifier(identifier);
-                return Get<ConfigEntryBase>(section, key);
-            }
-        }
 
         /// <summary>
         /// The base configuration file, can be used to modify certain settings.
         /// </summary>
         public ConfigFile File { get; }
 
-        public ConfigBuilder(ConfigFile config)
+        internal ConfigBuilder(ConfigFile config)
         {
             File = config;
         }
 
+        /// <summary>
+        /// Add a new entry to the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="identifier"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
         public ConfigBuilder Add<T>(string identifier, T defaultValue = default, string description = null)
         {
             var (section, key) = SplitIdentifier(identifier);
             return Add(section, key, defaultValue, description);
         }
 
+        /// <summary>
+        /// Add a new entry to the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="defaultValue"></param>
+        /// <param name="description"></param>
+        /// <returns></returns>
         public ConfigBuilder Add<T>(string section, string key, T defaultValue = default, string description = null)
         {
             if (!_configuration.TryGetValue(section, out var entries))
@@ -48,12 +51,25 @@ namespace SOD.Common.BepInEx
             return this;
         }
 
+        /// <summary>
+        /// Get an existing entry out of the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
         public T Get<T>(string identifier)
         {
             var (section, key) = SplitIdentifier(identifier);
             return Get<T>(section, key);
         }
 
+        /// <summary>
+        /// Get an existing entry out of the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
         public T Get<T>(string section, string key)
         {
             if (_configuration.TryGetValue(section, out var entries) && entries.TryGetValue(key, out var entry))
@@ -66,12 +82,26 @@ namespace SOD.Common.BepInEx
             return default;
         }
 
+        /// <summary>
+        /// Set an existing entry to a new value in the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="identifier"></param>
+        /// <param name="value"></param>
         public void Set<T>(string identifier, T value)
         {
             var (section, key) = SplitIdentifier(identifier);
             Set(section, key, value);
         }
 
+        /// <summary>
+        /// Set an existing entry to a new value in the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <exception cref="Exception"></exception>
         public void Set<T>(string section, string key, T value)
         {
             if (ExistsInternal<T>(section, key, out var entry))
@@ -80,6 +110,13 @@ namespace SOD.Common.BepInEx
                 throw new Exception($"No configuration entry exists for section \"{section}\" and key \"{key}\".");
         }
 
+        /// <summary>
+        /// Check if a binding exists in the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="identifier"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         public bool Exists<T>(string identifier, out T entry)
         {
             var exists = ExistsInternal<T>(identifier, out var config);
@@ -87,6 +124,14 @@ namespace SOD.Common.BepInEx
             return exists;
         }
 
+        /// <summary>
+        /// Check if a binding exists in the configuration builder
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="entry"></param>
+        /// <returns></returns>
         public bool Exists<T>(string section, string key, out T entry)
         {
             var exists = ExistsInternal<T>(section, key, out var config);
@@ -94,13 +139,13 @@ namespace SOD.Common.BepInEx
             return exists;
         }
 
-        private bool ExistsInternal<T>(string identifier, out ConfigEntry<T> config)
+        internal bool ExistsInternal<T>(string identifier, out ConfigEntry<T> config)
         {
             var (section, key) = SplitIdentifier(identifier);
             return ExistsInternal(section, key, out config);
         }
 
-        private bool ExistsInternal<T>(string section, string key, out ConfigEntry<T> config)
+        internal bool ExistsInternal<T>(string section, string key, out ConfigEntry<T> config)
         {
             config = null;
             if (_configuration.TryGetValue(section, out var entries) && entries.TryGetValue(key, out var entry))
@@ -111,20 +156,31 @@ namespace SOD.Common.BepInEx
             return false;
         }
 
+        #region Proxy
+        internal bool ExistsInternal(string section, string key, out ConfigEntryBase config)
+        {
+            config = null;
+            if (_configuration.TryGetValue(section, out var entries) && entries.TryGetValue(key, out var entry))
+            {
+                config = (ConfigEntryBase)entry;
+                return true;
+            }
+            return false;
+        }
+
+        internal bool ExistsInternal(string identifier, out ConfigEntryBase config)
+        {
+            var (section, key) = SplitIdentifier(identifier);
+            return ExistsInternal(section, key, out config);
+        }
+        #endregion
+
         private static (string section, string key) SplitIdentifier(string identifier)
         {
             var parts = identifier.Split('.');
             if (parts.Length != 2)
                 throw new Exception($"Invalid configuration identifier \"{identifier}\" provided.");
             return (parts[0], parts[1]);
-        }
-    }
-
-    public static class ConfigEntryBaseExtensions
-    {
-        public static T Value<T>(this ConfigEntryBase entryBase)
-        {
-            return (T)entryBase.BoxedValue;
         }
     }
 }

@@ -2,37 +2,22 @@
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using SOD.Common.BepInEx.Configuration;
+using SOD.Common.BepInEx.Proxies;
 using System.Reflection;
 
 namespace SOD.Common.BepInEx
 {
-    public abstract class PluginController : BasePlugin
+    public abstract class PluginController : PluginController<IConfigurationBindings>
+    { }
+
+    public abstract class PluginController<T> : BasePlugin
+        where T : class, IConfigurationBindings
     {
         private Harmony _harmony;
         protected Harmony Harmony { get { return _harmony ??= new Harmony(PluginGUID); } }
-        protected new ConfigBuilder Config { get; }
-        protected virtual bool Plugin_Enabled
-        {
-            get 
-            {
-                if (!Config.Exists<bool>("General.Enabled", out var entry))
-                {
-                    Config.Add("General.Enabled", true, "Should the plugin be enabled?");
-                    return Config["General.Enabled"].Value<bool>();
-                }
-                return entry;
-            }
-            set
-            {
-                if (!Config.Exists<bool>("General.Enabled", out _))
-                {
-                    Config.Add("General.Enabled", true, "Should the plugin be enabled?");
-                    Config["General.Enabled"].BoxedValue = value;
-                    return;
-                }
-                Config["General.Enabled"].BoxedValue = value;
-            }
-        }
+        protected new T Config { get; }
+        protected ConfigBuilder ConfigBuilder { get; }
 
         private string _pluginGUID;
         private string PluginGUID
@@ -54,7 +39,8 @@ namespace SOD.Common.BepInEx
         public PluginController()
         {
             Log = base.Log;
-            Config = new ConfigBuilder(base.Config);
+            ConfigBuilder = new ConfigBuilder(base.Config);
+            Config = ConfigurationProxy<T>.Create(ConfigBuilder);
         }
 
         /// <summary>
@@ -68,7 +54,7 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public override void Load()
         {
-            if (!Plugin_Enabled)
+            if (!Config.Enabled)
             {
                 Log.LogInfo($"Plugin \"{PluginGUID}\" is disabled.");
                 return;
@@ -76,11 +62,11 @@ namespace SOD.Common.BepInEx
 
             Log.LogInfo($"Plugin \"{PluginGUID}\" is loading.");
 
-            Config.File.SaveOnConfigSet = false;
+            ConfigBuilder.File.SaveOnConfigSet = false;
             Log.LogInfo($"Plugin \"{PluginGUID}\" is setting up configuration bindings.");
             OnConfigureBindings(out var saveBindings);
-            if (saveBindings) Config.File.Save();
-            Config.File.SaveOnConfigSet = true;
+            if (saveBindings) ConfigBuilder.File.Save();
+            ConfigBuilder.File.SaveOnConfigSet = true;
 
             Log.LogInfo($"Plugin \"{PluginGUID}\" is patching.");
             OnPatching();
