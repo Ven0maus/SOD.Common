@@ -1,4 +1,4 @@
-﻿namespace SOD.Plugins.LightsOutTruce
+﻿namespace SOD.LightsOutTruce
 {
     public class PluginHooks
     {

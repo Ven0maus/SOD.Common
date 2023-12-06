@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SOD.Plugins.Common.BepInEx
+namespace SOD.Common.BepInEx
 {
     public class ConfigBuilder
     {

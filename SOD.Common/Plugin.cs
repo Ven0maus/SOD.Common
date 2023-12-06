@@ -1,7 +1,7 @@
 ﻿using BepInEx;
-using SOD.Plugins.Common.BepInEx;
+using SOD.Common.BepInEx;
 
-namespace SOD.Plugins.Common
+namespace SOD.Common
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     public class Plugin : PluginExt

@@ -4,7 +4,7 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using System.Reflection;
 
-namespace SOD.Plugins.Common.BepInEx
+namespace SOD.Common.BepInEx
 {
     public abstract class PluginExt : BasePlugin
     {

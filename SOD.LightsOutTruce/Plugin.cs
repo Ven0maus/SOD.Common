@@ -1,7 +1,7 @@
 ﻿using BepInEx;
-using SOD.Plugins.Common.BepInEx;
+using SOD.Common.BepInEx;
 
-namespace SOD.Plugins.LightsOutTruce
+namespace SOD.LightsOutTruce
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
