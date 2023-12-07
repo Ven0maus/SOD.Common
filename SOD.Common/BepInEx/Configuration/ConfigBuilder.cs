@@ -53,6 +53,7 @@ namespace SOD.Common.BepInEx.Configuration
 
         /// <summary>
         /// Get an existing entry out of the configuration builder
+        /// <br>If you want the <see cref="ConfigEntryBase"/> object, use <see cref="ConfigEntryBase"/> as generic type.</br>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="identifier"></param>
@@ -65,6 +66,7 @@ namespace SOD.Common.BepInEx.Configuration
 
         /// <summary>
         /// Get an existing entry out of the configuration builder
+        /// <br>If you want the <see cref="ConfigEntryBase"/> object, use <see cref="ConfigEntryBase"/> as generic type.</br>
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="section"></param>
@@ -79,7 +81,7 @@ namespace SOD.Common.BepInEx.Configuration
                 else
                     return ((ConfigEntry<T>)entry).Value;
             }
-            return default;
+            throw new Exception($"No configuration entry exists for section \"{section}\" and key \"{key}\".");
         }
 
         /// <summary>
