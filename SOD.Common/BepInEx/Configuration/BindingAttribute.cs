@@ -3,13 +3,13 @@
 namespace SOD.Common.BepInEx.Configuration
 {
     [AttributeUsage(AttributeTargets.Property)]
-    public sealed class ConfigurationAttribute : Attribute
+    public sealed class BindingAttribute : Attribute
     {
         public string Name { get; }
         public object DefaultValue { get; }
         public string Description { get; }
 
-        public ConfigurationAttribute(string name, object defaultValue, string description)
+        public BindingAttribute(string name, object defaultValue, string description)
         {
             Name = name;
             DefaultValue = defaultValue;

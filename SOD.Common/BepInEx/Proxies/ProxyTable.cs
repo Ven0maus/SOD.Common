@@ -13,6 +13,7 @@ namespace SOD.Common.BepInEx.Proxies
     /// <typeparam name="TInterface">Proxied interface</typeparam>
     /// <typeparam name="TImpl">Implementation type</typeparam>
     internal static class ProxyTable<TInterface>
+        where TInterface : class
     {
         private static Dictionary<string, Func<ConfigBuilder, object>> _getters;
         private static Dictionary<string, Action<ConfigBuilder, object>> _setters;

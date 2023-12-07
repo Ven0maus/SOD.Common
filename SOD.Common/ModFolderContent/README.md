@@ -5,12 +5,12 @@ Contains various extensions and methods to manipulate commonly needed gamedata.
 # Features
 **Modelbased configuration**
 ```csharp
-public interface IConfigBindings : IConfigurationBindings
+public interface IConfigBindings
 {
-    [Configuration("Prices.SyncDiskPrice", 500, "The price for the sync disk.")]
+    [Binding("Prices.SyncDiskPrice", 500, "The price for the sync disk.")]
     int SyncDiskPrice { get; set; }
 
-    [Configuration("General.SomeTextConfig", "Hello", "Yep this is some text config!")]
+    [Binding("General.SomeTextConfig", "Hello", "Yep this is some text config!")]
     string SomeTextConfig { get; set; }
 }
 
@@ -25,13 +25,11 @@ public class Plugin : PluginController<IConfigBindings>
     }
 }
 ```
-You can also combine these configuration interfaces, so long as IConfigurationBindings is one of them: 
+You can also combine these interfaces:
 ```csharp
-public interface IConfigBindings : ISomeOtherBindings, ISomeMoreBindings, IConfigurationBindings
+public interface IConfigBindings : ISomeOtherBindings, ISomeMoreBindings
 { }
 ```
-By default the base IConfigurationBindings interface provides a bool configuration property "Enabled"
-which specifies if the plugin is enabled or not. (Default: true)
 # Base functionality
 The PluginController provides some base setup methods for your config, hooks, etc..
 Following methods can be overriden and run in the given sequence:

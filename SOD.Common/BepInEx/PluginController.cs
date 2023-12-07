@@ -10,10 +10,13 @@ using System.Reflection;
 
 namespace SOD.Common.BepInEx
 {
+    public interface IEmptyBindings 
+    { }
+
     /// <summary>
-    /// Base plugin controller with the default configuration bindings
+    /// Base plugin controller with no configuration bindings
     /// </summary>
-    public abstract class PluginController : PluginController<IConfigurationBindings>
+    public abstract class PluginController : PluginController<IEmptyBindings>
     { }
 
     /// <summary>
@@ -21,7 +24,7 @@ namespace SOD.Common.BepInEx
     /// </summary>
     /// <typeparam name="T"></typeparam>
     public abstract class PluginController<T> : BasePlugin
-        where T : class, IConfigurationBindings
+        where T : class
     {
         private Harmony _harmony;
         /// <summary>
@@ -69,12 +72,6 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public override void Load()
         {
-            if (!Config.Enabled)
-            {
-                Log.LogInfo($"Plugin \"{PluginGUID}\" is disabled.");
-                return;
-            }
-
             Log.LogInfo($"Plugin \"{PluginGUID}\" is setting up configuration bindings.");
             OnConfigureBindings();
 

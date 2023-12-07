@@ -6,7 +6,7 @@ using System.Reflection;
 namespace SOD.Common.BepInEx.Proxies
 {
     internal sealed class ConfigurationProxy<T> : IInterceptor
-        where T : class, IConfigurationBindings
+        where T : class
     {
         private static readonly ProxyGenerator _proxyGenerator;
         private readonly ConfigBuilder _configBuilder;
@@ -40,7 +40,7 @@ namespace SOD.Common.BepInEx.Proxies
                 PropertyInfo info = property.PropertyInfo;
                 Type type = info.PropertyType;
 
-                var configurationAttribute = info.GetCustomAttribute<ConfigurationAttribute>() ??
+                var configurationAttribute = info.GetCustomAttribute<BindingAttribute>() ??
                     throw new Exception($"Invalid property \"{info.Name}\" defined without a configuration attribute.");
 
                 property.GetMethod = builder =>
@@ -48,7 +48,8 @@ namespace SOD.Common.BepInEx.Proxies
                     if (!builder.ExistsInternal(configurationAttribute.Name, out var entryBase))
                     {
                         SetByType(type, builder, configurationAttribute, configurationAttribute.DefaultValue);
-                        return configurationAttribute.DefaultValue;
+                        builder.ExistsInternal(configurationAttribute.Name, out entryBase);
+                        return entryBase.BoxedValue;
                     }
                     return entryBase.BoxedValue;
                 };
@@ -59,7 +60,7 @@ namespace SOD.Common.BepInEx.Proxies
             });
         }
 
-        private static void SetByType(Type type, ConfigBuilder builder, ConfigurationAttribute configurationAttribute, object value)
+        private static void SetByType(Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, object value)
         {
             // Supported types by BepInEx config file:
             /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal, enum */
