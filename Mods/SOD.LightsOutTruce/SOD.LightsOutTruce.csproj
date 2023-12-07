@@ -19,6 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SOD.Common\SOD.Common.csproj" />
+    <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
   </ItemGroup>
 </Project>
