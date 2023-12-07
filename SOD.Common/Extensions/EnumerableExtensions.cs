@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace SOD.Common.Extensions
 {
-    internal static class EnumerableExtensions
+    public static class EnumerableExtensions
     {
-        internal static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
             foreach (var value in enumerable)
                 action(value);
