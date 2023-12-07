@@ -26,11 +26,10 @@ namespace SOD.Common.BepInEx
     public abstract class PluginController<T> : BasePlugin
         where T : class
     {
-        private Harmony _harmony;
         /// <summary>
         /// A harmony instance
         /// </summary>
-        protected Harmony Harmony { get { return _harmony ??= new Harmony(PluginGUID); } }
+        protected Harmony Harmony { get; }
         /// <summary>
         /// A model based configuration implementation
         /// </summary>
@@ -65,6 +64,7 @@ namespace SOD.Common.BepInEx
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
             Config = ConfigurationProxy<T>.Create(ConfigBuilder);
+            Harmony = new Harmony(PluginGUID);
         }
 
         /// <summary>

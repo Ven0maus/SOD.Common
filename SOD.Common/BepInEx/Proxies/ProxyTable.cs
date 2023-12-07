@@ -21,12 +21,12 @@ namespace SOD.Common.BepInEx.Proxies
         /// <summary>
         /// Interface property information
         /// </summary>
-        public class Property
+        internal class Property
         {
             /// <summary>
             /// Property information (reflection)
             /// </summary>
-            public PropertyInfo PropertyInfo { get; }
+            internal PropertyInfo PropertyInfo { get; }
 
             internal Property(PropertyInfo info)
             {
@@ -36,7 +36,7 @@ namespace SOD.Common.BepInEx.Proxies
             /// <summary>
             /// Property get delegate
             /// </summary>
-            public Func<ConfigBuilder, object> GetMethod
+            internal Func<ConfigBuilder, object> GetMethod
             {
                 set => AddGetMethod(PropertyInfo, value);
             }
@@ -44,7 +44,7 @@ namespace SOD.Common.BepInEx.Proxies
             /// <summary>
             /// Property set delegate
             /// </summary>
-            public Action<ConfigBuilder, object> SetMethod
+            internal Action<ConfigBuilder, object> SetMethod
             {
                 set => AddSetMethod(PropertyInfo, value);
             }
@@ -55,7 +55,7 @@ namespace SOD.Common.BepInEx.Proxies
         /// </summary>
         /// <param name="rebuild">Rebuild existing tables</param>
         /// <param name="generator">Accessor generator (invoked for each property of the interface)</param>
-        public static void Build(bool rebuild, Action<Property> generator)
+        internal static void Build(bool rebuild, Action<Property> generator)
         {
             // Initialize tables (quick exit if already present)
             if (_setters != null && _getters != null && !rebuild)
@@ -120,7 +120,7 @@ namespace SOD.Common.BepInEx.Proxies
         /// <param name="invocation">Proxy method (getter/setter)</param>
         /// <param name="impl">Implementation object</param>
         /// <returns>Proxy return message</returns>
-        public static void Invoke(IInvocation invocation, ConfigBuilder impl)
+        internal static void Invoke(IInvocation invocation, ConfigBuilder impl)
         {
             string method = invocation.Method.Name;
             if (method.StartsWith("get_"))
@@ -141,33 +141,6 @@ namespace SOD.Common.BepInEx.Proxies
                 return;
             }
             throw new NotSupportedException();
-        }
-
-        /// <summary>
-        /// Get a property value
-        /// </summary>
-        /// <param name="impl">Implementation object</param>
-        /// <param name="property">Property name (case-sensitive)</param>
-        /// <returns>Property value</returns>
-        public static object GetProperty(ConfigBuilder impl, string property)
-        {
-            string method = "get_" + property;
-            Func<ConfigBuilder, object> getter = _getters[method];
-            object value = getter.Invoke(impl);
-            return value;
-        }
-
-        /// <summary>
-        /// Set a property value
-        /// </summary>
-        /// <param name="impl">Implementation object</param>
-        /// <param name="property">Property name (case-sensitive)</param>
-        /// <param name="value">Property value</param>
-        public static void SetProperty(ConfigBuilder impl, string property, object value)
-        {
-            string method = "set_" + property;
-            Action<ConfigBuilder, object> setter = _setters[method];
-            setter.Invoke(impl, value);
         }
     }
 }

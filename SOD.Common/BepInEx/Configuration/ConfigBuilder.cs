@@ -26,10 +26,10 @@ namespace SOD.Common.BepInEx.Configuration
         /// <param name="defaultValue"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public ConfigBuilder Add<T>(string identifier, T defaultValue = default, string description = null)
+        public ConfigBuilder Add<T>(string identifier, string description, T defaultValue = default)
         {
             var (section, key) = SplitIdentifier(identifier);
-            return Add(section, key, defaultValue, description);
+            return Add(section, key, description, defaultValue);
         }
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace SOD.Common.BepInEx.Configuration
         /// <param name="defaultValue"></param>
         /// <param name="description"></param>
         /// <returns></returns>
-        public ConfigBuilder Add<T>(string section, string key, T defaultValue = default, string description = null)
+        public ConfigBuilder Add<T>(string section, string key, string description, T defaultValue = default)
         {
             if (!_configuration.TryGetValue(section, out var entries))
                 _configuration.Add(section, entries = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase));

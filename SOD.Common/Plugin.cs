@@ -19,5 +19,10 @@ namespace SOD.Common
                 Unhollowed_Modules_Folder = System.IO.Path.Combine(Paths.BepInExRootPath, "interop")
             });
         }
+
+        /// <summary>
+        /// Overriden as no patching needs to happen for common library
+        /// </summary>
+        public override void OnPatching() { }
     }
 }
