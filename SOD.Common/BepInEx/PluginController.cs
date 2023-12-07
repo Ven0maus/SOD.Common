@@ -5,7 +5,6 @@ using HarmonyLib;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
 using SOD.Common.Extensions;
-using SOD.Common.Game;
 using System.Linq;
 using System.Reflection;
 
@@ -43,11 +42,6 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public new static ManualLogSource Log { get; private set; }
 
-        /// <summary>
-        /// Helper library to easily access game information and functions
-        /// </summary>
-        public static SodHelpersLibrary Helpers { get; private set; }
-
         private string _pluginGUID;
         private string PluginGUID
         {
@@ -68,7 +62,6 @@ namespace SOD.Common.BepInEx
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
             Config = ConfigurationProxy<T>.Create(ConfigBuilder);
-            Helpers = new SodHelpersLibrary();
         }
 
         /// <summary>
