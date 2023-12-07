@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.LightsOutTruce", "SOD.L
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.Common", "SOD.Common\SOD.Common.csproj", "{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{E42A1F57-30D2-46D5-AE03-7E1675524E39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{20529558-CA28-4AB9-B48C-7DA106D94DC2} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92CC1827-8FE6-4E8C-8518-DE8D0EAEE515}
