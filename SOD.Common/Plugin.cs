@@ -12,7 +12,7 @@ namespace SOD.Common
 
         public override void OnConfigureBindings()
         {
-            base.OnConfigureBindings();
+            // No need to call base, as this common library has no bindings
             // Init universe lib
             UniverseLib.Universe.Init(0, null, null, new UniverseLib.Config.UniverseLibConfig()
             {

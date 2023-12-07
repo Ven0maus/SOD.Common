@@ -17,7 +17,10 @@ namespace SOD.Common.BepInEx
     /// Base plugin controller with no configuration bindings
     /// </summary>
     public abstract class PluginController : PluginController<IEmptyBindings>
-    { }
+    {
+        // Since this class uses no bindings, there is no need to init the proxy
+        public override void OnConfigureBindings() { }
+    }
 
     /// <summary>
     /// Base plugin controller with custom configuration bindings
