@@ -83,28 +83,23 @@ namespace SOD.Common.BepInEx
             ConfigBuilder = new ConfigBuilder(base.Config);
             Config = ConfigurationProxy<T>.Create(ConfigBuilder);
             Harmony = new Harmony(PluginGUID);
+
+            // There is no point in setting up empty bindings
+            if (typeof(T) != typeof(IEmptyBindings))
+            {
+                Log.LogInfo($"Setting up configuration bindings.");
+                OnConfigureBindings();
+            }
         }
 
         /// <summary>
         /// This method is the entrypoint for the plugin.
         /// </summary>
         public override void Load()
-        {
-            Log.LogInfo($"Plugin is setting up configuration bindings.");
-            OnConfigureBindings();
-
-            Log.LogInfo($"Plugin is loading.");
-            OnBeforePatching();
-
-            Log.LogInfo($"Plugin is patching.");
-            OnPatching();
-
-            Log.LogInfo($"Plugin is loaded.");
-        }
+        { }
 
         /// <summary>
         /// This method is used to setup configuration bindings.
-        /// <br>Set savebindings to true if you want the configuration to be stored in the plugin config file.</br>
         /// </summary>
         public virtual void OnConfigureBindings()
         {
@@ -116,21 +111,6 @@ namespace SOD.Common.BepInEx
             // Do a save once after setting all config
             ConfigBuilder.File.Save();
             ConfigBuilder.File.SaveOnConfigSet = true;
-        }
-
-        /// <summary>
-        /// This method is called right before patching happens.
-        /// </summary>
-        public virtual void OnBeforePatching()
-        { }
-
-        /// <summary>
-        /// This method is called after OnLoading to patch all hooks in the assembly.
-        /// <br>If overrriden you can use the Harmony property to do patching yourself.</br>
-        /// </summary>
-        public virtual void OnPatching()
-        {
-            Harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         /// <summary>

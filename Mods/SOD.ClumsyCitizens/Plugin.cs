@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
+using System.Reflection;
 
 namespace SOD.ClumsyCitizens
 {
@@ -10,5 +11,11 @@ namespace SOD.ClumsyCitizens
         public const string PLUGIN_GUID = "Venomaus.SOD.ClumsyCitizens";
         public const string PLUGIN_NAME = "ClumsyCitizens";
         public const string PLUGIN_VERSION = "1.0.0";
+
+        public override void Load()
+        {
+            Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Log.LogInfo("Plugin is patched.");
+        }
     }
 }
