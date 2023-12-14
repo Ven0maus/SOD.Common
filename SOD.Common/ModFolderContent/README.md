@@ -4,6 +4,7 @@ Contains various extensions and methods to manipulate commonly needed gamedata.
 
 # Features
 **PluginController**
+
 The PluginController provides some basic helper and setup functionalities for your plugin.
 Following methods can be overriden and run in the given sequence:
 
@@ -12,9 +13,11 @@ Following methods can be overriden and run in the given sequence:
 - Unload (Runs when the plugin is unloaded, unpatches self)
 
 **Extensions**
+
 The extensions namespace contains several extensions for things such as logging, enumerables, general quality of life, etc..
 
 **Modelbased configuration**
+
 It is now possible to model your configuration within interfaces,
 to easily access or set configuration in your bepinex config file.
 Here is a quick example:
