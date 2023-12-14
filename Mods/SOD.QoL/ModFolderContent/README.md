@@ -1,4 +1,4 @@
-# SOD.QualityOfLife
+# SOD.QoL
 Adds several quality of life changes to Shadows of Doubt
 
 **Features**

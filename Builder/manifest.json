@@ -13,11 +13,11 @@
     },
     {
       "ProjectParentPath": "Mods",
-      "ProjectName": "SOD.QualityOfLife",
+      "ProjectName": "SOD.QoL",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
       "DLLPaths": [
-        "bin\\Release\\net6.0\\SOD.QualityOfLife.dll"
+        "bin\\Release\\net6.0\\SOD.QoL.dll"
       ],
       "Package": true
     }

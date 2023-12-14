@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.QualityOfLife", "Mods\SOD.QualityOfLife\SOD.QualityOfLife.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.QoL", "Mods\SOD.QoL\SOD.QoL.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.Common", "SOD.Common\SOD.Common.csproj", "{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}"
 EndProject
@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{41E97C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Deployment", "Deployment", "{D6470792-AB41-40B1-B029-4E67A5D91F1C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Builder", "Builder\Builder.csproj", "{093E8556-E4D7-44C9-B428-E80BCAE8BCBC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Builder", "Builder\Builder.csproj", "{093E8556-E4D7-44C9-B428-E80BCAE8BCBC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

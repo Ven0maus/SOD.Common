@@ -1,10 +1,10 @@
 {
-  "name": "Venomaus-SOD.QualityOfLife",
-  "version_number": "1.0.0",
+  "name": "SODQoL",
+  "version_number": "1.0.1",
   "website_url": "",
   "description": "Adds several QoL changes to Shadows of doubt.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SOD.Common-1.0.0"
+    "Venomaus-SODCommon-1.0.0"
   ]
 }

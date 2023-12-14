@@ -2,14 +2,14 @@
 using SOD.Common.BepInEx;
 using System.Reflection;
 
-namespace SOD.QualityOfLife
+namespace SOD.QoL
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
     public class Plugin : PluginController<IPluginBindings>
     {
-        public const string PLUGIN_GUID = "Venomaus.SOD.QualityOfLife";
-        public const string PLUGIN_NAME = "QualityOfLife";
+        public const string PLUGIN_GUID = "Venomaus.SOD.QoL";
+        public const string PLUGIN_NAME = "QoL";
         public const string PLUGIN_VERSION = "1.0.0";
 
         public override void Load()

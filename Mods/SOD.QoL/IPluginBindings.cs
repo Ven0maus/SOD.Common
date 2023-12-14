@@ -1,12 +1,9 @@
 ﻿using SOD.Common.BepInEx.Configuration;
 
-namespace SOD.QualityOfLife
+namespace SOD.QoL
 {
     public interface IPluginBindings
     {
-        [Binding(true, "Test")]
-        bool Test { get; set; }
-
         [Binding(true, "Allow ending conversations with menu key", "QoL.Conversations.CanEndWithMenuKey")]
         bool EndConversationPatch { get; set; }
 

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>SOD.QualityOfLife</AssemblyName>
+    <AssemblyName>SOD.QoL</AssemblyName>
     <Description>Makes the citizens more clumsy.</Description>
     <Version>1.0.0</Version>
     <LangVersion>latest</LangVersion>
@@ -10,7 +10,7 @@
       https://api.nuget.org/v3/index.json;
       https://nuget.bepinex.dev/v3/index.json
     </RestoreAdditionalProjectSources>
-    <RootNamespace>SOD.QualityOfLife</RootNamespace>
+    <RootNamespace>SOD.QoL</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 

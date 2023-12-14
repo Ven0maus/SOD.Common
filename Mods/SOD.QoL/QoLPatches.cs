@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using Rewired;
 
-namespace SOD.QualityOfLife
+namespace SOD.QoL
 {
     public class QoLPatches
     {
