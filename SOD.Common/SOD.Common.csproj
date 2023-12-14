@@ -15,6 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ModFolderContent\Builds\**" />
+    <EmbeddedResource Remove="ModFolderContent\Builds\**" />
+    <None Remove="ModFolderContent\Builds\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="Castle.Core" Version="5.1.1">
       <IncludeAssets></IncludeAssets>
@@ -41,10 +47,6 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="ModFolderContent\Builds\" />
   </ItemGroup>
 
 </Project>
