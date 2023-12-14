@@ -18,6 +18,7 @@ project.lock.json
 [Dd]ebugPublic/
 [Rr]elease/
 [Rr]eleases/
+[Bb]uilds/
 x64/
 x86/
 build/
@@ -27,6 +28,7 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+
 
 # Visual Studio 2015
 .vs/

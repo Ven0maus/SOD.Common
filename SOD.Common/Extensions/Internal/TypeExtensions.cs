@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.Common.Extensions
+namespace SOD.Common.Extensions.Internal
 {
     internal static class TypeExtensions
     {

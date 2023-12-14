@@ -5,7 +5,7 @@ using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
-using SOD.Common.Extensions;
+using SOD.Common.Extensions.Internal;
 using System;
 using System.Linq;
 using System.Reflection;

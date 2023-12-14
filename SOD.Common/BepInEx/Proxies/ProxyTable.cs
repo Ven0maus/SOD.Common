@@ -1,6 +1,6 @@
 ﻿using Castle.DynamicProxy;
 using SOD.Common.BepInEx.Configuration;
-using SOD.Common.Extensions;
+using SOD.Common.Extensions.Internal;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

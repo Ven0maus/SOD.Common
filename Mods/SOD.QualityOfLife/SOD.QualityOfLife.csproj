@@ -19,9 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj">
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </ProjectReference>
+    <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

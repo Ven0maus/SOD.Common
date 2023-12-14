@@ -1,9 +1,23 @@
 # SOD.Common
-A common library for Shadows of Doubt.
+A common library for Shadows of Doubt mods.
 Contains various extensions and methods to manipulate commonly needed gamedata.
 
 # Features
-**Modelbased configuration**
+** PluginController **
+The PluginController provides some basic helper and setup functionalities for your plugin.
+Following methods can be overriden and run in the given sequence:
+
+- Load (EntryPoint)
+- OnConfigureBindings (Runs at constructor level of PluginController, initializing the model based configuration bindings if any exist)
+- Unload (Runs when the plugin is unloaded, unpatches self)
+
+** Extensions **
+The extensions namespace contains several extensions for things such as logging, enumerables, general quality of life, etc..
+
+** Modelbased configuration **
+It is now possible to model your configuration within interfaces,
+to easily access or set configuration in your bepinex config file.
+Here is a quick example:
 ```csharp
 public interface IConfigBindings
 {
@@ -27,18 +41,8 @@ public class Plugin : PluginController<IConfigBindings>
     }
 }
 ```
-You can also combine interfaces:
+You can also combine multiple interfaces:
 ```csharp
 public interface IConfigBindings : ISomeOtherBindings, ISomeMoreBindings
 { }
 ```
-# Base functionality
-The PluginController provides some basic helper and setup functionalities.
-Following methods can be overriden and run in the given sequence:
-
-- Load (EntryPoint)
-- OnConfigureBindings (Runs at constructor level of PluginController, initializing the model based configuration bindings if any)
-- Unload (Runs when the plugin is unloaded, unpatches self)
-
-# UniverseLib
-Comes standard with UniverseLib for assetbundle loading and other IL2CPP goodies.
