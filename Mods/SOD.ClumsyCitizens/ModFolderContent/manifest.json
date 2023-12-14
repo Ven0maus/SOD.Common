@@ -1,9 +1,0 @@
-{
-  "name": "Venomaus-SOD.ClumsyCitizens",
-  "version_number": "1.0.0",
-  "website_url": "",
-  "description": "Gives each citizen a chance to be clumsy.",
-  "dependencies": [
-    "Venomaus-SOD.Common-1.0.0"
-  ]
-}

@@ -1,0 +1,24 @@
+{
+  "Builds": [
+    {
+      "ProjectName": "SOD.Common",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "DLLPaths": [
+        "bin\\Release\\net6.0\\SOD.Common.dll",
+        "bin\\Release\\net6.0\\Castle.Core.dll"
+      ],
+      "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods", // Located in subfolder mods
+      "ProjectName": "SOD.QualityOfLife",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "DLLPaths": [
+        "bin\\Release\\net6.0\\SOD.QualityOfLife.dll"
+      ],
+      "Package": true
+    }
+  ]
+}

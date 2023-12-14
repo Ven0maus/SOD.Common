@@ -32,12 +32,19 @@
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
     </Reference>
+    <Reference Include="Rewired_Core">
+      <HintPath>..\libs\il2cpp\Rewired_Core.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\libs\il2cpp\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ModFolderContent\Builds\" />
   </ItemGroup>
 
 </Project>

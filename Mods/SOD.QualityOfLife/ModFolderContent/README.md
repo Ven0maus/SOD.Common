@@ -1,4 +1,4 @@
-# SOD.ClumsyCitizens
+# SOD.QualityOfLife
 Gives each citizen a chance te be clumsy.
 
 **Features**
