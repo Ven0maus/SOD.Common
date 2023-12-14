@@ -12,6 +12,7 @@
     </RestoreAdditionalProjectSources>
     <RootNamespace>SOD.Common</RootNamespace>
 	<BepInExPath>$(APPDATA)\r2modmanPlus-local\ShadowsofDoubt\profiles\Default\BepInEx\</BepInExPath>
+	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,7 +26,6 @@
     <PackageReference Include="Castle.Core" Version="5.1.1">
       <IncludeAssets></IncludeAssets>
     </PackageReference>
-    <PackageReference Include="UniverseLib.IL2CPP.Interop" Version="1.5.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -47,6 +47,15 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UniverseLib.IL2CPP.Interop">
+      <HintPath>UniverseLib.IL2CPP.Interop.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="UniverseLib.IL2CPP.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

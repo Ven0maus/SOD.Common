@@ -6,7 +6,8 @@
       "DestinationFolderName": "Builds",
       "DLLPaths": [
         "bin\\Release\\net6.0\\SOD.Common.dll",
-        "bin\\Release\\net6.0\\Castle.Core.dll"
+        "bin\\Release\\net6.0\\Castle.Core.dll",
+        "bin\\Release\\net6.0\\UniverseLib.IL2CPP.Interop.dll"
       ],
       "Package": true
     },

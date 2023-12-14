@@ -10,6 +10,11 @@ namespace Builder
     {
         static void Main()
         {
+            Console.Write("Clear all previous builds?(Y/N): ");
+            var reply = Console.ReadLine();
+            bool clearBuilds = reply.Equals("Y", StringComparison.OrdinalIgnoreCase);
+            Console.Clear();
+
             Console.ForegroundColor = ConsoleColor.Cyan;
             var originalColor = Console.ForegroundColor;
 
@@ -44,6 +49,15 @@ namespace Builder
                 var destinationPath = Path.Combine(folderPath, build.DestinationFolderName);
                 if (!Directory.Exists(destinationPath))
                     Directory.CreateDirectory(destinationPath);
+
+                if (clearBuilds)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.WriteLine("Clearing previous build(s).");
+                    Console.ForegroundColor = originalColor;
+                    foreach (var file in Directory.EnumerateFiles(destinationPath))
+                        File.Delete(file);
+                }
 
                 var packageBuilder = new BuildTool.PackageBuilder(build.ProjectName, folderPath, destinationPath);
                 foreach (var dllPath in build.DLLPaths)

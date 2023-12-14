@@ -42,15 +42,13 @@ namespace SOD.Common.BepInEx.Proxies
 
                 var configurationAttribute = info.GetCustomAttribute<BindingAttribute>() ??
                     throw new Exception($"Missing Binding attribute for interface configuration property \"{info.Name}\".");
-                if (configurationAttribute.Name.Trim() == string.Empty)
-                    throw new Exception("Cannot provide an empty or whitespace value for Binding Name. Leave empty for auto generation or specify a valid name.");
 
+                var name = string.IsNullOrWhiteSpace(configurationAttribute.Name) ? $"General.{info.Name}" : configurationAttribute.Name;
                 property.GetMethod = builder =>
                 {
-                    var name = configurationAttribute.Name ?? $"General.{info.Name}";
                     if (!builder.ExistsInternal(name, out var entryBase))
                     {
-                        SetByType(info, type, builder, configurationAttribute, configurationAttribute.DefaultValue);
+                        SetByType(info, type, builder, configurationAttribute, name, configurationAttribute.DefaultValue);
                         builder.ExistsInternal(name, out entryBase);
                         return entryBase.BoxedValue;
                     }
@@ -58,15 +56,13 @@ namespace SOD.Common.BepInEx.Proxies
                 };
                 property.SetMethod = (builder, value) =>
                 {
-                    SetByType(info, type, builder, configurationAttribute, value);
+                    SetByType(info, type, builder, configurationAttribute, name, value);
                 };
             });
         }
 
-        private static void SetByType(PropertyInfo info, Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, object value)
+        private static void SetByType(PropertyInfo info, Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, string name, object value)
         {
-            var name = configurationAttribute.Name ?? $"General.{info.Name}";
-
             // Supported types by BepInEx config file:
             /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal, enum */
             if (type == typeof(string))
