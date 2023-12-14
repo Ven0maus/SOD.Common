@@ -1,5 +1,6 @@
 # SOD.QualityOfLife
-Gives each citizen a chance te be clumsy.
+Adds several quality of life changes to Shadows of Doubt
 
 **Features**
-- Chance to forget to lock door after closing it when its suppose to be locked.
+- Automatically unpause the game after closing the main menu using the menu key (ESC by default)
+- You are able to end a conversation with a citizen using the menu key (ESC by default)
