@@ -1,6 +1,6 @@
 ﻿namespace SOD.Common.Shadows.Implementations
 {
-    public class GameMessage
+    public sealed class GameMessage
     {
         /// <summary>
         /// Broadcasts a message to be shown on the screen.
@@ -10,7 +10,7 @@
         /// <param name="icon"></param>
         /// <param name="color"></param>
         /// <param name="delay"></param>
-        public static void Broadcast(string message, InterfaceController.GameMessageType messageType = InterfaceController.GameMessageType.notification, InterfaceControls.Icon icon = InterfaceControls.Icon.empty, UnityEngine.Color? color = null, float delay = 0f)
+        public void Broadcast(string message, InterfaceController.GameMessageType messageType = InterfaceController.GameMessageType.notification, InterfaceControls.Icon icon = InterfaceControls.Icon.empty, UnityEngine.Color? color = null, float delay = 0f)
         {
             if (color == null)
                 color = InterfaceControls.Instance.messageRed;
