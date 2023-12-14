@@ -1,10 +1,12 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
 using SOD.Common.Extensions;
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -30,22 +32,31 @@ namespace SOD.Common.BepInEx
         where T : class
     {
         /// <summary>
-        /// A harmony instance
+        /// Provides an instance implementation for the current plugin.
         /// </summary>
-        protected Harmony Harmony { get; }
+        public static PluginController<T> Instance { get; private set; }
         /// <summary>
-        /// A model based configuration implementation
+        /// A model based configuration implementation.
+        /// <br>The config file can be accessed through the property <see cref="ConfigFile"/>.</br>
         /// </summary>
-        protected new T Config { get; }
+        public new T Config { get; }
         /// <summary>
-        /// A builder for configuration, the original BepInEx config can be accessed on the ConfigBuilder.File property.
+        /// The original configuration implementation provided by BepInEx.
         /// </summary>
-        protected ConfigBuilder ConfigBuilder { get; }
-
+        public ConfigFile ConfigFile { get { return ConfigBuilder.File; } }
         /// <summary>
         /// Static log source
         /// </summary>
         public new static ManualLogSource Log { get; private set; }
+
+        /// <summary>
+        /// A harmony instance
+        /// </summary>
+        protected Harmony Harmony { get; }
+        /// <summary>
+        /// A builder for configuration, the original BepInEx config can be accessed on the ConfigBuilder.File property.
+        /// </summary>
+        protected ConfigBuilder ConfigBuilder { get; }
 
         private string _pluginGUID;
         private string PluginGUID
@@ -64,6 +75,10 @@ namespace SOD.Common.BepInEx
 
         public PluginController()
         {
+            if (Instance != null)
+                throw new Exception("A PluginController instance already exist.");
+
+            Instance = this;
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
             Config = ConfigurationProxy<T>.Create(ConfigBuilder);
@@ -75,16 +90,16 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public override void Load()
         {
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is setting up configuration bindings.");
+            Log.LogInfo($"Plugin is setting up configuration bindings.");
             OnConfigureBindings();
 
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is loading.");
+            Log.LogInfo($"Plugin is loading.");
             OnBeforePatching();
 
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is patching.");
+            Log.LogInfo($"Plugin is patching.");
             OnPatching();
 
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is loaded.");
+            Log.LogInfo($"Plugin is loaded.");
         }
 
         /// <summary>
@@ -125,7 +140,7 @@ namespace SOD.Common.BepInEx
         public override bool Unload()
         {
             Harmony.UnpatchSelf();
-            Log.LogInfo($"Plugin \"{PluginGUID}\" is unloaded.");
+            Log.LogInfo($"Plugin is unloaded.");
             return true;
         }
     }

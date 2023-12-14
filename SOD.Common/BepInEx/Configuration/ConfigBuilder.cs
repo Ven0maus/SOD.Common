@@ -1,6 +1,7 @@
 ﻿using BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Common.BepInEx.Configuration
 {
@@ -180,9 +181,26 @@ namespace SOD.Common.BepInEx.Configuration
         private static (string section, string key) SplitIdentifier(string identifier)
         {
             var parts = identifier.Split('.');
-            if (parts.Length != 2)
-                throw new Exception($"Invalid configuration identifier \"{identifier}\" provided.");
-            return (parts[0], parts[1]);
+            if (parts.Length < 2 || parts.Any(string.IsNullOrWhiteSpace))
+                throw new Exception($"Invalid configuration identifier format \"{identifier}\" provided, must be in format \"section.propertyName\".");
+
+            // Support for identifiers such as "General.Sub.PropertyName"
+            // If we have more than two parts, we concat all parts together except the last to use as the section
+            string section = null;
+            if (parts.Length > 2)
+            {
+                for (int i=0; i < parts.Length - 1; i++)
+                {
+                    section += parts[i];
+                    if (i < parts.Length - 2)
+                        section += ".";
+                }
+            }
+            else
+            {
+                section = parts[0];
+            }
+            return (section, parts.Last());
         }
     }
 }
