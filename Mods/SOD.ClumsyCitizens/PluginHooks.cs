@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using SOD.Common.Extensions;
 using System;
 
 namespace SOD.ClumsyCitizens
@@ -17,10 +16,8 @@ namespace SOD.ClumsyCitizens
             private static Type Class { get { return _class ??= typeof(NewDoor_OnClose); } }
 
             [HarmonyPrefix]
-            public static void Prefix(Actor actor, NewDoor __instance)
+            public static void Prefix(NewDoor __instance, Actor actor)
             {
-                Plugin.Log.LogMethodEntry(Class, nameof(Prefix));
-
                 // If the door is suppose to be locked behind, have an opportunity to be clumsy
                 if (!__instance.isLocked && __instance.preset.armLockOnClose)
                 {
@@ -35,15 +32,11 @@ namespace SOD.ClumsyCitizens
                         Plugin.Log.LogInfo($"Left door({__instance.GetInstanceID()}) unlocked.");
                     }
                 }
-
-                Plugin.Log.LogMethodExit(Class, nameof(Prefix));
             }
 
             [HarmonyPostfix]
-            public static void Postfix(Actor actor, NewDoor __instance)
+            public static void Postfix(NewDoor __instance, Actor actor)
             {
-                Plugin.Log.LogMethodEntry(Class, nameof(Postfix));
-
                 if (_hasAdjusted)
                 {
                     // Reset previous state
@@ -54,8 +47,6 @@ namespace SOD.ClumsyCitizens
                     _lockInteractableRear = null;
                     Plugin.Log.LogInfo($"Door locked state after postfix: " + (__instance.isLocked ? "locked" : "unlocked"));
                 }
-
-                Plugin.Log.LogMethodExit(Class, nameof(Postfix));
             }
         }
     }
