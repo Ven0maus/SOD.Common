@@ -11,7 +11,7 @@
       "Package": true
     },
     {
-      "ProjectParentPath": "Mods", // Located in subfolder mods
+      "ProjectParentPath": "Mods",
       "ProjectName": "SOD.QualityOfLife",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
