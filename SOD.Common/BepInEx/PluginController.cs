@@ -12,6 +12,9 @@ using System.Reflection;
 
 namespace SOD.Common.BepInEx
 {
+    /// <summary>
+    /// Placeholder interface for an empty bindings implementation
+    /// </summary>
     public interface IEmptyBindings 
     { }
 
@@ -20,8 +23,13 @@ namespace SOD.Common.BepInEx
     /// </summary>
     public abstract class PluginController : PluginController<IEmptyBindings>
     {
-        // Since this class uses no bindings, there is no need to init the proxy
-        public override void OnConfigureBindings() { }
+        /// <summary>
+        /// The original configuration implementation provided by BepInEx.
+        /// </summary>
+        public new ConfigFile Config { get { return base.ConfigFile; } }
+
+        [Obsolete("This property is unused for this implementation, use \"Config\" property instead.", true)]
+        public new ConfigFile ConfigFile { get { return base.ConfigFile; } }
     }
 
     /// <summary>
@@ -81,12 +89,12 @@ namespace SOD.Common.BepInEx
             Instance = this;
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
-            Config = ConfigurationProxy<T>.Create(ConfigBuilder);
             Harmony = new Harmony(PluginGUID);
 
             // There is no point in setting up empty bindings
             if (typeof(T) != typeof(IEmptyBindings))
             {
+                Config = ConfigurationProxy<T>.Create(ConfigBuilder);
                 Log.LogInfo($"Setting up configuration bindings.");
                 OnConfigureBindings();
             }
