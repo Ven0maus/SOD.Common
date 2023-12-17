@@ -33,7 +33,7 @@ namespace Builder
                     continue;
                 }
 
-                var solutionDirectory = TryGetSolutionDirectoryInfo() ?? 
+                var solutionDirectory = TryGetSolutionDirectoryInfo() ??
                     throw new Exception("Unable to find solution directory.");
 
                 // Get paths based on solution folder and project name

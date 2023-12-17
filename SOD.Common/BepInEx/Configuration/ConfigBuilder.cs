@@ -189,7 +189,7 @@ namespace SOD.Common.BepInEx.Configuration
             string section = null;
             if (parts.Length > 2)
             {
-                for (int i=0; i < parts.Length - 1; i++)
+                for (int i = 0; i < parts.Length - 1; i++)
                 {
                     section += parts[i];
                     if (i < parts.Length - 2)

@@ -6,7 +6,7 @@ namespace SOD.QoL
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
-    public class Plugin : PluginController<IPluginBindings>
+    public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.QoL";
         public const string PLUGIN_NAME = "QoL";

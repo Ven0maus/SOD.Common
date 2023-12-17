@@ -1,59 +1,19 @@
 ﻿using HarmonyLib;
-using Rewired;
-using System;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace SOD.QoL
+namespace SOD.QoL.Patches
 {
-    public class QoLPatches
+    internal class MapPatches
     {
-        [HarmonyPatch(typeof(InputController), nameof(InputController.Update))]
-        public class InputController_Update
-        {
-            // Some minor improvements for ways to exit menu and conversations
-
-            [HarmonyPrefix]
-            public static bool Prefix(InputController __instance)
-            {
-                if (!Plugin.Instance.Config.EndConversationPatch && !Plugin.Instance.Config.UnpauseGameOnMainMenuExit) return true;
-                if (!__instance.enabled || !ReInput.isReady) return true;
-
-                if (__instance.player != null && __instance.player.GetButtonDown("Menu"))
-                {
-                    // This allows ending conversations with the menu key
-                    if (Plugin.Instance.Config.EndConversationPatch &&
-                        SessionData.Instance.startedGame && SessionData.Instance.play && !MainMenuController.Instance.mainMenuActive)
-                    {
-                        if (Player.Instance.interactingWith != null)
-                        {
-                            ActionController.Instance.Return(null, null, Player.Instance);
-                            return false;
-                        }
-                    }
-
-                    // This fixes the fact that the game is still paused after you exit the menu with the menu key
-                    if (Plugin.Instance.Config.UnpauseGameOnMainMenuExit &&
-                        SessionData.Instance.startedGame && !SessionData.Instance.play && MainMenuController.Instance.mainMenuActive &&
-                        (CityConstructor.Instance == null || !CityConstructor.Instance.preSimActive))
-                    {
-                        SessionData.Instance.ResumeGame();
-                        MainMenuController.Instance.EnableMainMenu(false, true, true, MainMenuController.Component.mainMenuButtons);
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-
         [HarmonyPatch(typeof(MapController), nameof(MapController.Setup))]
-        public class MapController_Setup
+        internal class MapController_Setup
         {
             // Changes the player color and size to be more visible on the map also zooms out entirely as default
 
             [HarmonyPrefix]
-            public static void Prefix()
+            internal static void Prefix()
             {
                 // Set marker color
                 if (Plugin.Instance.Config.ChangePlayerMarkerColor)
@@ -71,7 +31,7 @@ namespace SOD.QoL
             }
 
             [HarmonyPostfix]
-            public static void Postfix(MapController __instance)
+            internal static void Postfix(MapController __instance)
             {
                 if (!Plugin.Instance.Config.ZoomOutOnStart) return;
 
@@ -126,14 +86,14 @@ namespace SOD.QoL
         }
 
         [HarmonyPatch(typeof(MapController), nameof(MapController.CentreOnObject))]
-        public class MapController_CentreOnObject
+        internal class MapController_CentreOnObject
         {
             // When zooming and moving around the camera, then centering on an object the camera doesn't move properly, this fixes that.
 
             private static bool _calledBefore = false;
 
             [HarmonyPostfix]
-            public static void Postfix(MapController __instance, RectTransform mapObj, bool instant, bool showPointer)
+            internal static void Postfix(MapController __instance, RectTransform mapObj, bool instant, bool showPointer)
             {
                 if (!Plugin.Instance.Config.FixCenterOnPlayer) return;
                 if (_calledBefore)

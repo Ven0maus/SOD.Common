@@ -20,6 +20,16 @@
         "bin\\Release\\net6.0\\SOD.QoL.dll"
       ],
       "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods",
+      "ProjectName": "SOD.StockMarket",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "DLLPaths": [
+        "bin\\Release\\net6.0\\SOD.StockMarket.dll"
+      ],
+      "Package": true
     }
   ]
 }

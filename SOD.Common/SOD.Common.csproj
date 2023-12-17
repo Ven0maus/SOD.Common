@@ -16,16 +16,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ModFolderContent\Builds\**" />
-    <EmbeddedResource Remove="ModFolderContent\Builds\**" />
-    <None Remove="ModFolderContent\Builds\**" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
-    <PackageReference Include="Castle.Core" Version="5.1.1">
-      <IncludeAssets></IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Castle.Core" Version="5.1.1" />
+	<Compile Remove="ModFolderContent\Builds\**" />
+	<EmbeddedResource Remove="ModFolderContent\Builds\**" />
+	<None Remove="ModFolderContent\Builds\**" />
+	<None Update="UniverseLib.IL2CPP.Interop.dll">
+		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	</None>
   </ItemGroup>
 
   <ItemGroup>
@@ -56,12 +54,6 @@
     <Reference Include="UniverseLib.IL2CPP.Interop">
       <HintPath>UniverseLib.IL2CPP.Interop.dll</HintPath>
     </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="UniverseLib.IL2CPP.Interop.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

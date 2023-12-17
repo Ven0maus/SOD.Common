@@ -15,13 +15,14 @@ namespace SOD.Common.BepInEx
     /// <summary>
     /// Placeholder interface for an empty bindings implementation
     /// </summary>
-    public interface IEmptyBindings 
+    public interface IEmptyBindings
     { }
 
     /// <summary>
     /// Base plugin controller with no configuration bindings
     /// </summary>
-    public abstract class PluginController : PluginController<IEmptyBindings>
+    public abstract class PluginController<TImpl> : PluginController<TImpl, IEmptyBindings>
+        where TImpl : PluginController<TImpl>
     {
         /// <summary>
         /// The original configuration implementation provided by BepInEx.
@@ -36,18 +37,19 @@ namespace SOD.Common.BepInEx
     /// Base plugin controller with custom configuration bindings
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public abstract class PluginController<T> : BasePlugin
-        where T : class
+    public abstract class PluginController<TImpl, TBindings> : BasePlugin
+        where TImpl : PluginController<TImpl, TBindings>
+        where TBindings : class
     {
         /// <summary>
         /// Provides an instance implementation for the current plugin.
         /// </summary>
-        public static PluginController<T> Instance { get; private set; }
+        public static TImpl Instance { get; private set; }
         /// <summary>
         /// A model based configuration implementation.
         /// <br>The config file can be accessed through the property <see cref="ConfigFile"/>.</br>
         /// </summary>
-        public new T Config { get; }
+        public new TBindings Config { get; }
         /// <summary>
         /// The original configuration implementation provided by BepInEx.
         /// </summary>
@@ -86,15 +88,15 @@ namespace SOD.Common.BepInEx
             if (Instance != null)
                 throw new Exception("A PluginController instance already exist.");
 
-            Instance = this;
+            Instance = (TImpl)this;
             Log = base.Log;
             ConfigBuilder = new ConfigBuilder(base.Config);
             Harmony = new Harmony(PluginGUID);
 
             // There is no point in setting up empty bindings
-            if (typeof(T) != typeof(IEmptyBindings))
+            if (typeof(TBindings) != typeof(IEmptyBindings))
             {
-                Config = ConfigurationProxy<T>.Create(ConfigBuilder);
+                Config = ConfigurationProxy<TBindings>.Create(ConfigBuilder);
                 Log.LogInfo($"Setting up configuration bindings.");
                 OnConfigureBindings();
             }
@@ -146,7 +148,7 @@ namespace SOD.Common.BepInEx
             }
             catch (Exception ex)
             {
-                Plugin.Log.LogError($"[Binding({info.Name})]: {ex.Message}");
+                Log.LogError($"[Binding({info.Name})]: {ex.Message}");
                 return true;
             }
             return false;
