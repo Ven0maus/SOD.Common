@@ -47,6 +47,12 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\libs\il2cpp\UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>..\libs\il2cpp\UnityEngine.UIModule.dll</HintPath>
+    </Reference>
     <Reference Include="UniverseLib.IL2CPP.Interop">
       <HintPath>UniverseLib.IL2CPP.Interop.dll</HintPath>
     </Reference>

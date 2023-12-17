@@ -3,7 +3,7 @@ A common library for Shadows of Doubt mods.
 Contains various extensions and methods to manipulate commonly needed gamedata.
 
 # Features
-** PluginController **
+**PluginController**
 The PluginController provides some basic helper and setup functionalities for your plugin.
 Following methods can be overriden and run in the given sequence:
 
@@ -11,10 +11,10 @@ Following methods can be overriden and run in the given sequence:
 - OnConfigureBindings (Runs at constructor level of PluginController, initializing the model based configuration bindings if any exist)
 - Unload (Runs when the plugin is unloaded, unpatches self)
 
-** Extensions **
+**Extensions**
 The extensions namespace contains several extensions for things such as logging, enumerables, general quality of life, etc..
 
-** Modelbased configuration **
+**Modelbased configuration**
 It is now possible to model your configuration within interfaces,
 to easily access or set configuration in your bepinex config file.
 Here is a quick example:
