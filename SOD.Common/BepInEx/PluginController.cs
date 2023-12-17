@@ -114,8 +114,14 @@ namespace SOD.Common.BepInEx
             ConfigBuilder.File.SaveOnConfigSet = false;
             // This accesses the proxy of each property which binds the configuration of that property
             var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
+            bool issuesDuringBindingValidation = false;
             foreach (var property in properties)
-                _ = property.GetValue(Config);
+            {
+                if (OnValidateBinding(property))
+                    issuesDuringBindingValidation = true;
+            }
+            if (issuesDuringBindingValidation)
+                throw new Exception("Invalid binding configuration.");
             // Do a save once after setting all config
             ConfigBuilder.File.Save();
             ConfigBuilder.File.SaveOnConfigSet = true;
@@ -130,6 +136,20 @@ namespace SOD.Common.BepInEx
             Harmony.UnpatchSelf();
             Log.LogInfo($"Plugin is unloaded.");
             return true;
+        }
+
+        private bool OnValidateBinding(PropertyInfo info)
+        {
+            try
+            {
+                _ = info.GetValue(Config);
+            }
+            catch (Exception ex)
+            {
+                Plugin.Log.LogError($"[Binding({info.Name})]: {ex.Message}");
+                return true;
+            }
+            return false;
         }
     }
 }

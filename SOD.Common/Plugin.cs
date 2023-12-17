@@ -8,7 +8,7 @@ namespace SOD.Common
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.Common";
         public const string PLUGIN_NAME = "SOD.Common";
-        public const string PLUGIN_VERSION = "1.0.2";
+        public const string PLUGIN_VERSION = "1.0.3";
 
         public override void Load()
         {

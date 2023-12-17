@@ -1,10 +1,10 @@
 {
   "name": "SODQoL",
-  "version_number": "1.0.2",
+  "version_number": "1.0.3",
   "website_url": "https://github.com/Ven0maus/ShadowsOfDoubtMods/tree/main/Mods/SOD.QoL",
-  "description": "Adds several QoL changes to Shadows of doubt.",
+  "description": "Adds several Quality of Life changes to Shadows of doubt.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.0.1"
+    "Venomaus-SODCommon-1.0.3"
   ]
 }
