@@ -163,6 +163,10 @@ namespace SOD.Common.BepInEx.Proxies
                 else
                     builder.Set(name, (Enum)value);
             }
+            else
+            {
+                throw new Exception($"Configuration type {type.Name} is not supported by BepInEx.");
+            }
         }
     }
 }

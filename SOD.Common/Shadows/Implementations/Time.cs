@@ -30,6 +30,9 @@ namespace SOD.Common.Shadows.Implementations
         /// </summary>
         public event EventHandler<TimeChangedArgs> OnYearChanged;
 
+        private float? _currentGameTime;
+        private TimeData? _currentTimeData;
+
         /// <summary>
         /// Returns the current in game date and time.
         /// </summary>
@@ -37,8 +40,15 @@ namespace SOD.Common.Shadows.Implementations
         {
             get
             {
-                return GetTimeInfo() ?? 
+                if (!IsInitialized)
                     throw new Exception("Time is not initialized at this state of the game, check for the property \"Lib.Time.IsInitialized\".");
+
+                if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
+                {
+                    _currentGameTime = SessionData.Instance.gameTime;
+                    _currentTimeData = GetTimeInfo();
+                }
+                return _currentTimeData.Value;
             }
         }
 
@@ -156,7 +166,6 @@ namespace SOD.Common.Shadows.Implementations
                 }
             }
 
-
             public TimeData(int year, int month, int day, int hour, int minute)
             {
                 Year = year;
@@ -205,17 +214,30 @@ namespace SOD.Common.Shadows.Implementations
                 return !(left == right);
             }
         }
+    }
 
-        public sealed class TimeChangedArgs : EventArgs
+    /// <summary>
+    /// EventArgs for Lib.Time
+    /// </summary>
+    public sealed class TimeChangedArgs : EventArgs
+    {
+        public Time.TimeData Previous { get; }
+        public Time.TimeData Current { get; }
+        public bool IsMinuteChanged { get; }
+        public bool IsHourChanged { get; }
+        public bool IsDayChanged { get; }
+        public bool IsMonthChanged { get; }
+        public bool IsYearChanged { get; }
+
+        internal TimeChangedArgs(Time.TimeData previous, Time.TimeData current)
         {
-            public TimeData Previous { get; }
-            public TimeData Current { get; }
-
-            internal TimeChangedArgs(TimeData previous, TimeData current)
-            {
-                Previous = previous;
-                Current = current;
-            }
+            Previous = previous;
+            Current = current;
+            IsMinuteChanged = previous.Minute != current.Minute;
+            IsHourChanged = previous.Hour != current.Hour;
+            IsDayChanged = previous.Day != current.Day;
+            IsMonthChanged = previous.Month != current.Month;
+            IsYearChanged = previous.Year != current.Year;
         }
     }
 }
