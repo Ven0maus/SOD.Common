@@ -46,7 +46,26 @@ namespace SOD.Common.Shadows.Implementations
                 if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
                 {
                     _currentGameTime = SessionData.Instance.gameTime;
-                    _currentTimeData = GetTimeInfo();
+                    _currentTimeData = GetTimeInfo(false);
+                }
+                return _currentTimeData.Value;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current in game date. (no time included)
+        /// </summary>
+        public TimeData CurrentDate
+        {
+            get
+            {
+                if (!IsInitialized)
+                    throw new Exception("Time is not initialized at this state of the game, check for the property \"Lib.Time.IsInitialized\".");
+
+                if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
+                {
+                    _currentGameTime = SessionData.Instance.gameTime;
+                    _currentTimeData = GetTimeInfo(true);
                 }
                 return _currentTimeData.Value;
             }
@@ -77,7 +96,7 @@ namespace SOD.Common.Shadows.Implementations
         /// <summary>
         /// Updates the current game time information, if the game is in a playing state.
         /// </summary>
-        private TimeData? GetTimeInfo()
+        private TimeData? GetTimeInfo(bool onlyDate)
         {
             if (!IsInitialized) return null;
 
@@ -125,7 +144,9 @@ namespace SOD.Common.Shadows.Implementations
             day++;
 
             // Set information
-            return new TimeData(year, month, day, hourInt, minute);
+            return onlyDate ? 
+                new TimeData(year, month, day, 0, 0) :
+                new TimeData(year, month, day, hourInt, minute);
         }
 
         internal void OnTimeChanged(TimeData previous, TimeData current)
@@ -212,6 +233,14 @@ namespace SOD.Common.Shadows.Implementations
             public static bool operator !=(TimeData left, TimeData right)
             {
                 return !(left == right);
+            }
+
+            public static TimeSpan operator -(TimeData left, TimeData right)
+            {
+                var dateLeft = new DateTime(left.Year, left.Month, left.Day, left.Hour, left.Minute, 0);
+                var dateRight = new DateTime(right.Year, right.Month, right.Day, right.Hour, right.Minute, 0);
+                var diff = dateLeft - dateRight;
+                return diff;
             }
         }
     }
