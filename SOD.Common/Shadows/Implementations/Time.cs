@@ -46,7 +46,7 @@ namespace SOD.Common.Shadows.Implementations
                 if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
                 {
                     _currentGameTime = SessionData.Instance.gameTime;
-                    _currentTimeData = GetTimeInfo(false);
+                    GetGameTimeInfo(out _currentTimeData, out _currentDateData);
                 }
                 return _currentTimeData.Value;
             }
@@ -65,7 +65,7 @@ namespace SOD.Common.Shadows.Implementations
                 if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
                 {
                     _currentGameTime = SessionData.Instance.gameTime;
-                    _currentDateData = GetTimeInfo(true);
+                    GetGameTimeInfo(out _currentTimeData, out _currentDateData);
                 }
                 return _currentDateData.Value;
             }
@@ -96,13 +96,11 @@ namespace SOD.Common.Shadows.Implementations
         /// <summary>
         /// Updates the current game time information, if the game is in a playing state.
         /// </summary>
-        private TimeData? GetTimeInfo(bool onlyDate)
+        private static void GetGameTimeInfo(out TimeData? dateTime, out TimeData? date)
         {
-            if (!IsInitialized) return null;
-
             var hour = SessionData.Instance.gameTime;
             var session = SessionData.Instance;
-            var date = 0;
+            var dateNr = 0;
             var leapCycleOut = GameplayControls.Instance.yearZeroLeapYearCycle;
             var day = GameplayControls.Instance.dayZero;
             var month = 0;
@@ -111,7 +109,7 @@ namespace SOD.Common.Shadows.Implementations
             {
                 hour -= 24;
                 day++;
-                date++;
+                dateNr++;
                 if (day >= 7)
                 {
                     day -= 7;
@@ -121,9 +119,9 @@ namespace SOD.Common.Shadows.Implementations
                 {
                     num++;
                 }
-                if (date >= num)
+                if (dateNr >= num)
                 {
-                    date -= num;
+                    dateNr -= num;
                     month++;
                     if (month >= 12)
                     {
@@ -143,10 +141,9 @@ namespace SOD.Common.Shadows.Implementations
             month++;
             day++;
 
-            // Set information
-            return onlyDate ? 
-                new TimeData(year, month, day, 0, 0) :
-                new TimeData(year, month, day, hourInt, minute);
+            // Set datetime structs
+            date = new TimeData(year, month, day, 0, 0);
+            dateTime = new TimeData(year, month, day, hourInt, minute);
         }
 
         internal void OnTimeChanged(TimeData previous, TimeData current)
@@ -223,6 +220,13 @@ namespace SOD.Common.Shadows.Implementations
             public override bool Equals(object obj)
             {
                 return obj is TimeData data && Equals(data);
+            }
+
+            public TimeData AddDays(int days)
+            {
+                DateTime currentDateTime = new(Year, Month, Day, Hour, Minute, 0);
+                DateTime newDateTime = currentDateTime.AddDays(days);
+                return new TimeData(newDateTime.Year, newDateTime.Month, newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
             }
 
             public static bool operator ==(TimeData left, TimeData right)
