@@ -48,7 +48,7 @@ namespace SOD.Common.BepInEx.Proxies
                 {
                     if (!builder.ExistsInternal(name, out var entryBase))
                     {
-                        SetByType(info, type, builder, configurationAttribute, name, configurationAttribute.DefaultValue);
+                        SetByType(type, builder, configurationAttribute, name, configurationAttribute.DefaultValue);
                         builder.ExistsInternal(name, out entryBase);
                         return entryBase.BoxedValue;
                     }
@@ -56,12 +56,12 @@ namespace SOD.Common.BepInEx.Proxies
                 };
                 property.SetMethod = (builder, value) =>
                 {
-                    SetByType(info, type, builder, configurationAttribute, name, value);
+                    SetByType(type, builder, configurationAttribute, name, value);
                 };
             });
         }
 
-        private static void SetByType(PropertyInfo info, Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, string name, object value)
+        private static void SetByType(Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, string name, object value)
         {
             // Supported types by BepInEx config file:
             /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal, enum */

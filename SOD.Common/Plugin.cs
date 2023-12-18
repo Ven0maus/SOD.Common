@@ -21,6 +21,7 @@ namespace SOD.Common
 
             // Apply patches
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Plugin.Log.LogInfo("Plugin is patched.");
         }
     }
 }
