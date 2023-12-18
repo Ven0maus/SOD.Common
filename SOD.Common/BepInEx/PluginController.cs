@@ -94,9 +94,9 @@ namespace SOD.Common.BepInEx
             Harmony = new Harmony(PluginGUID);
 
             // There is no point in setting up empty bindings
-            var bindingsType = typeof(TBindings);
-            var properties = bindingsType.GetProperties();
-            if (properties.Length > 0)
+            var bindingsType = typeof(TBindings).ExpandInheritedInterfaces();
+            var properties = bindingsType.SelectMany(a => a.GetProperties());
+            if (properties.Any())
             {
                 Config = ConfigurationProxy<TBindings>.Create(ConfigBuilder);
                 Log.LogInfo($"Setting up configuration bindings.");
