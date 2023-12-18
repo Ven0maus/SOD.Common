@@ -31,7 +31,7 @@ namespace SOD.StockMarket
         [Binding(10, "The maximum amount of trends that can be ongoing at once. (-1 for unlimited)", "StockMarket.Economy.MaxTrends")]
         int MaxTrends { get; set; }
 
-        [Binding(12, "The maximum amount of hours a trend can persist until its completed. (MIN 1)", "StockMarket.Economy.MaxHoursTrendsCanPersist")]
+        [Binding(8, "The maximum amount of hours a trend can persist until its completed. (MIN 1)", "StockMarket.Economy.MaxHoursTrendsCanPersist")]
         int MaxHoursTrendsCanPersist { get; set; }
 
         [Binding(1, "The minimum amount of hours a trend must persist until its completed. (MIN 1)", "StockMarket.Economy.MinHoursTrendsMustPersist")]
