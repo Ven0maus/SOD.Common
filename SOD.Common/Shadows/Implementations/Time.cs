@@ -31,7 +31,7 @@ namespace SOD.Common.Shadows.Implementations
         public event EventHandler<TimeChangedArgs> OnYearChanged;
 
         private float? _currentGameTime;
-        private TimeData? _currentTimeData;
+        private TimeData? _currentTimeData, _currentDateData;
 
         /// <summary>
         /// Returns the current in game date and time.
@@ -65,9 +65,9 @@ namespace SOD.Common.Shadows.Implementations
                 if (_currentGameTime == null || !_currentGameTime.Value.Equals(SessionData.Instance.gameTime))
                 {
                     _currentGameTime = SessionData.Instance.gameTime;
-                    _currentTimeData = GetTimeInfo(true);
+                    _currentDateData = GetTimeInfo(true);
                 }
-                return _currentTimeData.Value;
+                return _currentDateData.Value;
             }
         }
 
