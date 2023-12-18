@@ -32,7 +32,7 @@ public interface IConfigBindings
 
 [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
 [BepInDependency("Venomaus.SOD.Common")]
-public class Plugin : PluginController<IConfigBindings>
+public class Plugin : PluginController<Plugin, IConfigBindings>
 {
     public override void Load()
     {

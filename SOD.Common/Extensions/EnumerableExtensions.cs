@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Common.Extensions
 {
@@ -28,12 +29,29 @@ namespace SOD.Common.Extensions
             }
         }
 
+        /// <summary>
+        /// Convert to an IL2CPP list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="enumerable"></param>
+        /// <returns></returns>
         public static Il2CppSystem.Collections.Generic.List<T> ToListIL2Cpp<T>(IEnumerable<T> enumerable)
         {
             var list = new Il2CppSystem.Collections.Generic.List<T>();
             foreach (var value in enumerable)
                 list.Add(value);
             return list;
+        }
+
+        /// <summary>
+        /// Convert to a regular list
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(this Il2CppSystem.Collections.Generic.List<T> list)
+        {
+            return list.Select(a => a).ToList();
         }
     }
 }

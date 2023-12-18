@@ -1,4 +1,9 @@
 # CHANGELOG
+**1.0.4**
+- Renamed Common class to Lib to make it easier to access the helper classes.
+- Added Time helper class to Lib which contains ways to retrieve the current game time, and adds several events when the time changes.
+- PluginController Instance now returns the actual class itself by using PluginController<TImpl, TBindings> where TImpl is your Plugin class.
+
 **1.0.3**
 - Added validation messages for each binding when it is initialized incase something went wrong.
 
