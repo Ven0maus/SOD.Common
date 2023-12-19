@@ -37,10 +37,10 @@ namespace SOD.StockMarket
         [Binding(1, "The minimum amount of hours a trend must persist until its completed. (MIN 1)", "StockMarket.Economy.MinHoursTrendsMustPersist")]
         int MinHoursTrendsMustPersist { get; set; }
 
-        [Binding(0.15, "The price fluctuation percentage that could happen for a stock, if there is no trend ongoing.", "StockMarket.Economy.PriceFluctuationPercentage")]
+        [Binding(0.35, "The price fluctuation percentage that could happen for a stock, if there is no trend ongoing.", "StockMarket.Economy.PriceFluctuationPercentage")]
         double PriceFluctuationPercentage { get; set; }
 
-        [Binding(30, "The amount of days the historical data should be kept per stock.", "StockMarket.Economy.DaysToKeepStockHistoricalData")]
+        [Binding(14, "The amount of days the historical data should be kept per stock.", "StockMarket.Economy.DaysToKeepStockHistoricalData")]
         int DaysToKeepStockHistoricalData { get; set; }
     }
 }

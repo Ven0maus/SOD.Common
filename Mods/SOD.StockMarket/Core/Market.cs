@@ -183,8 +183,9 @@ namespace SOD.StockMarket.Core
         {
             var customCompanies = new (CompanyData data, decimal? basePrice)[] 
             {
-                (new CompanyData("Starch Kola", "STK"), (decimal)Toolbox.Instance.Rand(5000f, 10000f, true)),
-                (new CompanyData("Kaizen", "KAI"), (decimal)Toolbox.Instance.Rand(2000f, 5000f, true))
+                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Toolbox.Instance.Rand(5000f, 10000f, true)),
+                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Toolbox.Instance.Rand(2000f, 5000f, true)),
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Toolbox.Instance.Rand(0.85f, 1.25f, true))
             };
             foreach (var (data, basePrice) in customCompanies)
                 AddStock(new Stock(data, basePrice));
@@ -201,7 +202,7 @@ namespace SOD.StockMarket.Core
             foreach (var stock in _stocks)
             {
                 StockData previous = null;
-                for (int i = totalDays; i >= totalDays; i--)
+                for (int i = totalDays; i >= 0; i--)
                 {
                     var newDate = currentDate.AddDays(-i);
                     var newStockData = new StockData
@@ -209,13 +210,30 @@ namespace SOD.StockMarket.Core
                         Date = newDate,
                         Open = previous?.Close ?? stock.Price
                     };
-                    newStockData.Close = newStockData.Open + newStockData.Open / 100m * Helpers.Random.Next(-50, 50);
-                    newStockData.Low = newStockData.Close + newStockData.Close / 100m * Helpers.Random.Next(-50, 1);
-                    newStockData.High = newStockData.Close + newStockData.Close / 100m * Helpers.Random.Next(0, 51);
+
+                    var sizeRange = stock.Volatility;
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-85f * (float)stock.Volatility, 85f * (float)stock.Volatility, true), 2);
+                    if (newStockData.Close <= 0m)
+                        newStockData.Close = 0.01m;
+                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-85f * (float)stock.Volatility, 1, true), 2);
+                    if (newStockData.Low <= 0m)
+                        newStockData.Low = 0.01m;
+                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, 86f * (float)stock.Volatility, true), 2);
+                    if (newStockData.High <= 0m)
+                        newStockData.High = 0.01m;
+
                     stock.CreateHistoricalData(newStockData);
                     previous = newStockData;
                     totalEntries++;
                 }
+
+                if (Plugin.Instance.Config.IsDebugEnabled)
+                    Plugin.Log.LogInfo($"Stock({stock.Symbol}) {stock.Name} [HA] | " +
+                        $"Volatility ({stock.Volatility}) | " +
+                        $"Close ({Math.Round(stock.HistoricalData.Average(a => a.Close), 2)}) | " +
+                        $"Open ({Math.Round(stock.HistoricalData.Average(a => a.Open), 2)}) | " +
+                        $"High ({Math.Round(stock.HistoricalData.Average(a => a.High), 2)}) | " +
+                        $"Low ({Math.Round(stock.HistoricalData.Average(a => a.Low), 2)}).");
             }
 
             if (Plugin.Instance.Config.IsDebugEnabled)

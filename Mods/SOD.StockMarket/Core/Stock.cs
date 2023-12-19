@@ -11,6 +11,7 @@ namespace SOD.StockMarket.Core
         internal decimal Price { get; private set; }
         internal decimal OpeningPrice { get; set; }
         internal decimal ClosingPrice { get; set; }
+        internal double Volatility => _companyData.Volatility;
         internal StockTrend? Trend { get; private set; }
         internal IReadOnlyList<StockData> HistoricalData => _historicalData;
 
@@ -77,7 +78,7 @@ namespace SOD.StockMarket.Core
             if (stockPrice == null)
             {
                 // Add a small random flunctuation in the price based on a percentage
-                decimal maxPercentageAdjustment = (decimal)Plugin.Instance.Config.PriceFluctuationPercentage;
+                decimal maxPercentageAdjustment = (decimal)Plugin.Instance.Config.PriceFluctuationPercentage * (decimal)Volatility;
 
                 // Calculate the range based on the current price
                 decimal range = Price * (maxPercentageAdjustment / 100m);

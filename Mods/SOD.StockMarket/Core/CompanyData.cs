@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Extensions;
+using System;
 using System.Linq;
 
 namespace SOD.StockMarket.Core
@@ -11,11 +12,13 @@ namespace SOD.StockMarket.Core
         internal decimal AverageSales => GetAverageSales();
         internal decimal MinSalary => GetMinSalary();
         internal decimal TopSalary => GetTopSalary();
+        internal double Volatility { get; private set; }
 
-        internal CompanyData(string name, string symbol)
+        internal CompanyData(string name, string symbol, double volatility)
         {
             Name = name;
             Symbol = symbol.ToUpper();
+            Volatility = volatility;
         }
 
         internal CompanyData(Company company)
@@ -23,12 +26,16 @@ namespace SOD.StockMarket.Core
             Company = company;
         }
 
+        /// <summary>
+        /// Called later in the flow when Company object is initialized
+        /// </summary>
         internal void UpdateInfo()
         {
             if (Company != null)
             {
                 Name = Company.name;
                 Symbol = string.Join("", Name.Split(' ').Select(a => a.Trim()[0])).ToUpper();
+                Volatility = Math.Round((double)Toolbox.Instance.Rand(0.15f, 0.85f, true), 2);
             }
         }
 
