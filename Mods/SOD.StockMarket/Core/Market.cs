@@ -212,13 +212,13 @@ namespace SOD.StockMarket.Core
                     };
 
                     var sizeRange = stock.Volatility;
-                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-85f * (float)stock.Volatility, 85f * (float)stock.Volatility, true), 2);
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-20f * (float)stock.Volatility, 21f * (float)stock.Volatility, true), 2);
                     if (newStockData.Close <= 0m)
                         newStockData.Close = 0.01m;
-                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-85f * (float)stock.Volatility, 1, true), 2);
+                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-20f * (float)stock.Volatility, 1, true), 2);
                     if (newStockData.Low <= 0m)
                         newStockData.Low = 0.01m;
-                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, 86f * (float)stock.Volatility, true), 2);
+                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, 21f * (float)stock.Volatility, true), 2);
                     if (newStockData.High <= 0m)
                         newStockData.High = 0.01m;
 
@@ -406,15 +406,15 @@ namespace SOD.StockMarket.Core
                     else
                     {
                         // Use a uniform mean and deviation if there is no historical data yet
-                        stockMean = 3.86d;
-                        stockStdDev = 7.45d;
+                        stockMean = 0.0d;
+                        stockStdDev = 0.3d;
                     }
 
                     // Generate a realistic percentage change using a normal distribution
                     double percentage = Math.Round(Helpers.NextGaussian(stockMean, stockStdDev));
 
                     // Ensure the generated percentage is within a reasonable range
-                    percentage = Math.Clamp(percentage, -25, 25);
+                    //percentage = Math.Clamp(percentage, -25, 25);
 
                     // Skip 0 percentage differences
                     if (((int)percentage) == 0) continue; 

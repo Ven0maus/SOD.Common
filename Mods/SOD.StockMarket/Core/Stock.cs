@@ -135,9 +135,9 @@ namespace SOD.StockMarket.Core
                 High = _highestPrice.Value,
             });
 
-            // Reset
-            _lowestPrice = null;
-            _highestPrice = null;
+            // Update for next day
+            _lowestPrice = ClosingPrice;
+            _highestPrice = ClosingPrice;
         }
 
         internal int CleanUpHistoricalData()
@@ -146,16 +146,13 @@ namespace SOD.StockMarket.Core
             var maxDays = Plugin.Instance.Config.DaysToKeepStockHistoricalData;
 
             // Remove all historical data that is atleast 30 days old
-            var prevCount = _historicalData.Count;
-            _historicalData.RemoveAll(stockData =>
+            return _historicalData.RemoveAll(stockData =>
             {
                 var diff = currentDate - stockData.Date;
                 if (diff.Days > maxDays)
                     return true;
                 return false;
             });
-
-            return prevCount - _historicalData.Count;
         }
 
         internal void Initialize()
@@ -164,6 +161,9 @@ namespace SOD.StockMarket.Core
 
             // Set initial price
             Price = Math.Round(_basePrice ?? _companyData.AverageSales / (_companyData.MinSalary + _companyData.TopSalary) * 1000m / 10, 2);
+            OpeningPrice = Price;
+            _lowestPrice = Price;
+            _highestPrice = Price;
         }
 
         private void UpdateHighestLowestPrices()
