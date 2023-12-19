@@ -54,6 +54,10 @@ namespace SOD.StockMarket
             var maxTrends = Config.MaxTrends;
             if (maxTrends < -1)
                 Config.MaxTrends = -1;
+
+            var pastHistoricalDataVolatility = Config.PastHistoricalDataVolatility;
+            if (pastHistoricalDataVolatility < 1.0)
+                Config.PastHistoricalDataVolatility = 1.0;
         }
     }
 }

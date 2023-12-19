@@ -199,6 +199,7 @@ namespace SOD.StockMarket.Core
             int totalEntries = 0;
             var currentDate = Lib.Time.CurrentDate;
             int totalDays = Plugin.Instance.Config.DaysToKeepStockHistoricalData;
+            float historicalDataPercentage = (float)Plugin.Instance.Config.PastHistoricalDataVolatility;
             foreach (var stock in _stocks)
             {
                 StockData previous = null;
@@ -212,13 +213,13 @@ namespace SOD.StockMarket.Core
                     };
 
                     var sizeRange = stock.Volatility;
-                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-20f * (float)stock.Volatility, 21f * (float)stock.Volatility, true), 2);
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-historicalDataPercentage * (float)stock.Volatility, (historicalDataPercentage + 1f) * (float)stock.Volatility, true), 2);
                     if (newStockData.Close <= 0m)
                         newStockData.Close = 0.01m;
-                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-20f * (float)stock.Volatility, 1, true), 2);
+                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-historicalDataPercentage * (float)stock.Volatility, 1, true), 2);
                     if (newStockData.Low <= 0m)
                         newStockData.Low = 0.01m;
-                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, 21f * (float)stock.Volatility, true), 2);
+                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, (historicalDataPercentage + 1f) * (float)stock.Volatility, true), 2);
                     if (newStockData.High <= 0m)
                         newStockData.High = 0.01m;
 
