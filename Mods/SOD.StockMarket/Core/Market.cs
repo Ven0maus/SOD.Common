@@ -48,8 +48,9 @@ namespace SOD.StockMarket.Core
             _citizens = new Dictionary<int, decimal>();
 
             // Init save and load events
-            Lib.SaveGame.OnBeforeLoad += OnGameLoad;
-            Lib.SaveGame.OnBeforeSave += OnGameSave;
+            Lib.SaveGame.OnBeforeLoad += OnFileLoad;
+            Lib.SaveGame.OnBeforeSave += OnFileSave;
+            Lib.SaveGame.OnBeforeDelete += OnFileDelete;
         }
 
         /// <summary>
@@ -443,34 +444,38 @@ namespace SOD.StockMarket.Core
                 Plugin.Log.LogInfo($"[GameTime({Lib.Time.CurrentDateTime})] Created {trendsGenerated} new trends.");
         }
 
-        private void OnGameSave(object sender, SaveGameArgs e)
+        private void OnFileSave(object sender, SaveGameArgs e)
         {
-            Save(GetSaveFilePath(e.FilePath));
+            var path = GetSaveFilePath(e.FilePath);
+            DataExporter.Export(this, path);
+            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
         }
 
-        private void OnGameLoad(object sender, SaveGameArgs e)
+        private void OnFileLoad(object sender, SaveGameArgs e)
         {
-            Load(GetSaveFilePath(e.FilePath));
-        }
-
-        internal void Save(string currentSavePath)
-        {
-            DataExporter.Export(this, currentSavePath);
-            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(currentSavePath)}\".");
-        }
-
-        internal void Load(string filePath)
-        {
-            if (!File.Exists(filePath))
+            var path = GetSaveFilePath(e.FilePath);
+            if (!File.Exists(path))
             {
-                Plugin.Log.LogInfo($"No market savestore file found at path \"{filePath}\", skipping load existing attempt.");
+                Plugin.Log.LogInfo($"No market savestore file found at path \"{path}\", skipping load existing attempt.");
                 return;
             }
 
             // TODO: load data from csv
 
-            Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(filePath)}\".");
+            Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(path)}\".");
             Initialized = true;
+        }
+
+        private void OnFileDelete(object sender, SaveGameArgs e)
+        {
+            var path = GetSaveFilePath(e.FilePath);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+                Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
+                return;
+            }
+            Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
         }
 
         /// <summary>
