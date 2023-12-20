@@ -3,7 +3,9 @@ using SOD.Common.Shadows;
 using SOD.Common.Shadows.Implementations;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace SOD.StockMarket.Core
 {
@@ -40,10 +42,14 @@ namespace SOD.StockMarket.Core
         internal Market()
         {
             Plugin.Log.LogInfo("Initializing stock market.");
-            // TODO: Init from savegame if it exists
+
             _stocks = new List<Stock>();
             _ownedStocks = new Dictionary<int, Dictionary<Stock, int>>();
             _citizens = new Dictionary<int, decimal>();
+
+            // Init save and load events
+            Lib.SaveGame.OnBeforeGameLoad += OnGameLoad;
+            Lib.SaveGame.OnAfterGameSave += OnGameSave;
         }
 
         /// <summary>
@@ -95,7 +101,7 @@ namespace SOD.StockMarket.Core
         /// Add's a new stock for the given company into the market.
         /// </summary>
         /// <param name="company"></param>
-        internal void AddStock(Stock stock)
+        internal void InitStock(Stock stock)
         {
             if (Initialized) return;
             _stocks.Add(stock);
@@ -188,7 +194,7 @@ namespace SOD.StockMarket.Core
                 (new CompanyData("Crow", "CRO", 0.05d), (decimal)Toolbox.Instance.Rand(0.85f, 1.25f, true))
             };
             foreach (var (data, basePrice) in customCompanies)
-                AddStock(new Stock(data, basePrice));
+                InitStock(new Stock(data, basePrice));
         }
 
         private void InitializeHistoricalData(object sender, TimeChangedArgs e)
@@ -435,6 +441,52 @@ namespace SOD.StockMarket.Core
 
             if (trendsGenerated > 0 && Plugin.Instance.Config.IsDebugEnabled && Lib.Time.IsInitialized)
                 Plugin.Log.LogInfo($"[GameTime({Lib.Time.CurrentDateTime})] Created {trendsGenerated} new trends.");
+        }
+
+        private void OnGameSave(object sender, SaveGameArgs e)
+        {
+            var state = e.StateSaveData;
+            Save(GetSaveFilePath(state));
+        }
+
+        private void OnGameLoad(object sender, SaveGameArgs e)
+        {
+            var state = e.StateSaveData;
+            Load(GetSaveFilePath(state));
+        }
+
+        internal void Save(string filePath)
+        {
+            DataExporter.Export(this, filePath);
+            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(filePath)}\".");
+        }
+
+        internal void Load(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                Plugin.Log.LogInfo($"No market savestore file found at path \"{filePath}\", skipping load existing attempt.");
+                return;
+            }
+
+            // TODO: load data from csv
+
+            Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(filePath)}\".");
+            Initialized = true;
+        }
+
+        /// <summary>
+        /// Builds a unique save filepath for the current savegame.
+        /// </summary>
+        /// <param name="stateSaveData"></param>
+        /// <returns></returns>
+        private static string GetSaveFilePath(StateSaveData stateSaveData)
+        {
+            // Get market savestore
+            var savecode = Lib.SaveGame.GetUniqueString(stateSaveData);
+            var fileName = $"StockMarket_{savecode}.csv";
+            var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
+            return Path.Combine(saveStore, fileName);
         }
     }
 }

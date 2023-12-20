@@ -160,7 +160,7 @@ namespace SOD.Common.Shadows.Implementations
                 OnYearChanged?.Invoke(this, new TimeChangedArgs(previous, current));
         }
 
-        public readonly struct TimeData : IEquatable<TimeData>
+        public readonly struct TimeData : IEquatable<TimeData>, IComparable<TimeData>, IComparable
         {
             public int Year { get; }
             public int Month { get; }
@@ -227,6 +227,49 @@ namespace SOD.Common.Shadows.Implementations
                 DateTime currentDateTime = new(Year, Month, Day, Hour, Minute, 0);
                 DateTime newDateTime = currentDateTime.AddDays(days);
                 return new TimeData(newDateTime.Year, newDateTime.Month, newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+            }
+
+            public int CompareTo(TimeData other)
+            {
+                // Compare by year
+                int result = Year.CompareTo(other.Year);
+                if (result != 0)
+                    return result;
+
+                // If years are equal, compare by month
+                result = Month.CompareTo(other.Month);
+                if (result != 0)
+                    return result;
+
+                // If months are equal, compare by day
+                result = Day.CompareTo(other.Day);
+                if (result != 0)
+                    return result;
+
+                // If days are equal, compare by hour
+                result = Hour.CompareTo(other.Hour);
+                if (result != 0)
+                    return result;
+
+                // If hours are equal, compare by minute
+                return Minute.CompareTo(other.Minute);
+            }
+
+            public int CompareTo(object obj)
+            {
+                if (obj == null)
+                {
+                    // A null reference is considered greater than any non-null reference
+                    return 1;
+                }
+
+                if (obj is TimeData otherTimeData)
+                {
+                    // Use the existing generic CompareTo method
+                    return CompareTo(otherTimeData);
+                }
+
+                throw new ArgumentException("Object is not a TimeData");
             }
 
             public static bool operator ==(TimeData left, TimeData right)

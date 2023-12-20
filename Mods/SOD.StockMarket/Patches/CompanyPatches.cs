@@ -12,7 +12,7 @@ namespace SOD.StockMarket.Patches
             internal static void Postfix(Company __instance)
             {
                 if (Plugin.Instance.Market.Initialized) return;
-                Plugin.Instance.Market.AddStock(new Stock(__instance));
+                Plugin.Instance.Market.InitStock(new Stock(__instance));
             }
         }
     }

@@ -8,3 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 // Most of these statics are suppressed because they should be instances to make the methods easy to access from one place
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Shadows.Implementations.GameMessage.Broadcast(System.String,InterfaceController.GameMessageType,InterfaceControls.Icon,System.Nullable{UnityEngine.Color},System.Single)")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~P:SOD.Common.Shadows.Implementations.Time.IsInitialized")]
+[assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Shadows.Implementations.SaveGame.GetUniqueString(StateSaveData)~System.String")]
+[assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Shadows.Implementations.Il2CppConverter.ConvertDelegate``1(System.Delegate)~``0")]
+[assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Shadows.Implementations.SaveGame.GetSavestoreDirectoryPath(System.Reflection.Assembly)~System.String")]
