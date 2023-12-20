@@ -351,16 +351,17 @@ namespace SOD.StockMarket.Core
                 }
             }
 
-            if (trendsGenerated > 0 && Plugin.Instance.Config.IsDebugEnabled && Lib.Time.IsInitialized)
+            if (trendsGenerated > 0 && debugModeEnabled && Lib.Time.IsInitialized)
                 Plugin.Log.LogInfo($"[GameTime({Lib.Time.CurrentDateTime})] Created {trendsGenerated} new trends.");
         }
 
         private void OnFileSave(object sender, SaveGameArgs e)
         {
-            Plugin.Log.LogInfo($"Original save path: \"{e.FilePath}\".");
             var path = GetSaveFilePath(e.FilePath);
             DataExporter.Export(this, path);
-            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
+
+            if (Plugin.Instance.Config.IsDebugEnabled)
+                Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
         }
 
         private void OnFileLoad(object sender, SaveGameArgs e)
@@ -368,27 +369,30 @@ namespace SOD.StockMarket.Core
             var path = GetSaveFilePath(e.FilePath);
             if (!File.Exists(path))
             {
-                Plugin.Log.LogInfo($"No market savestore file found at path \"{path}\", skipping load existing attempt.");
+                if (Plugin.Instance.Config.IsDebugEnabled)
+                    Plugin.Log.LogInfo($"No market savestore file found at path \"{path}\", skipping load existing attempt.");
                 return;
             }
 
             // TODO: load data from csv
 
-            Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(path)}\".");
+            if (Plugin.Instance.Config.IsDebugEnabled)
+                Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(path)}\".");
             Initialized = true;
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)
         {
-            Plugin.Log.LogInfo($"Original path \"{e.FilePath}\".");
             var path = GetSaveFilePath(e.FilePath);
             if (File.Exists(path))
             {
                 File.Delete(path);
-                Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
+                if (Plugin.Instance.Config.IsDebugEnabled)
+                    Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
                 return;
             }
-            Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
+            if (Plugin.Instance.Config.IsDebugEnabled)
+                Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
         }
 
         /// <summary>
@@ -398,9 +402,10 @@ namespace SOD.StockMarket.Core
         /// <returns></returns>
         private static string GetSaveFilePath(string filePath)
         {
+            // TODO: Add configuration option to save it as a custom binary format or .csv format
             // Get market savestore
             var savecode = Lib.SaveGame.GetUniqueString(filePath);
-            var fileName = $"{savecode}.csv";
+            var fileName = $"stocks_{savecode}.csv";
             var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
             return Path.Combine(saveStore, fileName);
         }

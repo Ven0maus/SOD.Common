@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace SOD.Common.Shadows.Implementations
 {
@@ -44,7 +42,7 @@ namespace SOD.Common.Shadows.Implementations
         public string GetUniqueString(string saveFilePath)
         {
             // Hash the code
-            return GetSHA256Hash(saveFilePath);
+            return ComputeHash(saveFilePath);
         }
         
         /// <summary>
@@ -60,19 +58,28 @@ namespace SOD.Common.Shadows.Implementations
             return path;
         }
 
-        private static string GetSHA256Hash(string input)
+        // FNV prime and offset basis for 32-bit hash
+        private const uint FnvPrime = 16777619;
+        private const uint FnvOffsetBasis = 2166136261;
+
+        /// <summary>
+        /// Simple FNV-1a hashing algorithm.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"></exception>
+        private static string ComputeHash(string input)
         {
-            using SHA256 sha256 = SHA256.Create();
-            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
 
-            // Convert the byte array to a hexadecimal string
-            StringBuilder hashBuilder = new();
-            foreach (byte b in hashBytes)
+            uint hash = FnvOffsetBasis;
+            foreach (char c in input)
             {
-                hashBuilder.Append(b.ToString("x2"));
+                hash ^= c;
+                hash *= FnvPrime;
             }
-
-            return hashBuilder.ToString();
+            return hash.ToString();
         }
 
         internal void OnSave(string path, bool after)
