@@ -35,7 +35,6 @@ namespace SOD.Common.Shadows.Implementations
         /// <returns></returns>
         public string GetUniqueString(StateSaveData data)
         {
-            // TODO: Check if we can use "RestartSafeController.Instance.saveStateFileInfo".
             // These properties should be unique enough per save
             var gameTime = data.gameTime;
             var gameLength = data.gameLength;

@@ -484,7 +484,7 @@ namespace SOD.StockMarket.Core
         {
             // Get market savestore
             var savecode = Lib.SaveGame.GetUniqueString(stateSaveData);
-            var fileName = $"StockMarket_{savecode}.csv";
+            var fileName = $"{savecode}.csv";
             var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
             return Path.Combine(saveStore, fileName);
         }
