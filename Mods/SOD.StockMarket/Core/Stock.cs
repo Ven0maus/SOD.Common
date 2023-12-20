@@ -40,17 +40,16 @@ namespace SOD.StockMarket.Core
 
         // Total steps is 60, until it reaches the next hour
         private int _currentStep = 0;
-        internal bool DeterminePrice()
+        internal void DeterminePrice()
         {
             // Have a small chance not to change price at all (only if there is no trend going on)
             if ((Trend == null || _currentStep >= Trend.Value.Steps) && Helpers.Random.Next(0, 100) < 10)
             {
                 if (Trend != null && _currentStep >= Trend.Value.Steps)
                     RemoveTrend();
-                return false;
+                return;
             }
 
-            decimal oldPrice = Price;
             decimal? stockPrice = null;
 
             if (Trend != null)
@@ -99,8 +98,6 @@ namespace SOD.StockMarket.Core
 
             // Keep highest / lowest prices
             UpdateHighestLowestPrices();
-
-            return oldPrice != Price;
         }
 
         internal void SetTrend(StockTrend stockTrend)

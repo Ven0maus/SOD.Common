@@ -39,7 +39,6 @@ namespace SOD.StockMarket.Core
                     High = stock.HighPrice,
                     Low = stock.LowPrice,
                     Trend = stock.Trend != null ? stock.Trend.Value.Percentage : 0,
-                    IsCurrentState = true
                 };
                 dataDump.Add(mainDto);
 
@@ -57,7 +56,6 @@ namespace SOD.StockMarket.Core
                         High = history.High,
                         Low = history.Low,
                         Trend = history.Trend != null ? history.Trend.Value.Percentage : 0,
-                        IsCurrentState = false
                     };
                     dataDump.Add(historicalDto);
                 }
@@ -66,7 +64,7 @@ namespace SOD.StockMarket.Core
             // Write dataDump to CSV file
             using var writer = new StreamWriter(path);
             // Write the header
-            writer.WriteLine("Name,Symbol,Date,Price,Open,Close,High,Low,Trend,Average,IsCurrentState");
+            writer.WriteLine("Name,Symbol,Date,Price,Open,Close,High,Low,Trend,Average");
 
             // Write each record
             foreach (var record in dataDump)
@@ -75,14 +73,13 @@ namespace SOD.StockMarket.Core
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
                     $"{EscapeCsvField(record.Date.ToString())}," +
-                    $"{record.Price?.ToString(CultureInfo.InvariantCulture) ?? "null"}," +
+                    $"{record.Price?.ToString(CultureInfo.InvariantCulture) ?? string.Empty}," +
                     $"{record.Open.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.Close.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.High.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.Low.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.Trend.ToString(CultureInfo.InvariantCulture)}," +
-                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}," +
-                    $"{record.IsCurrentState}");
+                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}");
             }
 
             Plugin.Log.LogInfo($"Exported {dataDump.Count} stock market data rows.");
@@ -99,7 +96,6 @@ namespace SOD.StockMarket.Core
             public decimal Low { get; set; }
             public decimal? Price { get; set; }
             public double Trend { get; set; }
-            public bool IsCurrentState { get; set; }
             public decimal Average { get { return (Open + Close + High + Low + (Price ?? 0m)) / 5m; } }
         }
 

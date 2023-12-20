@@ -44,7 +44,7 @@ namespace SOD.Common.Patches
             {
                 // The game saves to sodb when compression is enabled
                 // The path by default is always .sod
-                if (path != null && Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
+                if (path != null && Game.Instance.useSaveGameCompression && path.EndsWith(".sod"))
                     path += "b";
                 Lib.SaveGame.OnSave(path, false);
             }
@@ -54,7 +54,7 @@ namespace SOD.Common.Patches
             {
                 // The game saves to sodb when compression is enabled
                 // The path by default is always .sod
-                if (path != null && Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
+                if (path != null && Game.Instance.useSaveGameCompression && path.EndsWith(".sod"))
                     path += "b";
                 Lib.SaveGame.OnSave(path, true);
             }

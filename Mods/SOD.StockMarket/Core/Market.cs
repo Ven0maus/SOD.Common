@@ -41,16 +41,17 @@ namespace SOD.StockMarket.Core
 
         internal Market()
         {
-            Plugin.Log.LogInfo("Initializing stock market.");
-
             _stocks = new List<Stock>();
             _ownedStocks = new Dictionary<int, Dictionary<Stock, int>>();
             _citizens = new Dictionary<int, decimal>();
 
-            // Init save and load events
+            // Setup events
             Lib.SaveGame.OnBeforeLoad += OnFileLoad;
             Lib.SaveGame.OnBeforeSave += OnFileSave;
             Lib.SaveGame.OnBeforeDelete += OnFileDelete;
+            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
+            Lib.Time.OnMinuteChanged += (sender, args) => OnMinuteChanged(args);
+            Lib.Time.OnHourChanged += (sender, args) => OnHourChanged();
         }
 
         /// <summary>
@@ -80,19 +81,9 @@ namespace SOD.StockMarket.Core
             foreach (var stock in _stocks)
                 stock.Initialize();
 
-            // Add player to the citizens
-            _citizens.Add(Player.Instance.humanID, GameplayController.Instance.money);
-
-            // TODO: Save current stocks
-
             // Market is finished initializing stocks
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo("Stocks created: " + _stocks.Count);
-
-            // Subscribe to events
-            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
-            Lib.Time.OnMinuteChanged += (sender, args) => OnMinuteChanged(args);
-            Lib.Time.OnHourChanged += (sender, args) => OnHourChanged();
 
             Plugin.Log.LogInfo("Stock market initialized.");
             Initialized = true;
@@ -106,81 +97,6 @@ namespace SOD.StockMarket.Core
         {
             if (Initialized) return;
             _stocks.Add(stock);
-        }
-
-        internal void BuyStock(Human human, Stock stock, int amount)
-        {
-            // A dead citizen shouldn't be able to buy new stocks
-            if (human.isDead || human.currentHealth <= 0f) return;
-
-            // Check if human can afford stock
-            var money = GetCitizenMoney(human);
-            if (money < stock.Price * amount)
-            {
-                // Calculate the maximum amount of stock the human can purchase
-                var amountToBuy = (int)Math.Floor(money / stock.Price);
-                if (amountToBuy == 0) return;
-                amount = amountToBuy;
-            }
-
-            // Add stock dictionary if it doesn't yet exist
-            if (!_ownedStocks.TryGetValue(human.humanID, out var stocks))
-                _ownedStocks[human.humanID] = stocks = new Dictionary<Stock, int>();
-
-            // Add stock and amount
-            if (!stocks.ContainsKey(stock))
-                stocks.Add(stock, amount);
-            else
-                stocks[stock] += amount;
-
-            // Deduct the money from the human
-            AddCitizenMoney(human, -stock.Price * amount);
-        }
-
-        internal void SellStock(Human human, Stock stock, int amount)
-        {
-            if (!_ownedStocks.TryGetValue(human.humanID, out var stocks))
-                return;
-            if (!stocks.TryGetValue(stock, out var stockAmount))
-                return;
-
-            int totalStocksToCashOut = amount;
-            if (stockAmount <= amount)
-            {
-                // Set stock to cashout to the correct amount and remove the stock
-                totalStocksToCashOut = stockAmount;
-                stocks.Remove(stock);
-
-                // Remove left over dictionary instance if no stocks are left
-                if (stocks.Count == 0)
-                    _ownedStocks.Remove(human.humanID);
-            }
-            else if (stockAmount > amount)
-            {
-                // Deduct sold stocks
-                stocks[stock] -= amount;
-            }
-
-            // Cash out the human
-            AddCitizenMoney(human, stock.Price * totalStocksToCashOut);
-        }
-
-        private decimal GetCitizenMoney(Human human)
-        {
-            if (_citizens.TryGetValue(human.humanID, out decimal money))
-                return money;
-            
-            // Add citizen and his money.
-            _citizens.Add(human.humanID, money);
-            return money;
-        }
-
-        private void AddCitizenMoney(Human human, decimal amount)
-        {
-            if (!_citizens.ContainsKey(human.humanID))
-                _citizens.Add(human.humanID, amount);
-            else
-                _citizens[human.humanID] += amount;
         }
 
         /// <summary>
@@ -359,9 +275,7 @@ namespace SOD.StockMarket.Core
         private void Calculate()
         {
             foreach (var stock in _stocks)
-            {
-                _ = stock.DeterminePrice();
-            }
+                stock.DeterminePrice();
         }
 
         /// <summary>
@@ -443,6 +357,7 @@ namespace SOD.StockMarket.Core
 
         private void OnFileSave(object sender, SaveGameArgs e)
         {
+            Plugin.Log.LogInfo($"Original save path: \"{e.FilePath}\".");
             var path = GetSaveFilePath(e.FilePath);
             DataExporter.Export(this, path);
             Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
@@ -465,6 +380,7 @@ namespace SOD.StockMarket.Core
 
         private void OnFileDelete(object sender, SaveGameArgs e)
         {
+            Plugin.Log.LogInfo($"Original path \"{e.FilePath}\".");
             var path = GetSaveFilePath(e.FilePath);
             if (File.Exists(path))
             {
@@ -472,7 +388,6 @@ namespace SOD.StockMarket.Core
                 Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
                 return;
             }
-            Plugin.Log.LogInfo($"Original path \"{e.FilePath}\".");
             Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
         }
 
