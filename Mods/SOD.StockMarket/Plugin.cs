@@ -13,16 +13,17 @@ namespace SOD.StockMarket
         public const string PLUGIN_NAME = "StockMarket";
         public const string PLUGIN_VERSION = "1.0.0";
 
-        private Market _market;
         /// <summary>
         /// The stockmarket running during the game, used to do all calculations
         /// </summary>
-        internal Market Market => _market ??= new();
+        internal Market Market { get; private set; }
 
         public override void Load()
         {
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
+
+            Market = new Market();
         }
 
         public override void OnConfigureBindings()

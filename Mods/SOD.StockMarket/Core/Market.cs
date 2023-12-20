@@ -445,20 +445,18 @@ namespace SOD.StockMarket.Core
 
         private void OnGameSave(object sender, SaveGameArgs e)
         {
-            var state = e.StateSaveData;
-            Save(GetSaveFilePath(state));
+            Save(GetSaveFilePath(e.FilePath));
         }
 
         private void OnGameLoad(object sender, SaveGameArgs e)
         {
-            var state = e.StateSaveData;
-            Load(GetSaveFilePath(state));
+            Load(GetSaveFilePath(e.FilePath));
         }
 
-        internal void Save(string filePath)
+        internal void Save(string currentSavePath)
         {
-            DataExporter.Export(this, filePath);
-            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(filePath)}\".");
+            DataExporter.Export(this, currentSavePath);
+            Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(currentSavePath)}\".");
         }
 
         internal void Load(string filePath)
@@ -480,10 +478,10 @@ namespace SOD.StockMarket.Core
         /// </summary>
         /// <param name="stateSaveData"></param>
         /// <returns></returns>
-        private static string GetSaveFilePath(StateSaveData stateSaveData)
+        private static string GetSaveFilePath(string filePath)
         {
             // Get market savestore
-            var savecode = Lib.SaveGame.GetUniqueString(stateSaveData);
+            var savecode = Lib.SaveGame.GetUniqueString(filePath);
             var fileName = $"{savecode}.csv";
             var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
             return Path.Combine(saveStore, fileName);

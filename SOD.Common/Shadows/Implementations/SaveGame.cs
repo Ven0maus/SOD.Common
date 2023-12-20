@@ -26,6 +26,8 @@ namespace SOD.Common.Shadows.Implementations
         /// </summary>
         public event EventHandler<SaveGameArgs> OnAfterGameLoad;
 
+        // TODO: Add events for SaveFileDeletion
+
         /// <summary>
         /// Returns a unique hashed string related to the savegame. 
         /// <br>Will always return the same unique code for the same <see cref="StateSaveData"/>.</br>
@@ -33,23 +35,10 @@ namespace SOD.Common.Shadows.Implementations
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public string GetUniqueString(StateSaveData data)
+        public string GetUniqueString(string saveFilePath)
         {
-            // These properties should be unique enough per save
-            var gameTime = data.gameTime;
-            var gameLength = data.gameLength;
-            var playerPos = data.playerPos;
-            var playerRot = data.playerRot;
-            var cityShare = data.cityShare;
-
-            // Build a unique hash based on above data
-            float uniqueNumber = gameTime + gameLength + playerPos.x + playerPos.y + playerPos.z + playerRot.x + playerRot.y + playerRot.z;
-
-            // Combination
-            var combinedCode = cityShare + "." + uniqueNumber;
-
             // Hash the code
-            return GetSHA256Hash(combinedCode);
+            return GetSHA256Hash(saveFilePath);
         }
         
         /// <summary>
@@ -80,39 +69,39 @@ namespace SOD.Common.Shadows.Implementations
             return hashBuilder.ToString();
         }
 
-        internal void GameSaved(StateSaveData stateSaveData, bool after)
+        internal void GameSaved(string path, bool after)
         {
             if (after)
-                OnAfterGameSave?.Invoke(this, new SaveGameArgs(stateSaveData));
+                OnAfterGameSave?.Invoke(this, new SaveGameArgs(path));
             else
-                OnBeforeGameSave?.Invoke(this, new SaveGameArgs(stateSaveData));
+                OnBeforeGameSave?.Invoke(this, new SaveGameArgs(path));
         }
 
-        internal void GameLoaded(StateSaveData stateSaveData, bool after)
+        internal void GameLoaded(string path, bool after)
         {
             if (after)
-                OnAfterGameLoad?.Invoke(this, new SaveGameArgs(stateSaveData));
+                OnAfterGameLoad?.Invoke(this, new SaveGameArgs(path));
             else
-                OnBeforeGameLoad?.Invoke(this, new SaveGameArgs(stateSaveData));
+                OnBeforeGameLoad?.Invoke(this, new SaveGameArgs(path));
         }
     }
 
     public sealed class SaveGameArgs : EventArgs
     {
-        private readonly StateSaveData _stateSaveData;
-        public StateSaveData StateSaveData
+        private readonly string _filePath;
+        public string FilePath
         {
             get
             {
-                if (_stateSaveData == null)
-                    Plugin.Log.LogWarning("StateSaveData is unavailable in \"OnGameSaveBefore\" event, use the \"OnGameSaveBefore\" event if you require this data.");
-                return _stateSaveData;
+                if (_filePath == null)
+                    Plugin.Log.LogWarning("Current is unavailable in \"OnGameSaveBefore\" event, use the \"OnGameSaveBefore\" event if you require this data.");
+                return _filePath;
             }
         }
-
-        public SaveGameArgs(StateSaveData stateSaveData)
+        
+        public SaveGameArgs(string filePath)
         {
-            _stateSaveData = stateSaveData;
+            _filePath = filePath;
         }
     }
 }

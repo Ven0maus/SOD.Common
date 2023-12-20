@@ -1,24 +1,46 @@
 ﻿using HarmonyLib;
 using SOD.Common.Shadows;
-using System.IO;
 
 namespace SOD.Common.Patches
 {
     internal class SaveStateControllerPatches
     {
-        [HarmonyPatch(typeof(SaveStateController), nameof(SaveStateController.LoadSaveState))]
-        internal class SaveStateController_LoadSaveState
+        [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.StartLoading))]
+        internal class CityConstructor_GenerateCityFromShareCode
         {
+            private static bool _loaded = false;
+            private static Il2CppSystem.IO.FileInfo _fileInfo;
+
             [HarmonyPrefix]
-            internal static void Prefix(StateSaveData __instance)
+            internal static void Prefix(CityConstructor __instance)
             {
-                Lib.SaveGame.GameLoaded(__instance, false);
+                if (!__instance.generateNew && RestartSafeController.Instance.loadSaveGame)
+                {
+                    _loaded = true;
+                    _fileInfo = RestartSafeController.Instance.saveStateFileInfo;
+                    string filePath = _fileInfo?.FullPath;
+                    // The game saves to sodb when compression is enabled
+                    // The path by default is always .sod
+                    if (filePath != null && Game.Instance.useSaveGameCompression && filePath.EndsWith(".sod"))
+                        filePath += "b";
+                    Lib.SaveGame.GameLoaded(filePath, false);
+                }
             }
 
             [HarmonyPostfix]
-            internal static void Postfix(StateSaveData __instance)
+            internal static void Postfix()
             {
-                Lib.SaveGame.GameLoaded(__instance, true);
+                if (_loaded)
+                {
+                    _loaded = false;
+                    string filePath = _fileInfo?.FullPath;
+                    _fileInfo = null;
+                    // The game saves to sodb when compression is enabled
+                    // The path by default is always .sod
+                    if (filePath != null && Game.Instance.useSaveGameCompression && filePath.EndsWith(".sod"))
+                        filePath += "b";
+                    Lib.SaveGame.GameLoaded(filePath, true);
+                }
             }
         }
 
@@ -26,69 +48,23 @@ namespace SOD.Common.Patches
         internal class SaveStateController_CaptureSaveStateAsync
         {
             [HarmonyPrefix]
-            internal static void Prefix()
-            {
-                Lib.SaveGame.GameSaved(null, false);
-            }
-
-            [HarmonyPostfix]
-            internal static void Postfix(ref Il2CppSystem.Threading.Tasks.Task __result, string path)
+            internal static void Prefix(string path)
             {
                 // The game saves to sodb when compression is enabled
                 // The path by default is always .sod
                 if (Game.Instance.useSaveGameCompression)
                     path += "b";
-
-                // Define how we enter out main logic
-                if (!__result.IsCompleted)
-                {
-                    var continueAction = Lib.Il2Cpp.ConvertDelegate<Il2CppSystem.Action<Il2CppSystem.Threading.Tasks.Task>>(
-                        (Il2CppSystem.Threading.Tasks.Task task) =>
-                        {
-                            ContinueFromMainCall(path);
-                        });
-                    __result.ContinueWith(continueAction);
-                }
-                else
-                {
-                    ContinueFromMainCall(path);
-                }
+                Lib.SaveGame.GameSaved(path, false);
             }
 
-            private static void ContinueFromMainCall(string path)
+            [HarmonyPostfix]
+            internal static void Postfix(string path)
             {
-                if (!File.Exists(path))
-                {
-                    Plugin.Log.LogWarning($"[SaveGame-Provider] Could not load savedata file at path \"{path}\".");
-                    return;
-                }
-
-                // Grab the save file and attempt to parse it into a valid StateSaveData object
-                var fileInfo = new FileInfo(path);
-                var onCompleteDataLoad = Lib.Il2Cpp.ConvertDelegate<Il2CppSystem.Action<StateSaveData>>(OnComplete);
-
-                // Load StateSaveData from file path
-                var task = DataCompressionController.Instance.LoadCompressedDataAsync(path, onCompleteDataLoad);
-                if (!task.IsCompleted)
-                {
-                    var continueAction = Lib.Il2Cpp.ConvertDelegate<Il2CppSystem.Action<Il2CppSystem.Threading.Tasks.Task>>(
-                        (Il2CppSystem.Threading.Tasks.Task t1) =>
-                        {
-                            if (!task.Result)
-                                Plugin.Log.LogWarning("[SaveGame-Provider] Unable to load compressed data file.");
-                        });
-                    task.ContinueWith(continueAction);
-                }
-                else
-                {
-                    if (!task.Result)
-                        Plugin.Log.LogWarning("[SaveGame-Provider] Unable to load compressed data file.");
-                }
-            }
-
-            private static void OnComplete(StateSaveData stateSaveData)
-            {
-                Lib.SaveGame.GameSaved(stateSaveData, true);
+                // The game saves to sodb when compression is enabled
+                // The path by default is always .sod
+                if (Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
+                    path += "b";
+                Lib.SaveGame.GameSaved(path, true);
             }
         }
     }
