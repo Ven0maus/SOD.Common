@@ -30,6 +30,7 @@ namespace SOD.StockMarket.Core
                 var currentDate = stock.HistoricalData.LastOrDefault()?.Date;
                 var mainDto = new StockDataDTO
                 {
+                    Id = stock.Id,
                     Name = stock.Name,
                     Symbol = stock.Symbol,
                     Date = currentDate ?? new Time.TimeData(0, 0, 0, 0, 0),
@@ -48,6 +49,7 @@ namespace SOD.StockMarket.Core
                 {
                     var historicalDto = new StockDataDTO
                     {
+                        Id = stock.Id,
                         Name = stock.Name,
                         Symbol = stock.Symbol,
                         Date = history.Date,
@@ -66,12 +68,13 @@ namespace SOD.StockMarket.Core
             // Write dataDump to CSV file
             using var writer = new StreamWriter(path);
             // Write the header
-            writer.WriteLine("Name,Symbol,Date,Price,Open,Close,High,Low,Trend,Average");
+            writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Trend,Average");
 
             // Write each record
             foreach (var record in dataDump)
             {
                 writer.WriteLine(
+                    $"{record.Id}," +
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
                     $"{EscapeCsvField(record.Date.ToString())}," +
@@ -89,6 +92,7 @@ namespace SOD.StockMarket.Core
 
         class StockDataDTO
         {
+            public int Id { get; set; }
             public string Name { get; set; }
             public string Symbol { get; set; }
             public Time.TimeData Date { get; set; }

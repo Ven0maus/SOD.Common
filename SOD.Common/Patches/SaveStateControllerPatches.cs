@@ -24,7 +24,7 @@ namespace SOD.Common.Patches
             }
 
             [HarmonyPostfix]
-            internal static void Postfix(CityConstructor __instance)
+            internal static void Postfix()
             {
                 if (_loaded)
                 {

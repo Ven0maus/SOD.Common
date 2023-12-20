@@ -6,6 +6,8 @@ namespace SOD.StockMarket.Core
 {
     internal class Stock
     {
+        private static int _id;
+        internal int Id { get; }
         internal string Name => _companyData.Name;
         internal string Symbol => _companyData.Symbol;
         internal double Volatility => _companyData.Volatility;
@@ -34,6 +36,7 @@ namespace SOD.StockMarket.Core
 
         private Stock(decimal? basePrice = null)
         {
+            Id = _id++;
             _historicalData = new List<StockData>();
             _basePrice = basePrice;
         }
