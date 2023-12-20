@@ -24,7 +24,7 @@ namespace SOD.Common.Patches
             }
 
             [HarmonyPostfix]
-            internal static void Postfix()
+            internal static void Postfix(CityConstructor __instance)
             {
                 if (_loaded)
                 {
@@ -33,6 +33,31 @@ namespace SOD.Common.Patches
                     _fileInfo = null;
                     Lib.SaveGame.OnLoad(filePath, true);
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.OnMenuComponentSwitchComplete))]
+        internal class MainMenuController_OnMenuComponentSwitchComplete
+        {
+            // BUGFIX: LoadGame triggers loading process twice when loading a file from an ongoing game, this fixes it
+
+            private static MainMenuController.Component? _previousComponentCompleted;
+            private static bool _wasDirty = false;
+
+            [HarmonyPrefix]
+            internal static bool Prefix(MainMenuController __instance)
+            {
+                if (__instance.currentComponent == null || _previousComponentCompleted == null) return true;
+                if (__instance.currentComponent.component == __instance.previousComponent) return true;
+                if (__instance.currentComponent.component == _previousComponentCompleted && SessionData.Instance.dirtyScene == _wasDirty) return false;
+                return true;
+            }
+
+            [HarmonyPostfix]
+            internal static void Postfix(MainMenuController __instance)
+            {
+                _previousComponentCompleted = __instance.currentComponent?.component;
+                _wasDirty = SessionData.Instance.dirtyScene;
             }
         }
 
