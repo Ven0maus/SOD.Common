@@ -192,7 +192,7 @@ namespace SOD.StockMarket.Core
             {
                 (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Toolbox.Instance.Rand(5000f, 10000f, true)),
                 (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Toolbox.Instance.Rand(2000f, 5000f, true)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Toolbox.Instance.Rand(0.85f, 1.25f, true))
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Toolbox.Instance.Rand(0.95f, 1.05f, true))
             };
             foreach (var (data, basePrice) in customCompanies)
                 InitStock(new Stock(data, basePrice));

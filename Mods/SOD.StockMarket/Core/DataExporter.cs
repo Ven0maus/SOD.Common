@@ -33,8 +33,9 @@ namespace SOD.StockMarket.Core
                     Name = stock.Name,
                     Symbol = stock.Symbol,
                     Date = currentDate ?? new Time.TimeData(0, 0, 0, 0, 0),
-                    Close = stock.ClosingPrice,
+                    Price = stock.Price,
                     Open = stock.OpeningPrice,
+                    Close = stock.ClosingPrice,
                     High = stock.HighPrice,
                     Low = stock.LowPrice,
                     Trend = stock.Trend != null ? stock.Trend.Value.Percentage : 0,
@@ -50,6 +51,7 @@ namespace SOD.StockMarket.Core
                         Name = stock.Name,
                         Symbol = stock.Symbol,
                         Date = history.Date,
+                        Price = null,
                         Open = history.Open,
                         Close = history.Close,
                         High = history.High,
@@ -64,7 +66,7 @@ namespace SOD.StockMarket.Core
             // Write dataDump to CSV file
             using var writer = new StreamWriter(path);
             // Write the header
-            writer.WriteLine("Name,Symbol,Date,Open,Close,High,Low,Trend,Average,IsCurrentState");
+            writer.WriteLine("Name,Symbol,Date,Price,Open,Close,High,Low,Trend,Average,IsCurrentState");
 
             // Write each record
             foreach (var record in dataDump)
@@ -73,6 +75,7 @@ namespace SOD.StockMarket.Core
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
                     $"{EscapeCsvField(record.Date.ToString())}," +
+                    $"{record.Price?.ToString(CultureInfo.InvariantCulture) ?? "null"}," +
                     $"{record.Open.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.Close.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.High.ToString(CultureInfo.InvariantCulture)}," +
@@ -94,9 +97,10 @@ namespace SOD.StockMarket.Core
             public decimal Close { get; set; }
             public decimal High { get; set; }
             public decimal Low { get; set; }
+            public decimal? Price { get; set; }
             public double Trend { get; set; }
             public bool IsCurrentState { get; set; }
-            public decimal Average { get { return (Open + Close + High + Low) / 4m; } }
+            public decimal Average { get { return (Open + Close + High + Low + (Price ?? 0m)) / 5m; } }
         }
 
         static string EscapeCsvField(string field)
