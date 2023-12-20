@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using static GameplayController;
 
 namespace SOD.StockMarket.Core
 {
@@ -39,6 +40,7 @@ namespace SOD.StockMarket.Core
                     High = stock.HighPrice,
                     Low = stock.LowPrice,
                     Trend = stock.Trend != null ? stock.Trend.Value.Percentage : 0,
+                    Average = (stock.HighPrice + stock.LowPrice + stock.Price) / 3m,
                 };
                 dataDump.Add(mainDto);
 
@@ -56,6 +58,7 @@ namespace SOD.StockMarket.Core
                         High = history.High,
                         Low = history.Low,
                         Trend = history.Trend != null ? history.Trend.Value.Percentage : 0,
+                        Average = (history.Open + history.Close + history.High + history.Low) / 4m,
                     };
                     dataDump.Add(historicalDto);
                 }
@@ -96,7 +99,7 @@ namespace SOD.StockMarket.Core
             public decimal Low { get; set; }
             public decimal? Price { get; set; }
             public double Trend { get; set; }
-            public decimal Average { get { return (Open + Close + High + Low + (Price ?? 0m)) / 5m; } }
+            public decimal Average { get; set; }
         }
 
         static string EscapeCsvField(string field)

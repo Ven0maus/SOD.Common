@@ -43,9 +43,14 @@ namespace SOD.Common.Patches
             internal static void Prefix(string path)
             {
                 // The game saves to sodb when compression is enabled
-                // The path by default is always .sod
+                // The path retrieved here by default is always .sod
+                // Also the slashs are in the wrong direction here???
                 if (path != null && Game.Instance.useSaveGameCompression && path.EndsWith(".sod"))
                     path += "b";
+
+                // Fix slashes
+                path = path.Replace('/', '\\');
+
                 Lib.SaveGame.OnSave(path, false);
             }
 
@@ -53,9 +58,14 @@ namespace SOD.Common.Patches
             internal static void Postfix(string path)
             {
                 // The game saves to sodb when compression is enabled
-                // The path by default is always .sod
+                // The path retrieved here by default is always .sod
+                // Also the slashs are in the wrong direction here???
                 if (path != null && Game.Instance.useSaveGameCompression && path.EndsWith(".sod"))
                     path += "b";
+
+                // Fix slashes
+                path = path.Replace('/', '\\');
+
                 Lib.SaveGame.OnSave(path, true);
             }
         }
