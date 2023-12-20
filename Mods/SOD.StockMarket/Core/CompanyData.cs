@@ -8,7 +8,7 @@ namespace SOD.StockMarket.Core
     {
         internal string Name { get; private set; }
         internal string Symbol { get; private set; }
-        internal Company Company { get; }
+        internal Company Company { get; private set; }
         internal decimal AverageSales => GetAverageSales();
         internal decimal MinSalary => GetMinSalary();
         internal decimal TopSalary => GetTopSalary();
@@ -35,8 +35,11 @@ namespace SOD.StockMarket.Core
             {
                 Name = Company.name;
                 Symbol = string.Join("", Name.Split(' ').Select(a => a.Trim()[0])).ToUpper();
-                Volatility = Math.Round((double)Toolbox.Instance.Rand(0.15f, 0.85f, true), 2);
+                Volatility = Math.Round((double)Helpers.Random.NextDouble(0.15f, 0.85f, true), 2);
             }
+
+            // Check if we need to keep company in memory for something later?
+            Company = null;
         }
 
         private decimal? _averageSales;

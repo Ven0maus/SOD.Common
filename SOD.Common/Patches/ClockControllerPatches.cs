@@ -8,28 +8,26 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(ClockController), nameof(ClockController.Update))]
         internal class ClockController_Update
         {
-            private static Shadows.Implementations.Time.TimeData? _lastTime;
-            private static bool _isInitialized = false;
+            internal static Shadows.Implementations.Time.TimeData? LastTime;
 
             [HarmonyPostfix]
             internal static void Postfix()
             {
                 if (!SessionData.Instance.play) return;
-                if (!_isInitialized)
-                {
+
+                // Init time
+                if (!Lib.Time.IsInitialized)
                     Lib.Time.InitializeTime();
-                    _isInitialized = true;
-                }
 
                 var currentTime = Lib.Time.CurrentDateTime;
-                if (_lastTime == null)
-                    _lastTime = currentTime;
+                if (LastTime == null)
+                    LastTime = currentTime;
 
                 // Check if last time has changed
-                if (!_lastTime.Equals(currentTime))
+                if (!LastTime.Equals(currentTime))
                 {
-                    Lib.Time.OnTimeChanged(_lastTime.Value, currentTime);
-                    _lastTime = currentTime;
+                    Lib.Time.OnTimeChanged(LastTime.Value, currentTime);
+                    LastTime = currentTime;
                 }
             }
         }

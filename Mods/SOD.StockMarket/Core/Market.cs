@@ -17,19 +17,6 @@ namespace SOD.StockMarket.Core
         /// </summary>
         internal IReadOnlyList<Stock> Stocks => _stocks;
 
-        private readonly Dictionary<int, Dictionary<Stock, int>> _ownedStocks;
-        /// <summary>
-        /// Contains all the stocks and their amount owned by citizens id.
-        /// </summary>
-        internal IReadOnlyDictionary<int, IReadOnlyDictionary<Stock, int>> OwnedStocks => _ownedStocks
-            .ToDictionary(a => a.Key, a => (IReadOnlyDictionary<Stock, int>)a.Value);
-
-        private readonly Dictionary<int, decimal> _citizens;
-        /// <summary>
-        /// The money each citizen has including the player.
-        /// </summary>
-        internal IReadOnlyDictionary<int, decimal> Citizens => _citizens;
-
         internal bool Initialized { get; private set; } = false;
 
         private bool _interiorCreatorFinished = false;
@@ -42,16 +29,13 @@ namespace SOD.StockMarket.Core
         internal Market()
         {
             _stocks = new List<Stock>();
-            _ownedStocks = new Dictionary<int, Dictionary<Stock, int>>();
-            _citizens = new Dictionary<int, decimal>();
 
             // Setup events
             Lib.SaveGame.OnBeforeLoad += OnFileLoad;
             Lib.SaveGame.OnBeforeSave += OnFileSave;
             Lib.SaveGame.OnBeforeDelete += OnFileDelete;
-            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
-            Lib.Time.OnMinuteChanged += (sender, args) => OnMinuteChanged(args);
-            Lib.Time.OnHourChanged += (sender, args) => OnHourChanged();
+            Lib.Time.OnMinuteChanged += OnMinuteChanged;
+            Lib.Time.OnHourChanged += OnHourChanged;
         }
 
         /// <summary>
@@ -66,13 +50,26 @@ namespace SOD.StockMarket.Core
                 _interiorCreatorFinished = true;
             else if (type == typeof(CityConstructor))
                 _cityConstructorFinalized = true;
+            else if (type == typeof(StockDataIO))
+            {
+                Lib.Time.OnTimeInitialized += InitSeedOnLoad;
+
+                // If we come from an import
+                _citizenCreatorFinished = true;
+                _interiorCreatorFinished = true;
+                _cityConstructorFinalized = true;
+                Initialized = true;
+                _isLoading = false;
+                Plugin.Log.LogInfo("Stock market loaded.");
+                return;
+            }
 
             // We need to wait until all 3 processes are completely finished initializing
-            if (Initialized || !_citizenCreatorFinished || !_interiorCreatorFinished || !_cityConstructorFinalized)
+            if (_isLoading || Initialized || !_citizenCreatorFinished || !_interiorCreatorFinished || !_cityConstructorFinalized)
                 return;
 
             // Init helper
-            Helpers.Init(UnityEngine.Random.seed);
+            Helpers.Init(CityData.Instance.seed.GetHashCode());
 
             // Also add some default game related stocks and update prices
             AddIconicStocks();
@@ -81,12 +78,21 @@ namespace SOD.StockMarket.Core
             foreach (var stock in _stocks)
                 stock.Initialize();
 
+            // Hook initialize for historical data
+            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
+
             // Market is finished initializing stocks
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo("Stocks created: " + _stocks.Count);
 
             Plugin.Log.LogInfo("Stock market initialized.");
             Initialized = true;
+        }
+
+        private void InitSeedOnLoad(object sender, TimeChangedArgs args)
+        {
+            Lib.Time.OnTimeInitialized -= InitSeedOnLoad;
+            Helpers.Init(CityData.Instance.seed.GetHashCode());
         }
 
         /// <summary>
@@ -106,9 +112,9 @@ namespace SOD.StockMarket.Core
         {
             var customCompanies = new (CompanyData data, decimal? basePrice)[] 
             {
-                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Toolbox.Instance.Rand(5000f, 10000f, true)),
-                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Toolbox.Instance.Rand(2000f, 5000f, true)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Toolbox.Instance.Rand(0.95f, 1.05f, true))
+                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Helpers.Random.NextDouble(5000f, 10000f, true)),
+                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Helpers.Random.NextDouble(2000f, 5000f, true)),
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.95f, 1.05f, true))
             };
             foreach (var (data, basePrice) in customCompanies)
                 InitStock(new Stock(data, basePrice));
@@ -136,13 +142,13 @@ namespace SOD.StockMarket.Core
                     };
 
                     var sizeRange = stock.Volatility;
-                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Toolbox.Instance.Rand(-historicalDataPercentage * (float)stock.Volatility, (historicalDataPercentage + 1f) * (float)stock.Volatility, true), 2);
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Helpers.Random.NextDouble(-historicalDataPercentage * (float)stock.Volatility, historicalDataPercentage * (float)stock.Volatility, true), 2);
                     if (newStockData.Close <= 0m)
                         newStockData.Close = 0.01m;
-                    newStockData.Low = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(-historicalDataPercentage * (float)stock.Volatility, 1, true), 2);
+                    newStockData.Low = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(-historicalDataPercentage * (float)stock.Volatility, 0, true), 2);
                     if (newStockData.Low <= 0m)
                         newStockData.Low = 0.01m;
-                    newStockData.High = Math.Round(newStockData.Close + newStockData.Close / 100m * (decimal)Toolbox.Instance.Rand(0f, (historicalDataPercentage + 1f) * (float)stock.Volatility, true), 2);
+                    newStockData.High = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(0f, historicalDataPercentage * (float)stock.Volatility, true), 2);
                     if (newStockData.High <= 0m)
                         newStockData.High = 0.01m;
 
@@ -154,7 +160,7 @@ namespace SOD.StockMarket.Core
                 if (Plugin.Instance.Config.IsDebugEnabled)
                     Plugin.Log.LogInfo($"Stock({stock.Symbol}) {stock.Name} [HA] | " +
                         $"Volatility ({stock.Volatility}) | " +
-                        $"Close ({Math.Round(stock.HistoricalData.Average(a => a.Close), 2)}) | " +
+                        $"Close ({Math.Round(stock.HistoricalData.Average(a => a.Close.Value), 2)}) | " +
                         $"Open ({Math.Round(stock.HistoricalData.Average(a => a.Open), 2)}) | " +
                         $"High ({Math.Round(stock.HistoricalData.Average(a => a.High), 2)}) | " +
                         $"Low ({Math.Round(stock.HistoricalData.Average(a => a.Low), 2)}).");
@@ -170,7 +176,7 @@ namespace SOD.StockMarket.Core
         /// <summary>
         /// Updates the stock market based on the current trends.
         /// </summary>
-        private void OnMinuteChanged(TimeChangedArgs args)
+        private void OnMinuteChanged(object sender, TimeChangedArgs args)
         {
             // Don't execute calculations when the stock market is closed
             if (!IsOpen()) return;
@@ -199,7 +205,7 @@ namespace SOD.StockMarket.Core
             }
         }
 
-        private void OnHourChanged()
+        private void OnHourChanged(object sender, TimeChangedArgs args)
         {
             var currentTime = Lib.Time.CurrentDateTime;
             if (Plugin.Instance.Config.IsDebugEnabled)
@@ -264,7 +270,11 @@ namespace SOD.StockMarket.Core
 
         private void OnOpen()
         {
-            _stocks.ForEach(a => a.OpeningPrice = a.ClosingPrice);
+            _stocks.ForEach(a =>
+            {
+                a.OpeningPrice = a.ClosingPrice.Value;
+                a.ClosingPrice = null;
+            });
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo("Stock market is opening.");
         }
@@ -313,8 +323,8 @@ namespace SOD.StockMarket.Core
                         // Calculate historical percentage changes for the current stock
                         for (int i = 1; i < stock.HistoricalData.Count; i++)
                         {
-                            decimal previousClose = stock.HistoricalData[i - 1].Close;
-                            decimal currentClose = stock.HistoricalData[i].Close;
+                            decimal previousClose = stock.HistoricalData[i - 1].Close.Value;
+                            decimal currentClose = stock.HistoricalData[i].Close.Value;
 
                             double percentageChange = (double)((currentClose - previousClose) / previousClose * 100);
                             historicalPercentageChanges.Add(percentageChange);
@@ -358,12 +368,15 @@ namespace SOD.StockMarket.Core
         private void OnFileSave(object sender, SaveGameArgs e)
         {
             var path = GetSaveFilePath(e.FilePath);
-            DataExporter.Export(this, path);
+
+            // Export data to save file
+            new StockDataIO(this).Export(path);
 
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
         }
 
+        private bool _isLoading = false;
         private void OnFileLoad(object sender, SaveGameArgs e)
         {
             var path = GetSaveFilePath(e.FilePath);
@@ -374,11 +387,18 @@ namespace SOD.StockMarket.Core
                 return;
             }
 
-            // TODO: load data from csv
+            if (_isLoading) return;
+            _isLoading = true;
 
-            if (Plugin.Instance.Config.IsDebugEnabled)
-                Plugin.Log.LogInfo($"Loaded market data from savestore \"{Path.GetFileName(path)}\".");
-            Initialized = true;
+            // Clear current market
+            _stocks.Clear();
+            _interiorCreatorFinished = true;
+            _cityConstructorFinalized = true;
+            _citizenCreatorFinished = true;
+            Initialized = false;
+
+            // Import data from save file
+            new StockDataIO(this).Import(path);
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)

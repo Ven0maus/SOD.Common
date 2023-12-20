@@ -16,6 +16,10 @@ namespace SOD.Common.Patches
             {
                 if (!__instance.generateNew && RestartSafeController.Instance.loadSaveGame)
                 {
+                    // Overwrite time, so we initialize again
+                    ClockControllerPatches.ClockController_Update.LastTime = null;
+                    Lib.Time.InitializeTime(true);
+
                     _loaded = true;
                     _fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                     string filePath = _fileInfo?.FullPath;

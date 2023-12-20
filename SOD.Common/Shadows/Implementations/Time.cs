@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace SOD.Common.Shadows.Implementations
 {
@@ -165,8 +166,22 @@ namespace SOD.Common.Shadows.Implementations
                 OnYearChanged?.Invoke(this, new TimeChangedArgs(previous, current));
         }
 
-        internal void InitializeTime()
+        /// <summary>
+        /// Invokes init time, if reset is true it will simply reset to false.
+        /// <br>The next run will then pick it up automatically.</br>
+        /// </summary>
+        /// <param name="reset"></param>
+        internal void InitializeTime(bool reset = false)
         {
+            if (reset)
+            {
+                _initialized = false;
+                _currentGameTime = null;
+                _currentDateData = null;
+                _currentTimeData = null;
+                return;
+            }
+
             if (_initialized) return;
             _initialized = true;
             OnTimeInitialized?.Invoke(this, new TimeChangedArgs(CurrentDateTime, CurrentDateTime));
@@ -203,6 +218,19 @@ namespace SOD.Common.Shadows.Implementations
                 Day = day;
                 Hour = hour;
                 Minute = minute;
+            }
+
+
+            public string Serialize()
+            {
+                return $"{Year}|{Month}|{Day}|{Hour}|{Minute}";
+            }
+
+            public static TimeData Deserialize(string serializedString)
+            {
+                var data = serializedString.Split('|').Select(int.Parse).ToArray();
+                if (data.Length != 5) throw new Exception("Invalid timedata serialize string, use method .Serialize() on TimeData instance.");
+                return new TimeData(data[0], data[1], data[2], data[3], data[4]);
             }
 
             public override string ToString()

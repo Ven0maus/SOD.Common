@@ -7,19 +7,19 @@ namespace SOD.StockMarket.Core
         /// <summary>
         /// Percentage difference
         /// </summary>
-        internal double Percentage { get; }
+        internal double Percentage { get; init; }
         /// <summary>
         /// The price the trend started at
         /// </summary>
-        internal decimal StartPrice { get; }
+        internal decimal StartPrice { get; init; }
         /// <summary>
         /// The goal price for the trend
         /// </summary>
-        internal decimal EndPrice { get; }
+        internal decimal EndPrice { get; init; }
         /// <summary>
         /// Total steps to take to reach the end price.
         /// </summary>
-        internal int Steps { get; }
+        internal int Steps { get; init; }
 
         internal StockTrend(double percentage, decimal currentPrice, int steps) 
         {

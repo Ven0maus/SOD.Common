@@ -2,6 +2,7 @@
 using SOD.Common.BepInEx;
 using System.Reflection;
 using SOD.StockMarket.Core;
+using SOD.Common.Shadows;
 
 namespace SOD.StockMarket
 {
@@ -23,7 +24,10 @@ namespace SOD.StockMarket
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
 
+            // Initialize market object
             Market = new Market();
+
+            Log.LogInfo("Initialized stocked market hooks.");
         }
 
         public override void OnConfigureBindings()

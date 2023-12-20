@@ -13,7 +13,7 @@ namespace SOD.StockMarket.Core
         internal double Volatility => _companyData.Volatility;
         internal decimal Price { get; private set; }
         internal decimal OpeningPrice { get; set; }
-        internal decimal ClosingPrice { get; set; }
+        internal decimal? ClosingPrice { get; set; }
         internal decimal HighPrice { get; private set; }
         internal decimal LowPrice { get; private set; }
         internal StockTrend? Trend { get; private set; }
@@ -29,14 +29,49 @@ namespace SOD.StockMarket.Core
             _companyData = new CompanyData(company);
         }
 
-        internal Stock(CompanyData companyData, decimal? basePrice = null) : this(basePrice)
+        internal Stock(CompanyData companyData, decimal? basePrice = null) : this(basePrice: basePrice)
         {
             _companyData = companyData;
         }
 
-        private Stock(decimal? basePrice = null)
+        /// <summary>
+        /// Called from a data import.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <param name="historicalData"></param>
+        internal Stock(StockDataIO.StockDataDTO dto, IEnumerable<StockData> historicalData) : this(dto.Id, dto.Price)
         {
-            Id = _id++;
+            _companyData = new CompanyData(dto.Name, dto.Symbol, dto.Volatility.Value);
+
+            // Set initial values
+            Price = dto.Price.Value;
+            OpeningPrice = dto.Open;
+            ClosingPrice = dto.Close;
+            LowPrice = dto.Low;
+            HighPrice = dto.High;
+
+            // Set trend if there is one
+            if (dto.TrendPercentage != null && dto.TrendStartPrice != null &&
+                dto.TrendEndPrice != null && dto.TrendSteps != null)
+            {
+                var trend = new StockTrend
+                {
+                    Percentage = dto.TrendPercentage.Value,
+                    StartPrice = dto.TrendStartPrice.Value,
+                    EndPrice = dto.TrendEndPrice.Value,
+                    Steps = dto.TrendSteps.Value
+                };
+                Trend = trend;
+            }
+
+            // Add historical data to the stock
+            foreach (var data in historicalData)
+                CreateHistoricalData(data);
+        }
+
+        private Stock(int? id = null, decimal? basePrice = null)
+        {
+            Id = id ?? _id++;
             _historicalData = new List<StockData>();
             _basePrice = basePrice;
         }
@@ -137,8 +172,8 @@ namespace SOD.StockMarket.Core
             });
 
             // Update for next day
-            LowPrice = ClosingPrice;
-            HighPrice = ClosingPrice;
+            LowPrice = ClosingPrice.Value;
+            HighPrice = ClosingPrice.Value;
         }
 
         internal int CleanUpHistoricalData()
