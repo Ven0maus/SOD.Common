@@ -12,21 +12,27 @@ namespace SOD.Common.Shadows.Implementations
         /// Raised right before a savegame is saved.
         /// <br>Note: StateSaveData is unavailable in the before event.</br>
         /// </summary>
-        public event EventHandler<SaveGameArgs> OnBeforeGameSave;
+        public event EventHandler<SaveGameArgs> OnBeforeSave;
         /// <summary>
         /// Raised right after a savegame is saved.
         /// </summary>
-        public event EventHandler<SaveGameArgs> OnAfterGameSave;
+        public event EventHandler<SaveGameArgs> OnAfterSave;
         /// <summary>
         /// Raised right before a savegame is loaded.
         /// </summary>
-        public event EventHandler<SaveGameArgs> OnBeforeGameLoad;
+        public event EventHandler<SaveGameArgs> OnBeforeLoad;
         /// <summary>
         /// Raised right after a savegame is loaded.
         /// </summary>
-        public event EventHandler<SaveGameArgs> OnAfterGameLoad;
-
-        // TODO: Add events for SaveFileDeletion
+        public event EventHandler<SaveGameArgs> OnAfterLoad;
+        /// <summary>
+        /// Raised right before a savegame file is removed.
+        /// </summary>
+        public event EventHandler<SaveGameArgs> OnBeforeDelete;
+        /// <summary>
+        /// Raised right after a savegame file is removed.
+        /// </summary>
+        public event EventHandler<SaveGameArgs> OnAfterDelete;
 
         /// <summary>
         /// Returns a unique hashed string related to the savegame. 
@@ -69,39 +75,38 @@ namespace SOD.Common.Shadows.Implementations
             return hashBuilder.ToString();
         }
 
-        internal void GameSaved(string path, bool after)
+        internal void OnSave(string path, bool after)
         {
             if (after)
-                OnAfterGameSave?.Invoke(this, new SaveGameArgs(path));
+                OnAfterSave?.Invoke(this, new SaveGameArgs(path));
             else
-                OnBeforeGameSave?.Invoke(this, new SaveGameArgs(path));
+                OnBeforeSave?.Invoke(this, new SaveGameArgs(path));
         }
 
-        internal void GameLoaded(string path, bool after)
+        internal void OnLoad(string path, bool after)
         {
             if (after)
-                OnAfterGameLoad?.Invoke(this, new SaveGameArgs(path));
+                OnAfterLoad?.Invoke(this, new SaveGameArgs(path));
             else
-                OnBeforeGameLoad?.Invoke(this, new SaveGameArgs(path));
+                OnBeforeLoad?.Invoke(this, new SaveGameArgs(path));
+        }
+
+        internal void OnDelete(string path, bool after)
+        {
+            if (after)
+                OnAfterDelete?.Invoke(this, new SaveGameArgs(path));
+            else
+                OnBeforeDelete?.Invoke(this, new SaveGameArgs(path));
         }
     }
 
     public sealed class SaveGameArgs : EventArgs
     {
-        private readonly string _filePath;
-        public string FilePath
-        {
-            get
-            {
-                if (_filePath == null)
-                    Plugin.Log.LogWarning("Current is unavailable in \"OnGameSaveBefore\" event, use the \"OnGameSaveBefore\" event if you require this data.");
-                return _filePath;
-            }
-        }
+        public string FilePath { get; }
         
         public SaveGameArgs(string filePath)
         {
-            _filePath = filePath;
+            FilePath = filePath;
         }
     }
 }

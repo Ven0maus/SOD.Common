@@ -48,8 +48,8 @@ namespace SOD.StockMarket.Core
             _citizens = new Dictionary<int, decimal>();
 
             // Init save and load events
-            Lib.SaveGame.OnBeforeGameLoad += OnGameLoad;
-            Lib.SaveGame.OnAfterGameSave += OnGameSave;
+            Lib.SaveGame.OnBeforeLoad += OnGameLoad;
+            Lib.SaveGame.OnBeforeSave += OnGameSave;
         }
 
         /// <summary>

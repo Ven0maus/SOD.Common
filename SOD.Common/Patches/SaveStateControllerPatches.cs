@@ -6,7 +6,7 @@ namespace SOD.Common.Patches
     internal class SaveStateControllerPatches
     {
         [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.StartLoading))]
-        internal class CityConstructor_GenerateCityFromShareCode
+        internal class CityConstructor_StartLoading
         {
             private static bool _loaded = false;
             private static Il2CppSystem.IO.FileInfo _fileInfo;
@@ -19,11 +19,7 @@ namespace SOD.Common.Patches
                     _loaded = true;
                     _fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                     string filePath = _fileInfo?.FullPath;
-                    // The game saves to sodb when compression is enabled
-                    // The path by default is always .sod
-                    if (filePath != null && Game.Instance.useSaveGameCompression && filePath.EndsWith(".sod"))
-                        filePath += "b";
-                    Lib.SaveGame.GameLoaded(filePath, false);
+                    Lib.SaveGame.OnLoad(filePath, false);
                 }
             }
 
@@ -35,11 +31,7 @@ namespace SOD.Common.Patches
                     _loaded = false;
                     string filePath = _fileInfo?.FullPath;
                     _fileInfo = null;
-                    // The game saves to sodb when compression is enabled
-                    // The path by default is always .sod
-                    if (filePath != null && Game.Instance.useSaveGameCompression && filePath.EndsWith(".sod"))
-                        filePath += "b";
-                    Lib.SaveGame.GameLoaded(filePath, true);
+                    Lib.SaveGame.OnLoad(filePath, true);
                 }
             }
         }
@@ -52,9 +44,9 @@ namespace SOD.Common.Patches
             {
                 // The game saves to sodb when compression is enabled
                 // The path by default is always .sod
-                if (Game.Instance.useSaveGameCompression)
+                if (path != null && Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
                     path += "b";
-                Lib.SaveGame.GameSaved(path, false);
+                Lib.SaveGame.OnSave(path, false);
             }
 
             [HarmonyPostfix]
@@ -62,9 +54,40 @@ namespace SOD.Common.Patches
             {
                 // The game saves to sodb when compression is enabled
                 // The path by default is always .sod
-                if (Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
+                if (path != null && Game.Instance.useSaveGameCompression && !path.EndsWith(".sod"))
                     path += "b";
-                Lib.SaveGame.GameSaved(path, true);
+                Lib.SaveGame.OnSave(path, true);
+            }
+        }
+
+        [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.DeleteSave))]
+        internal class MainMenuController_DeleteSave
+        {
+            private static bool _delete = false;
+            private static Il2CppSystem.IO.FileInfo _fileInfo;
+
+            [HarmonyPrefix]
+            internal static void Prefix(MainMenuController __instance)
+            {
+                if (__instance.selectedSave != null && !__instance.selectedSave.isInternal && 
+                    __instance.selectedSave.info != null && System.IO.File.Exists(__instance.selectedSave.info.FullName))
+                {
+                    _delete = true;
+                    _fileInfo = __instance.selectedSave.info;
+                    Lib.SaveGame.OnDelete(_fileInfo.FullName, false);
+                }
+            }
+
+            [HarmonyPostfix]
+            internal static void Postfix()
+            {
+                if (_delete)
+                {
+                    _delete = false;
+                    var path = _fileInfo.FullPath;
+                    _fileInfo = null;
+                    Lib.SaveGame.OnDelete(path, true);
+                }
             }
         }
     }
