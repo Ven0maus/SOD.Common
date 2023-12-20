@@ -26,9 +26,26 @@ namespace SOD.StockMarket.Core
             var dataDump = new List<StockDataDTO>();
             foreach (var stock in market.Stocks.OrderBy(a => a.Symbol))
             {
+                // Dump first the current state of the stock
+                var currentDate = stock.HistoricalData.LastOrDefault()?.Date;
+                var mainDto = new StockDataDTO
+                {
+                    Name = stock.Name,
+                    Symbol = stock.Symbol,
+                    Date = currentDate ?? new Time.TimeData(0, 0, 0, 0, 0),
+                    Close = stock.ClosingPrice,
+                    Open = stock.OpeningPrice,
+                    High = stock.HighPrice,
+                    Low = stock.LowPrice,
+                    Trend = stock.Trend != null ? stock.Trend.Value.Percentage : 0,
+                    IsCurrentState = true
+                };
+                dataDump.Add(mainDto);
+
+                // Next dump all the historical data
                 foreach (var history in stock.HistoricalData.OrderBy(a => a.Date))
                 {
-                    var dto = new StockDataDTO
+                    var historicalDto = new StockDataDTO
                     {
                         Name = stock.Name,
                         Symbol = stock.Symbol,
@@ -36,16 +53,18 @@ namespace SOD.StockMarket.Core
                         Open = history.Open,
                         Close = history.Close,
                         High = history.High,
-                        Low = history.Low
+                        Low = history.Low,
+                        Trend = history.Trend != null ? history.Trend.Value.Percentage : 0,
+                        IsCurrentState = false
                     };
-                    dataDump.Add(dto);
+                    dataDump.Add(historicalDto);
                 }
             }
 
             // Write dataDump to CSV file
             using var writer = new StreamWriter(path);
             // Write the header
-            writer.WriteLine("Name,Symbol,Date,Open,Close,High,Low,Average");
+            writer.WriteLine("Name,Symbol,Date,Open,Close,High,Low,Trend,Average,IsCurrentState");
 
             // Write each record
             foreach (var record in dataDump)
@@ -58,7 +77,9 @@ namespace SOD.StockMarket.Core
                     $"{record.Close.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.High.ToString(CultureInfo.InvariantCulture)}," +
                     $"{record.Low.ToString(CultureInfo.InvariantCulture)}," +
-                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}");
+                    $"{record.Trend.ToString(CultureInfo.InvariantCulture)}," +
+                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}," +
+                    $"{record.IsCurrentState}");
             }
 
             Plugin.Log.LogInfo($"Exported {dataDump.Count} stock market data rows.");
@@ -73,6 +94,8 @@ namespace SOD.StockMarket.Core
             public decimal Close { get; set; }
             public decimal High { get; set; }
             public decimal Low { get; set; }
+            public double Trend { get; set; }
+            public bool IsCurrentState { get; set; }
             public decimal Average { get { return (Open + Close + High + Low) / 4m; } }
         }
 

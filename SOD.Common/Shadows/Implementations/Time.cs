@@ -4,10 +4,11 @@ namespace SOD.Common.Shadows.Implementations
 {
     public sealed class Time
     {
+        private bool _initialized = false;
         /// <summary>
         /// When this property is true, you can collect time information from the game.
         /// </summary>
-        public bool IsInitialized { get { return SessionData.Instance.play && (SessionData.Instance.gameTime > 0 || SessionData.Instance.gameTime < 0); } }
+        public bool IsInitialized { get { return _initialized; } }
 
         /// <summary>
         /// Raised when an in game minute passes.
@@ -29,6 +30,10 @@ namespace SOD.Common.Shadows.Implementations
         /// Raised when an in game year passes.
         /// </summary>
         public event EventHandler<TimeChangedArgs> OnYearChanged;
+        /// <summary>
+        /// Raised when the time is initialized and can be used.
+        /// </summary>
+        public event EventHandler<TimeChangedArgs> OnTimeInitialized;
 
         private float? _currentGameTime;
         private TimeData? _currentTimeData, _currentDateData;
@@ -158,6 +163,13 @@ namespace SOD.Common.Shadows.Implementations
                 OnMonthChanged?.Invoke(this, new TimeChangedArgs(previous, current));
             if (previous.Year != current.Year)
                 OnYearChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+        }
+
+        internal void InitializeTime()
+        {
+            if (_initialized) return;
+            _initialized = true;
+            OnTimeInitialized?.Invoke(this, new TimeChangedArgs(CurrentDateTime, CurrentDateTime));
         }
 
         public readonly struct TimeData : IEquatable<TimeData>, IComparable<TimeData>, IComparable

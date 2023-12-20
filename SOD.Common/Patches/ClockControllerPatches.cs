@@ -9,11 +9,17 @@ namespace SOD.Common.Patches
         internal class ClockController_Update
         {
             private static Shadows.Implementations.Time.TimeData? _lastTime;
+            private static bool _isInitialized = false;
 
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                if (!Lib.Time.IsInitialized) return;
+                if (!SessionData.Instance.play) return;
+                if (!_isInitialized)
+                {
+                    Lib.Time.InitializeTime();
+                    _isInitialized = true;
+                }
 
                 var currentTime = Lib.Time.CurrentDateTime;
                 if (_lastTime == null)

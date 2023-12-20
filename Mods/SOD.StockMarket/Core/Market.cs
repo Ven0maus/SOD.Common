@@ -90,7 +90,7 @@ namespace SOD.StockMarket.Core
                 Plugin.Log.LogInfo("Stocks created: " + _stocks.Count);
 
             // Subscribe to events
-            Lib.Time.OnMinuteChanged += InitializeHistoricalData;
+            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
             Lib.Time.OnMinuteChanged += (sender, args) => OnMinuteChanged(args);
             Lib.Time.OnHourChanged += (sender, args) => OnHourChanged();
 
@@ -201,7 +201,7 @@ namespace SOD.StockMarket.Core
         private void InitializeHistoricalData(object sender, TimeChangedArgs e)
         {
             // Unsubscribe after first call
-            Lib.Time.OnMinuteChanged -= InitializeHistoricalData;
+            Lib.Time.OnTimeInitialized -= InitializeHistoricalData;
 
             int totalEntries = 0;
             var currentDate = Lib.Time.CurrentDate;
@@ -421,9 +421,6 @@ namespace SOD.StockMarket.Core
                     // Generate a realistic percentage change using a normal distribution
                     double percentage = Math.Round(Helpers.NextGaussian(stockMean, stockStdDev));
 
-                    // Ensure the generated percentage is within a reasonable range
-                    //percentage = Math.Clamp(percentage, -25, 25);
-
                     // Skip 0 percentage differences
                     if (((int)percentage) == 0) continue; 
 
@@ -475,6 +472,7 @@ namespace SOD.StockMarket.Core
                 Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
                 return;
             }
+            Plugin.Log.LogInfo($"Original path \"{e.FilePath}\".");
             Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
         }
 

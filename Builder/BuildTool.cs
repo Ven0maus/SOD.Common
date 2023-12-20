@@ -76,7 +76,7 @@ namespace Builder
                     var entryName = Path.GetFileName(filePath);
                     var entry = archive.CreateEntry(entryName);
 
-                    using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                    using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                     using var entryStream = entry.Open();
                     // Copy the file content to the archive entry
                     fileStream.CopyTo(entryStream);

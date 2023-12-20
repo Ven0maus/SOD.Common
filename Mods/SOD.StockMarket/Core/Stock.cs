@@ -8,18 +8,18 @@ namespace SOD.StockMarket.Core
     {
         internal string Name => _companyData.Name;
         internal string Symbol => _companyData.Symbol;
+        internal double Volatility => _companyData.Volatility;
         internal decimal Price { get; private set; }
         internal decimal OpeningPrice { get; set; }
         internal decimal ClosingPrice { get; set; }
-        internal double Volatility => _companyData.Volatility;
+        internal decimal HighPrice { get; private set; }
+        internal decimal LowPrice { get; private set; }
         internal StockTrend? Trend { get; private set; }
+
         internal IReadOnlyList<StockData> HistoricalData => _historicalData;
 
         private readonly List<StockData> _historicalData;
         private readonly CompanyData _companyData;
-
-        private decimal? _lowestPrice;
-        private decimal? _highestPrice;
         private readonly decimal? _basePrice;
 
         internal Stock(Company company) : this()
@@ -131,13 +131,14 @@ namespace SOD.StockMarket.Core
                 Date = currentDate,
                 Close = ClosingPrice,
                 Open = OpeningPrice,
-                Low = _lowestPrice.Value,
-                High = _highestPrice.Value,
+                Low = LowPrice,
+                High = HighPrice,
+                Trend = Trend
             });
 
             // Update for next day
-            _lowestPrice = ClosingPrice;
-            _highestPrice = ClosingPrice;
+            LowPrice = ClosingPrice;
+            HighPrice = ClosingPrice;
         }
 
         internal int CleanUpHistoricalData()
@@ -159,19 +160,19 @@ namespace SOD.StockMarket.Core
         {
             _companyData.UpdateInfo();
 
-            // Set initial price
+            // Set initial prices
             Price = Math.Round(_basePrice ?? _companyData.AverageSales / (_companyData.MinSalary + _companyData.TopSalary) * 1000m / 10, 2);
             OpeningPrice = Price;
-            _lowestPrice = Price;
-            _highestPrice = Price;
+            LowPrice = Price;
+            HighPrice = Price;
         }
 
         private void UpdateHighestLowestPrices()
         {
-            if (_lowestPrice == null || _lowestPrice > Price)
-                _lowestPrice = Price;
-            else if (_highestPrice == null || _highestPrice < Price)
-                _highestPrice = Price;
+            if (LowPrice > Price)
+                LowPrice = Price;
+            else if (HighPrice < Price)
+                HighPrice = Price;
         }
     }
 }

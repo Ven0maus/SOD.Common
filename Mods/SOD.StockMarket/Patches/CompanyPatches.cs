@@ -12,6 +12,7 @@ namespace SOD.StockMarket.Patches
             internal static void Postfix(Company __instance)
             {
                 if (Plugin.Instance.Market.Initialized) return;
+                if (__instance.preset != null && __instance.preset.isSelfEmployed) return;
                 Plugin.Instance.Market.InitStock(new Stock(__instance));
             }
         }
