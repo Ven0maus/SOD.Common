@@ -6,6 +6,8 @@ namespace SOD.Common.Shadows.Implementations
 {
     public sealed class SaveGame
     {
+        // TODO: Add OnBeforeNewGame and OnAfterNewGame
+
         /// <summary>
         /// Raised right before a savegame is saved.
         /// <br>Note: StateSaveData is unavailable in the before event.</br>

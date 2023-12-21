@@ -35,7 +35,7 @@ namespace SOD.StockMarket.Core
             {
                 Name = Company.name;
                 Symbol = string.Join("", Name.Split(' ').Select(a => a.Trim()[0])).ToUpper();
-                Volatility = Math.Round((double)Helpers.Random.NextDouble(0.15f, 0.85f, true), 2);
+                Volatility = Math.Round(Helpers.Random.NextDouble(0.15d, 0.85d), 2);
             }
 
             // Check if we need to keep company in memory for something later?

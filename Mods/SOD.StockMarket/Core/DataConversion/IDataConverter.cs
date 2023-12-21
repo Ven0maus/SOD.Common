@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SOD.Common.Shadows.Implementations;
+using System.Collections.Generic;
 
 namespace SOD.StockMarket.Core.DataConversion
 {
@@ -9,7 +10,7 @@ namespace SOD.StockMarket.Core.DataConversion
         /// </summary>
         /// <param name="data"></param>
         /// <param name="path"></param>
-        void Save(List<StockDataIO.StockDataDTO> data, string path);
+        void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path);
         /// <summary>
         /// Load data from file path
         /// </summary>

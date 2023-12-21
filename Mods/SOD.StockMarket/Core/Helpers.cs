@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common.Shadows.Implementations;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -6,23 +7,20 @@ namespace SOD.StockMarket.Core
 {
     internal class Helpers
     {
-        private static bool hasSpareRandom;
-        private static double spareRandom;
-        public static Random Random { get; private set; }
+        internal static MersenneTwisterRandom Random { get; private set; }
 
-        public static void Init(int seed)
+        internal static void Init(int seed)
         {
-            Random = new Random(seed);
+            Random = new MersenneTwisterRandom(seed);
+        }
+
+        internal static void Init(MersenneTwisterRandom random)
+        {
+            Random = random;
         }
 
         private static double NextGaussian()
         {
-            if (hasSpareRandom)
-            {
-                hasSpareRandom = false;
-                return spareRandom;
-            }
-
             double u, v, s;
             do
             {
@@ -32,8 +30,6 @@ namespace SOD.StockMarket.Core
             } while (s >= 1.0 || s == 0.0);
 
             s = Math.Sqrt(-2.0 * Math.Log(s) / s);
-            spareRandom = v * s;
-            hasSpareRandom = true;
 
             return u * s;
         }

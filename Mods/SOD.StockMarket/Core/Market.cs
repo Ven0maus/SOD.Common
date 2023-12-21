@@ -52,8 +52,6 @@ namespace SOD.StockMarket.Core
                 _cityConstructorFinalized = true;
             else if (type == typeof(StockDataIO))
             {
-                Lib.Time.OnTimeInitialized += InitSeedOnLoad;
-
                 // If we come from an import
                 _citizenCreatorFinished = true;
                 _interiorCreatorFinished = true;
@@ -89,12 +87,6 @@ namespace SOD.StockMarket.Core
             Initialized = true;
         }
 
-        private void InitSeedOnLoad(object sender, TimeChangedArgs args)
-        {
-            Lib.Time.OnTimeInitialized -= InitSeedOnLoad;
-            Helpers.Init(CityData.Instance.seed.GetHashCode());
-        }
-
         /// <summary>
         /// Add's a new stock for the given company into the market.
         /// </summary>
@@ -112,9 +104,9 @@ namespace SOD.StockMarket.Core
         {
             var customCompanies = new (CompanyData data, decimal? basePrice)[] 
             {
-                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Helpers.Random.NextDouble(5000f, 10000f, true)),
-                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Helpers.Random.NextDouble(2000f, 5000f, true)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.95f, 1.05f, true))
+                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Helpers.Random.NextDouble(5000f, 10000f)),
+                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Helpers.Random.NextDouble(2000f, 5000f)),
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.95f, 1.05f))
             };
             foreach (var (data, basePrice) in customCompanies)
                 InitStock(new Stock(data, basePrice));
@@ -141,14 +133,17 @@ namespace SOD.StockMarket.Core
                         Open = previous?.Close ?? stock.Price
                     };
 
+                    var historicalOne = -historicalDataPercentage * (float)stock.Volatility;
+                    var historicalTwo = historicalDataPercentage * (float)stock.Volatility;
+                    
                     var sizeRange = stock.Volatility;
-                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Helpers.Random.NextDouble(-historicalDataPercentage * (float)stock.Volatility, historicalDataPercentage * (float)stock.Volatility, true), 2);
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Helpers.Random.NextDouble(historicalOne, historicalTwo), 2);
                     if (newStockData.Close <= 0m)
                         newStockData.Close = 0.01m;
-                    newStockData.Low = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(-historicalDataPercentage * (float)stock.Volatility, 0, true), 2);
+                    newStockData.Low = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(historicalOne, 0d), 2);
                     if (newStockData.Low <= 0m)
                         newStockData.Low = 0.01m;
-                    newStockData.High = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(0f, historicalDataPercentage * (float)stock.Volatility, true), 2);
+                    newStockData.High = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(0d, historicalTwo), 2);
                     if (newStockData.High <= 0m)
                         newStockData.High = 0.01m;
 

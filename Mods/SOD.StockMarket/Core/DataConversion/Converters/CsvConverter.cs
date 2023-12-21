@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Shadows.Implementations;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -13,11 +14,15 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
         {
             using var writer = new StreamWriter(path);
             // Write the header
             writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
+
+            // Write random state
+            var (index, mt) = random.SaveState();
+            writer.WriteLine($"{index}|{Convert.ToBase64String(ConvertUIntArrayToBytes(mt))}");
 
             // Write each record
             foreach (var record in data)
@@ -50,6 +55,16 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
                 // Skip the header line
                 reader.ReadLine();
 
+                // Second line is the random state
+                if (!reader.EndOfStream)
+                {
+                    var randomState = reader.ReadLine();
+                    var data = randomState.Split('|');
+                    var index = int.Parse(data[0]);
+                    var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
+                    Helpers.Init(new MersenneTwisterRandom((index, mt)));
+                }
+
                 while (!reader.EndOfStream)
                 {
                     var line = reader.ReadLine();
@@ -77,6 +92,25 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
                 }
             }
             return stockDataList;
+        }
+
+        static byte[] ConvertUIntArrayToBytes(uint[] uintArray)
+        {
+            List<byte> byteList = new();
+            foreach (uint value in uintArray)
+                byteList.AddRange(BitConverter.GetBytes(value));
+            return byteList.ToArray();
+        }
+
+        static uint[] ConvertByteArrayToUIntArray(byte[] byteArray)
+        {
+            if (byteArray.Length % 4 != 0)
+                throw new ArgumentException("Byte array length is not a multiple of 4.", nameof(byteArray));
+            int uintCount = byteArray.Length / 4;
+            uint[] uintArray = new uint[uintCount];
+            for (int i = 0; i < uintCount; i++)
+                uintArray[i] = BitConverter.ToUInt32(byteArray, i * 4);
+            return uintArray;
         }
 
         static decimal? ParseDecimal(string decimalValue)

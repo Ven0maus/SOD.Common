@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common.Shadows.Implementations;
+using System;
 using System.Collections.Generic;
 
 namespace SOD.StockMarket.Core.DataConversion.Converters
@@ -17,7 +18,7 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
         {
             throw new NotImplementedException();
         }
