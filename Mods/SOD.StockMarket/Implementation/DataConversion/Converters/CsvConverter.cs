@@ -26,13 +26,14 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         /// <inheritdoc/>
         public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
         {
-            using var writer = new StreamWriter(path, new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write });
-            // Write the header
-            writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
+            using var writer = new StreamWriter(path, new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write, Share = FileShare.Write });
 
             // Write random state
             var (index, mt) = random.SaveState();
             writer.WriteLine($"{index}|{Convert.ToBase64String(ConvertUIntArrayToBytes(mt))}");
+
+            // Write the header
+            writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
 
             // Write each record
             foreach (var record in data)
@@ -60,20 +61,17 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         public List<StockDataIO.StockDataDTO> Load(string path)
         {
             var stockDataList = new List<StockDataIO.StockDataDTO>();
-            using (var reader = new StreamReader(path, new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read }))
+            using (var reader = new StreamReader(path, new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read, Share = FileShare.Read }))
             {
-                // Skip the header line
-                reader.ReadLine();
+                // First line is the random state
+                var randomState = reader.ReadLine();
+                var data = randomState.Split('|');
+                var index = int.Parse(data[0]);
+                var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
+                MathHelper.Init(new MersenneTwisterRandom((index, mt)));
 
-                // Second line is the random state
-                if (!reader.EndOfStream)
-                {
-                    var randomState = reader.ReadLine();
-                    var data = randomState.Split('|');
-                    var index = int.Parse(data[0]);
-                    var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
-                    MathHelper.Init(new MersenneTwisterRandom((index, mt)));
-                }
+                // Second the line is the header, skip it
+                reader.ReadLine();
 
                 while (!reader.EndOfStream)
                 {

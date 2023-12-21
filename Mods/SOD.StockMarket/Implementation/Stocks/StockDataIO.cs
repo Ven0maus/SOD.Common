@@ -152,7 +152,13 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
 
             if (Plugin.Instance.Config.IsDebugEnabled)
+            {
                 Plugin.Log.LogInfo("Stocks data loaded: " + _market.Stocks.Count);
+                Plugin.Log.LogInfo($"- Loaded stocks -");
+                foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
+                    Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
+                Plugin.Log.LogInfo($"- End of Stocks -");
+            }
 
             _market.PostStocksInitialization(typeof(StockDataIO));
         }

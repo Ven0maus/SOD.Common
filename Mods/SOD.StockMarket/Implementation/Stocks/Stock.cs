@@ -1,6 +1,7 @@
 ﻿using SOD.Common.Shadows;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.StockMarket.Implementation.Stocks
 {
@@ -66,7 +67,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
 
             // Add historical data to the stock
-            foreach (var data in historicalData)
+            foreach (var data in historicalData.OrderBy(a => a.Date))
                 CreateHistoricalData(data);
 
             _imported = true;
@@ -85,7 +86,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         internal void DeterminePrice()
         {
             // Have a small chance not to change price at all (only if there is no trend going on)
-            if ((Trend == null || _currentStep >= Trend.Value.Steps) && MathHelper.Random.Next(0, 100) < 10)
+            if ((Trend == null || _currentStep >= Trend.Value.Steps) && MathHelper.Random.Next(0, 99) < 10)
             {
                 if (Trend != null && _currentStep >= Trend.Value.Steps)
                     RemoveTrend();

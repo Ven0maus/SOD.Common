@@ -21,8 +21,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             // Get company initials
             string initials = GetInitials(companyName);
 
-            if (_companySymbolCount == null)
-                _companySymbolCount = new();
+            _companySymbolCount ??= new();
 
             // Check if the company already has a symbol
             if (_companySymbolCount.TryGetValue(initials, out int count))
@@ -39,7 +38,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             string stockSymbol = initials + count.ToString("D2");
 
             // Truncate to a maximum of 4 characters
-            stockSymbol = stockSymbol.Substring(0, Math.Min(stockSymbol.Length, 4));
+            stockSymbol = stockSymbol[..Math.Min(stockSymbol.Length, 4)];
 
             return stockSymbol.ToUpper();
         }

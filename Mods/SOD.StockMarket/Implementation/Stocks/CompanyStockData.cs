@@ -87,7 +87,7 @@ namespace SOD.StockMarket.Implementation.Stocks
                     .DefaultIfEmpty()
                     .Average();
             }
-            return _averageSales ??= MathHelper.Random.Next(5, 100, true);
+            return _averageSales ??= MathHelper.Random.Next(5, 100);
         }
 
         private decimal? _minSalary;
@@ -95,7 +95,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         {
             if (_company != null && _company.minimumSalary > 0)
                 return (decimal)_company.minimumSalary;
-            return _minSalary ??= MathHelper.Random.Next(350, 750, true);
+            return _minSalary ??= MathHelper.Random.Next(350, 750);
         }
 
         private decimal? _topSalary;

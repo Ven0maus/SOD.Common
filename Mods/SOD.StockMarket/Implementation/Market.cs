@@ -102,13 +102,6 @@ namespace SOD.StockMarket.Implementation
             _stocks.Add(stock);
         }
 
-        private static string GetInitials(string companyName)
-        {
-            // Extract the first letter of each word in the company name
-            string[] words = companyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return string.Join("", words.Select(word => word[0]));
-        }
-
         private void InitializeMarket(object sender, TimeChangedArgs e)
         {
             // Unsubscribe after first call
@@ -208,7 +201,7 @@ namespace SOD.StockMarket.Implementation
             if (Plugin.Instance.Config.IsDebugEnabled)
             {
                 Plugin.Log.LogInfo($"- New stock updates -");
-                foreach (var stock in _stocks)
+                foreach (var stock in _stocks.OrderBy(a => a.Id))
                     Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
                 Plugin.Log.LogInfo($"- End of Stocks -");
             }
@@ -332,7 +325,7 @@ namespace SOD.StockMarket.Implementation
                     if (((int)percentage) == 0) continue;
 
                     // Total steps to full-fill trend (1 step = 1 in game minute)
-                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps, true);
+                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
 
                     // Generate the stock trend entry
                     var stockTrend = new StockTrend(percentage, stock.Price, steps);

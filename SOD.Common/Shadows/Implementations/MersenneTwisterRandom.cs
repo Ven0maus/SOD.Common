@@ -152,12 +152,11 @@ namespace SOD.Common.Shadows.Implementations
         /// <param name="minValue">The lower bound (inclusive)</param>
         /// <param name="maxValue">The higher bound (inclusive)</param>
         /// <returns></returns>
-        public int Next(int minValue, int maxValue, bool inclusive = false)
+        public int Next(int minValue, int maxValue)
         {
             if (maxValue < minValue)
                 throw new ArgumentException("MaxValue cannot be smaller than minValue.");
-            return inclusive ? Convert.ToInt32(Math.Floor(NextDouble(minValue * 1.0d, maxValue * 1.0d))) : 
-                Convert.ToInt32(Math.Ceiling(NextDouble(minValue * 1.0d, maxValue * 1.0d - double.Epsilon)));
+            return Convert.ToInt32(Math.Floor(NextDouble(minValue * 1.0d, maxValue * 1.0d)));
         }
 
         /// <summary>
