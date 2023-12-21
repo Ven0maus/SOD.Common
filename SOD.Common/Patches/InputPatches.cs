@@ -42,7 +42,7 @@ namespace SOD.Common.Patches
                     {
                         Lib.InputDetection.ReportButtonStateChange(actionName, true);
                     }
-                    if (__instance.player.GetButtonUp(actionName))
+                    else if (__instance.player.GetButtonUp(actionName))
                     {
                         Lib.InputDetection.ReportButtonStateChange(actionName, false);
                     }
