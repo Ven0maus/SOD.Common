@@ -6,8 +6,17 @@ using System.IO;
 
 namespace SOD.StockMarket.Core.DataConversion.Converters
 {
+    /// <summary>
+    /// Converter to convert stock data into/from csv files.
+    /// </summary>
     internal sealed class CsvConverter : IDataConverter
     {
+        private CsvConverter() { }
+
+        /// <summary>
+        /// Create's a new instance.
+        /// </summary>
+        /// <returns></returns>
         internal static CsvConverter Create()
         {
             return new CsvConverter();

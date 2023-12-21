@@ -70,14 +70,14 @@ namespace SOD.StockMarket.Core
             Helpers.Init(CityData.Instance.seed.GetHashCode());
 
             // Also add some default game related stocks and update prices
-            AddIconicStocks();
+            AddCustomStocks();
 
             // Init the stocks
             foreach (var stock in _stocks)
                 stock.Initialize();
 
             // Hook initialize for historical data
-            Lib.Time.OnTimeInitialized += InitializeHistoricalData;
+            Lib.Time.OnTimeInitialized += InitializeMarket;
 
             // Market is finished initializing stocks
             if (Plugin.Instance.Config.IsDebugEnabled)
@@ -98,24 +98,24 @@ namespace SOD.StockMarket.Core
         }
 
         /// <summary>
-        /// Adds some hardcoded game related stocks.
+        /// Adds some hardcoded custom stocks.
         /// </summary>
-        private void AddIconicStocks()
+        private void AddCustomStocks()
         {
             var customCompanies = new (CompanyData data, decimal? basePrice)[] 
             {
                 (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Helpers.Random.NextDouble(5000f, 10000f)),
                 (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Helpers.Random.NextDouble(2000f, 5000f)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.95f, 1.05f))
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.975f, 1.025f))
             };
             foreach (var (data, basePrice) in customCompanies)
                 InitStock(new Stock(data, basePrice));
         }
 
-        private void InitializeHistoricalData(object sender, TimeChangedArgs e)
+        private void InitializeMarket(object sender, TimeChangedArgs e)
         {
             // Unsubscribe after first call
-            Lib.Time.OnTimeInitialized -= InitializeHistoricalData;
+            Lib.Time.OnTimeInitialized -= InitializeMarket;
 
             int totalEntries = 0;
             var currentDate = Lib.Time.CurrentDate;
@@ -124,7 +124,8 @@ namespace SOD.StockMarket.Core
             foreach (var stock in _stocks)
             {
                 StockData previous = null;
-                for (int i = totalDays; i >= 0; i--)
+                // Not >= we don't want to add one for the current date
+                for (int i = totalDays + 1; i > 0; i--)
                 {
                     var newDate = currentDate.AddDays(-i);
                     var newStockData = new StockData
@@ -164,10 +165,10 @@ namespace SOD.StockMarket.Core
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo($"Initialized {totalEntries} historical data entries.");
 
+            // Also attempt to generate some trends
             GenerateTrends();
         }
 
-        private int _minutesPassed;
         /// <summary>
         /// Updates the stock market based on the current trends.
         /// </summary>
@@ -176,28 +177,10 @@ namespace SOD.StockMarket.Core
             // Don't execute calculations when the stock market is closed
             if (!IsOpen()) return;
 
-            // If there is no hour change, we do a new update of the prices
-            // When the hour changes, we need to update prices after setting opening price
-            // If this is indeed applicable it will be handled within OnHourChanged
-            if (!args.IsHourChanged)
-            {
-                // Execute everything to simulate the economy each in game minute
+            // Trigger price update every in game minute
+            // Hour change price updates are handled seperately
+            if (!args.IsHourChanged)  
                 Calculate();
-            }
-
-            // Logging every 1 hour
-            _minutesPassed++;
-            if (_minutesPassed % 60 == 0)
-            {
-                _minutesPassed = 0;
-                if (Plugin.Instance.Config.IsDebugEnabled)
-                {
-                    Plugin.Log.LogInfo($"- New stock updates -");
-                    foreach (var stock in _stocks)
-                        Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
-                    Plugin.Log.LogInfo($"- End of Stocks -");
-                }
-            }
         }
 
         private void OnHourChanged(object sender, TimeChangedArgs args)
@@ -210,9 +193,6 @@ namespace SOD.StockMarket.Core
             if (currentTime.Hour == OpeningHour)
             {
                 OnOpen();
-
-                // Update prices after the opening price was set
-                Calculate();
             }
             else if (currentTime.Hour == ClosingHour)
             {
@@ -222,8 +202,19 @@ namespace SOD.StockMarket.Core
 
             if (!IsOpen()) return;
 
+            // Update prices
+            Calculate();
+
             // Generate hourly trends
             GenerateTrends();
+
+            if (Plugin.Instance.Config.IsDebugEnabled)
+            {
+                Plugin.Log.LogInfo($"- New stock updates -");
+                foreach (var stock in _stocks)
+                    Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
+                Plugin.Log.LogInfo($"- End of Stocks -");
+            }
         }
 
         public static bool IsOpen()

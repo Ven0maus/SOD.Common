@@ -4,8 +4,17 @@ using System.Collections.Generic;
 
 namespace SOD.StockMarket.Core.DataConversion.Converters
 {
+    /// <summary>
+    /// Converter to convert stock data into/from binary files.
+    /// </summary>
     internal class BinaryConverter : IDataConverter
     {
+        private BinaryConverter() { }
+
+        /// <summary>
+        /// Create's a new instance.
+        /// </summary>
+        /// <returns></returns>
         internal static BinaryConverter Create()
         {
             return new BinaryConverter();

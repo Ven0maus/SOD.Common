@@ -23,6 +23,7 @@ namespace SOD.StockMarket.Core
         private readonly List<StockData> _historicalData;
         private readonly CompanyData _companyData;
         private readonly decimal? _basePrice;
+        private readonly bool _imported;
 
         internal Stock(Company company) : this()
         {
@@ -67,6 +68,8 @@ namespace SOD.StockMarket.Core
             // Add historical data to the stock
             foreach (var data in historicalData)
                 CreateHistoricalData(data);
+
+            _imported = true;
         }
 
         private Stock(int? id = null, decimal? basePrice = null)
@@ -74,6 +77,7 @@ namespace SOD.StockMarket.Core
             Id = id ?? _id++;
             _historicalData = new List<StockData>();
             _basePrice = basePrice;
+            _imported = false;
         }
 
         // Total steps is 60, until it reaches the next hour
@@ -193,6 +197,8 @@ namespace SOD.StockMarket.Core
 
         internal void Initialize()
         {
+            if (_imported)
+                throw new Exception("An imported stock is already initialized, no need to call Initialize();");
             _companyData.UpdateInfo();
 
             // Set initial prices

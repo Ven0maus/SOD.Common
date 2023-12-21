@@ -104,7 +104,7 @@ namespace SOD.StockMarket.Core
             var converter = ConverterFactory.Get(path);
             var stockDtos = converter.Load(path);
 
-            // Each stockdto that doesn't have a price is an historical data entry, create a dictionary lookup on stock Id.
+            // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
             var historicalDatas = stockDtos
                 .Where(a => a.Price == null)
                 .GroupBy(a => a.Id)
@@ -141,13 +141,12 @@ namespace SOD.StockMarket.Core
                 })
                 .ToDictionary(a => a.Key, a => a.Data);
 
-            // Import the actual stocks, each stockdto that has a price is the "most recent" version of the stock.
+            // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
             // Ordering by id is important to keep the random state working correctly.
             foreach (var stockDto in stockDtos.Where(a => a.Price != null).OrderBy(a => a.Id))
             {
+                // Create a stock an init it
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
-
-                // Init the stock into the market
                 _market.InitStock(stock);
             }
 
