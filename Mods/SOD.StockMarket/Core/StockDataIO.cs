@@ -29,7 +29,7 @@ namespace SOD.StockMarket.Core
             }
 
             var dataDump = new List<StockDataDTO>();
-            foreach (var stock in _market.Stocks.OrderBy(a => a.Symbol))
+            foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
             {
                 // Dump first the current state of the stock
                 var currentDate = stock.HistoricalData.LastOrDefault()?.Date;
