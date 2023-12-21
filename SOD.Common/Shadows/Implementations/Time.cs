@@ -80,7 +80,7 @@ namespace SOD.Common.Shadows.Implementations
         /// <summary>
         /// Returns the current weekday enum
         /// </summary>
-        public SessionData.WeekDay CurrentWeekDay
+        public SessionData.WeekDay CurrentDayEnum
         {
             get
             {
@@ -91,7 +91,7 @@ namespace SOD.Common.Shadows.Implementations
         /// <summary>
         /// Returns the current month enum
         /// </summary>
-        public SessionData.Month CurrentMonth
+        public SessionData.Month CurrentMonthEnum
         {
             get
             {
@@ -195,7 +195,10 @@ namespace SOD.Common.Shadows.Implementations
             public int Hour { get; }
             public int Minute { get; }
 
-            public SessionData.WeekDay CurrentWeekDay
+            /// <summary>
+            /// Return's the game's WeekDay enum for the week day
+            /// </summary>
+            public SessionData.WeekDay DayEnum
             {
                 get
                 {
@@ -203,7 +206,10 @@ namespace SOD.Common.Shadows.Implementations
                 }
             }
 
-            public SessionData.Month CurrentMonth
+            /// <summary>
+            /// Return's the game's Month enum for the current month
+            /// </summary>
+            public SessionData.Month MonthEnum
             {
                 get
                 {
@@ -221,11 +227,21 @@ namespace SOD.Common.Shadows.Implementations
             }
 
 
+            /// <summary>
+            /// Serializes the data in a string format "{Year}|{Month}|{Day}|{Hour}|{Minute}".
+            /// </summary>
+            /// <returns></returns>
             public string Serialize()
             {
                 return $"{Year}|{Month}|{Day}|{Hour}|{Minute}";
             }
 
+            /// <summary>
+            /// Deserializes to a TimeData struct from following string format "{Year}|{Month}|{Day}|{Hour}|{Minute}".
+            /// </summary>
+            /// <param name="serializedString"></param>
+            /// <returns></returns>
+            /// <exception cref="Exception"></exception>
             public static TimeData Deserialize(string serializedString)
             {
                 var data = serializedString.Split('|').Select(int.Parse).ToArray();
@@ -233,9 +249,28 @@ namespace SOD.Common.Shadows.Implementations
                 return new TimeData(data[0], data[1], data[2], data[3], data[4]);
             }
 
+            /// <summary>
+            /// Returns a string format "MM/dd/yyyy HH:mm".
+            /// </summary>
+            /// <returns></returns>
             public override string ToString()
             {
-                return "MM/dd/yyyy HH:mm"
+                return ToString("MM/dd/yyyy HH:mm");
+            }
+
+            /// <summary>
+            /// Returns a custom string format, you can use any of the following elements which will be correctly replaced:
+            /// <br>dd -> day</br>
+            /// <br>MM -> month</br>
+            /// <br>yyyy -> year</br>
+            /// <br>HH -> hour</br>
+            /// <br>mm -> minute</br>
+            /// </summary>
+            /// <param name="format"></param>
+            /// <returns></returns>
+            public string ToString(string format)
+            {
+                return format
                     .Replace("dd", Month.ToString("00"))
                     .Replace("MM", Day.ToString("00"))
                     .Replace("yyyy", Year.ToString())
@@ -262,6 +297,11 @@ namespace SOD.Common.Shadows.Implementations
                 return obj is TimeData data && Equals(data);
             }
 
+            /// <summary>
+            /// Add's a certain amount of days to the TimeData
+            /// </summary>
+            /// <param name="days"></param>
+            /// <returns></returns>
             public TimeData AddDays(int days)
             {
                 DateTime currentDateTime = new(Year, Month, Day, Hour, Minute, 0);

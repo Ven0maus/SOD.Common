@@ -241,7 +241,7 @@ namespace SOD.StockMarket.Core
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => Enum.Parse<SessionData.WeekDay>(a.ToLower()))
                 .ToHashSet();
-            var currentDay = Lib.Time.CurrentWeekDay;
+            var currentDay = Lib.Time.CurrentDayEnum;
             if (closedDays.Contains(currentDay))
                 return false;
 
