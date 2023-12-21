@@ -1,11 +1,9 @@
-﻿using SOD.StockMarket.Implementation.DataConversion;
-
-namespace SOD.StockMarket
+﻿namespace SOD.StockMarket
 {
     internal class Constants
     {
         internal const bool IsDebugEnabled = false;
-        internal const DataSaveFormat StockDataSaveFormat = DataSaveFormat.Csv;
+        internal const string StockDataSaveFormat = "csv";
         internal const int OpeningHour = 9;
         internal const int ClosingHour = 16;
         internal const string DaysClosed = "Saturday,Sunday";

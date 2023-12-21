@@ -1,6 +1,7 @@
 ﻿using SOD.Common.Extensions;
 using SOD.Common.Shadows;
 using SOD.Common.Shadows.Implementations;
+using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Collections.Generic;
@@ -401,7 +402,12 @@ namespace SOD.StockMarket.Implementation
             // TODO: Add configuration option to save it as a custom binary format or .csv format
             // Get market savestore
             var savecode = Lib.SaveGame.GetUniqueString(filePath);
-            var fileName = $"stocks_{savecode}.csv";
+
+            if (!Enum.TryParse<DataSaveFormat>(Plugin.Instance.Config.StockDataSaveFormat.Trim(), true, out var extType))
+                throw new Exception($"Invalid save format \"{Plugin.Instance.Config.StockDataSaveFormat}\".");
+
+            string extension = $".{extType.ToString().ToLower()}";
+            var fileName = $"stocks_{savecode}{extension}";
             var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
             return Path.Combine(saveStore, fileName);
         }

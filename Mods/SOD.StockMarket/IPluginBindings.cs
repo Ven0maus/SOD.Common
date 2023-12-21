@@ -1,5 +1,4 @@
 ﻿using SOD.Common.BepInEx.Configuration;
-using SOD.StockMarket.Implementation.DataConversion;
 
 namespace SOD.StockMarket
 {
@@ -11,8 +10,8 @@ namespace SOD.StockMarket
         [Binding(Constants.IsDebugEnabled, "Enables debug mode which prints several useful information into the console.", "Debugging.EnableDebugMode")]
         bool IsDebugEnabled { get; set; }
 
-        [Binding(Constants.StockDataSaveFormat, "The default save format for the stock data. (binary = smaller file size)", "Debugging.StockDataSaveFormat")]
-        DataSaveFormat StockDataSaveFormat { get; set; }
+        [Binding(Constants.StockDataSaveFormat, "The save format for the stock data. Options: \"csv\", \"bin\")", "Debugging.StockDataSaveFormat")]
+        string StockDataSaveFormat { get; set; }
     }
 
     public interface IMarketBindings

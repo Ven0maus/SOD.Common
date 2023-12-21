@@ -64,8 +64,10 @@ namespace SOD.StockMarket
 
             // Fallback to default format
             var stockDataSaveFormat = Config.StockDataSaveFormat;
-            if (!Enum.IsDefined(typeof(DataSaveFormat), stockDataSaveFormat))
+            if (!Enum.TryParse<DataSaveFormat>(stockDataSaveFormat.Trim(), true, out _))
+            {
                 Config.StockDataSaveFormat = Constants.StockDataSaveFormat;
+            }
         }
     }
 }

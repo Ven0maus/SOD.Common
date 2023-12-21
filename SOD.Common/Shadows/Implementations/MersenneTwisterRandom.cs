@@ -8,6 +8,11 @@ namespace SOD.Common.Shadows.Implementations
     public sealed class MersenneTwisterRandom
     {
         /// <summary>
+        /// The internal size of the array
+        /// </summary>
+        public const int ArraySize = 625;
+
+        /// <summary>
         /// N
         /// </summary>
         private static readonly int N = 624;
@@ -94,7 +99,7 @@ namespace SOD.Common.Shadows.Implementations
             return y >> 18;
         }
 
-        private readonly uint[] mt = new uint[625];
+        private readonly uint[] mt = new uint[ArraySize];
         private int mti = N + 1;
 
         private void Generate(uint seed)

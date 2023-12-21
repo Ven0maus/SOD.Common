@@ -3,6 +3,6 @@
     public enum DataSaveFormat
     {
         Csv,
-        Binary
+        Bin
     }
 }

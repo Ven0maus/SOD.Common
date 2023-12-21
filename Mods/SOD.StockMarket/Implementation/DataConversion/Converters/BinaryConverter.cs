@@ -38,7 +38,21 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             // Save each record
             foreach (var record in data)
             {
-                // TODO: Write record value
+                writer.Write(record.Id);
+                writer.Write(record.Name);
+                writer.Write(record.Symbol);
+                WriteNullableTimeData(writer, record.Date);
+                WriteNullableDecimal(writer, record.Price);
+                writer.Write(record.Open);
+                WriteNullableDecimal(writer, record.Close);
+                writer.Write(record.High);
+                writer.Write(record.Low);
+                WriteNullableDouble(writer, record.Volatility);
+                WriteNullableDouble(writer, record.TrendPercentage);
+                WriteNullableDecimal(writer, record.TrendStartPrice);
+                WriteNullableDecimal(writer, record.TrendEndPrice);
+                WriteNullableInt(writer, record.TrendSteps);
+                writer.Write(record.Average);
             }
         }
 
@@ -55,7 +69,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
 
                 // Read random state
                 var index = reader.ReadInt32();
-                var mt = new uint[624];
+                var mt = new uint[MersenneTwisterRandom.ArraySize];
                 for (int i = 0; i < mt.Length; i++)
                     mt[i] = reader.ReadUInt32();
                 MathHelper.Init(new MersenneTwisterRandom((index, mt)));
@@ -63,10 +77,84 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 // Read each record
                 while (reader.BaseStream.Position < reader.BaseStream.Length)
                 {
-                    // TODO: Create stock data
+                    var stockData = new StockDataIO.StockDataDTO
+                    {
+                        Id = reader.ReadInt32(),
+                        Name = reader.ReadString(),
+                        Symbol = reader.ReadString(),
+                        Date = ReadNullableTimeData(reader),
+                        Price = ReadNullableDecimal(reader),
+                        Open = reader.ReadDecimal(),
+                        Close = ReadNullableDecimal(reader),
+                        High = reader.ReadDecimal(),
+                        Low = reader.ReadDecimal(),
+                        Volatility = ReadNullableDouble(reader),
+                        TrendPercentage = ReadNullableDouble(reader),
+                        TrendStartPrice = ReadNullableDecimal(reader),
+                        TrendEndPrice = ReadNullableDecimal(reader),
+                        TrendSteps = ReadNullableInt(reader),
+                        Average = reader.ReadDecimal()
+                    };
+                    stockDataList.Add(stockData);
                 }
             }
             return stockDataList;
+        }
+
+        private static void WriteNullableTimeData(BinaryWriter writer, Time.TimeData? value)
+        {
+            writer.Write(value.HasValue);
+            if (value.HasValue)
+                writer.Write(value.Value.Serialize());
+        }
+
+        private static void WriteNullableDecimal(BinaryWriter writer, decimal? value)
+        {
+            writer.Write(value.HasValue);
+            if (value.HasValue)
+                writer.Write(value.Value);
+        }
+
+        private static void WriteNullableDouble(BinaryWriter writer, double? value)
+        {
+            writer.Write(value.HasValue);
+            if (value.HasValue)
+                writer.Write(value.Value);
+        }
+
+        private static void WriteNullableInt(BinaryWriter writer, int? value)
+        {
+            writer.Write(value.HasValue);
+            if (value.HasValue)
+                writer.Write(value.Value);
+        }
+
+        private static Time.TimeData? ReadNullableTimeData(BinaryReader reader)
+        {
+            if (reader.ReadBoolean())
+                return Time.TimeData.Deserialize(reader.ReadString());
+            return null;
+        }
+
+        private static decimal? ReadNullableDecimal(BinaryReader reader)
+        {
+            if (reader.ReadBoolean())
+                return reader.ReadDecimal();
+            return null;
+        }
+
+        private static double? ReadNullableDouble(BinaryReader reader)
+        {
+            if (reader.ReadBoolean())
+                return reader.ReadDouble();
+            return null;
+        }
+
+        private static int? ReadNullableInt(BinaryReader reader)
+        {
+            if (reader.ReadBoolean())
+                return reader.ReadInt32();
+            return null;
         }
     }
 }
