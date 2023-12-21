@@ -31,26 +31,17 @@
     <Reference Include="Assembly-CSharp">
       <HintPath>..\libs\il2cpp\Assembly-CSharp.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp-firstpass">
-      <HintPath>..\libs\il2cpp\Assembly-CSharp-firstpass.dll</HintPath>
-    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
     </Reference>
     <Reference Include="Rewired_Core">
       <HintPath>..\libs\il2cpp\Rewired_Core.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>..\libs\il2cpp\UnityEngine.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\libs\il2cpp\UnityEngine.UI.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\libs\il2cpp\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UniverseLib.IL2CPP.Interop">
       <HintPath>UniverseLib.IL2CPP.Interop.dll</HintPath>
