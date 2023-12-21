@@ -1,5 +1,4 @@
-﻿using SOD.Common.Shadows;
-using SOD.Common.Shadows.Implementations;
+﻿using SOD.Common.Shadows.Implementations;
 using SOD.StockMarket.Core.DataConversion;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +9,7 @@ namespace SOD.StockMarket.Core
     {
         private readonly Market _market;
 
-        internal StockDataIO(Market market) 
+        internal StockDataIO(Market market)
         {
             _market = market;
         }
@@ -108,12 +107,12 @@ namespace SOD.StockMarket.Core
             var historicalDatas = stockDtos
                 .Where(a => a.Price == null)
                 .GroupBy(a => a.Id)
-                .Select(a => 
+                .Select(a =>
                 {
                     // Order from oldest to newest (last entry is the newest)
                     var stockDatas = a
                         .OrderBy(a => a.Date)
-                        .Select(a => 
+                        .Select(a =>
                     {
                         var data = new StockData
                         {

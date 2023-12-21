@@ -102,7 +102,7 @@ namespace SOD.StockMarket.Core
         /// </summary>
         private void AddCustomStocks()
         {
-            var customCompanies = new (CompanyData data, decimal? basePrice)[] 
+            var customCompanies = new (CompanyData data, decimal? basePrice)[]
             {
                 (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)MathHelper.Random.NextDouble(5000f, 10000f)),
                 (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)MathHelper.Random.NextDouble(2000f, 5000f)),
@@ -136,7 +136,7 @@ namespace SOD.StockMarket.Core
 
                     var historicalOne = -historicalDataPercentage * (float)stock.Volatility;
                     var historicalTwo = historicalDataPercentage * (float)stock.Volatility;
-                    
+
                     var sizeRange = stock.Volatility;
                     newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)MathHelper.Random.NextDouble(historicalOne, historicalTwo), 2);
                     if (newStockData.Close <= 0m)
@@ -179,7 +179,7 @@ namespace SOD.StockMarket.Core
 
             // Trigger price update every in game minute
             // Hour change price updates are handled seperately
-            if (!args.IsHourChanged)  
+            if (!args.IsHourChanged)
                 Calculate();
         }
 
@@ -242,7 +242,7 @@ namespace SOD.StockMarket.Core
         private void OnClose()
         {
             int historicalDataDeleted = 0;
-            _stocks.ForEach(a => 
+            _stocks.ForEach(a =>
             {
                 a.ClosingPrice = a.Price;
                 a.CreateHistoricalData();
@@ -332,7 +332,7 @@ namespace SOD.StockMarket.Core
                     double percentage = Math.Round(MathHelper.NextGaussian(stockMean, stockStdDev));
 
                     // Skip 0 percentage differences
-                    if (((int)percentage) == 0) continue; 
+                    if (((int)percentage) == 0) continue;
 
                     // Total steps to full-fill trend (1 step = 1 in game minute)
                     int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);

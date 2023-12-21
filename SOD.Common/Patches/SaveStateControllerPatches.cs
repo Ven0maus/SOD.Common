@@ -108,7 +108,7 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static void Prefix(MainMenuController __instance)
             {
-                if (__instance.selectedSave != null && !__instance.selectedSave.isInternal && 
+                if (__instance.selectedSave != null && !__instance.selectedSave.isInternal &&
                     __instance.selectedSave.info != null && System.IO.File.Exists(__instance.selectedSave.info.FullName))
                 {
                     _delete = true;

@@ -22,7 +22,7 @@ namespace SOD.StockMarket.Core
         }
 
         internal CompanyData(Company company)
-        { 
+        {
             Company = company;
         }
 

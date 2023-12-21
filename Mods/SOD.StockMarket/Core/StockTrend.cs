@@ -21,7 +21,7 @@ namespace SOD.StockMarket.Core
         /// </summary>
         internal int Steps { get; init; }
 
-        internal StockTrend(double percentage, decimal currentPrice, int steps) 
+        internal StockTrend(double percentage, decimal currentPrice, int steps)
         {
             Percentage = percentage;
             StartPrice = currentPrice;

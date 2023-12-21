@@ -46,7 +46,7 @@ namespace SOD.Common.Shadows.Implementations
             // Hash the code
             return ComputeHash(saveFilePath);
         }
-        
+
         /// <summary>
         /// Returns a path to a folder where you can store all your data.
         /// <br>If the folder does not yet exist, it will create it for you.</br>
@@ -112,7 +112,7 @@ namespace SOD.Common.Shadows.Implementations
     public sealed class SaveGameArgs : EventArgs
     {
         public string FilePath { get; }
-        
+
         public SaveGameArgs(string filePath)
         {
             FilePath = filePath;

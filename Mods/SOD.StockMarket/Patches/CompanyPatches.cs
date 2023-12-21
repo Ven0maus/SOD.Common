@@ -16,8 +16,8 @@ namespace SOD.StockMarket.Patches
                 if (Plugin.Instance.Market.Initialized) return;
 
                 // Don't create stocks for these types of companies
-                if (__instance.preset != null && __instance.preset.isSelfEmployed || 
-                    __instance.preset.isIllegal || !__instance.preset.publicFacing) 
+                if (__instance.preset != null && __instance.preset.isSelfEmployed ||
+                    __instance.preset.isIllegal || !__instance.preset.publicFacing)
                     return;
 
                 if (!_shownInitializingMessage)

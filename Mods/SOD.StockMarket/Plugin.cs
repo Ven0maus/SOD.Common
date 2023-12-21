@@ -1,8 +1,7 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
-using System.Reflection;
 using SOD.StockMarket.Core;
-using SOD.Common.Shadows;
+using System.Reflection;
 
 namespace SOD.StockMarket
 {

@@ -280,10 +280,10 @@ namespace SOD.Common.Shadows.Implementations
 
             public bool Equals(TimeData other)
             {
-                return other.Year == Year && 
-                    other.Month == Month && 
-                    other.Day == Day && 
-                    other.Hour == Hour && 
+                return other.Year == Year &&
+                    other.Month == Month &&
+                    other.Day == Day &&
+                    other.Hour == Hour &&
                     other.Minute == Minute;
             }
 

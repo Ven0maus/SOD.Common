@@ -1,7 +1,7 @@
-﻿using System;
+﻿using SOD.StockMarket.Core.DataConversion.Converters;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using SOD.StockMarket.Core.DataConversion.Converters;
 
 namespace SOD.StockMarket.Core.DataConversion
 {
