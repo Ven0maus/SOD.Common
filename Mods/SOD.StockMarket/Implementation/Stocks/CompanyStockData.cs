@@ -1,14 +1,13 @@
 ﻿using SOD.Common.Extensions;
-using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Linq;
 
-namespace SOD.StockMarket.Implementation
+namespace SOD.StockMarket.Implementation.Stocks
 {
     /// <summary>
     /// Info container regarding company details.
     /// </summary>
-    internal class CompanyData
+    internal class CompanyStockData
     {
         /// <summary>
         /// The name of the stock.
@@ -46,7 +45,7 @@ namespace SOD.StockMarket.Implementation
         /// <param name="name"></param>
         /// <param name="volatility"></param>
         /// <param name="symbol"></param>
-        internal CompanyData(string name, double volatility, string symbol = null)
+        internal CompanyStockData(string name, double volatility, string symbol = null)
         {
             Name = name;
             Symbol = symbol ?? StockSymbolGenerator.Generate(Name);
@@ -57,7 +56,7 @@ namespace SOD.StockMarket.Implementation
         /// Use this to insert a new stock from an in-game company.
         /// </summary>
         /// <param name="company"></param>
-        internal CompanyData(Company company)
+        internal CompanyStockData(Company company)
         {
             _company = company;
         }

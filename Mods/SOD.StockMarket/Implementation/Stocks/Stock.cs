@@ -21,16 +21,16 @@ namespace SOD.StockMarket.Implementation.Stocks
         internal IReadOnlyList<StockData> HistoricalData => _historicalData;
 
         private readonly List<StockData> _historicalData;
-        private readonly CompanyData _companyData;
+        private readonly CompanyStockData _companyData;
         private readonly decimal? _basePrice;
         private readonly bool _imported;
 
         internal Stock(Company company) : this()
         {
-            _companyData = new CompanyData(company);
+            _companyData = new CompanyStockData(company);
         }
 
-        internal Stock(CompanyData companyData, decimal? basePrice = null) : this(basePrice: basePrice)
+        internal Stock(CompanyStockData companyData, decimal? basePrice = null) : this(basePrice: basePrice)
         {
             _companyData = companyData;
         }
@@ -42,7 +42,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// <param name="historicalData"></param>
         internal Stock(StockDataIO.StockDataDTO dto, IEnumerable<StockData> historicalData) : this(dto.Id, dto.Price)
         {
-            _companyData = new CompanyData(dto.Name, dto.Volatility.Value, dto.Symbol);
+            _companyData = new CompanyStockData(dto.Name, dto.Volatility.Value, dto.Symbol);
 
             // Set initial values
             Price = dto.Price.Value;
