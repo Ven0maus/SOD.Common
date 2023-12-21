@@ -33,3 +33,4 @@ msbuild.wrn
 .vs/
 *.zip
 UnityProject
+libs
