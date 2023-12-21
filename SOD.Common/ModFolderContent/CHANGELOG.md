@@ -1,8 +1,13 @@
 # CHANGELOG
 **1.0.4**
 - Renamed Common class to Lib to make it easier to access the helper classes.
-- Added Time helper class to Lib which contains ways to retrieve the current game time, and adds several events for when the time changes.
 - PluginController Instance now returns the actual class itself by using PluginController<TImpl, TBindings> where TImpl is your Plugin class.
+- Added Newtonsoft.Json dependency (for serialization)
+- Addes SaveGame helper class (save/load/newgame events)
+- Added Time helper class (in game time events)
+- Added patch to fix double loading from within a game scene
+- Added MersenneTwisterRandom implementation
+- Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIL2Cpp)
 
 **1.0.3**
 - Added validation messages for each binding when it is initialized incase something went wrong.

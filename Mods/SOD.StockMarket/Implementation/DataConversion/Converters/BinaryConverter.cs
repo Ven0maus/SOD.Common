@@ -1,5 +1,6 @@
 ﻿using SOD.Common.Shadows.Implementations;
 using SOD.StockMarket.Implementation.Stocks;
+using SOD.StockMarket.Implementation.Trade;
 using System.Collections.Generic;
 using System.IO;
 
@@ -35,9 +36,14 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             foreach (var value in mt)        
                 writer.Write(value);
 
-            // Save each record
-            foreach (var record in data)
+            // Save trade save data
+            var tradeSaveData = data[0].TradeSaveData.ToJson();
+            writer.Write(tradeSaveData);
+
+            // Save each record, start at one because 0 is trade save data
+            for (int i=1; i < data.Count; i++)
             {
+                var record = data[i];
                 writer.Write(record.Id);
                 writer.Write(record.Name);
                 writer.Write(record.Symbol);
@@ -73,6 +79,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 for (int i = 0; i < mt.Length; i++)
                     mt[i] = reader.ReadUInt32();
                 MathHelper.Init(new MersenneTwisterRandom((index, mt)));
+
+                // Read trade save data
+                var tradeSaveData = TradeSaveData.FromJson(reader.ReadString());
+                stockDataList.Add(new StockDataIO.StockDataDTO { TradeSaveData = tradeSaveData });
 
                 // Read each record
                 while (reader.BaseStream.Position < reader.BaseStream.Length)

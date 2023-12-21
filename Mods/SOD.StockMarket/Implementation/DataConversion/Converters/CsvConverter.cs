@@ -1,5 +1,7 @@
-﻿using SOD.Common.Shadows.Implementations;
+﻿using Il2CppInterop.Generator.Extensions;
+using SOD.Common.Shadows.Implementations;
 using SOD.StockMarket.Implementation.Stocks;
+using SOD.StockMarket.Implementation.Trade;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -32,6 +34,9 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             var (index, mt) = random.SaveState();
             writer.WriteLine($"{index}|{Convert.ToBase64String(ConvertUIntArrayToBytes(mt))}");
 
+            // Write trade save data
+            writer.WriteLine(data[0].TradeSaveData.ToJson());
+
             // Write the header
             writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
 
@@ -63,14 +68,18 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             var stockDataList = new List<StockDataIO.StockDataDTO>();
             using (var reader = new StreamReader(path, new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read, Share = FileShare.Read }))
             {
-                // First line is the random state
+                // Read the random state
                 var randomState = reader.ReadLine();
                 var data = randomState.Split('|');
                 var index = int.Parse(data[0]);
                 var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
                 MathHelper.Init(new MersenneTwisterRandom((index, mt)));
 
-                // Second the line is the header, skip it
+                // Read trade save data
+                var tradeSaveData = TradeSaveData.FromJson(reader.ReadLine());
+                stockDataList.Add(new StockDataIO.StockDataDTO { TradeSaveData = tradeSaveData });
+
+                // Skip header
                 reader.ReadLine();
 
                 while (!reader.EndOfStream)

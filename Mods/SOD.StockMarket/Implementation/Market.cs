@@ -3,6 +3,7 @@ using SOD.Common.Shadows;
 using SOD.Common.Shadows.Implementations;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
+using SOD.StockMarket.Implementation.Trade;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,6 +20,11 @@ namespace SOD.StockMarket.Implementation
         /// </summary>
         internal IReadOnlyList<Stock> Stocks => _stocks;
 
+        /// <summary>
+        /// Raised when the economy calculates.
+        /// </summary>
+        internal event EventHandler<EventArgs> OnCalculate;
+
         internal bool Initialized { get; private set; } = false;
 
         private bool _interiorCreatorFinished = false;
@@ -28,9 +34,12 @@ namespace SOD.StockMarket.Implementation
         private static int OpeningHour => Plugin.Instance.Config.OpeningHour;
         private static int ClosingHour => Plugin.Instance.Config.ClosingHour;
 
+        private readonly TradeController _tradeController;
+
         internal Market()
         {
             _stocks = new List<Stock>();
+            _tradeController = new TradeController(this);
 
             // Setup events
             Lib.SaveGame.OnBeforeLoad += OnFileLoad;
@@ -263,6 +272,7 @@ namespace SOD.StockMarket.Implementation
         {
             foreach (var stock in _stocks)
                 stock.DeterminePrice();
+            OnCalculate?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -347,7 +357,7 @@ namespace SOD.StockMarket.Implementation
             var path = GetSaveFilePath(e.FilePath);
 
             // Export data to save file
-            new StockDataIO(this).Export(path);
+            new StockDataIO(this, _tradeController).Export(path);
 
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
@@ -375,7 +385,7 @@ namespace SOD.StockMarket.Implementation
             Initialized = false;
 
             // Import data from save file
-            new StockDataIO(this).Import(path);
+            new StockDataIO(this, _tradeController).Import(path);
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)

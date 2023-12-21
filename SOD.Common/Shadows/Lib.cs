@@ -21,10 +21,5 @@ namespace SOD.Common.Shadows
         /// Contains helper methods regarding saving and loading game.
         /// </summary>
         public static SaveGame SaveGame { get; } = new SaveGame();
-
-        /// <summary>
-        /// Contains helper methods for converting to Il2Cpp objects
-        /// </summary>
-        public static Il2CppConverter Il2Cpp { get; } = new Il2CppConverter();
     }
 }

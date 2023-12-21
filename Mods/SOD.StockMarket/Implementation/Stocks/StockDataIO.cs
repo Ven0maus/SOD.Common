@@ -1,5 +1,6 @@
 ﻿using SOD.Common.Shadows.Implementations;
 using SOD.StockMarket.Implementation.DataConversion;
+using SOD.StockMarket.Implementation.Trade;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,10 +12,12 @@ namespace SOD.StockMarket.Implementation.Stocks
     internal sealed class StockDataIO
     {
         private readonly Market _market;
+        private readonly TradeController _tradeController;
 
-        internal StockDataIO(Market market)
+        internal StockDataIO(Market market, TradeController tradeController)
         {
             _market = market;
+            _tradeController = tradeController;
         }
 
         /// <summary>
@@ -30,7 +33,12 @@ namespace SOD.StockMarket.Implementation.Stocks
                 return;
             }
 
-            var dataDump = new List<StockDataDTO>();
+            // Data dump list, with trade save data as first entry
+            var dataDump = new List<StockDataDTO>
+            {
+                new StockDataDTO { TradeSaveData = _tradeController.Export() }
+            };
+
             foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
             {
                 // Dump first the current state of the stock
@@ -107,7 +115,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
             var historicalDatas = stockDtos
-                .Where(a => a.Price == null)
+                .Where(a => a.TradeSaveData == null && a.Price == null)
                 .GroupBy(a => a.Id)
                 .Select(a =>
                 {
@@ -144,11 +152,19 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
             // Ordering by id is important to keep the random state working correctly.
-            foreach (var stockDto in stockDtos.Where(a => a.Price != null).OrderBy(a => a.Id))
+            foreach (var stockDto in stockDtos.Where(a => a.TradeSaveData == null && a.Price != null).OrderBy(a => a.Id))
             {
                 // Create a stock an init it
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
                 _market.InitStock(stock);
+            }
+
+            // Import data into trade controller
+            var tradeSaveData = stockDtos[0].TradeSaveData;
+            if (tradeSaveData != null)
+            {
+                Plugin.Log.LogInfo("Loading trade data..");
+                _tradeController.Import(tradeSaveData);
             }
 
             if (Plugin.Instance.Config.IsDebugEnabled)
@@ -180,6 +196,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             public decimal? TrendStartPrice { get; set; }
             public decimal? TrendEndPrice { get; set; }
             public int? TrendSteps { get; set; }
+            public TradeSaveData TradeSaveData { get; set; }
         }
     }
 }
