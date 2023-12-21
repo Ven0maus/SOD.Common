@@ -63,103 +63,118 @@ namespace SOD.Common.BepInEx.Proxies
 
         private static void SetByType(Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, string name, object value)
         {
+            object realDefaultValue;
+            try
+            {
+                // Attempt to change the value to the real value
+                realDefaultValue = Convert.ChangeType(configurationAttribute.DefaultValue, configurationAttribute.Type);
+            }
+            catch (InvalidCastException)
+            {
+                throw new Exception($"The defaultValue \"{value}\" cannot be converted to the provided type \"{type.Name}\".");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
             // Supported types by BepInEx config file:
             /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal, enum */
             if (type == typeof(string))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (string)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (string)realDefaultValue);
                 else
                     builder.Set(name, (string)value);
             }
             else if (type == typeof(bool))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (bool)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (bool)realDefaultValue);
                 else
                     builder.Set(name, (bool)value);
             }
             else if (type == typeof(byte))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (byte)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (byte)realDefaultValue);
                 else
                     builder.Set(name, (byte)value);
             }
             else if (type == typeof(sbyte))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (sbyte)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (sbyte)realDefaultValue);
                 else
                     builder.Set(name, (sbyte)value);
             }
             else if (type == typeof(short))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (short)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (short)realDefaultValue);
                 else
                     builder.Set(name, (short)value);
             }
             else if (type == typeof(ushort))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (ushort)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (ushort)realDefaultValue);
                 else
                     builder.Set(name, (ushort)value);
             }
             else if (type == typeof(int))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (int)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (int)realDefaultValue);
                 else
                     builder.Set(name, (int)value);
             }
             else if (type == typeof(uint))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (uint)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (uint)realDefaultValue);
                 else
                     builder.Set(name, (uint)value);
             }
             else if (type == typeof(long))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (long)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (long)realDefaultValue);
                 else
                     builder.Set(name, (long)value);
             }
             else if (type == typeof(ulong))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (ulong)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (ulong)realDefaultValue);
                 else
                     builder.Set(name, (ulong)value);
             }
             else if (type == typeof(float))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (float)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (float)realDefaultValue);
                 else
                     builder.Set(name, (float)value);
             }
             else if (type == typeof(double))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (double)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (double)realDefaultValue);
                 else
                     builder.Set(name, (double)value);
             }
             else if (type == typeof(decimal))
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (decimal)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (decimal)realDefaultValue);
                 else
                     builder.Set(name, (decimal)value);
             }
             else if (type.IsEnum)
             {
                 if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (Enum)configurationAttribute.DefaultValue);
+                    builder.Add(name, configurationAttribute.Description, (Enum)realDefaultValue);
                 else
                     builder.Set(name, (Enum)value);
             }

@@ -2,6 +2,9 @@
 
 namespace SOD.Common.Shadows
 {
+    /// <summary>
+    /// Base library that provides all helper implementations.
+    /// </summary>
     public class Lib
     {
         /// <summary>
