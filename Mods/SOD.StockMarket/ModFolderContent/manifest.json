@@ -1,7 +1,7 @@
 {
   "name": "SODStockMarket",
   "version_number": "1.0.0",
-  "website_url": "https://github.com/Ven0maus/ShadowsOfDoubtMods/tree/main/Mods/SOD.StockMarket",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.StockMarket",
   "description": "Adds a fully functional stock market into the game.",
   "author": "Venomaus",
   "dependencies": [

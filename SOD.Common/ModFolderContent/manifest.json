@@ -1,7 +1,7 @@
 {
   "name": "SODCommon",
   "version_number": "1.0.4",
-  "website_url": "https://github.com/Ven0maus/ShadowsOfDoubtMods/tree/main/SOD.Common",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/SOD.Common",
   "description": "A common library for SOD mods.",
   "author": "Venomaus",
   "dependencies": []
