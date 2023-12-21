@@ -25,7 +25,7 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
         /// <inheritdoc/>
         public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
         {
-            using var writer = new StreamWriter(path);
+            using var writer = new StreamWriter(path, new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write });
             // Write the header
             writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
 
@@ -59,7 +59,7 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
         public List<StockDataIO.StockDataDTO> Load(string path)
         {
             var stockDataList = new List<StockDataIO.StockDataDTO>();
-            using (var reader = new StreamReader(path))
+            using (var reader = new StreamReader(path, new FileStreamOptions { Mode = FileMode.Open, Access = FileAccess.Read }))
             {
                 // Skip the header line
                 reader.ReadLine();
