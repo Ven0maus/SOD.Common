@@ -110,7 +110,10 @@ namespace SOD.StockMarket.Core
                 .GroupBy(a => a.Id)
                 .Select(a => 
                 {
-                    var stockDatas = a.Select(a => 
+                    // Order from oldest to newest (last entry is the newest)
+                    var stockDatas = a
+                        .OrderBy(a => a.Date)
+                        .Select(a => 
                     {
                         var data = new StockData
                         {
