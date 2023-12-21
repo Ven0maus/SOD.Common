@@ -70,15 +70,17 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool BuyOrder(Stock stock, int amount)
+        internal bool BuyOrder(Stock stock, int amount, bool deductMoney = true)
         {
             if (!IsValidOrder(OrderType.Buy, stock, amount)) return false;
 
-            // Calculate price for the current stock
-            var totalPrice = (int)Math.Round(stock.Price * amount, 0);
-
             // Deduct money
-            Money -= totalPrice;
+            if (deductMoney)
+            {
+                // Calculate price for the current stock
+                var totalPrice = (int)Math.Round(stock.Price * amount, 0);
+                Money -= totalPrice;
+            }
 
             // Set stocks
             if (_playerStocks.TryGetValue(stock.Id, out var total))
@@ -96,15 +98,18 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool SellOrder(Stock stock, int amount)
+        internal bool SellOrder(Stock stock, int amount, bool removeStock = true)
         {
             // Check if player has this amount of stocks
             if (!IsValidOrder(OrderType.Sell, stock, amount)) return false;
 
             // Remove stocks
-            _playerStocks[stock.Id] -= amount;
-            if (_playerStocks[stock.Id] <= 0)
-                _playerStocks.Remove(stock.Id);
+            if (removeStock)
+            {
+                _playerStocks[stock.Id] -= amount;
+                if (_playerStocks[stock.Id] <= 0)
+                    _playerStocks.Remove(stock.Id);
+            }
 
             // Calculate price for the current stock
             var totalPrice = (int)Math.Round(stock.Price * amount, 0);
@@ -125,6 +130,12 @@ namespace SOD.StockMarket.Implementation.Trade
         internal bool BuyLimitOrder(Stock stock, decimal price, int amount)
         {
             if (!IsValidOrder(OrderType.Buy, stock, amount)) return false;
+
+            // Since we are placing a buy limit order, we need to already deduct the money from the player
+            // Calculate price for the current stock
+            var totalPrice = (int)Math.Round(stock.Price * amount, 0);
+            Money -= totalPrice;
+
             _playerTradeOrders.Add(new TradeOrder(OrderType.Buy, stock.Id, price, amount));
             return true;
         }
@@ -140,13 +151,42 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             if (!IsValidOrder(OrderType.Sell, stock, amount)) return false;
             _playerTradeOrders.Add(new TradeOrder(OrderType.Sell, stock.Id, price, amount));
+
+            // Remove it from player stocks already
+            _playerStocks[stock.Id] -= amount;
+            if (_playerStocks[stock.Id] <= 0)
+                _playerStocks.Remove(stock.Id);
+
             return true;
+        }
+
+        /// <summary>
+        /// Cancel's a pending trade order.
+        /// </summary>
+        /// <param name="order"></param>
+        internal void CancelOrder(TradeOrder order)
+        {
+            // If buy order, give back the money and cancel the order
+            if (order.OrderType == OrderType.Buy)
+                Money += (int)Math.Round(order.Price * order.Amount, 0);
+            else if (order.OrderType == OrderType.Sell)
+            {
+                // Add stocks back into player stocks
+                if (_playerStocks.TryGetValue(order.StockId, out var total))
+                    _playerStocks[order.StockId] = total + order.Amount;
+                else
+                    _playerStocks[order.StockId] = order.Amount;
+            }    
+            order.Complete();
+            _playerTradeOrders.Remove(order);
         }
 
         private void Market_OnCalculate(object sender, EventArgs e)
         {
             foreach (var order in _playerTradeOrders)
             {
+                if (order.Completed) continue;
+
                 // Check if order can be full-filled.
                 var stock = _market.Stocks[order.StockId];
                 var currentPrice = stock.Price;
@@ -155,8 +195,8 @@ namespace SOD.StockMarket.Implementation.Trade
                     // Execute order
                     _ = order.OrderType switch
                     {
-                        OrderType.Buy => BuyOrder(stock, order.Amount),
-                        OrderType.Sell => SellOrder(stock, order.Amount),
+                        OrderType.Buy => BuyOrder(stock, order.Amount, false),
+                        OrderType.Sell => SellOrder(stock, order.Amount, false),
                         _ => throw new NotImplementedException($"OrderType \"{order.OrderType}\" doesn't have an implementation."),
                     };
 
