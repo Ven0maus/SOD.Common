@@ -107,26 +107,5 @@ namespace SOD.Common.Extensions
                 yield return obj;
             }
         }
-
-        /// <summary>
-        /// Allows use of LINQ's Single query while prepending more useful exception information.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="enumerable"></param>
-        /// <param name="predicate"></param>
-        /// <param name="exceptionMsg">The exception message to be prepended to the original exception.</param>
-        /// <returns></returns>
-        /// <exception cref="System.ArgumentException"></exception>
-        public static T Single<T>(this IEnumerable<T> enumerable, Func<T, bool> predicate, string exceptionMsg)
-        {
-            try
-            {
-                return enumerable.Single(predicate);
-            }
-            catch (System.ArgumentException originalException)
-            {
-                throw new System.ArgumentException($"{exceptionMsg} - {originalException.Message}", originalException);
-            }
-        }
     }
 }
