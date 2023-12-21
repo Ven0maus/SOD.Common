@@ -1,2 +1,2 @@
-# ShadowsOfDoubtMods
-Mod collection for Shadows of Doubt
+# SOD.Common
+A common library for shadows of doubt mods.
