@@ -1,3 +1,4 @@
+libs/
 *.swp
 *.*~
 project.lock.json
