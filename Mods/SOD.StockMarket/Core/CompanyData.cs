@@ -5,16 +5,47 @@ using System.Linq;
 
 namespace SOD.StockMarket.Core
 {
+    /// <summary>
+    /// Info container regarding company details.
+    /// </summary>
     internal class CompanyData
     {
+        /// <summary>
+        /// The name of the stock.
+        /// </summary>
         internal string Name { get; private set; }
+        /// <summary>
+        /// The symbol of the stock.
+        /// </summary>
         internal string Symbol { get; private set; }
-        internal Company Company { get; private set; }
+        /// <summary>
+        /// Used to determine stock starting price.
+        /// </summary>
         internal decimal AverageSales => GetAverageSales();
+        /// <summary>
+        /// Used to determine stock starting price.
+        /// </summary>
         internal decimal MinSalary => GetMinSalary();
+        /// <summary>
+        /// Used to determine stock starting price.
+        /// </summary>
         internal decimal TopSalary => GetTopSalary();
+        /// <summary>
+        /// Used to determine stock price movement volatility.
+        /// </summary>
         internal double Volatility { get; private set; }
 
+        /// <summary>
+        /// Reference to the in-game company, this is removed after initialize.
+        /// </summary>
+        private Company _company;
+
+        /// <summary>
+        /// Use this to insert exported stock information, or custom stocks.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="volatility"></param>
+        /// <param name="symbol"></param>
         internal CompanyData(string name, double volatility, string symbol = null)
         {
             Name = name;
@@ -22,33 +53,37 @@ namespace SOD.StockMarket.Core
             Volatility = volatility;
         }
 
+        /// <summary>
+        /// Use this to insert a new stock from an in-game company.
+        /// </summary>
+        /// <param name="company"></param>
         internal CompanyData(Company company)
         {
-            Company = company;
+            _company = company;
         }
 
         /// <summary>
         /// Called later in the flow when Company object is initialized
         /// </summary>
-        internal void UpdateInfo()
+        internal void Initialize()
         {
-            if (Company != null)
+            if (_company != null)
             {
-                Name = Company.name;
+                Name = _company.name;
                 Symbol = StockSymbolGenerator.Generate(Name);
                 Volatility = Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2);
             }
 
             // Check if we need to keep company in memory for something later?
-            Company = null;
+            _company = null;
         }
 
         private decimal? _averageSales;
         private decimal GetAverageSales()
         {
-            if (Company != null && Company.sales.Count > 0)
+            if (_company != null && _company.sales.Count > 0)
             {
-                return (decimal)Company.sales
+                return (decimal)_company.sales
                     .Select(a => a.cost)
                     .DefaultIfEmpty()
                     .Average();
@@ -59,16 +94,16 @@ namespace SOD.StockMarket.Core
         private decimal? _minSalary;
         private decimal GetMinSalary()
         {
-            if (Company != null && Company.minimumSalary > 0)
-                return (decimal)Company.minimumSalary;
+            if (_company != null && _company.minimumSalary > 0)
+                return (decimal)_company.minimumSalary;
             return _minSalary ??= MathHelper.Random.Next(350, 750, true);
         }
 
         private decimal? _topSalary;
         private decimal GetTopSalary()
         {
-            if (Company != null && Company.topSalary > 0)
-                return (decimal)Company.topSalary;
+            if (_company != null && _company.topSalary > 0)
+                return (decimal)_company.topSalary;
             return _topSalary ??= MathHelper.Random.Next((int)GetMinSalary() + 1, 2000);
         }
     }

@@ -199,7 +199,7 @@ namespace SOD.StockMarket.Core.Stocks
         {
             if (_imported)
                 throw new Exception("An imported stock is already initialized, no need to call Initialize();");
-            _companyData.UpdateInfo();
+            _companyData.Initialize();
 
             // Set initial prices
             Price = Math.Round(_basePrice ?? _companyData.AverageSales / (_companyData.MinSalary + _companyData.TopSalary) * 1000m / 10, 2);

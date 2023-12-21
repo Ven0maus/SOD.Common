@@ -5,6 +5,9 @@ using System.Linq;
 
 namespace SOD.StockMarket.Core.Stocks
 {
+    /// <summary>
+    /// Handles export and import to/from files of stock data into the market.
+    /// </summary>
     internal sealed class StockDataIO
     {
         private readonly Market _market;
@@ -19,7 +22,7 @@ namespace SOD.StockMarket.Core.Stocks
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        public void Export(string path)
+        internal void Export(string path)
         {
             if (!_market.Initialized)
             {
@@ -89,7 +92,7 @@ namespace SOD.StockMarket.Core.Stocks
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        public void Import(string path)
+        internal void Import(string path)
         {
             if (_market.Initialized)
             {
