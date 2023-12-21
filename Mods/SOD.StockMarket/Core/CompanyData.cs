@@ -15,10 +15,10 @@ namespace SOD.StockMarket.Core
         internal decimal TopSalary => GetTopSalary();
         internal double Volatility { get; private set; }
 
-        internal CompanyData(string name, string symbol, double volatility)
+        internal CompanyData(string name, double volatility, string symbol = null)
         {
             Name = name;
-            Symbol = symbol.ToUpper();
+            Symbol = symbol ?? StockSymbolGenerator.Generate(Name);
             Volatility = volatility;
         }
 

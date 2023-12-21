@@ -42,7 +42,7 @@ namespace SOD.StockMarket.Core.Stocks
         /// <param name="historicalData"></param>
         internal Stock(StockDataIO.StockDataDTO dto, IEnumerable<StockData> historicalData) : this(dto.Id, dto.Price)
         {
-            _companyData = new CompanyData(dto.Name, dto.Symbol, dto.Volatility.Value);
+            _companyData = new CompanyData(dto.Name, dto.Volatility.Value, dto.Symbol);
 
             // Set initial values
             Price = dto.Price.Value;
