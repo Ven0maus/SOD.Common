@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Shadows.Implementations;
+using SOD.StockMarket.Core.Stocks;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

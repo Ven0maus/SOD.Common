@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Shadows.Implementations;
+using SOD.StockMarket.Core.Stocks;
 using System.Collections.Generic;
 
 namespace SOD.StockMarket.Core.DataConversion

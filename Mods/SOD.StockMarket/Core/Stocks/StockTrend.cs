@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.StockMarket.Core
+namespace SOD.StockMarket.Core.Stocks
 {
     internal readonly struct StockTrend
     {
@@ -26,7 +26,7 @@ namespace SOD.StockMarket.Core
             Percentage = percentage;
             StartPrice = currentPrice;
             Steps = steps;
-            EndPrice = Math.Round(StartPrice + (StartPrice / 100m * (decimal)Percentage), 2);
+            EndPrice = Math.Round(StartPrice + StartPrice / 100m * (decimal)Percentage, 2);
         }
     }
 }

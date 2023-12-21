@@ -3,7 +3,7 @@ using SOD.StockMarket.Core.DataConversion;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.StockMarket.Core
+namespace SOD.StockMarket.Core.Stocks
 {
     internal sealed class StockDataIO
     {

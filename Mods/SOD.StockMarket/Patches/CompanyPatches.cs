@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using SOD.StockMarket.Core;
+using SOD.StockMarket.Core.Stocks;
 
 namespace SOD.StockMarket.Patches
 {
