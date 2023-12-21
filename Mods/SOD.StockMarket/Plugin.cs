@@ -1,6 +1,8 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
 using SOD.StockMarket.Core;
+using SOD.StockMarket.Core.DataConversion;
+using System;
 using System.Reflection;
 
 namespace SOD.StockMarket
@@ -42,26 +44,29 @@ namespace SOD.StockMarket
         {
             var maxTrendSteps = Config.MaxHoursTrendsCanPersist;
             if (maxTrendSteps < 1)
-                Config.MaxHoursTrendsCanPersist = 1;
+                Config.MaxHoursTrendsCanPersist = Constants.MaxHoursTrendsCanPersist;
 
             var minTrendSteps = Config.MinHoursTrendsMustPersist;
             if (minTrendSteps < 1)
-                Config.MinHoursTrendsMustPersist = 1;
+                Config.MinHoursTrendsMustPersist = Constants.MinHoursTrendsMustPersist;
 
             var trendChancePerStock = Config.StockTrendChancePercentage;
-            if (trendChancePerStock < 0)
-                Config.StockTrendChancePercentage = 0;
-            else if (trendChancePerStock > 100)
-                Config.StockTrendChancePercentage = 100;
+            if (trendChancePerStock < 0 || trendChancePerStock > 100)
+                Config.StockTrendChancePercentage = Constants.StockTrendChancePercentage;
 
             // -1 is infinite, no point in going lower
             var maxTrends = Config.MaxTrends;
             if (maxTrends < -1)
-                Config.MaxTrends = -1;
+                Config.MaxTrends = Constants.MaxTrends;
 
             var pastHistoricalDataVolatility = Config.PastHistoricalDataVolatility;
             if (pastHistoricalDataVolatility < 1.0)
-                Config.PastHistoricalDataVolatility = 1.0;
+                Config.PastHistoricalDataVolatility = Constants.PastHistoricalDataVolatility;
+
+            // Fallback to default format
+            var stockDataSaveFormat = Config.StockDataSaveFormat;
+            if (!Enum.IsDefined(typeof(DataSaveFormat), stockDataSaveFormat))
+                Config.StockDataSaveFormat = Constants.StockDataSaveFormat;
         }
     }
 }
