@@ -41,7 +41,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                     $"{record.Id}," +
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
-                    $"{EscapeCsvField(record.Date.Serialize())}," +
+                    $"{(record.Date != null ? EscapeCsvField(record.Date.Value.Serialize()) : string.Empty)}," +
                     $"{record.Price?.ToString(CultureInfo.InvariantCulture) ?? string.Empty}," +
                     $"{record.Open.ToString(CultureInfo.InvariantCulture)}," +
                     $"{(record.Close != null ? record.Close.Value.ToString(CultureInfo.InvariantCulture) : string.Empty)}," +
@@ -85,7 +85,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                         Id = int.Parse(values[0]),
                         Name = values[1],
                         Symbol = values[2],
-                        Date = Time.TimeData.Deserialize(values[3]),
+                        Date = string.IsNullOrWhiteSpace(values[3]) ? null : Time.TimeData.Deserialize(values[3]),
                         Price = ParseDecimal(values[4]),
                         Open = ParseDecimal(values[5]).Value,
                         Close = ParseDecimal(values[6]),

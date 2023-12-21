@@ -38,21 +38,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             // Save each record
             foreach (var record in data)
             {
-                writer.Write(record.Id);
-                WriteString(writer, record.Name);
-                WriteString(writer, record.Symbol);
-                WriteDateTime(writer, record.Date);
-                WriteNullableDecimal(writer, record.Price);
-                writer.Write(record.Open);
-                WriteNullableDecimal(writer, record.Close);
-                writer.Write(record.High);
-                writer.Write(record.Low);
-                WriteNullableDouble(writer, record.Volatility);
-                WriteNullableDouble(writer, record.TrendPercentage);
-                WriteNullableDecimal(writer, record.TrendStartPrice);
-                WriteNullableDecimal(writer, record.TrendEndPrice);
-                WriteNullableInt(writer, record.TrendSteps);
-                writer.Write(record.Average);
+                // TODO: Write record value
             }
         }
 
@@ -77,81 +63,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 // Read each record
                 while (reader.BaseStream.Position < reader.BaseStream.Length)
                 {
-                    var stockData = new StockDataIO.StockDataDTO
-                    {
-                        Id = reader.ReadInt32(),
-                        Name = ReadString(reader),
-                        Symbol = ReadString(reader),
-                        Date = ReadDateTime(reader),
-                        Price = ReadNullableDecimal(reader),
-                        Open = reader.ReadDecimal(),
-                        Close = ReadNullableDecimal(reader),
-                        High = reader.ReadDecimal(),
-                        Low = reader.ReadDecimal(),
-                        Volatility = ReadNullableDouble(reader),
-                        TrendPercentage = ReadNullableDouble(reader),
-                        TrendStartPrice = ReadNullableDecimal(reader),
-                        TrendEndPrice = ReadNullableDecimal(reader),
-                        TrendSteps = ReadNullableInt(reader),
-                        Average = reader.ReadDecimal(),
-                    };
-                    stockDataList.Add(stockData);
+                    // TODO: Create stock data
                 }
             }
             return stockDataList;
-        }
-
-        private static void WriteString(BinaryWriter writer, string value)
-        {
-            writer.Write(value ?? string.Empty);
-        }
-
-        private static string ReadString(BinaryReader reader)
-        {
-            return reader.ReadString();
-        }
-
-        private static void WriteDateTime(BinaryWriter writer, Time.TimeData value)
-        {
-            writer.Write(value.Serialize());
-        }
-
-        private static Time.TimeData ReadDateTime(BinaryReader reader)
-        {
-            return Time.TimeData.Deserialize(reader.ReadString());
-        }
-
-        private static void WriteNullableDecimal(BinaryWriter writer, decimal? value)
-        {
-            writer.Write(value ?? 0m);
-        }
-
-        private static decimal? ReadNullableDecimal(BinaryReader reader)
-        {
-            var value = reader.ReadDecimal();
-            return value == 0m ? null : value;
-        }
-
-        private static void WriteNullableDouble(BinaryWriter writer, double? value)
-        {
-            writer.Write(value ?? 0.0);
-        }
-
-        private static double? ReadNullableDouble(BinaryReader reader)
-        {
-            var value = reader.ReadDouble();
-            return value == 0.0 ? null : value;
-        }
-
-        private static void WriteNullableInt(BinaryWriter writer, int? value)
-        {
-            writer.Write(value ?? 0);
-        }
-
-        private static int? ReadNullableInt(BinaryReader reader)
-        {
-            var value = reader.ReadInt32();
-            return value == 0 ? null : value;
         }
     }
 }

@@ -34,13 +34,12 @@ namespace SOD.StockMarket.Implementation.Stocks
             foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
             {
                 // Dump first the current state of the stock
-                var currentDate = stock.HistoricalData.LastOrDefault()?.Date;
                 var mainDto = new StockDataDTO
                 {
                     Id = stock.Id,
                     Name = stock.Name,
                     Symbol = stock.Symbol,
-                    Date = currentDate ?? new Time.TimeData(0, 0, 0, 0, 0),
+                    Date = null,
                     Price = stock.Price,
                     Open = stock.OpeningPrice,
                     Close = stock.ClosingPrice,
@@ -122,7 +121,7 @@ namespace SOD.StockMarket.Implementation.Stocks
                             Close = a.Close,
                             High = a.High,
                             Low = a.Low,
-                            Date = a.Date,
+                            Date = a.Date.Value,
                             Open = a.Open,
                         };
                         if (a.TrendPercentage != null && a.TrendStartPrice != null &&
@@ -163,7 +162,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             public int Id { get; set; }
             public string Name { get; set; }
             public string Symbol { get; set; }
-            public Time.TimeData Date { get; set; }
+            public Time.TimeData? Date { get; set; }
             public decimal Open { get; set; }
             public decimal? Close { get; set; }
             public decimal High { get; set; }
