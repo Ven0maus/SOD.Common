@@ -80,7 +80,7 @@ namespace SOD.StockMarket.Core
 
             // Convert and export data
             var converter = ConverterFactory.Get(path);
-            converter.Save(dataDump, Helpers.Random, path);
+            converter.Save(dataDump, MathHelper.Random, path);
 
             Plugin.Log.LogInfo($"Exported {dataDump.Count} stock market data rows.");
         }

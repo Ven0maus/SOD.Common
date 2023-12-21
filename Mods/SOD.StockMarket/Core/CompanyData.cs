@@ -35,7 +35,7 @@ namespace SOD.StockMarket.Core
             {
                 Name = Company.name;
                 Symbol = string.Join("", Name.Split(' ').Select(a => a.Trim()[0])).ToUpper();
-                Volatility = Math.Round(Helpers.Random.NextDouble(0.15d, 0.85d), 2);
+                Volatility = Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2);
             }
 
             // Check if we need to keep company in memory for something later?
@@ -52,7 +52,7 @@ namespace SOD.StockMarket.Core
                     .DefaultIfEmpty()
                     .Average();
             }
-            return _averageSales ??= Helpers.Random.Next(5, 100);
+            return _averageSales ??= MathHelper.Random.Next(5, 100);
         }
 
         private decimal? _minSalary;
@@ -60,7 +60,7 @@ namespace SOD.StockMarket.Core
         {
             if (Company != null && Company.minimumSalary > 0)
                 return (decimal)Company.minimumSalary;
-            return _minSalary ??= Helpers.Random.Next(350, 750);
+            return _minSalary ??= MathHelper.Random.Next(350, 750);
         }
 
         private decimal? _topSalary;
@@ -68,7 +68,7 @@ namespace SOD.StockMarket.Core
         {
             if (Company != null && Company.topSalary > 0)
                 return (decimal)Company.topSalary;
-            return _topSalary ??= Helpers.Random.Next((int)GetMinSalary() + 1, 2000);
+            return _topSalary ??= MathHelper.Random.Next((int)GetMinSalary() + 1, 2000);
         }
     }
 }

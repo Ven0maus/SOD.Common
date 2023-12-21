@@ -85,7 +85,7 @@ namespace SOD.StockMarket.Core
         internal void DeterminePrice()
         {
             // Have a small chance not to change price at all (only if there is no trend going on)
-            if ((Trend == null || _currentStep >= Trend.Value.Steps) && Helpers.Random.Next(0, 100) < 10)
+            if ((Trend == null || _currentStep >= Trend.Value.Steps) && MathHelper.Random.Next(0, 100) < 10)
             {
                 if (Trend != null && _currentStep >= Trend.Value.Steps)
                     RemoveTrend();
@@ -125,7 +125,7 @@ namespace SOD.StockMarket.Core
                 decimal range = Price * (maxPercentageAdjustment / 100m);
 
                 // Generate a random adjustment within the calculated range
-                stockPrice = Price + (decimal)(Helpers.Random.NextDouble() * (double)range * 2) - range;
+                stockPrice = Price + (decimal)(MathHelper.Random.NextDouble() * (double)range * 2) - range;
             }
 
             // Make sure stock price never falls under 0.1

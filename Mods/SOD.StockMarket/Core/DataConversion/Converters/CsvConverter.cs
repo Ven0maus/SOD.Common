@@ -71,7 +71,7 @@ namespace SOD.StockMarket.Core.DataConversion.Converters
                     var data = randomState.Split('|');
                     var index = int.Parse(data[0]);
                     var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
-                    Helpers.Init(new MersenneTwisterRandom((index, mt)));
+                    MathHelper.Init(new MersenneTwisterRandom((index, mt)));
                 }
 
                 while (!reader.EndOfStream)

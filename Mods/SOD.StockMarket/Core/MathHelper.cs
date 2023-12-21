@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace SOD.StockMarket.Core
 {
-    internal class Helpers
+    internal static class MathHelper
     {
         internal static MersenneTwisterRandom Random { get; private set; }
 

@@ -67,7 +67,7 @@ namespace SOD.StockMarket.Core
                 return;
 
             // Init helper
-            Helpers.Init(CityData.Instance.seed.GetHashCode());
+            MathHelper.Init(CityData.Instance.seed.GetHashCode());
 
             // Also add some default game related stocks and update prices
             AddCustomStocks();
@@ -104,9 +104,9 @@ namespace SOD.StockMarket.Core
         {
             var customCompanies = new (CompanyData data, decimal? basePrice)[] 
             {
-                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)Helpers.Random.NextDouble(5000f, 10000f)),
-                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)Helpers.Random.NextDouble(2000f, 5000f)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)Helpers.Random.NextDouble(0.975f, 1.025f))
+                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)MathHelper.Random.NextDouble(5000f, 10000f)),
+                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)MathHelper.Random.NextDouble(2000f, 5000f)),
+                (new CompanyData("Crow", "CRO", 0.05d), (decimal)MathHelper.Random.NextDouble(0.975f, 1.025f))
             };
             foreach (var (data, basePrice) in customCompanies)
                 InitStock(new Stock(data, basePrice));
@@ -138,13 +138,13 @@ namespace SOD.StockMarket.Core
                     var historicalTwo = historicalDataPercentage * (float)stock.Volatility;
                     
                     var sizeRange = stock.Volatility;
-                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)Helpers.Random.NextDouble(historicalOne, historicalTwo), 2);
+                    newStockData.Close = Math.Round(newStockData.Open + newStockData.Open / 100m * (decimal)MathHelper.Random.NextDouble(historicalOne, historicalTwo), 2);
                     if (newStockData.Close <= 0m)
                         newStockData.Close = 0.01m;
-                    newStockData.Low = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(historicalOne, 0d), 2);
+                    newStockData.Low = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)MathHelper.Random.NextDouble(historicalOne, 0d), 2);
                     if (newStockData.Low <= 0m)
                         newStockData.Low = 0.01m;
-                    newStockData.High = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)Helpers.Random.NextDouble(0d, historicalTwo), 2);
+                    newStockData.High = Math.Round(newStockData.Close.Value + newStockData.Close.Value / 100m * (decimal)MathHelper.Random.NextDouble(0d, historicalTwo), 2);
                     if (newStockData.High <= 0m)
                         newStockData.High = 0.01m;
 
@@ -298,7 +298,7 @@ namespace SOD.StockMarket.Core
             // Generate new trends
             foreach (var stock in Stocks.Where(a => a.Trend == null))
             {
-                var chance = Helpers.Random.NextDouble() * 100 < trendChancePerStock;
+                var chance = MathHelper.Random.NextDouble() * 100 < trendChancePerStock;
                 if (chance)
                 {
                     // Generate mean and standard deviation based on historical data
@@ -318,7 +318,7 @@ namespace SOD.StockMarket.Core
 
                         // Calculate mean and standard deviation for the current stock
                         stockMean = historicalPercentageChanges.Average();
-                        stockStdDev = Helpers.CalculateStandardDeviation(historicalPercentageChanges);
+                        stockStdDev = MathHelper.CalculateStandardDeviation(historicalPercentageChanges);
                         historicalPercentageChanges.Clear();
                     }
                     else
@@ -329,13 +329,13 @@ namespace SOD.StockMarket.Core
                     }
 
                     // Generate a realistic percentage change using a normal distribution
-                    double percentage = Math.Round(Helpers.NextGaussian(stockMean, stockStdDev));
+                    double percentage = Math.Round(MathHelper.NextGaussian(stockMean, stockStdDev));
 
                     // Skip 0 percentage differences
                     if (((int)percentage) == 0) continue; 
 
                     // Total steps to full-fill trend (1 step = 1 in game minute)
-                    int steps = Helpers.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
+                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
 
                     // Generate the stock trend entry
                     var stockTrend = new StockTrend(percentage, stock.Price, steps);
