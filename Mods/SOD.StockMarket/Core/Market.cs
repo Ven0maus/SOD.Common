@@ -71,7 +71,8 @@ namespace SOD.StockMarket.Core
             MathHelper.Init(CityData.Instance.seed.GetHashCode());
 
             // Also add some default game related stocks and update prices
-            AddCustomStocks();
+            foreach (var (data, basePrice) in CustomStocks.Stocks)
+                InitStock(new Stock(data, basePrice));
 
             // Init the stocks
             foreach (var stock in _stocks)
@@ -96,21 +97,6 @@ namespace SOD.StockMarket.Core
         {
             if (Initialized) return;
             _stocks.Add(stock);
-        }
-
-        /// <summary>
-        /// Adds some hardcoded custom stocks.
-        /// </summary>
-        private void AddCustomStocks()
-        {
-            var customCompanies = new (CompanyData data, decimal? basePrice)[]
-            {
-                (new CompanyData("Starch Kola", "STK", 0.4d), (decimal)MathHelper.Random.NextDouble(5000f, 10000f)),
-                (new CompanyData("Kaizen", "KAI", 0.3d), (decimal)MathHelper.Random.NextDouble(2000f, 5000f)),
-                (new CompanyData("Crow", "CRO", 0.05d), (decimal)MathHelper.Random.NextDouble(0.975f, 1.025f))
-            };
-            foreach (var (data, basePrice) in customCompanies)
-                InitStock(new Stock(data, basePrice));
         }
 
         private void InitializeMarket(object sender, TimeChangedArgs e)
