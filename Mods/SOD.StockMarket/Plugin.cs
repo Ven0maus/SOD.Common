@@ -27,8 +27,7 @@ namespace SOD.StockMarket
 
             // Initialize market object
             Market = new Market();
-
-            Log.LogInfo("Initialized stocked market hooks.");
+            Log.LogInfo("Initialized stock market hooks.");
         }
 
         public override void OnConfigureBindings()
