@@ -335,7 +335,7 @@ namespace SOD.StockMarket.Core
                     if (((int)percentage) == 0) continue;
 
                     // Total steps to full-fill trend (1 step = 1 in game minute)
-                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
+                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps, true);
 
                     // Generate the stock trend entry
                     var stockTrend = new StockTrend(percentage, stock.Price, steps);
