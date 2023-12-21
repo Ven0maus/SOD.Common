@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Extensions;
+using SOD.StockMarket.Core.Stocks;
 using System;
 using System.Linq;
 
@@ -34,7 +35,7 @@ namespace SOD.StockMarket.Core
             if (Company != null)
             {
                 Name = Company.name;
-                Symbol = string.Join("", Name.Split(' ').Select(a => a.Trim()[0])).ToUpper();
+                Symbol = StockSymbolGenerator.Generate(Name);
                 Volatility = Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2);
             }
 

@@ -78,6 +78,9 @@ namespace SOD.StockMarket.Core
             foreach (var stock in _stocks)
                 stock.Initialize();
 
+            // Clear out memory
+            StockSymbolGenerator.Clear();
+
             // Hook initialize for historical data
             Lib.Time.OnTimeInitialized += InitializeMarket;
 
@@ -97,6 +100,13 @@ namespace SOD.StockMarket.Core
         {
             if (Initialized) return;
             _stocks.Add(stock);
+        }
+
+        private static string GetInitials(string companyName)
+        {
+            // Extract the first letter of each word in the company name
+            string[] words = companyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            return string.Join("", words.Select(word => word[0]));
         }
 
         private void InitializeMarket(object sender, TimeChangedArgs e)
