@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.StockMarket.Core.Stocks
+namespace SOD.StockMarket.Implementation.Stocks
 {
     /// <summary>
     /// Generator for stock symbols

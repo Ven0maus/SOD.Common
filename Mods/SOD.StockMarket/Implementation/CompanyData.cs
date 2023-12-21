@@ -1,9 +1,9 @@
 ﻿using SOD.Common.Extensions;
-using SOD.StockMarket.Core.Stocks;
+using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Linq;
 
-namespace SOD.StockMarket.Core
+namespace SOD.StockMarket.Implementation
 {
     /// <summary>
     /// Info container regarding company details.

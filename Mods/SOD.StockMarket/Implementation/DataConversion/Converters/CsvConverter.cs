@@ -1,11 +1,11 @@
 ﻿using SOD.Common.Shadows.Implementations;
-using SOD.StockMarket.Core.Stocks;
+using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 
-namespace SOD.StockMarket.Core.DataConversion.Converters
+namespace SOD.StockMarket.Implementation.DataConversion.Converters
 {
     /// <summary>
     /// Converter to convert stock data into/from csv files.

@@ -1,9 +1,9 @@
-﻿using SOD.StockMarket.Core.DataConversion.Converters;
+﻿using SOD.StockMarket.Implementation.DataConversion.Converters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SOD.StockMarket.Core.DataConversion
+namespace SOD.StockMarket.Implementation.DataConversion
 {
     internal static class ConverterFactory
     {

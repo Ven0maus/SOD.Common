@@ -1,7 +1,7 @@
 ﻿using System;
 using TimeData = SOD.Common.Shadows.Implementations.Time.TimeData;
 
-namespace SOD.StockMarket.Core.Stocks
+namespace SOD.StockMarket.Implementation.Stocks
 {
     internal class StockData : IEquatable<StockData>
     {

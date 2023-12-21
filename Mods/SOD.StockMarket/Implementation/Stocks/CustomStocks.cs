@@ -1,4 +1,4 @@
-﻿namespace SOD.StockMarket.Core.Stocks
+﻿namespace SOD.StockMarket.Implementation.Stocks
 {
     /// <summary>
     /// All the custom stock configurations that are added to the market.

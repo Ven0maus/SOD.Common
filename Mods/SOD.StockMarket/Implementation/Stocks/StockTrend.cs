@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.StockMarket.Core.Stocks
+namespace SOD.StockMarket.Implementation.Stocks
 {
     internal readonly struct StockTrend
     {

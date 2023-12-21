@@ -1,9 +1,9 @@
 ﻿using SOD.Common.Shadows.Implementations;
-using SOD.StockMarket.Core.DataConversion;
+using SOD.StockMarket.Implementation.DataConversion;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.StockMarket.Core.Stocks
+namespace SOD.StockMarket.Implementation.Stocks
 {
     /// <summary>
     /// Handles export and import to/from files of stock data into the market.

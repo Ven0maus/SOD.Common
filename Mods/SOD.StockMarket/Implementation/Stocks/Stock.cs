@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SOD.StockMarket.Core.Stocks
+namespace SOD.StockMarket.Implementation.Stocks
 {
     internal class Stock
     {

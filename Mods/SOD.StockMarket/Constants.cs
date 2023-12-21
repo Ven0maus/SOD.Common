@@ -1,4 +1,4 @@
-﻿using SOD.StockMarket.Core.DataConversion;
+﻿using SOD.StockMarket.Implementation.DataConversion;
 
 namespace SOD.StockMarket
 {

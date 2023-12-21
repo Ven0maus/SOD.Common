@@ -1,7 +1,7 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
-using SOD.StockMarket.Core;
-using SOD.StockMarket.Core.DataConversion;
+using SOD.StockMarket.Implementation;
+using SOD.StockMarket.Implementation.DataConversion;
 using System;
 using System.Reflection;
 

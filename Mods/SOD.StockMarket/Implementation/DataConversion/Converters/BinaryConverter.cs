@@ -1,9 +1,9 @@
 ﻿using SOD.Common.Shadows.Implementations;
-using SOD.StockMarket.Core.Stocks;
+using SOD.StockMarket.Implementation.Stocks;
 using System.Collections.Generic;
 using System.IO;
 
-namespace SOD.StockMarket.Core.DataConversion.Converters
+namespace SOD.StockMarket.Implementation.DataConversion.Converters
 {
     /// <summary>
     /// Converter to convert stock data into/from binary files.

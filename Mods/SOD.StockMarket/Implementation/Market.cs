@@ -1,14 +1,14 @@
 ﻿using SOD.Common.Extensions;
 using SOD.Common.Shadows;
 using SOD.Common.Shadows.Implementations;
-using SOD.StockMarket.Core.Stocks;
+using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace SOD.StockMarket.Core
+namespace SOD.StockMarket.Implementation
 {
     internal class Market
     {
