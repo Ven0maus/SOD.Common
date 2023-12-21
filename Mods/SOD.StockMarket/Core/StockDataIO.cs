@@ -142,7 +142,8 @@ namespace SOD.StockMarket.Core
                 .ToDictionary(a => a.Key, a => a.Data);
 
             // Import the actual stocks, each stockdto that has a price is the "most recent" version of the stock.
-            foreach (var stockDto in stockDtos.Where(a => a.Price != null))
+            // Ordering by id is important to keep the random state working correctly.
+            foreach (var stockDto in stockDtos.Where(a => a.Price != null).OrderBy(a => a.Id))
             {
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
 
