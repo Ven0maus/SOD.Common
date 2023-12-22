@@ -44,7 +44,7 @@ namespace SOD.Common.Extensions
         }
 
         /// <summary>
-        /// Convert to a regular list
+        /// Convert IL2CPP List to an unmanaged/regular List
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="list"></param>
@@ -52,6 +52,59 @@ namespace SOD.Common.Extensions
         public static List<T> ToList<T>(this Il2CppSystem.Collections.Generic.List<T> list)
         {
             return list.Select(a => a).ToList();
+        }
+
+        /// <summary>
+        /// Convert IL2CPP IList to an unmanaged/regular List
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public static List<T> ToList<T>(this Il2CppSystem.Collections.Generic.IList<T> list)
+        {
+            var iListAsList = list.Select(x => x);
+            return iListAsList.ToList();
+        }
+
+        public static IEnumerable<TResult> Select<TSource, TResult>(this Il2CppSystem.Collections.Generic.IList<TSource> iList, Func<TSource, TResult> selector)
+        {
+            int index = 0;
+            while (true)
+            {
+                TSource obj;
+                try
+                {
+                    obj = iList[index];
+                    index++;
+                }
+                catch (Exception)
+                {
+                    yield break;
+                }
+                yield return selector.Invoke(obj);
+            }
+        }
+
+        public static IEnumerable<T> Where<T>(this Il2CppSystem.Collections.Generic.IList<T> iList, Func<T, bool> criteria)
+        {
+            int index = 0;
+            while (true)
+            {
+                T obj;
+                try
+                {
+                    obj = iList[index];
+                    index++;
+                }
+                catch (Exception)
+                {
+                    yield break;
+                }
+                if(!criteria(obj)) {
+                    continue;
+                }
+                yield return obj;
+            }
         }
     }
 }

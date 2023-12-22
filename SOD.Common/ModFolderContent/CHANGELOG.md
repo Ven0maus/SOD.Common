@@ -1,5 +1,6 @@
 # CHANGELOG
 **1.0.4**
+- Added InputDetection helper class (Rewired button state detection)
 - Renamed Common class to Lib to make it easier to access the helper classes.
 - PluginController Instance now returns the actual class itself by using PluginController<TImpl, TBindings> where TImpl is your Plugin class.
 - Added Newtonsoft.Json dependency (for serialization)
@@ -7,7 +8,7 @@
 - Added Time helper class (in game time events)
 - Added patch to fix double loading from within a game scene
 - Added MersenneTwisterRandom implementation
-- Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIL2Cpp)
+- Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIL2Cpp), including Il2Cpp IList objects
 
 **1.0.3**
 - Added validation messages for each binding when it is initialized incase something went wrong.

@@ -21,5 +21,10 @@ namespace SOD.Common.Shadows
         /// Contains helper methods regarding saving and loading game.
         /// </summary>
         public static SaveGame SaveGame { get; } = new SaveGame();
+        
+        /// <summary>
+        /// Contains helper methods regarding input detection through Rewired.
+        /// </summary>
+        public static InputDetection InputDetection { get; } = new InputDetection();
     }
 }
