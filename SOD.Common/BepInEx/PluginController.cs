@@ -53,7 +53,7 @@ namespace SOD.Common.BepInEx
         /// <summary>
         /// The original configuration implementation provided by BepInEx.
         /// </summary>
-        public ConfigFile ConfigFile { get { return ConfigBuilder.File; } }
+        public ConfigFile ConfigFile { get { return base.Config; } }
         /// <summary>
         /// Static log source
         /// </summary>
@@ -63,10 +63,6 @@ namespace SOD.Common.BepInEx
         /// A harmony instance
         /// </summary>
         protected Harmony Harmony { get; }
-        /// <summary>
-        /// A builder for configuration, the original BepInEx config can be accessed on the ConfigBuilder.File property.
-        /// </summary>
-        protected ConfigBuilder ConfigBuilder { get; }
 
         private string _pluginGUID;
         private string PluginGUID
@@ -90,7 +86,6 @@ namespace SOD.Common.BepInEx
 
             Instance = (TImpl)this;
             Log = base.Log;
-            ConfigBuilder = new ConfigBuilder(base.Config);
             Harmony = new Harmony(PluginGUID);
 
             // There is no point in setting up empty bindings
@@ -98,7 +93,7 @@ namespace SOD.Common.BepInEx
             var properties = bindingsType.SelectMany(a => a.GetProperties());
             if (properties.Any())
             {
-                Config = ConfigurationProxy<TBindings>.Create(ConfigBuilder);
+                Config = ConfigurationProxy<TBindings>.Create(new ConfigBuilder(base.Config));
                 Log.LogInfo($"Setting up configuration bindings.");
                 OnConfigureBindings();
             }
@@ -115,7 +110,7 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public virtual void OnConfigureBindings()
         {
-            ConfigBuilder.File.SaveOnConfigSet = false;
+            ConfigFile.SaveOnConfigSet = false;
             // This accesses the proxy of each property which binds the configuration of that property
             var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
             bool issuesDuringBindingValidation = false;
@@ -127,8 +122,8 @@ namespace SOD.Common.BepInEx
             if (issuesDuringBindingValidation)
                 throw new Exception("Invalid binding configuration.");
             // Do a save once after setting all config
-            ConfigBuilder.File.Save();
-            ConfigBuilder.File.SaveOnConfigSet = true;
+            ConfigFile.Save();
+            ConfigFile.SaveOnConfigSet = true;
         }
 
         /// <summary>
