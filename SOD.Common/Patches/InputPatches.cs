@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using HarmonyLib;
-using Il2CppInterop.Runtime;
 using Rewired;
 using SOD.Common.Extensions;
 using SOD.Common.Shadows;
-using UnityEngine.Events;
 
 namespace SOD.Common.Patches
 {
