@@ -47,16 +47,22 @@ namespace SOD.Common.Helpers
             return ComputeHash(saveFilePath);
         }
 
+
         /// <summary>
         /// Returns a path to a folder where you can store all your data.
         /// <br>If the folder does not yet exist, it will create it for you.</br>
+        /// <br>If you provided a fileName argument, it will Path.Combine it for you.</br>
         /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <param name="fileName">(optional)</param>
         /// <returns></returns>
-        public string GetSavestoreDirectoryPath(Assembly executingAssembly)
+        public string GetSavestoreDirectoryPath(Assembly executingAssembly, string fileName = null)
         {
             var path = Path.Combine(Path.GetDirectoryName(executingAssembly.Location), "Savestore");
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+            if (!string.IsNullOrWhiteSpace(fileName))
+                path = Path.Combine(path, fileName);
             return path;
         }
 
