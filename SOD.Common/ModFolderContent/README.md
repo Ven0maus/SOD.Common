@@ -5,6 +5,8 @@
 Welcome to **SOD.Common**! 
 This library provides a comprehensive set of helper classes and extensions to enhance your modding experience for the game "Shadows of Doubt."
 
+**Current target: IL2CPP Branch**
+
 ## Table of Contents
 
 - [Features](#features)

@@ -35,7 +35,7 @@ namespace SOD.Common.Extensions
         /// <typeparam name="T"></typeparam>
         /// <param name="enumerable"></param>
         /// <returns></returns>
-        public static Il2CppSystem.Collections.Generic.List<T> ToListIL2Cpp<T>(IEnumerable<T> enumerable)
+        public static Il2CppSystem.Collections.Generic.List<T> ToListIl2Cpp<T>(IEnumerable<T> enumerable)
         {
             var list = new Il2CppSystem.Collections.Generic.List<T>();
             foreach (var value in enumerable)
