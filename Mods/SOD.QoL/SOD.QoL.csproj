@@ -8,18 +8,22 @@
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
-      https://nuget.bepinex.dev/v3/index.json
+      https://nuget.bepinex.dev/v3/index.json;
+	  https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
     <RootNamespace>SOD.QoL</RootNamespace>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ModFolderContent\Builds\**" />
+    <EmbeddedResource Remove="ModFolderContent\Builds\**" />
+    <None Remove="ModFolderContent\Builds\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
 	<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
-	<Compile Remove="ModFolderContent\Builds\**" />
-	<EmbeddedResource Remove="ModFolderContent\Builds\**" />
-	<None Remove="ModFolderContent\Builds\**" />
   </ItemGroup>
 
   <ItemGroup>

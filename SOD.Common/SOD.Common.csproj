@@ -17,14 +17,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ModFolderContent\Builds\**" />
+    <EmbeddedResource Remove="ModFolderContent\Builds\**" />
+    <None Remove="ModFolderContent\Builds\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+  <!-- Nugets -->
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="Castle.Core" Version="5.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	<Compile Remove="ModFolderContent\Builds\**" />
-	<EmbeddedResource Remove="ModFolderContent\Builds\**" />
-	<None Remove="ModFolderContent\Builds\**" />
-	<None Update="UniverseLib.IL2CPP.Interop.dll">
-		<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+  <!-- Project included dll's -->
+    <None Update="UniverseLib.IL2CPP.Interop.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	</None>
   </ItemGroup>
 
