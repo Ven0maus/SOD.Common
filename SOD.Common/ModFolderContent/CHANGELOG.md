@@ -1,5 +1,5 @@
 # CHANGELOG
-**1.0.4**
+**1.1.0**
 - Added InputDetection helper class (Rewired button state detection)
 - Renamed Common class to Lib to make it easier to access the helper classes.
 - PluginController Instance now returns the actual class itself by using PluginController<TImpl, TBindings> where TImpl is your Plugin class.

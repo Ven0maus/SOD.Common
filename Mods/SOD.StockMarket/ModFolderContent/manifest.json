@@ -5,6 +5,6 @@
   "description": "Adds a fully functional stock market into the game.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.0.3"
+    "Venomaus-SODCommon-1.1.0"
   ]
 }

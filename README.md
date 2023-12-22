@@ -7,8 +7,6 @@ This library provides a comprehensive set of helper classes and extensions to en
 
 **Current target: IL2CPP Branch**
 
-** Latest stable release: 1.0.4**
-
 ## Table of Contents
 
 - [Features](#features)
