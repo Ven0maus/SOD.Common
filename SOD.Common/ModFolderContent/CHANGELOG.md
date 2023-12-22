@@ -8,7 +8,7 @@
 - Added Time helper class (in game time events)
 - Added patch to fix double loading from within a game scene
 - Added MersenneTwisterRandom implementation
-- Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIL2Cpp), including Il2Cpp IList objects
+- Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIl2Cpp), including Il2Cpp IList objects
 
 **1.0.3**
 - Added validation messages for each binding when it is initialized incase something went wrong.
