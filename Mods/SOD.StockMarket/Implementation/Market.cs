@@ -418,8 +418,7 @@ namespace SOD.StockMarket.Implementation
 
             string extension = $".{extType.ToString().ToLower()}";
             var fileName = $"stocks_{savecode}{extension}";
-            var saveStore = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
-            return Path.Combine(saveStore, fileName);
+            return Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
         }
     }
 }
