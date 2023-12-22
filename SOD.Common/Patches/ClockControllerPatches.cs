@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using SOD.Common.Shadows;
+using SOD.Common.Helpers;
 
 namespace SOD.Common.Patches
 {
@@ -8,7 +8,7 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(ClockController), nameof(ClockController.Update))]
         internal class ClockController_Update
         {
-            internal static Shadows.Implementations.Time.TimeData? LastTime;
+            internal static Time.TimeData? LastTime;
 
             [HarmonyPostfix]
             internal static void Postfix()

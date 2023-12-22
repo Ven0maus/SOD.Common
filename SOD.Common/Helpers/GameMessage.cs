@@ -1,4 +1,4 @@
-﻿namespace SOD.Common.Shadows.Implementations
+﻿namespace SOD.Common.Helpers
 {
     public sealed class GameMessage
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace SOD.Common.Shadows.Implementations
+namespace SOD.Common.Helpers
 {
     public sealed class Time
     {
@@ -141,7 +141,7 @@ namespace SOD.Common.Shadows.Implementations
             // Convert hour/minutes properly the way the game does it
             var formatted = session.FloatMinutes24H(hour);
             var hourInt = UnityEngine.Mathf.FloorToInt(formatted);
-            var minute = UnityEngine.Mathf.RoundToInt((formatted - (float)hourInt) * 100f);
+            var minute = UnityEngine.Mathf.RoundToInt((formatted - hourInt) * 100f);
 
             // Because it starts at 0, and we don't have 0 based months/days
             month++;

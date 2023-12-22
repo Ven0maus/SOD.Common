@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using SOD.Common.Shadows;
 
 namespace SOD.Common.Patches
 {

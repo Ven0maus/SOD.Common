@@ -1,4 +1,4 @@
-﻿using SOD.Common.Shadows.Implementations;
+﻿using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.Stocks;
 using System.Collections.Generic;
 

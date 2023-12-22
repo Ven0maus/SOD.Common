@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using HarmonyLib;
 using Rewired;
 using SOD.Common.Extensions;
-using SOD.Common.Shadows;
 
 namespace SOD.Common.Patches
 {

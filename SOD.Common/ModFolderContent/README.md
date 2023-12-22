@@ -1,48 +1,56 @@
 # SOD.Common
-A common library for Shadows of Doubt mods.
-Contains various extensions and methods to manipulate commonly needed gamedata.
 
-# Features
-**PluginController**
-The PluginController provides some basic helper and setup functionalities for your plugin.
-Following methods can be overriden and run in the given sequence:
+## Overview
 
-- Load (EntryPoint)
-- OnConfigureBindings (Runs at constructor level of PluginController, initializing the model based configuration bindings if any exist)
-- Unload (Runs when the plugin is unloaded, unpatches self)
+Welcome to **SOD.Common**! 
+This library provides a comprehensive set of helper classes and extensions to enhance your modding experience for the game "Shadows of Doubt."
 
-**Extensions**
-The extensions namespace contains several extensions for things such as logging, enumerables, general quality of life, etc..
+## Table of Contents
 
-**Modelbased configuration**
-It is now possible to model your configuration within interfaces,
-to easily access or set configuration in your bepinex config file.
-Here is a quick example:
-```csharp
-public interface IConfigBindings
-{
-    // Binds in the config file as: Prices.SyncDiskPrice
-    [Binding(500, "The price for the sync disk.", "Prices.SyncDiskPrice")]
-    int SyncDiskPrice { get; set; }
+- [Features](#features)
+- [Thunderstore](#thunderstore)
+- [Modding](#modding)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Releases](#releases)
+- [License](#license)
 
-    // Binds in the config file as: General.SomeTextConfig
-    [Binding("Hello", "Yep this is some text config!")]
-    string SomeTextConfig { get; set; }
-}
+## Features
 
-[BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
-[BepInDependency("Venomaus.SOD.Common")]
-public class Plugin : PluginController<Plugin, IConfigBindings>
-{
-    public override void Load()
-    {
-        Log.LogInfo("SyncDiskPrice: " + Config.SyncDiskPrice);
-        Log.LogInfo("SomeTextConfig: " + Config.SomeTextConfig);
-    }
-}
-```
-You can also combine multiple interfaces:
-```csharp
-public interface IConfigBindings : ISomeOtherBindings, ISomeMoreBindings
-{ }
-```
+- **Extensive Helper Classes:** This library includes a wide range of helper classes to simplify common modding tasks in Shadows of Doubt.
+
+- **Useful Extensions:** Take advantage of useful extensions designed to streamline your mod development process.
+
+- **Compatibility:** The library is designed to be compatible with the latest version of Shadows of Doubt.
+
+## Thunderstore
+
+The official thunderstore page can be found here: [SOD.Common](https://thunderstore.io/c/shadows-of-doubt/p/Venomaus/SODCommon/) 
+
+**Setting up your mod manifest with SOD.Common:**
+
+Setup **SOD.Common** as a dependency to your mod using the correct dependency string:
+
+    "dependencies": ["Venomaus-SODCommon-VERSION"]
+    // Example:
+    "dependencies": ["Venomaus-SODCommon-1.0.0"]
+
+## Modding
+To install **SOD.Common** for use during your mod development, you can install the nuget package of the latest build. 
+You can find the latest nuget package here:
+[SOD.Common Nuget Packages]()
+
+## Documentation
+All the documentation about the features and extensions can be found on the [wiki](https://github.com/Ven0maus/SOD.Common/wiki).
+
+## Contributing
+To contribute to the library, take a look at [CONTRIBUTING](https://github.com/Ven0maus/SOD.Common/blob/main/CONTRIBUTING.md).
+
+## Releases
+-   **Main:** Contains the current public **stable** release available on Thunderstore.
+-   **Develop:** Contains the latest additions and bugfixes.
+
+When a new public **stable** release is created it will also be tagged with the version number.
+
+## License
+This project is licensed under the [MIT License](https://github.com/Ven0maus/SOD.Common/blob/main/LICENSE)

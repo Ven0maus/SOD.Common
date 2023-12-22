@@ -1,6 +1,6 @@
-﻿using SOD.Common.Shadows.Implementations;
+﻿using SOD.Common.Helpers;
 
-namespace SOD.Common.Shadows
+namespace SOD.Common
 {
     /// <summary>
     /// Base library that provides all helper implementations.
@@ -21,7 +21,7 @@ namespace SOD.Common.Shadows
         /// Contains helper methods regarding saving and loading game.
         /// </summary>
         public static SaveGame SaveGame { get; } = new SaveGame();
-        
+
         /// <summary>
         /// Contains helper methods regarding input detection through Rewired.
         /// </summary>

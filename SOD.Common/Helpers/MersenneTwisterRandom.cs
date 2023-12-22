@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.Common.Shadows.Implementations
+namespace SOD.Common.Helpers
 {
     /// <summary>
     /// A Mersenne Twister Random Generator implementation, allows to export and import the state of the random.
@@ -106,7 +106,7 @@ namespace SOD.Common.Shadows.Implementations
         {
             mt[0] = seed & 0xffffffff;
             for (mti = 1; mti < N; mti++)
-                mt[mti] = (69069 * mt[mti - 1]) & 0xffffffff;
+                mt[mti] = 69069 * mt[mti - 1] & 0xffffffff;
         }
 
         private double Generate()
@@ -119,16 +119,16 @@ namespace SOD.Common.Shadows.Implementations
                 int kk;
                 for (kk = 0; kk < N - M; kk++)
                 {
-                    y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
-                    mt[kk] = mt[kk + M] ^ (y >> 1) ^ mag01[y & 0x1];
+                    y = mt[kk] & UPPER_MASK | mt[kk + 1] & LOWER_MASK;
+                    mt[kk] = mt[kk + M] ^ y >> 1 ^ mag01[y & 0x1];
                 }
                 for (; kk < N - 1; kk++)
                 {
-                    y = (mt[kk] & UPPER_MASK) | (mt[kk + 1] & LOWER_MASK);
-                    mt[kk] = mt[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1];
+                    y = mt[kk] & UPPER_MASK | mt[kk + 1] & LOWER_MASK;
+                    mt[kk] = mt[kk + (M - N)] ^ y >> 1 ^ mag01[y & 0x1];
                 }
-                y = (mt[N - 1] & UPPER_MASK) | (mt[0] & LOWER_MASK);
-                mt[N - 1] = mt[M - 1] ^ (y >> 1) ^ mag01[y & 0x1];
+                y = mt[N - 1] & UPPER_MASK | mt[0] & LOWER_MASK;
+                mt[N - 1] = mt[M - 1] ^ y >> 1 ^ mag01[y & 0x1];
 
                 mti = 0;
             }
@@ -139,7 +139,7 @@ namespace SOD.Common.Shadows.Implementations
             y ^= TemperingShiftT(y) & TEMPERING_MASK_C;
             y ^= TemperingShiftL(y);
 
-            return (y * FINAL_CONSTANT);
+            return y * FINAL_CONSTANT;
         }
 
         /// <summary>
@@ -174,7 +174,7 @@ namespace SOD.Common.Shadows.Implementations
         {
             if (maxValue < minValue)
                 throw new ArgumentException("MaxValue cannot be smaller than minValue.");
-            return (NextDouble() * (maxValue - minValue + 1)) + minValue;
+            return NextDouble() * (maxValue - minValue + 1) + minValue;
         }
 
         public (int mti, uint[] mt) SaveState()

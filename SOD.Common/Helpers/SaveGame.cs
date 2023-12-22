@@ -2,7 +2,7 @@
 using System.IO;
 using System.Reflection;
 
-namespace SOD.Common.Shadows.Implementations
+namespace SOD.Common.Helpers
 {
     public sealed class SaveGame
     {

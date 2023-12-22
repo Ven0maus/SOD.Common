@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.Common.Shadows.Implementations
+namespace SOD.Common.Helpers
 {
     public sealed class InputDetection
     {

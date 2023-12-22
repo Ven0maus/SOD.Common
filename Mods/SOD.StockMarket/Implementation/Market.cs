@@ -1,6 +1,6 @@
-﻿using SOD.Common.Extensions;
-using SOD.Common.Shadows;
-using SOD.Common.Shadows.Implementations;
+﻿using SOD.Common;
+using SOD.Common.Extensions;
+using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;

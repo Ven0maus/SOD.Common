@@ -1,5 +1,5 @@
 ﻿using System;
-using TimeData = SOD.Common.Shadows.Implementations.Time.TimeData;
+using TimeData = SOD.Common.Helpers.Time.TimeData;
 
 namespace SOD.StockMarket.Implementation.Stocks
 {
