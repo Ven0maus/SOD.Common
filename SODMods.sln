@@ -3,7 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.QoL", "Mods\SOD.QoL\SOD.QoL.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.StockMarket", "Mods\SOD.StockMarket\SOD.StockMarket.csproj", "{A66BBA46-687F-4C68-B5D3-94A00C75E285}"
+EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.Common", "SOD.Common\SOD.Common.csproj", "{80423AFE-CCF4-40A4-8177-1F40EA92AF3B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Mods", "Mods", "{E42A1F57-30D2-46D5-AE03-7E1675524E39}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{41E97C5C-35C5-42C6-9417-8CE5C9281FE7}"
 EndProject
