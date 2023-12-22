@@ -1,6 +1,10 @@
 # SOD.QoL
-Adds several quality of life changes to Shadows of Doubt
 
 **Features**
 - Automatically unpause the game after closing the main menu using the menu key (ESC by default)
 - You are able to end a conversation with a citizen using the menu key (ESC by default)
+- Map is by default zoomed out
+- PlayerMarker is now slightly larger and green (customizable)
+
+**Bugfixes**
+- Center on player button now properly zooms in to the player after zooming and moving camera
