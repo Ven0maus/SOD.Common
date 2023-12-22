@@ -179,7 +179,7 @@ namespace SOD.Common.Shadows.Implementations
 
         public (int mti, uint[] mt) SaveState()
         {
-            return (mti, mt);
+            return (mti, (uint[])mt.Clone());
         }
     }
 }
