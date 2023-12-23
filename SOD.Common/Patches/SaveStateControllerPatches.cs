@@ -4,12 +4,13 @@ namespace SOD.Common.Patches
 {
     internal class SaveStateControllerPatches
     {
+
+        /// <summary>
+        /// OnBeforeLoad event trigger
+        /// </summary>
         [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.StartLoading))]
         internal class CityConstructor_StartLoading
         {
-            private static bool _loaded = false;
-            private static Il2CppSystem.IO.FileInfo _fileInfo;
-
             [HarmonyPrefix]
             internal static void Prefix(CityConstructor __instance)
             {
@@ -19,31 +20,31 @@ namespace SOD.Common.Patches
                     ClockControllerPatches.ClockController_Update.LastTime = null;
                     Lib.Time.InitializeTime(true);
 
-                    _loaded = true;
-                    _fileInfo = RestartSafeController.Instance.saveStateFileInfo;
-                    string filePath = _fileInfo?.FullPath;
+                    var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
+                    string filePath = fileInfo?.FullPath;
                     Lib.SaveGame.OnLoad(filePath, false);
-                }
-            }
-
-            [HarmonyPostfix]
-            internal static void Postfix()
-            {
-                if (_loaded)
-                {
-                    _loaded = false;
-                    string filePath = _fileInfo?.FullPath;
-                    _fileInfo = null;
-                    Lib.SaveGame.OnLoad(filePath, true);
                 }
             }
         }
 
+        [HarmonyPatch(typeof(MurderController), nameof(MurderController.OnStartGame))]
+        internal class MurderController_OnStartGame
+        {
+            [HarmonyPrefix]
+            internal static void Prefix()
+            {
+                var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
+                string filePath = fileInfo?.FullPath;
+                Lib.SaveGame.OnLoad(filePath, true);
+            }
+        }
+
+        /// <summary>
+        /// BUGFIX: LoadGame triggers loading process twice when loading a file from an ongoing game, this fixes it
+        /// </summary>
         [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.OnMenuComponentSwitchComplete))]
         internal class MainMenuController_OnMenuComponentSwitchComplete
         {
-            // BUGFIX: LoadGame triggers loading process twice when loading a file from an ongoing game, this fixes it
-
             private static MainMenuController.Component? _previousComponentCompleted;
             private static bool _wasDirty = false;
 
@@ -64,6 +65,9 @@ namespace SOD.Common.Patches
             }
         }
 
+        /// <summary>
+        /// OnBeforeSave and OnAfterSave event triggers
+        /// </summary>
         [HarmonyPatch(typeof(SaveStateController), nameof(SaveStateController.CaptureSaveStateAsync))]
         internal class SaveStateController_CaptureSaveStateAsync
         {
@@ -98,6 +102,9 @@ namespace SOD.Common.Patches
             }
         }
 
+        /// <summary>
+        /// OnBeforeDelete and OnAfterDelete event triggers
+        /// </summary>
         [HarmonyPatch(typeof(MainMenuController), nameof(MainMenuController.DeleteSave))]
         internal class MainMenuController_DeleteSave
         {
