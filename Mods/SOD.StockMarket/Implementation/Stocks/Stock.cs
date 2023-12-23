@@ -203,7 +203,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             _companyData.Initialize();
 
             // Set initial prices
-            Price = Math.Round(_basePrice ?? _companyData.AverageSales / (_companyData.MinSalary + _companyData.TopSalary) * 1000m / 10, 2);
+            Price = Math.Round(_basePrice ?? (_companyData.AverageSales / (_companyData.MinSalary + _companyData.TopSalary) * 1000m), 2);
             OpeningPrice = Price;
             LowPrice = Price;
             HighPrice = Price;

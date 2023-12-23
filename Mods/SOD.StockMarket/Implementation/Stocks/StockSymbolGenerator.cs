@@ -19,7 +19,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         internal static string Generate(string companyName)
         {
             // Get company initials
-            string initials = GetInitials(companyName);
+            string initials = GetSymbol(companyName);
 
             _companySymbolCount ??= new();
 
@@ -31,11 +31,31 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
             else
             {
-                _companySymbolCount[initials] = 1;
+                _companySymbolCount[initials] = 0;
             }
 
-            // Generate the stock symbol
-            string stockSymbol = initials + count.ToString("D2");
+            // If the initials are 4 but the count is higher (so its a dupe)
+            if (initials.Length == 4 && count > 0)
+            {
+                // Then take first 3 initials, and check again for the count
+                initials = new string(initials.Take(3).ToArray());
+                if (_companySymbolCount.TryGetValue(initials, out count))
+                {
+                    count++;
+                    _companySymbolCount[initials] = count;
+                }
+                else
+                {
+                    _companySymbolCount[initials] = 0;
+                }
+            }
+
+            // Make sure there is always atleast 3 letters in the symbol
+            string stockSymbol = initials + count;
+            if (stockSymbol.Length == 1)
+                stockSymbol = initials + count.ToString("D3");
+            else if (stockSymbol.Length == 2)
+                stockSymbol = initials + count.ToString("D2");
 
             // Truncate to a maximum of 4 characters
             stockSymbol = stockSymbol[..Math.Min(stockSymbol.Length, 4)];
@@ -48,11 +68,30 @@ namespace SOD.StockMarket.Implementation.Stocks
             _companySymbolCount = null;
         }
 
-        private static string GetInitials(string companyName)
+        private static string GetSymbol(string companyName)
         {
             // Extract the first letter of each word in the company name
-            string[] words = companyName.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            return string.Join("", words.Select(word => word[0]));
+            char[] blockedChars = new[] { '-', '_', '&' };
+            string[] words = companyName
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Where(a => a.Length > 1) // Skip one length words (usually they are blocked chars)
+                .ToArray();
+            if (words.Length == 0)
+                throw new Exception("Missing company name.");
+            else if (words.Length == 1) // Return first 4 letters if there is only one word
+                return new string(words[0]
+                    .Where(a => !blockedChars.Contains(a))
+                    .Take(4)
+                    .ToArray());
+
+            // Return first 2 letters of first word, and 1st letter of last
+            return new string(words[0]
+                .Where(a => !blockedChars.Contains(a))
+                .Take(2)
+                .Concat(words[1]
+                    .Where(a => !blockedChars.Contains(a))
+                    .Take(2))
+                    .ToArray());
         }
     }
 }

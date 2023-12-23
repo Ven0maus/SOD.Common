@@ -154,7 +154,7 @@ namespace SOD.StockMarket.Implementation
                 }
 
                 if (Plugin.Instance.Config.IsDebugEnabled)
-                    Plugin.Log.LogInfo($"Stock({stock.Symbol}) {stock.Name} [HA] | " +
+                    Plugin.Log.LogInfo($"Stock({stock.Symbol}) {stock.Name} | " +
                         $"Volatility ({stock.Volatility}) | " +
                         $"Close ({Math.Round(stock.HistoricalData.Average(a => a.Close.Value), 2)}) | " +
                         $"Open ({Math.Round(stock.HistoricalData.Average(a => a.Open), 2)}) | " +

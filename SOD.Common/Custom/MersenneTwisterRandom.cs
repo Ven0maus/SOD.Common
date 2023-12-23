@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.Common.Helpers
+namespace SOD.Common.Custom
 {
     /// <summary>
     /// A Mersenne Twister Random Generator implementation, allows to export and import the state of the random.
