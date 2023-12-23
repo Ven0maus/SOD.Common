@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.4**
+- The current plotted route is now overriden when plotting a new route instead of canceling it.
+
 **1.0.3**
 - Map is now by default zoomed out
 - Center on player button now properly zooms in to the player after zooming and moving camera

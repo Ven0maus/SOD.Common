@@ -8,3 +8,4 @@
 
 **Bugfixes**
 - Center on player button now properly zooms in to the player after zooming and moving camera
+- The current plotted route is now overriden when plotting a new route instead of canceling it.
