@@ -10,14 +10,26 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.StartLoading))]
         internal class CityConstructor_StartLoading
         {
+            internal static void InitializeTime()
+            {
+                // Overwrite time, so we initialize again
+                ClockControllerPatches.ClockController_Update.LastTime = null;
+                Lib.Time.InitializeTime(true);
+            }
+
             [HarmonyPrefix]
             internal static void Prefix(CityConstructor __instance)
             {
+                if (Lib.SaveGame.IsStartingNewGame)
+                {
+                    InitializeTime();
+
+                    Lib.SaveGame.OnNewGame(false);
+                    return;
+                }
                 if (!__instance.generateNew && RestartSafeController.Instance.loadSaveGame)
                 {
-                    // Overwrite time, so we initialize again
-                    ClockControllerPatches.ClockController_Update.LastTime = null;
-                    Lib.Time.InitializeTime(true);
+                    InitializeTime();
 
                     var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                     string filePath = fileInfo?.FullPath;
@@ -35,6 +47,11 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static void Prefix()
             {
+                if (Lib.SaveGame.IsStartingNewGame)
+                {
+                    Lib.SaveGame.OnNewGame(true);
+                    return;
+                }
                 var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                 string filePath = fileInfo?.FullPath;
                 Lib.SaveGame.OnLoad(filePath, true);

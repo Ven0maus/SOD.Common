@@ -6,8 +6,6 @@ namespace SOD.Common.Helpers
 {
     public sealed class SaveGame
     {
-        // TODO: Add OnBeforeNewGame and OnAfterNewGame
-
         /// <summary>
         /// Raised right before a savegame is saved.
         /// <br>Note: StateSaveData is unavailable in the before event.</br>
@@ -33,6 +31,14 @@ namespace SOD.Common.Helpers
         /// Raised right after a savegame file is removed.
         /// </summary>
         public event EventHandler<SaveGameArgs> OnAfterDelete;
+        /// <summary>
+        /// Raised right before the game begins to create a new game, before the player clicks on the New Game button in the main menu.
+        /// </summary>
+        public event EventHandler OnBeforeNewGame;
+        /// <summary>
+        /// Raised right after the game spawns the player in and hides the loading screen. Only applies to a new game, and not a loaded save game.
+        /// </summary>
+        public event EventHandler OnAfterNewGame;
 
         /// <summary>
         /// Returns a unique hashed string related to the savegame. 
@@ -112,6 +118,23 @@ namespace SOD.Common.Helpers
                 OnAfterDelete?.Invoke(this, new SaveGameArgs(path));
             else
                 OnBeforeDelete?.Invoke(this, new SaveGameArgs(path));
+        }
+
+        // Communicate whether the game being loaded is a new game to the patch
+        internal bool IsStartingNewGame { get; set; }
+
+        internal void OnNewGame(bool after)
+        {
+            if (after)
+            {
+                IsStartingNewGame = false;
+                OnAfterNewGame?.Invoke(this, EventArgs.Empty);
+            }
+            else
+            {
+                IsStartingNewGame = true;
+                OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
+            }
         }
     }
 
