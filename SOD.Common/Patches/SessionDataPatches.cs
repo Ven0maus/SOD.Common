@@ -4,7 +4,7 @@ namespace SOD.Common.Patches
 {
     internal class SessionDataPatches
     {
-        private static bool _wasSaved = false;
+        private static bool _wasPaused = false;
 
         [HarmonyPatch(typeof(SessionData), nameof(SessionData.PauseGame))]
         internal static class SessionDataPauseGame
@@ -15,8 +15,8 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                if (_wasSaved) return;
-                _wasSaved = true;
+                if (_wasPaused) return;
+                _wasPaused = true;
                 Lib.Time.OnPauseModeChanged(true);
             }
         }
@@ -30,8 +30,8 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                if (!_wasSaved) return;
-                _wasSaved = false;
+                if (!_wasPaused) return;
+                _wasPaused = false;
                 Lib.Time.OnPauseModeChanged(false);
             }
         }
