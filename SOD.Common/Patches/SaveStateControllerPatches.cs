@@ -27,6 +27,9 @@ namespace SOD.Common.Patches
             }
         }
 
+        /// <summary>
+        /// OnAfterLoad event trigger
+        /// </summary>
         [HarmonyPatch(typeof(MurderController), nameof(MurderController.OnStartGame))]
         internal class MurderController_OnStartGame
         {
