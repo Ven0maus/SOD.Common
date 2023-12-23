@@ -9,7 +9,7 @@ namespace SOD.Common
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.Common";
         public const string PLUGIN_NAME = "SOD.Common";
-        public const string PLUGIN_VERSION = "1.0.4";
+        public const string PLUGIN_VERSION = "1.1.0";
 
         public override void Load()
         {
@@ -21,7 +21,7 @@ namespace SOD.Common
 
             // Apply patches
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Plugin.Log.LogInfo("Plugin is patched.");
+            Log.LogInfo("Plugin is patched.");
         }
     }
 }

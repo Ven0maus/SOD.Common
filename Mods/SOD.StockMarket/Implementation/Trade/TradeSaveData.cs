@@ -1,5 +1,5 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Text.Json;
 
 namespace SOD.StockMarket.Implementation.Trade
 {
@@ -10,12 +10,12 @@ namespace SOD.StockMarket.Implementation.Trade
 
         internal string ToJson()
         {
-            return JsonConvert.SerializeObject(this, Formatting.None);
+            return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = false });
         }
 
         internal static TradeSaveData FromJson(string json)
         {
-            return JsonConvert.DeserializeObject<TradeSaveData>(json);
+            return JsonSerializer.Deserialize<TradeSaveData>(json);
         }
     }
 }
