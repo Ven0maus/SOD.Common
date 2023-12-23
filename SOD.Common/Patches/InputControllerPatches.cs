@@ -16,7 +16,7 @@ namespace SOD.Common.Patches
         internal class InputController_Update
         {
             // TODO: Also add actionIds, which Rewired docs say makes polling faster.
-            private static List<string> actionNames = new();
+            private static readonly List<string> _actionNames = new();
 
             [HarmonyPrefix]
             internal static void Prefix(InputController __instance)
@@ -25,15 +25,15 @@ namespace SOD.Common.Patches
                 {
                     return;
                 }
-                if (actionNames.Count == 0)
+                if (_actionNames.Count == 0)
                 {
                     var actionList = ReInput.MappingHelper.Instance.Actions.ToList();
                     foreach (var action in actionList)
                     {
-                        actionNames.Add(action.name);
+                        _actionNames.Add(action.name);
                     }
                 }
-                foreach (var actionName in actionNames)
+                foreach (var actionName in _actionNames)
                 {
                     if (__instance.player.GetButtonDown(actionName))
                     {

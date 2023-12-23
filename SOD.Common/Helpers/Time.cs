@@ -9,8 +9,16 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// When this property is true, you can collect time information from the game.
         /// </summary>
-        public bool IsInitialized { get { return _initialized; } }
+        public bool IsInitialized => _initialized;
 
+        /// <summary>
+        /// Raised when the game is paused.
+        /// </summary>
+        public event EventHandler OnGamePaused;
+        /// <summary>
+        /// Raised when the game is resumed from a paused state.
+        /// </summary>
+        public event EventHandler OnGameResumed;
         /// <summary>
         /// Raised when an in game minute passes.
         /// </summary>
@@ -80,24 +88,26 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// Returns the current weekday enum
         /// </summary>
-        public SessionData.WeekDay CurrentDayEnum
-        {
-            get
-            {
-                return SessionData.Instance.WeekdayFromInt(CurrentDateTime.Day);
-            }
-        }
+        public SessionData.WeekDay CurrentDayEnum => SessionData.Instance.WeekdayFromInt(CurrentDateTime.Day);
 
         /// <summary>
         /// Returns the current month enum
         /// </summary>
-        public SessionData.Month CurrentMonthEnum
-        {
-            get
-            {
-                return SessionData.Instance.MonthFromInt(CurrentDateTime.Month);
-            }
-        }
+        public SessionData.Month CurrentMonthEnum => SessionData.Instance.MonthFromInt(CurrentDateTime.Month);
+
+        /// <summary>
+        /// Resumes the game.
+        /// </summary>
+        public void ResumeGame() => SessionData.Instance.ResumeGame();
+
+        /// <summary>
+        /// Pauses the game.
+        /// </summary>
+        /// <param name="showPauseText">Whether to show "Paused" text.</param>
+        /// <param name="delayOverride"></param>
+        /// <param name="openDesktopMode">Whether to open the pause menu including the map and notes screen.</param>
+        public void PauseGame(bool showPauseText = true, bool openDesktopMode = true, bool delayOverride = false) 
+            => SessionData.Instance.PauseGame(showPauseText, delayOverride, openDesktopMode);
 
         /// <summary>
         /// Updates the current game time information, if the game is in a playing state.
@@ -166,6 +176,14 @@ namespace SOD.Common.Helpers
                 OnYearChanged?.Invoke(this, new TimeChangedArgs(previous, current));
         }
 
+        internal void OnPauseModeChanged(bool paused)
+        {
+            if (paused)
+                OnGamePaused?.Invoke(this, EventArgs.Empty);
+            else
+                OnGameResumed?.Invoke(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// Invokes init time, if reset is true it will simply reset to false.
         /// <br>The next run will then pick it up automatically.</br>
@@ -198,24 +216,12 @@ namespace SOD.Common.Helpers
             /// <summary>
             /// Return's the game's WeekDay enum for the week day
             /// </summary>
-            public SessionData.WeekDay DayEnum
-            {
-                get
-                {
-                    return SessionData.Instance.WeekdayFromInt(Day);
-                }
-            }
+            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day);   
 
             /// <summary>
             /// Return's the game's Month enum for the current month
             /// </summary>
-            public SessionData.Month MonthEnum
-            {
-                get
-                {
-                    return SessionData.Instance.MonthFromInt(Month);
-                }
-            }
+            public SessionData.Month MonthEnum => SessionData.Instance.MonthFromInt(Month);
 
             public TimeData(int year, int month, int day, int hour, int minute)
             {
@@ -373,7 +379,7 @@ namespace SOD.Common.Helpers
     }
 
     /// <summary>
-    /// EventArgs for Lib.Time
+    /// EventArgs for time events
     /// </summary>
     public sealed class TimeChangedArgs : EventArgs
     {

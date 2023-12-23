@@ -4,7 +4,6 @@ namespace SOD.Common.Patches
 {
     internal class SaveStateControllerPatches
     {
-
         /// <summary>
         /// OnBeforeLoad event trigger
         /// </summary>
