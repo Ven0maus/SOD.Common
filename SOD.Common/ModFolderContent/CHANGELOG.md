@@ -10,6 +10,7 @@
 - Added MersenneTwisterRandom implementation
 - Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIl2Cpp), including Il2Cpp IList objects
 - Added pause and resume helpers and events in Lib.Time class
+- Added OnNewGame helpers and events in Lib.SaveGame class
 
 **1.0.3**
 - Added validation messages for each binding when it is initialized incase something went wrong.
