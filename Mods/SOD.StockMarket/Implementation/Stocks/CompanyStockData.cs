@@ -1,6 +1,4 @@
-﻿using SOD.Common.Extensions;
-using System;
-using System.Linq;
+﻿using System;
 
 namespace SOD.StockMarket.Implementation.Stocks
 {

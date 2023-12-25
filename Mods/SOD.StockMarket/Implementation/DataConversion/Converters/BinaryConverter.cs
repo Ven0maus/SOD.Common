@@ -24,7 +24,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path)
         {
             using var writer = new BinaryWriter(new FileStream(path, FileMode.Create, FileAccess.Write));
 
@@ -34,7 +34,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             // Save random state
             var (index, mt) = random.SaveState();
             writer.Write(index);
-            foreach (var value in mt)        
+            foreach (var value in mt)
                 writer.Write(value);
 
             // Save trade save data
@@ -42,7 +42,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             writer.Write(tradeSaveData);
 
             // Save each record, start at one because 0 is trade save data
-            for (int i=1; i < data.Count; i++)
+            for (int i = 1; i < data.Count; i++)
             {
                 var record = data[i];
                 writer.Write(record.Id);
@@ -76,10 +76,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
 
                 // Read random state
                 var index = reader.ReadInt32();
-                var mt = new uint[MersenneTwisterRandom.ArraySize];
+                var mt = new uint[MersenneTwister.ArraySize];
                 for (int i = 0; i < mt.Length; i++)
                     mt[i] = reader.ReadUInt32();
-                MathHelper.Init(new MersenneTwisterRandom((index, mt)));
+                MathHelper.Init(new MersenneTwister((index, mt)));
 
                 // Read trade save data
                 var tradeSaveData = TradeSaveData.FromJson(reader.ReadString());

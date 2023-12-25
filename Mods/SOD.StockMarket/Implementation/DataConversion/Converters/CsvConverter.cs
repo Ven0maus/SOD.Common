@@ -1,5 +1,4 @@
-﻿using Il2CppInterop.Generator.Extensions;
-using SOD.Common.Custom;
+﻿using SOD.Common.Custom;
 using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
@@ -27,7 +26,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path)
         {
             using var writer = new StreamWriter(path, new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write, Share = FileShare.Write });
 
@@ -74,7 +73,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 var data = randomState.Split('|');
                 var index = int.Parse(data[0]);
                 var mt = ConvertByteArrayToUIntArray(Convert.FromBase64String(data[1]));
-                MathHelper.Init(new MersenneTwisterRandom((index, mt)));
+                MathHelper.Init(new MersenneTwister((index, mt)));
 
                 // Read trade save data
                 var tradeSaveData = TradeSaveData.FromJson(reader.ReadLine());

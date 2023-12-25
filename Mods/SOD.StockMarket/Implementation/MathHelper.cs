@@ -7,14 +7,14 @@ namespace SOD.StockMarket.Implementation
 {
     internal static class MathHelper
     {
-        internal static MersenneTwisterRandom Random { get; private set; }
+        internal static MersenneTwister Random { get; private set; }
 
         internal static void Init(int seed)
         {
-            Random = new MersenneTwisterRandom(seed);
+            Random = new MersenneTwister(seed);
         }
 
-        internal static void Init(MersenneTwisterRandom random)
+        internal static void Init(MersenneTwister random)
         {
             Random = random;
         }

@@ -12,7 +12,7 @@
             (new CompanyStockData("Kaizen-7", 0.3d), (decimal)MathHelper.Random.NextDouble(2000f, 5000f)),
 
             // Currencies
-            (new CompanyStockData("Crow", 0.05d), (decimal)MathHelper.Random.NextDouble(0.975f, 1.025f))
+            (new CompanyStockData("Crow Coin", 0.05d), (decimal)MathHelper.Random.NextDouble(0.975f, 1.025f))
         };
     }
 }

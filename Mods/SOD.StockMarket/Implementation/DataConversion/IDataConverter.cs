@@ -11,7 +11,7 @@ namespace SOD.StockMarket.Implementation.DataConversion
         /// </summary>
         /// <param name="data"></param>
         /// <param name="path"></param>
-        void Save(List<StockDataIO.StockDataDTO> data, MersenneTwisterRandom random, string path);
+        void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path);
         /// <summary>
         /// Load data from file path
         /// </summary>

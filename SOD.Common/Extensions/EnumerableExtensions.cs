@@ -100,7 +100,8 @@ namespace SOD.Common.Extensions
                 {
                     yield break;
                 }
-                if(!criteria(obj)) {
+                if (!criteria(obj))
+                {
                     continue;
                 }
                 yield return obj;

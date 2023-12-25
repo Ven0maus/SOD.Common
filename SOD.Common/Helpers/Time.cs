@@ -106,7 +106,7 @@ namespace SOD.Common.Helpers
         /// <param name="showPauseText">Whether to show "Paused" text.</param>
         /// <param name="delayOverride"></param>
         /// <param name="openDesktopMode">Whether to open the pause menu including the map and notes screen.</param>
-        public void PauseGame(bool showPauseText = true, bool openDesktopMode = true, bool delayOverride = false) 
+        public void PauseGame(bool showPauseText = true, bool openDesktopMode = true, bool delayOverride = false)
             => SessionData.Instance.PauseGame(showPauseText, delayOverride, openDesktopMode);
 
         /// <summary>
@@ -216,7 +216,7 @@ namespace SOD.Common.Helpers
             /// <summary>
             /// Return's the game's WeekDay enum for the week day
             /// </summary>
-            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day);   
+            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day);
 
             /// <summary>
             /// Return's the game's Month enum for the current month

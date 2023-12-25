@@ -56,9 +56,9 @@ namespace SOD.StockMarket.Implementation.Trade
         internal TradeSaveData Export()
         {
             // Return a copy of the data
-            return new TradeSaveData 
-            { 
-                PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value), 
+            return new TradeSaveData
+            {
+                PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value),
                 PlayerTradeOrders = _playerTradeOrders.ToList()
             };
         }
@@ -176,7 +176,7 @@ namespace SOD.StockMarket.Implementation.Trade
                     _playerStocks[order.StockId] = total + order.Amount;
                 else
                     _playerStocks[order.StockId] = order.Amount;
-            }    
+            }
             order.Complete();
             _playerTradeOrders.Remove(order);
         }
