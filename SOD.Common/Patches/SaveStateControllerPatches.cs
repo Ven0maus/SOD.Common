@@ -4,31 +4,31 @@ namespace SOD.Common.Patches
 {
     internal class SaveStateControllerPatches
     {
+        // True if the game being loaded is a new game
+        private static bool _isStartingNewGame = false;
+
         /// <summary>
-        /// OnBeforeLoad event trigger
+        /// OnBeforeLoad, OnBeforeNewGame event triggers
         /// </summary>
         [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.StartLoading))]
         internal class CityConstructor_StartLoading
         {
-            internal static void InitializeTime()
-            {
-                // Overwrite time, so we initialize again
-                ClockControllerPatches.ClockController_Update.LastTime = null;
-                Lib.Time.InitializeTime(true);
-            }
-
             [HarmonyPrefix]
             internal static void Prefix(CityConstructor __instance)
             {
                 if (__instance.generateNew || RestartSafeController.Instance.newGameLoadCity)
                 {
-                    Lib.SaveGame.IsStartingNewGame = true;
+                    // Trigger new game event
+                    _isStartingNewGame = true;
                     Lib.SaveGame.OnNewGame(false);
                 }
                 else if (RestartSafeController.Instance.loadSaveGame)
                 {
-                    InitializeTime();
+                    // Overwrite time, so we initialize again
+                    ClockControllerPatches.ClockController_Update.LastTime = null;
+                    Lib.Time.InitializeTime(true);
 
+                    // Trigger load event with the file path to the save file
                     var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                     string filePath = fileInfo?.FullPath;
                     Lib.SaveGame.OnLoad(filePath, false);
@@ -37,7 +37,7 @@ namespace SOD.Common.Patches
         }
 
         /// <summary>
-        /// OnAfterLoad event trigger
+        /// OnAfterLoad, OnAfterNewGame event triggers
         /// </summary>
         [HarmonyPatch(typeof(MurderController), nameof(MurderController.OnStartGame))]
         internal class MurderController_OnStartGame
@@ -45,12 +45,15 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static void Prefix()
             {
-                if (Lib.SaveGame.IsStartingNewGame)
+                if (_isStartingNewGame)
                 {
-                    Lib.SaveGame.IsStartingNewGame = false;
+                    // Trigger new game event when this is a new game
+                    _isStartingNewGame = false;
                     Lib.SaveGame.OnNewGame(true);
                     return;
                 }
+
+                // Trigger load event with the file path to the save file
                 var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                 string filePath = fileInfo?.FullPath;
                 Lib.SaveGame.OnLoad(filePath, true);
@@ -101,6 +104,7 @@ namespace SOD.Common.Patches
                 // Fix slashes
                 path = path.Replace('/', '\\');
 
+                // Trigger OnBeforeSave
                 Lib.SaveGame.OnSave(path, false);
             }
 
@@ -116,6 +120,7 @@ namespace SOD.Common.Patches
                 // Fix slashes
                 path = path.Replace('/', '\\');
 
+                // Trigger OnAfterSave
                 Lib.SaveGame.OnSave(path, true);
             }
         }
@@ -136,6 +141,8 @@ namespace SOD.Common.Patches
                     __instance.selectedSave.info != null && System.IO.File.Exists(__instance.selectedSave.info.FullName))
                 {
                     _delete = true;
+
+                    // Trigger OnBeforeDelete
                     _fileInfo = __instance.selectedSave.info;
                     Lib.SaveGame.OnDelete(_fileInfo.FullName, false);
                 }
@@ -147,6 +154,8 @@ namespace SOD.Common.Patches
                 if (_delete)
                 {
                     _delete = false;
+
+                    // Trigger OnBeforeDelete
                     var path = _fileInfo.FullPath;
                     _fileInfo = null;
                     Lib.SaveGame.OnDelete(path, true);

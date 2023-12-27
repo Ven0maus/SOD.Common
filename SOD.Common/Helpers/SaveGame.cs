@@ -53,7 +53,6 @@ namespace SOD.Common.Helpers
             return ComputeHash(saveFilePath);
         }
 
-
         /// <summary>
         /// Returns a path to a folder where you can store all your data.
         /// <br>If the folder does not yet exist, it will create it for you.</br>
@@ -120,19 +119,12 @@ namespace SOD.Common.Helpers
                 OnBeforeDelete?.Invoke(this, new SaveGameArgs(path));
         }
 
-        // Communicate whether the game being loaded is a new game to the patch
-        internal bool IsStartingNewGame { get; set; }
-
         internal void OnNewGame(bool after)
         {
             if (after)
-            {
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
-            }
             else
-            {
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
-            }
         }
     }
 
