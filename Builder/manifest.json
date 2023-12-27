@@ -4,7 +4,7 @@
       "ProjectName": "SOD.Common",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
-      "DLLPaths": [
+      "ExtraFiles": [
         "bin\\Release\\net6.0\\SOD.Common.dll",
         "bin\\Release\\net6.0\\Castle.Core.dll",
         "bin\\Release\\net6.0\\UniverseLib.IL2CPP.Interop.dll"
@@ -16,7 +16,7 @@
       "ProjectName": "SOD.QoL",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
-      "DLLPaths": [
+      "ExtraFiles": [
         "bin\\Release\\net6.0\\SOD.QoL.dll"
       ],
       "Package": true
@@ -26,9 +26,12 @@
       "ProjectName": "SOD.StockMarket",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
-      "DLLPaths": [
-        "bin\\Release\\net6.0\\SOD.StockMarket.dll"
+      "ExtraFiles": [
+        "bin\\Release\\net6.0\\SOD.StockMarket.dll",
+        "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable",
+        "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable.manifest.json"
       ],
+      "DDSContent": "bin\\Release\\net6.0\\plugins",
       "Package": true
     }
   ]

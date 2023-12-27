@@ -54,8 +54,19 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="AssetBundles\" />
     <Folder Include="plugins\" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <None Update="AssetBundles\stockmarketbundle_stable">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="AssetBundles\stockmarketbundle_stable.manifest.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="plugins\DDSContent\Strings\English\Misc\computer.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

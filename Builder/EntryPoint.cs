@@ -60,14 +60,24 @@ namespace Builder
                 }
 
                 var packageBuilder = new BuildTool.PackageBuilder(build.ProjectName, folderPath, destinationPath);
-                foreach (var dllPath in build.DLLPaths)
+                foreach (var extraFilePath in build.ExtraFiles)
                 {
-                    string dllFullPath;
+                    string extraFileFullPath;
                     if (!string.IsNullOrWhiteSpace(build.ProjectParentPath))
-                        dllFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectParentPath, build.ProjectName, dllPath);
+                        extraFileFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectParentPath, build.ProjectName, extraFilePath);
                     else
-                        dllFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectName, dllPath);
-                    packageBuilder.AddDLL(dllFullPath);
+                        extraFileFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectName, extraFilePath);
+                    packageBuilder.AddExtraFiles(extraFileFullPath);
+                }
+
+                if (!string.IsNullOrWhiteSpace(build.DDSContent))
+                {
+                    string extraFileFullPath;
+                    if (!string.IsNullOrWhiteSpace(build.ProjectParentPath))
+                        extraFileFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectParentPath, build.ProjectName, build.DDSContent);
+                    else
+                        extraFileFullPath = Path.Combine(solutionDirectory.FullName, build.ProjectName, build.DDSContent);
+                    packageBuilder.DDSContent = (build.DDSContent, extraFileFullPath);
                 }
 
                 Console.WriteLine($"Attempting to build package for project: {build.ProjectName}");

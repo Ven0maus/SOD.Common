@@ -29,7 +29,7 @@ namespace SOD.StockMarket.Patches
             private static void LoadStockMarketBundle()
             {
                 // Get bundle information
-                var bundleName = "customcontent";
+                var bundleName = "stockmarketbundle";
                 var bundleDirectory = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), bundleName);
                 var assetBundle = BundleLoader.LoadBundle(bundleDirectory, stable: true);
 
