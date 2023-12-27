@@ -49,6 +49,11 @@ namespace SOD.StockMarket.Implementation
             Lib.Time.OnHourChanged += OnHourChanged;
         }
 
+        internal StockPagination GetPagination()
+        {
+            return new StockPagination(_stocks);
+        }
+
         /// <summary>
         /// Initializes the market, when all required components are finalized.
         /// </summary>
