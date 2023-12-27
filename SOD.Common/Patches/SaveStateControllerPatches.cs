@@ -20,14 +20,12 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static void Prefix(CityConstructor __instance)
             {
-                if (Lib.SaveGame.IsStartingNewGame)
+                if (__instance.generateNew || RestartSafeController.Instance.newGameLoadCity)
                 {
-                    InitializeTime();
-
+                    Lib.SaveGame.IsStartingNewGame = true;
                     Lib.SaveGame.OnNewGame(false);
-                    return;
                 }
-                if (!__instance.generateNew && RestartSafeController.Instance.loadSaveGame)
+                else if (RestartSafeController.Instance.loadSaveGame)
                 {
                     InitializeTime();
 
@@ -49,6 +47,7 @@ namespace SOD.Common.Patches
             {
                 if (Lib.SaveGame.IsStartingNewGame)
                 {
+                    Lib.SaveGame.IsStartingNewGame = false;
                     Lib.SaveGame.OnNewGame(true);
                     return;
                 }

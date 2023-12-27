@@ -127,12 +127,10 @@ namespace SOD.Common.Helpers
         {
             if (after)
             {
-                IsStartingNewGame = false;
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
             }
             else
             {
-                IsStartingNewGame = true;
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
             }
         }
