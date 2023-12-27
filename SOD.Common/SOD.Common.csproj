@@ -4,7 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>SOD.Common</AssemblyName>
     <Description>Common library for SOD modding.</Description>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
+	<Authors>Venomaus, Spyraxi</Authors>
+	<PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <LangVersion>latest</LangVersion>
     <RestoreAdditionalProjectSources>
       https://api.nuget.org/v3/index.json;
@@ -16,7 +19,18 @@
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
+		<None Include="README.md" Pack="true" PackagePath="/"/>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="/"/>
+	</ItemGroup>
+
+	<Target Name="CopyFiles" AfterTargets="Build">
+		<Copy SourceFiles="$(SolutionDir)README.md" DestinationFolder="$(ProjectDir)" />
+		<Copy SourceFiles="$(SolutionDir)README.md" DestinationFolder="$(ProjectDir)\ModFolderContent" />
+		<Copy SourceFiles="$(SolutionDir)LICENSE.txt" DestinationFolder="$(ProjectDir)" />
+	</Target>
+
+	<ItemGroup>
     <Compile Remove="ModFolderContent\Builds\**" />
     <EmbeddedResource Remove="ModFolderContent\Builds\**" />
     <None Remove="ModFolderContent\Builds\**" />

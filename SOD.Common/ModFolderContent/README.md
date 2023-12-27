@@ -40,7 +40,7 @@ Setup **SOD.Common** as a dependency to your mod using the correct dependency st
 ## Modding
 To install **SOD.Common** for use during your mod development, you can install the nuget package of the latest build. 
 You can find the latest nuget package here:
-[SOD.Common Nuget Packages]()
+[SOD.Common Nuget Packages](https://www.nuget.org/packages/SOD.Common)
 
 ## Documentation
 All the documentation about the features and extensions can be found on the [wiki](https://github.com/Ven0maus/SOD.Common/wiki).
