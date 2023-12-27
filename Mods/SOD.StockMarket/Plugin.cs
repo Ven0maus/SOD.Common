@@ -1,6 +1,8 @@
 ﻿using BepInEx;
+using Il2CppInterop.Runtime.Injection;
 using SOD.Common.BepInEx;
 using SOD.StockMarket.Implementation;
+using SOD.StockMarket.Implementation.Cruncher;
 using SOD.StockMarket.Implementation.DataConversion;
 using System;
 using System.Reflection;
@@ -22,6 +24,9 @@ namespace SOD.StockMarket
 
         public override void Load()
         {
+            // Register app content
+            ClassInjector.RegisterTypeInIl2Cpp<StockMarketAppContent>();
+
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
 
