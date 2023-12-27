@@ -1,7 +1,7 @@
 # CHANGELOG
 **1.1.0**
 Bugfixes:
-- Bugfix: loading a new game triggers twice
+- Bugfix: loading a save game triggers the load process twice
 
 Adjustments:
 - Renamed Common class to Lib to make it easier to access the helper classes.
