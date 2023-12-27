@@ -9,25 +9,16 @@ namespace SOD.StockMarket.Implementation.Stocks
     /// <summary>
     /// Handles export and import to/from files of stock data into the market.
     /// </summary>
-    internal sealed class StockDataIO
+    internal static class StockDataIO
     {
-        private readonly Market _market;
-        private readonly TradeController _tradeController;
-
-        internal StockDataIO(Market market, TradeController tradeController)
-        {
-            _market = market;
-            _tradeController = tradeController;
-        }
-
         /// <summary>
         /// Exports the stock data from the market.
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        internal void Export(string path)
+        internal static void Export(Market market, TradeController tradeController, string path)
         {
-            if (!_market.Initialized)
+            if (!market.Initialized)
             {
                 Plugin.Log.LogWarning("Cannot export stock market data, market not yet initialized.");
                 return;
@@ -36,10 +27,10 @@ namespace SOD.StockMarket.Implementation.Stocks
             // Data dump list, with trade save data as first entry
             var dataDump = new List<StockDataDTO>
             {
-                new StockDataDTO { TradeSaveData = _tradeController.Export() }
+                new StockDataDTO { TradeSaveData = tradeController.Export() }
             };
 
-            foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
+            foreach (var stock in market.Stocks.OrderBy(a => a.Id))
             {
                 // Dump first the current state of the stock
                 var mainDto = new StockDataDTO
@@ -99,9 +90,9 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        internal void Import(string path)
+        internal static void Import(Market market, TradeController tradeController, string path)
         {
-            if (_market.Initialized)
+            if (market.Initialized)
             {
                 Plugin.Log.LogWarning("Cannot import stock market data, market is already initialized.");
                 return;
@@ -156,7 +147,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             {
                 // Create a stock an init it
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
-                _market.InitStock(stock);
+                market.InitStock(stock);
             }
 
             // Import data into trade controller
@@ -164,19 +155,19 @@ namespace SOD.StockMarket.Implementation.Stocks
             if (tradeSaveData != null)
             {
                 Plugin.Log.LogInfo("Loading trade data..");
-                _tradeController.Import(tradeSaveData);
+                tradeController.Import(tradeSaveData);
             }
 
             if (Plugin.Instance.Config.IsDebugEnabled)
             {
-                Plugin.Log.LogInfo("Stocks data loaded: " + _market.Stocks.Count);
+                Plugin.Log.LogInfo("Stocks data loaded: " + market.Stocks.Count);
                 Plugin.Log.LogInfo($"- Loaded stocks -");
-                foreach (var stock in _market.Stocks.OrderBy(a => a.Id))
+                foreach (var stock in market.Stocks.OrderBy(a => a.Id))
                     Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
                 Plugin.Log.LogInfo($"- End of Stocks -");
             }
 
-            _market.PostStocksInitialization(typeof(StockDataIO));
+            market.PostStocksInitialization(typeof(StockDataIO));
         }
 
         internal sealed class StockDataDTO

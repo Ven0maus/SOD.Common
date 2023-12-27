@@ -40,6 +40,15 @@ namespace SOD.StockMarket.Implementation.Trade
         }
 
         /// <summary>
+        /// Resets all trade information, call this on a new game or loadgame.
+        /// </summary>
+        internal void Reset()
+        {
+            _playerStocks.Clear();
+            _playerTradeOrders.Clear();
+        }
+
+        /// <summary>
         /// Initializes data from a save state.
         /// </summary>
         /// <param name="saveData"></param>

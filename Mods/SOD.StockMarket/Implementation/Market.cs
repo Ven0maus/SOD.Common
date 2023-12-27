@@ -4,6 +4,7 @@ using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
+using SOD.StockMarket.Patches;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,11 +43,27 @@ namespace SOD.StockMarket.Implementation
             _tradeController = new TradeController(this);
 
             // Setup events
+            Lib.SaveGame.OnBeforeNewGame += OnBeforeNewGame;
             Lib.SaveGame.OnBeforeLoad += OnFileLoad;
             Lib.SaveGame.OnBeforeSave += OnFileSave;
             Lib.SaveGame.OnBeforeDelete += OnFileDelete;
             Lib.Time.OnMinuteChanged += OnMinuteChanged;
             Lib.Time.OnHourChanged += OnHourChanged;
+        }
+
+        private void OnBeforeNewGame(object sender, EventArgs e)
+        {
+            // Do a full market reset
+            _stocks.Clear();
+            _tradeController.Reset();
+            CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
+            CityConstructorPatches.CityConstructor_Finalized.Init = false;
+            CompanyPatches.Company_Setup.ShownInitializingMessage = false;
+            InteriorCreatorPatches.InteriorCreator_GenChunk.Init = false;
+            _interiorCreatorFinished = false;
+            _cityConstructorFinalized = false;
+            _citizenCreatorFinished = false;
+            Initialized = false;
         }
 
         internal StockPagination GetPagination()
@@ -360,7 +377,7 @@ namespace SOD.StockMarket.Implementation
             var path = GetSaveFilePath(e.FilePath);
 
             // Export data to save file
-            new StockDataIO(this, _tradeController).Export(path);
+            StockDataIO.Export(this, _tradeController, path);
         }
 
         private bool _isLoading = false;
@@ -375,13 +392,14 @@ namespace SOD.StockMarket.Implementation
 
             // Clear current market
             _stocks.Clear();
+            _tradeController.Reset();
             _interiorCreatorFinished = true;
             _cityConstructorFinalized = true;
             _citizenCreatorFinished = true;
             Initialized = false;
 
             // Import data from save file
-            new StockDataIO(this, _tradeController).Import(path);
+            StockDataIO.Import(this, _tradeController, path);
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)

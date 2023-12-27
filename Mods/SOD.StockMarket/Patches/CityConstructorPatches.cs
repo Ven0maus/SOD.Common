@@ -7,13 +7,13 @@ namespace SOD.StockMarket.Patches
         [HarmonyPatch(typeof(CityConstructor), nameof(CityConstructor.Finalized))]
         internal class CityConstructor_Finalized
         {
-            private static bool _init = false;
+            internal static bool Init = false;
 
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                if (_init) return;
-                _init = true;
+                if (Init) return;
+                Init = true;
                 Plugin.Instance.Market.PostStocksInitialization(typeof(CityConstructor));
             }
         }

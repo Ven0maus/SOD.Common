@@ -8,7 +8,7 @@ namespace SOD.StockMarket.Patches
         [HarmonyPatch(typeof(Company), nameof(Company.Setup))]
         internal class Company_Setup
         {
-            private static bool _shownInitializingMessage = false;
+            internal static bool ShownInitializingMessage = false;
 
             [HarmonyPostfix]
             internal static void Postfix(Company __instance)
@@ -20,10 +20,10 @@ namespace SOD.StockMarket.Patches
                     __instance.preset.isIllegal || !__instance.preset.publicFacing)
                     return;
 
-                if (!_shownInitializingMessage)
+                if (!ShownInitializingMessage)
                 {
                     Plugin.Log.LogInfo("Initializing stock market data.");
-                    _shownInitializingMessage = true;
+                    ShownInitializingMessage = true;
                 }
 
                 Plugin.Instance.Market.InitStock(new Stock(__instance));
