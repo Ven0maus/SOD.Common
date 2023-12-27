@@ -186,8 +186,6 @@ namespace SOD.StockMarket.Implementation
         private void OnHourChanged(object sender, TimeChangedArgs args)
         {
             var currentTime = Lib.Time.CurrentDateTime;
-            if (Plugin.Instance.Config.IsDebugEnabled)
-                Plugin.Log.LogInfo("Current time: " + currentTime.ToString());
 
             // Set the opening / closing price for each stock
             if (currentTime.Hour == OpeningHour)
@@ -358,9 +356,6 @@ namespace SOD.StockMarket.Implementation
 
             // Export data to save file
             new StockDataIO(this, _tradeController).Export(path);
-
-            if (Plugin.Instance.Config.IsDebugEnabled)
-                Plugin.Log.LogInfo($"Saved market data to savestore \"{Path.GetFileName(path)}\".");
         }
 
         private bool _isLoading = false;
@@ -368,11 +363,7 @@ namespace SOD.StockMarket.Implementation
         {
             var path = GetSaveFilePath(e.FilePath);
             if (!File.Exists(path))
-            {
-                if (Plugin.Instance.Config.IsDebugEnabled)
-                    Plugin.Log.LogInfo($"No market savestore file found at path \"{path}\", skipping load existing attempt.");
                 return;
-            }
 
             if (_isLoading) return;
             _isLoading = true;
@@ -394,12 +385,8 @@ namespace SOD.StockMarket.Implementation
             if (File.Exists(path))
             {
                 File.Delete(path);
-                if (Plugin.Instance.Config.IsDebugEnabled)
-                    Plugin.Log.LogInfo($"Deleted stock market save data at path \"{path}\".");
                 return;
             }
-            if (Plugin.Instance.Config.IsDebugEnabled)
-                Plugin.Log.LogInfo($"No stock market save data exists at path \"{path}\".");
         }
 
         /// <summary>
@@ -409,7 +396,6 @@ namespace SOD.StockMarket.Implementation
         /// <returns></returns>
         private static string GetSaveFilePath(string filePath)
         {
-            // TODO: Add configuration option to save it as a custom binary format or .csv format
             // Get market savestore
             var savecode = Lib.SaveGame.GetUniqueString(filePath);
 
