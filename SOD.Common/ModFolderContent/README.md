@@ -35,7 +35,7 @@ Setup **SOD.Common** as a dependency to your mod using the correct dependency st
 
     "dependencies": ["Venomaus-SODCommon-VERSION"]
     // Example:
-    "dependencies": ["Venomaus-SODCommon-1.0.0"]
+    "dependencies": ["Venomaus-SODCommon-1.1.0"]
 
 ## Modding
 To install **SOD.Common** for use during your mod development, you can install the nuget package of the latest build. 

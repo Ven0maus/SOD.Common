@@ -1,6 +1,6 @@
 # CHANGELOG
 **1.0.4**
-- The current plotted route is now overriden when plotting a new route instead of canceling it.
+- The current plotted route is now overriden when plotting a new route instead of canceling it. (to cancel it, plot the same route again)
 
 **1.0.3**
 - Map is now by default zoomed out

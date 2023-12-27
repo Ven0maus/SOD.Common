@@ -20,7 +20,7 @@ namespace SOD.Common.Helpers
         public string ActionName { get; }
         public bool IsDown { get; }
 
-        public InputDetectionEventArgs(string actionName, bool isDown)
+        internal InputDetectionEventArgs(string actionName, bool isDown)
         {
             ActionName = actionName;
             IsDown = isDown;

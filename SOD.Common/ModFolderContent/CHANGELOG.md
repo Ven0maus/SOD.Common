@@ -1,30 +1,18 @@
 # CHANGELOG
 **1.1.0**
-- Added InputDetection helper class (Rewired button state detection)
+Bugfixes:
+- Bugfix: loading a new game triggers twice
+- 
+Adjustments:
 - Renamed Common class to Lib to make it easier to access the helper classes.
 - PluginController Instance now returns the actual class itself by using PluginController<TImpl, TBindings> where TImpl is your Plugin class.
-- Added Newtonsoft.Json dependency (for serialization)
-- Addes SaveGame helper class (save/load/newgame events)
-- Added Time helper class (in game time events)
-- Added patch to fix double loading from within a game scene
-- Added MersenneTwisterRandom implementation
+
+New features:
+- Added MersenneTwister random number generator implementation (which allows the full state to be exported and reimported)
 - Added IEnumerable extensions for Il2Cpp list objects (Select, Where, ToList, ToListIl2Cpp), including Il2Cpp IList objects
-- Added pause and resume helpers and events in Lib.Time class
-- Added OnNewGame helpers and events in Lib.SaveGame class
-
-**1.0.3**
-- Added validation messages for each binding when it is initialized incase something went wrong.
-
-**1.0.1-2**
-- Minor fixes
+- Added SaveGame helper class (events that trigger such as: NewGame, LoadGame, Create SaveGame, Delete SaveGame)
+- Added Time helper class (events and properties to access the in-game time)
+- Added InputDetection helper class (events that trigger when a button is pressed)
 
 **1.0.0**
-[BepInEx Additions (SOD.Common.BepInEx namespace)]
-- Added PluginController base class and its generic variant PluginController<T>
-- Added model-based configuration within PluginController<T> class
-
-[Extension Additions (SOD.Common.Extensions namespace)]
-- Added several extentions (SOD.Common.Extensions namespace)
-
-[Common Additions (SOD.Common.Shadows namespace)]
-- Added Common class which contains several helper implementations
+- Initial release

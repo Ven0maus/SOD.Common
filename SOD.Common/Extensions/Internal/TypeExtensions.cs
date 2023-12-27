@@ -11,7 +11,7 @@ namespace SOD.Common.Extensions.Internal
         /// </summary>
         /// <param name="type">The most derived interface</param>
         /// <returns>List of inherited interfaces including the given one in the following order: most derived goes last</returns>
-        public static IEnumerable<Type> ExpandInheritedInterfaces(this Type type)
+        internal static IEnumerable<Type> ExpandInheritedInterfaces(this Type type)
         {
             var inheritedInterfaces = type.GetInterfaces().ToList();
             return inheritedInterfaces
@@ -24,10 +24,9 @@ namespace SOD.Common.Extensions.Internal
         /// </summary>
         /// <param name="interfaces">List of the most derived interface</param>
         /// <returns>List of inherited interfaces including the given ones in the following order: most derived goes last</returns>
-        public static IEnumerable<Type> ExpandInheritedInterfaces(this IEnumerable<Type> interfaces)
+        internal static IEnumerable<Type> ExpandInheritedInterfaces(this IEnumerable<Type> interfaces)
         {
             return interfaces.SelectMany(i => i.ExpandInheritedInterfaces());
         }
     }
-
 }

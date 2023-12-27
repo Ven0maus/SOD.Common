@@ -132,7 +132,7 @@ namespace SOD.Common.Helpers
     {
         public string FilePath { get; }
 
-        public SaveGameArgs(string filePath)
+        internal SaveGameArgs(string filePath)
         {
             FilePath = filePath;
         }
