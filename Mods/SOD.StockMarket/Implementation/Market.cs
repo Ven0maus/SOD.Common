@@ -21,10 +21,7 @@ namespace SOD.StockMarket.Implementation
         /// </summary>
         internal IReadOnlyList<Stock> Stocks => _stocks;
 
-        /// <summary>
-        /// Raised when the economy calculates.
-        /// </summary>
-        internal event EventHandler<EventArgs> OnCalculate;
+        internal event EventHandler<EventArgs> OnCalculate, OnInitialized;
 
         internal bool Initialized { get; private set; } = false;
 
@@ -36,6 +33,8 @@ namespace SOD.StockMarket.Implementation
         private static int ClosingHour => Plugin.Instance.Config.ClosingHour;
 
         private readonly TradeController _tradeController;
+        private readonly bool _simulation = false;
+        internal Time.TimeData? SimulationTime;
 
         internal Market()
         {
@@ -49,6 +48,70 @@ namespace SOD.StockMarket.Implementation
             Lib.SaveGame.OnBeforeDelete += OnFileDelete;
             Lib.Time.OnMinuteChanged += OnMinuteChanged;
             Lib.Time.OnHourChanged += OnHourChanged;
+
+            // Trigger simulation if enabled
+            OnInitialized += (sender, args) =>
+            {
+                if (Plugin.Instance.Config.RunSimulation)
+                {
+                    Simulate(Plugin.Instance.Config.SimulationDays);
+                }
+            };
+        }
+
+        /// <summary>
+        /// Constructor for a simulation market
+        /// </summary>
+        /// <param name="market"></param>
+        private Market(Market market)
+        {
+            _stocks = new List<Stock>();
+            foreach (var stock in market.Stocks)
+                _stocks.Add(new Stock(stock));
+            _tradeController = new TradeController(this);
+            _simulation = true;
+            SimulationTime = new Time.TimeData(1979,1,1, Plugin.Instance.Config.OpeningHour, 0);
+            Initialized = true;
+        }
+
+        /// <summary>
+        /// Create a market simulation export for x amount of days
+        /// </summary>
+        /// <param name="days"></param>
+        internal void Simulate(int days)
+        {
+            var simulation = new Market(this);
+            var tradeController = (TradeController)simulation
+                .GetType()
+                .GetField("_tradeController", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(simulation);
+
+            var marketOpenHours = Plugin.Instance.Config.ClosingHour - Plugin.Instance.Config.OpeningHour;
+            var openingHour = Plugin.Instance.Config.OpeningHour;
+
+            for (int day=0; day < days; day++)
+            {
+                for (int hour=0; hour < marketOpenHours; hour++)
+                {
+                    // The last minute we let OnHourChange do the calculation
+                    for (int minute = 0; minute < 59; minute++)
+                    {
+                        simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                            simulation.SimulationTime.Value.Day, simulation.SimulationTime.Value.Hour, minute);
+                        simulation.OnMinuteChanged(this, null);
+                    }
+                    simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                        simulation.SimulationTime.Value.Day, simulation.SimulationTime.Value.Hour + 1, 0);
+                    simulation.OnHourChanged(this, null);
+                }
+
+                simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                    simulation.SimulationTime.Value.Day, openingHour, 0);
+                simulation.SimulationTime = simulation.SimulationTime.Value.AddDays(1);
+            }
+
+            // TODO: Check why this isn't showing and simulation change
+            StockDataIO.Export(simulation, tradeController, Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), "Simulation.csv"), this);
         }
 
         private void OnBeforeNewGame(object sender, EventArgs e)
@@ -92,6 +155,7 @@ namespace SOD.StockMarket.Implementation
                 Initialized = true;
                 _isLoading = false;
                 Plugin.Log.LogInfo("Stock market loaded.");
+                OnInitialized?.Invoke(this, EventArgs.Empty);
                 return;
             }
 
@@ -139,6 +203,7 @@ namespace SOD.StockMarket.Implementation
             // Unsubscribe after first call
             Lib.Time.OnTimeInitialized -= InitializeMarket;
 
+            // Create the initial historical data
             int totalEntries = 0;
             var currentDate = Lib.Time.CurrentDate;
             int totalDays = Plugin.Instance.Config.DaysToKeepStockHistoricalData;
@@ -189,6 +254,9 @@ namespace SOD.StockMarket.Implementation
 
             // Also attempt to generate some trends
             GenerateTrends();
+
+            // Invoke initialized
+            OnInitialized?.Invoke(this, EventArgs.Empty);
         }
 
         /// <summary>
@@ -201,13 +269,13 @@ namespace SOD.StockMarket.Implementation
 
             // Trigger price update every in game minute
             // Hour change price updates are handled seperately
-            if (!args.IsHourChanged)
+            if (args == null || !args.IsHourChanged)
                 Calculate();
         }
 
         private void OnHourChanged(object sender, TimeChangedArgs args)
         {
-            var currentTime = Lib.Time.CurrentDateTime;
+            var currentTime = SimulationTime ?? Lib.Time.CurrentDateTime;
 
             // Set the opening / closing price for each stock
             if (currentTime.Hour == OpeningHour)
@@ -228,7 +296,7 @@ namespace SOD.StockMarket.Implementation
             // Generate hourly trends
             GenerateTrends();
 
-            if (Plugin.Instance.Config.IsDebugEnabled)
+            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
             {
                 Plugin.Log.LogInfo($"- New stock updates -");
                 foreach (var stock in _stocks.OrderBy(a => a.Id))
@@ -237,12 +305,12 @@ namespace SOD.StockMarket.Implementation
             }
         }
 
-        public static bool IsOpen()
+        private bool IsOpen()
         {
-            if (!Lib.Time.IsInitialized) return false;
+            if (!_simulation && !Lib.Time.IsInitialized) return false;
 
             // Check the time
-            var currentTime = Lib.Time.CurrentDateTime;
+            var currentTime = SimulationTime ?? Lib.Time.CurrentDateTime;
             var currentHour = currentTime.Hour;
             if (currentHour < OpeningHour || currentHour > ClosingHour)
                 return false;
@@ -252,7 +320,7 @@ namespace SOD.StockMarket.Implementation
                 StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => Enum.Parse<SessionData.WeekDay>(a.ToLower()))
                 .ToHashSet();
-            var currentDay = Lib.Time.CurrentDayEnum;
+            var currentDay = SimulationTime?.DayEnum ?? Lib.Time.CurrentDayEnum;
             if (closedDays.Contains(currentDay))
                 return false;
 
@@ -265,12 +333,12 @@ namespace SOD.StockMarket.Implementation
             _stocks.ForEach(a =>
             {
                 a.ClosingPrice = a.Price;
-                a.CreateHistoricalData();
-                historicalDataDeleted += a.CleanUpHistoricalData();
+                a.CreateHistoricalData(date: SimulationTime);
+                historicalDataDeleted += a.CleanUpHistoricalData(SimulationTime);
             });
-            if (historicalDataDeleted > 0 && Plugin.Instance.Config.IsDebugEnabled)
+            if (historicalDataDeleted > 0 && Plugin.Instance.Config.IsDebugEnabled && !_simulation)
                 Plugin.Log.LogInfo($"Deleted {historicalDataDeleted} old historical data.");
-            if (Plugin.Instance.Config.IsDebugEnabled)
+            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
                 Plugin.Log.LogInfo("Stock market is closing.");
         }
 
@@ -281,7 +349,7 @@ namespace SOD.StockMarket.Implementation
                 a.OpeningPrice = a.ClosingPrice.Value;
                 a.ClosingPrice = null;
             });
-            if (Plugin.Instance.Config.IsDebugEnabled)
+            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
                 Plugin.Log.LogInfo("Stock market is opening.");
         }
 
@@ -363,12 +431,12 @@ namespace SOD.StockMarket.Implementation
                     stock.SetTrend(stockTrend);
                     trendsGenerated++;
 
-                    if (debugModeEnabled)
+                    if (debugModeEnabled && !_simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");
                 }
             }
 
-            if (trendsGenerated > 0 && debugModeEnabled && Lib.Time.IsInitialized)
+            if (trendsGenerated > 0 && debugModeEnabled && !_simulation && Lib.Time.IsInitialized)
                 Plugin.Log.LogInfo($"[GameTime({Lib.Time.CurrentDateTime})] Created {trendsGenerated} new trends.");
         }
 

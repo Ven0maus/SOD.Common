@@ -12,6 +12,18 @@ namespace SOD.StockMarket.Implementation.Stocks
         public decimal Low { get; set; }
         public StockTrend? Trend { get; set; }
 
+        internal StockData() { }
+
+        internal StockData(StockData data)
+        {
+            Date = data.Date;
+            Open = data.Open;
+            Close = data.Close;
+            High = data.High;
+            Low = data.Low;
+            Trend = data.Trend;
+        }
+
         public bool Equals(StockData other)
         {
             return other != null && other.Date.Equals(Date);

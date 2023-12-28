@@ -12,6 +12,12 @@ namespace SOD.StockMarket
 
         [Binding(Constants.StockDataSaveFormat, "The save format for the stock data. Options: \"csv\", \"bin\")", "Debugging.StockDataSaveFormat")]
         string StockDataSaveFormat { get; set; }
+
+        [Binding(Constants.RunSimulation, "If this option is enabled, it will run a simulation after initial economy load and export it as a csv.", "Debugging.RunSimulation")]
+        bool RunSimulation { get; set; }
+
+        [Binding(Constants.SimulationDays, "The total amount of days to simulate for (only if RunSimulation is enabled).", "Debugging.SimulationDays")]
+        int SimulationDays { get; set; }
     }
 
     public interface IMarketBindings

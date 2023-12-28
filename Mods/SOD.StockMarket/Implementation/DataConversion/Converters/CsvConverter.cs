@@ -26,7 +26,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path, bool simulation = false)
         {
             using var writer = new StreamWriter(path, new FileStreamOptions { Mode = FileMode.Create, Access = FileAccess.Write, Share = FileShare.Write });
 
@@ -38,13 +38,15 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             writer.WriteLine(data[0].TradeSaveData.ToJson());
 
             // Write the header
-            writer.WriteLine("Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average");
+            var header = "Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average";
+            if (simulation)
+                header += ",OriginalPrice,SimulationChange";
+            writer.WriteLine(header);
 
             // Write each record
             foreach (var record in data)
             {
-                writer.WriteLine(
-                    $"{record.Id}," +
+                var recordContent = $"{record.Id}," +
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
                     $"{(record.Date != null ? EscapeCsvField(record.Date.Value.Serialize()) : string.Empty)}," +
@@ -58,7 +60,16 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                     $"{(record.TrendStartPrice != null ? record.TrendStartPrice.Value.ToString(CultureInfo.InvariantCulture) : string.Empty)}," +
                     $"{(record.TrendEndPrice != null ? record.TrendEndPrice.Value.ToString(CultureInfo.InvariantCulture) : string.Empty)}," +
                     $"{(record.TrendSteps != null ? record.TrendSteps.Value.ToString(CultureInfo.InvariantCulture) : string.Empty)}," +
-                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}");
+                    $"{record.Average.ToString(CultureInfo.InvariantCulture)}";
+                if (simulation)
+                {
+                    if (record.OriginalPrice != null && record.Price != null)
+                    {
+                        recordContent += "," + $"{record.OriginalPrice.Value.ToString(CultureInfo.InvariantCulture)}";
+                        recordContent += "," + $"{record.SimulationChange.ToString(CultureInfo.InvariantCulture)}";
+                    }
+                }
+                writer.WriteLine(recordContent);
             }
         }
 
@@ -153,6 +164,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
 
         static string EscapeCsvField(string field)
         {
+            if (string.IsNullOrWhiteSpace(field)) return field;
             if (field.Contains(',') || field.Contains('"') || field.Contains('\n'))
             {
                 // Enclose the field in double quotes and escape any existing double quotes

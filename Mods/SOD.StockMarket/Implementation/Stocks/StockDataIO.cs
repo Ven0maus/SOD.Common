@@ -1,6 +1,7 @@
 ﻿using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Trade;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -16,7 +17,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        internal static void Export(Market market, TradeController tradeController, string path)
+        internal static void Export(Market market, TradeController tradeController, string path, Market simulation = null)
         {
             if (!market.Initialized)
             {
@@ -24,8 +25,8 @@ namespace SOD.StockMarket.Implementation.Stocks
                 return;
             }
 
-            // Data dump list, with trade save data as first entry
-            var dataDump = new List<StockDataDTO>
+            // Data dump list
+            var dataDump = new List<StockDataDTO> 
             {
                 new StockDataDTO { TradeSaveData = tradeController.Export() }
             };
@@ -49,8 +50,16 @@ namespace SOD.StockMarket.Implementation.Stocks
                     TrendStartPrice = stock.Trend?.StartPrice,
                     TrendEndPrice = stock.Trend?.EndPrice,
                     TrendSteps = stock.Trend?.Steps,
-                    Average = (stock.HighPrice + stock.LowPrice + stock.Price) / 3m,
+                    Average = Math.Round((stock.HighPrice + stock.LowPrice + stock.Price) / 3m, 2),
                 };
+
+                // Add also the original price if its a simulation
+                if (simulation != null)
+                {
+                    var matchingStock = simulation.Stocks.First(a => a.Id == stock.Id);
+                    mainDto.OriginalPrice = matchingStock.Price;
+                }
+
                 dataDump.Add(mainDto);
 
                 // Next dump all the historical data
@@ -66,13 +75,14 @@ namespace SOD.StockMarket.Implementation.Stocks
                         Close = history.Close,
                         High = history.High,
                         Low = history.Low,
-                        Average = (history.Open + history.Close.Value + history.High + history.Low) / 4m,
+                        Average = Math.Round((history.Open + history.Close.Value + history.High + history.Low) / 4m),
                         Price = null,
                         Volatility = null,
                         TrendPercentage = history.Trend?.Percentage,
                         TrendStartPrice = history.Trend?.StartPrice,
                         TrendEndPrice = history.Trend?.EndPrice,
                         TrendSteps = history.Trend?.Steps,
+                        OriginalPrice = null,
                     };
                     dataDump.Add(historicalDto);
                 }
@@ -80,7 +90,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Convert and export data
             var converter = ConverterFactory.Get(path);
-            converter.Save(dataDump, MathHelper.Random, path);
+            converter.Save(dataDump, MathHelper.Random, path, simulation != null);
 
             Plugin.Log.LogInfo($"Exported {dataDump.Count} stock market data rows.");
         }
@@ -188,6 +198,14 @@ namespace SOD.StockMarket.Implementation.Stocks
             public decimal? TrendEndPrice { get; set; }
             public int? TrendSteps { get; set; }
             public TradeSaveData TradeSaveData { get; set; }
+            /// <summary>
+            /// Only used for simulations
+            /// </summary>
+            public decimal? OriginalPrice { get; set; }
+            /// <summary>
+            /// Only used for simulations
+            /// </summary>
+            public decimal SimulationChange { get { return Math.Round(Price.Value - OriginalPrice.Value, 2); } }
         }
     }
 }

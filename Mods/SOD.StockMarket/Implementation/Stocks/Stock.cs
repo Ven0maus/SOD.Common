@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +72,23 @@ namespace SOD.StockMarket.Implementation.Stocks
                 CreateHistoricalData(data);
 
             _imported = true;
+        }
+
+        internal Stock(Stock stock)
+        {
+            Id = stock.Id;
+            _companyData = stock._companyData;
+            Price = stock.Price;
+            OpeningPrice = stock.OpeningPrice;
+            ClosingPrice = stock.ClosingPrice;
+            LowPrice = stock.LowPrice;
+            HighPrice = stock.HighPrice;
+            Trend = stock.Trend;
+            _historicalData = new List<StockData>();
+            foreach (var data in stock._historicalData)
+                _historicalData.Add(new StockData(data));
+            _basePrice = stock._basePrice;
+            _imported = stock._imported;
         }
 
         private Stock(int? id = null, decimal? basePrice = null)
@@ -156,7 +174,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             Trend = null;
         }
 
-        internal void CreateHistoricalData(StockData stockData = null)
+        internal void CreateHistoricalData(StockData stockData = null, Time.TimeData? date = null)
         {
             if (stockData != null)
             {
@@ -165,7 +183,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
 
             // Add new historical data entry
-            var currentDate = Lib.Time.CurrentDate;
+            var currentDate = date ?? Lib.Time.CurrentDate;
             _historicalData.Add(new StockData
             {
                 Date = currentDate,
@@ -181,9 +199,9 @@ namespace SOD.StockMarket.Implementation.Stocks
             HighPrice = ClosingPrice.Value;
         }
 
-        internal int CleanUpHistoricalData()
+        internal int CleanUpHistoricalData(Time.TimeData? date)
         {
-            var currentDate = Lib.Time.CurrentDate;
+            var currentDate = date ?? Lib.Time.CurrentDate;
             var maxDays = Plugin.Instance.Config.DaysToKeepStockHistoricalData;
 
             // Remove all historical data that is atleast 30 days old

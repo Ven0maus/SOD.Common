@@ -24,7 +24,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
         }
 
         /// <inheritdoc/>
-        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path)
+        public void Save(List<StockDataIO.StockDataDTO> data, MersenneTwister random, string path, bool simulation = false)
         {
             using var writer = new BinaryWriter(new FileStream(path, FileMode.Create, FileAccess.Write));
 
