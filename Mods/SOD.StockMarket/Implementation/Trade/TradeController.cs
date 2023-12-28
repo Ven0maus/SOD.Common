@@ -80,6 +80,13 @@ namespace SOD.StockMarket.Implementation.Trade
             return 0;
         }
 
+        /// <summary>
+        /// TODO: Rework into keeping historical data from when you buy the stock
+        /// It should not be possible to see weekly, monthly change if you only bought the stock a second ago.
+        /// Also the daily stock should be based on the price bought at, not at the price of opening the previous day.
+        /// </summary>
+        /// <param name="days"></param>
+        /// <returns></returns>
         private decimal GetOwnedStockValueDaysAgo(int days)
         {
             var stocks = Stocks
@@ -175,7 +182,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool BuyOrder(Stock stock, int amount, bool deductMoney = true)
+        internal bool InstantBuy(Stock stock, int amount, bool deductMoney = true)
         {
             if (!IsValidOrder(OrderType.Buy, stock, amount)) return false;
 
@@ -184,7 +191,7 @@ namespace SOD.StockMarket.Implementation.Trade
             {
                 // Calculate price for the current stock
                 var totalPrice = (int)Math.Round(stock.Price * amount, 0);
-                Money -= totalPrice;
+                AvailableFunds -= totalPrice;
             }
 
             // Set stocks
@@ -203,7 +210,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool SellOrder(Stock stock, int amount, bool removeStock = true)
+        internal bool InstantSell(Stock stock, int amount, bool removeStock = true)
         {
             // Check if player has this amount of stocks
             if (!IsValidOrder(OrderType.Sell, stock, amount)) return false;
@@ -220,7 +227,7 @@ namespace SOD.StockMarket.Implementation.Trade
             var totalPrice = (int)Math.Round(stock.Price * amount, 0);
 
             // Add money
-            Money += totalPrice;
+            AvailableFunds += totalPrice;
 
             return true;
         }
@@ -239,7 +246,7 @@ namespace SOD.StockMarket.Implementation.Trade
             // Since we are placing a buy limit order, we need to already deduct the money from the player
             // Calculate price for the current stock
             var totalPrice = (int)Math.Round(stock.Price * amount, 0);
-            Money -= totalPrice;
+            AvailableFunds -= totalPrice;
 
             _playerTradeOrders.Add(new TradeOrder(OrderType.Buy, stock.Id, price, amount));
             return true;
@@ -273,7 +280,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             // If buy order, give back the money and cancel the order
             if (order.OrderType == OrderType.Buy)
-                Money += (int)Math.Round(order.Price * order.Amount, 0);
+                AvailableFunds += (int)Math.Round(order.Price * order.Amount, 0);
             else if (order.OrderType == OrderType.Sell)
             {
                 // Add stocks back into player stocks
@@ -300,8 +307,8 @@ namespace SOD.StockMarket.Implementation.Trade
                     // Execute order
                     _ = order.OrderType switch
                     {
-                        OrderType.Buy => BuyOrder(stock, order.Amount, false),
-                        OrderType.Sell => SellOrder(stock, order.Amount, false),
+                        OrderType.Buy => InstantBuy(stock, order.Amount, false),
+                        OrderType.Sell => InstantSell(stock, order.Amount, false),
                         _ => throw new NotImplementedException($"OrderType \"{order.OrderType}\" doesn't have an implementation."),
                     };
 
@@ -316,7 +323,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             return orderType switch
             {
-                OrderType.Buy => Money >= (int)Math.Round(stock.Price * amount, 0),
+                OrderType.Buy => AvailableFunds >= (int)Math.Round(stock.Price * amount, 0),
                 OrderType.Sell => _playerStocks.TryGetValue(stock.Id, out var total) && total >= amount,
                 _ => false,
             };

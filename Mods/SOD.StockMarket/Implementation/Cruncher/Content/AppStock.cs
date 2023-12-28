@@ -31,19 +31,24 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
             // Setup button listeners
             MapButton("Back", Back);
-            MapButton("Buy", Buy);
-            MapButton("Sell", Sell);
+            MapButton("InstantBuy", InstantBuy);
+            MapButton("InstantSell", InstantSell);
 
             // Update the info
-            UpdateInfo(this, null);
+            UpdateInfo();
 
             Lib.Time.OnMinuteChanged += UpdateInfo;
         }
 
         private void UpdateInfo(object sender, Common.Helpers.TimeChangedArgs e)
         {
-            if (_stock == null) return;
+            if (_stock == null || !ContentActive) return;
 
+            UpdateInfo();
+        }
+
+        private void UpdateInfo()
+        {
             // Set stock info
             _stockName.text = _stock.Name;
             _stockSymbol.text = _stock.Symbol;
@@ -74,19 +79,19 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             // Also update the stock info directly
             _stock = stock;
-            UpdateInfo(this, null);
+            UpdateInfo();
         }
 
-        private void Buy()
+        private void InstantBuy()
         {
-            Content.AppBuyInterface.SetStock(_stock);
-            Content.AppBuyInterface.Show();
+            Content.AppInstantBuyInterface.SetStock(_stock);
+            Content.AppInstantBuyInterface.Show();
         }
 
-        private void Sell()
+        private void InstantSell()
         {
-            Content.AppSellInterface.SetStock(_stock);
-            Content.AppSellInterface.Show();
+            Content.AppInstantSellInterface.SetStock(_stock);
+            Content.AppInstantSellInterface.Show();
         }
     }
 }

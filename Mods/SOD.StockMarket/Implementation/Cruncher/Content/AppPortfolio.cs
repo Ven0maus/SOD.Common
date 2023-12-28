@@ -47,36 +47,10 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _ownedStocksPagination = new StockPagination(Plugin.Instance.Market.TradeController, 8);
 
             // Set next button listener
-            var nextButton = Container.transform.Find("Next");
-            var button = nextButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Next();
-            });
-
-            // Set previous button listener
-            var previousButton = Container.transform.Find("Previous");
-            button = previousButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Previous();
-            });
-
-            // Set back button listener
-            var backButton = Container.transform.Find("Back");
-            button = backButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Back();
-            });
-
-            // Set back button listener
-            var withdrawDepositButton = Container.transform.Find("WithdrawDepositFunds");
-            button = withdrawDepositButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Content.AppFundsInterface.Show();
-            });
+            MapButton("Next", Next);
+            MapButton("Previous", Previous);
+            MapButton("Back", Back);
+            MapButton("WithdrawDepositFunds", Content.AppFundsInterface.Show);
 
             // Set current
             SetSlots(_ownedStocksPagination.Current);

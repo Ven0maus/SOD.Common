@@ -1,15 +1,16 @@
 ﻿using SOD.StockMarket.Implementation.Stocks;
-using System;
 using UnityEngine;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
-    internal class AppBuyInterface : AppContent
+    internal class AppInstantSellInterface : AppContent
     {
-        public AppBuyInterface(StockMarketAppContent content) : base(content)
+        public AppInstantSellInterface(StockMarketAppContent content) : base(content)
         { }
 
-        public override GameObject Container => Content.gameObject.transform.Find("BuyStockInterface").gameObject;
+        public override GameObject Container => Content.gameObject.transform.Find("InstantSellStockInterface").gameObject;
+
+        private Stock _stock;
 
         public override void OnSetup()
         {
@@ -19,7 +20,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         internal void SetStock(Stock stock)
         {
-            
+            _stock = stock;
         }
     }
 }

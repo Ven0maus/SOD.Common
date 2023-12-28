@@ -10,8 +10,8 @@ namespace SOD.StockMarket.Implementation.Cruncher
         internal AppPortfolio AppPortfolio;
         internal AppStock AppStock;
         internal AppFundsInterface AppFundsInterface;
-        internal AppBuyInterface AppBuyInterface;
-        internal AppSellInterface AppSellInterface;
+        internal AppInstantBuyInterface AppInstantBuyInterface;
+        internal AppInstantSellInterface AppInstantSellInterface;
         internal AppNews AppNews;
         internal AppTradeHistory AppTradeHistory;
         internal AppIntroduction AppIntroduction;
@@ -27,8 +27,8 @@ namespace SOD.StockMarket.Implementation.Cruncher
             AppPortfolio = new AppPortfolio(this);
             AppStock = new AppStock(this);
             AppFundsInterface = new AppFundsInterface(this);
-            AppBuyInterface = new AppBuyInterface(this);
-            AppSellInterface = new AppSellInterface(this);
+            AppInstantBuyInterface = new AppInstantBuyInterface(this);
+            AppInstantSellInterface = new AppInstantSellInterface(this);
             AppNews = new AppNews(this);
             AppTradeHistory = new AppTradeHistory(this);
             AppIntroduction = new AppIntroduction(this);
@@ -37,7 +37,7 @@ namespace SOD.StockMarket.Implementation.Cruncher
             var parts = new IAppContent[]
             {
                 AppMenu, AppStocks, AppPortfolio, AppStock,
-                AppFundsInterface, AppBuyInterface, AppSellInterface,
+                AppFundsInterface, AppInstantBuyInterface, AppInstantSellInterface,
                 AppNews, AppTradeHistory, AppIntroduction
             };
             foreach (var part in parts)

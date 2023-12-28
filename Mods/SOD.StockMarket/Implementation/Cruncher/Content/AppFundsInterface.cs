@@ -38,7 +38,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("WithdrawAll", () => Withdraw(int.MaxValue));
 
             // Set the balance values
-            UpdateInfo(this, null);
+            UpdateInfo();
 
             // Keep the balance values updated if something changes
             Lib.Time.OnMinuteChanged += UpdateInfo;
@@ -53,7 +53,13 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 Lib.Time.OnMinuteChanged -= UpdateInfo;
                 return;
             }
+            if (!ContentActive) return;
 
+            UpdateInfo();
+        }
+
+        private void UpdateInfo()
+        {
             var tradeController = Plugin.Instance.Market.TradeController;
             _bankBalance.text = $"Bank Balance: € {TradeController.Money.ToString(CultureInfo.InvariantCulture)}";
             _availableFunds.text = $"Available Funds: € {tradeController.AvailableFunds.ToString(CultureInfo.InvariantCulture)}";
@@ -70,7 +76,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             if (amount != 0)
             {
                 tradeController.DepositFunds(amount);
-                UpdateInfo(this, null);
+                UpdateInfo();
                 Content.AppPortfolio.UpdatePortfolio();
             }
         }
@@ -85,7 +91,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             if (amount != 0)
             {
                 tradeController.WithdrawFunds(amount);
-                UpdateInfo(this, null);
+                UpdateInfo();
                 Content.AppPortfolio.UpdatePortfolio();
             }
         }
