@@ -49,6 +49,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         private void UpdateInfo()
         {
+            if (_stock == null) return;
+
             // Set stock info
             _stockName.text = _stock.Name;
             _stockSymbol.text = _stock.Symbol;

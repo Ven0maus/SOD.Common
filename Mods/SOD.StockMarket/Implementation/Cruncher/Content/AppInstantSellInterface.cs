@@ -98,6 +98,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         private void UpdateInfo(Common.Helpers.TimeChangedArgs e)
         {
+            if (_stock == null) return;
+
             _stockSymbol.text = _stock.Symbol;
             _stockPrice.text = _stock.Price.ToString(CultureInfo.InvariantCulture);
 
