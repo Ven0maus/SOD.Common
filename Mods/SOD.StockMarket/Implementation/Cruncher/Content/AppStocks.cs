@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
+using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -25,7 +26,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _slots = Container.transform.Find("Scrollrect").Find("Panel").GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("StockEntry"))
                 .OrderBy(a => ExtractNumber(a.name))
-                .Select(a => new StockEntry(a.gameObject))
+                .Select(a => new StockEntry(this, a.gameObject))
                 .ToArray();
             if (_slots.Length != 7)
                 throw new Exception($"Something is wrong in the asset bundle, missing slots for stocks. {_slots.Length}/7");
@@ -92,12 +93,16 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private class StockEntry
         {
             internal bool Invalid = false;
+            private readonly AppStocks _appStocks;
             private readonly GameObject _container;
             private readonly TextMeshProUGUI _symbol, _price, _today, _daily, _weekly, _monthly;
+            private readonly UnityEngine.UI.Button _button;
 
-            internal StockEntry(GameObject slot)
+            internal StockEntry(AppStocks appStocks, GameObject slot)
             {
+                _appStocks = appStocks;
                 _container = slot;
+                _button = slot.transform.Find("Selector").GetComponent<UnityEngine.UI.Button>();
                 _symbol = slot.transform.Find("Name").GetComponentInChildren<TextMeshProUGUI>();
                 _price = slot.transform.Find("Price").GetComponentInChildren<TextMeshProUGUI>();
                 _today = slot.transform.Find("Today").GetComponentInChildren<TextMeshProUGUI>();
@@ -120,6 +125,14 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                     return;
                 }
                 _container.SetActive(true);
+
+                // Add listener to this specific stock
+                _button.onClick.RemoveAllListeners();
+                _button.onClick.AddListener(() =>
+                {
+                    _appStocks.Content.AppStock.SetStock(stock);
+                    _appStocks.Content.AppStock.Show();
+                });
 
                 // Set symbol and main price
                 _symbol.text = stock.Symbol;

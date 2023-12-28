@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using SOD.StockMarket.Implementation.Stocks;
+using System;
+using UnityEngine;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -13,6 +15,11 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             // Set back button listener
             MapButton("Back", Back);
+        }
+
+        internal void SetStock(Stock stock)
+        {
+            
         }
     }
 }

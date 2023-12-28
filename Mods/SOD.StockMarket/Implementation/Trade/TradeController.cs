@@ -48,6 +48,12 @@ namespace SOD.StockMarket.Implementation.Trade
             }
         }
 
+        internal int GetInvestedVolume(Stock stock)
+        {
+            if (_playerStocks.TryGetValue(stock.Id, out var volume)) return volume;
+            return 0;
+        }
+
         /// <summary>
         /// Basic constructor, can be called at game start with no save data, or when loading a new game (from first init main menu).
         /// </summary>
