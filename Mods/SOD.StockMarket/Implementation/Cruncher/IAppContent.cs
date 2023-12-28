@@ -5,5 +5,6 @@
         void OnSetup();
         void Show();
         void Hide();
+        void Back();
     }
 }

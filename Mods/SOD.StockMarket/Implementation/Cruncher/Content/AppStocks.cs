@@ -15,7 +15,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private StockPagination _stocksPagination;
         private StockEntry[] _slots;
 
-        public override GameObject Container => Content.gameObject.transform.FindChild("Stocks").gameObject;
+        public override GameObject Container => Content.gameObject.transform.Find("Stocks").gameObject;
 
         public AppStocks(StockMarketAppContent content) : base(content)
         { }
@@ -23,17 +23,19 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         public override void OnSetup()
         {
             // Setup main slots
-            _slots = Content.gameObject.GetComponentsInChildren<RectTransform>()
+            _slots = Container.transform.Find("Scrollrect").Find("Panel").GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("StockEntry"))
                 .OrderBy(a => ExtractNumber(a.name))
                 .Select(a => new StockEntry(a.gameObject))
                 .ToArray();
+            if (_slots.Length != 7)
+                throw new Exception($"Something is wrong in the asset bundle, missing slots for stocks. {_slots.Length}/7");
 
             // Setup pagination
             _stocksPagination = Plugin.Instance.Market.GetPagination();
 
             // Set next button listener
-            var nextButton = Content.gameObject.transform.FindChild("Next");
+            var nextButton = Container.transform.Find("Next");
             var button = nextButton.GetComponent<UnityEngine.UI.Button>();
             button.onClick.AddListener(() =>
             {
@@ -41,11 +43,19 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             });
 
             // Set previous button listener
-            var previousButton = Content.gameObject.transform.FindChild("Previous");
+            var previousButton = Container.transform.Find("Previous");
             button = previousButton.GetComponent<UnityEngine.UI.Button>();
             button.onClick.AddListener(() =>
             {
                 Previous();
+            });
+
+            // Set back button listener
+            var backButton = Container.transform.Find("Back");
+            button = backButton.GetComponent<UnityEngine.UI.Button>();
+            button.onClick.AddListener(() =>
+            {
+                Back();
             });
 
             // Set current
@@ -108,12 +118,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             internal StockEntry(GameObject slot)
             {
                 _container = slot;
-                _symbol = slot.transform.FindChild("Name").GetComponentInChildren<TextMeshProUGUI>();
-                _price = slot.transform.FindChild("Price").GetComponentInChildren<TextMeshProUGUI>();
-                _today = slot.transform.FindChild("Today").GetComponentInChildren<TextMeshProUGUI>();
-                _daily = slot.transform.FindChild("Daily").GetComponentInChildren<TextMeshProUGUI>();
-                _weekly = slot.transform.FindChild("Weekly").GetComponentInChildren<TextMeshProUGUI>();
-                _monthly = slot.transform.FindChild("Monthly").GetComponentInChildren<TextMeshProUGUI>();
+                _symbol = slot.transform.Find("Name").GetComponentInChildren<TextMeshProUGUI>();
+                _price = slot.transform.Find("Price").GetComponentInChildren<TextMeshProUGUI>();
+                _today = slot.transform.Find("Today").GetComponentInChildren<TextMeshProUGUI>();
+                _daily = slot.transform.Find("Daily").GetComponentInChildren<TextMeshProUGUI>();
+                _weekly = slot.transform.Find("Weekly").GetComponentInChildren<TextMeshProUGUI>();
+                _monthly = slot.transform.Find("Monthly").GetComponentInChildren<TextMeshProUGUI>();
             }
 
             internal void SetStock(Stock stock)

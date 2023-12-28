@@ -1,5 +1,5 @@
 ﻿using SOD.StockMarket.Implementation.Cruncher.Content;
-using UniverseLib;
+using System.Collections.Generic;
 
 namespace SOD.StockMarket.Implementation.Cruncher
 {
@@ -16,18 +16,11 @@ namespace SOD.StockMarket.Implementation.Cruncher
         internal AppTradeHistory AppTradeHistory;
         internal AppIntroduction AppIntroduction;
         internal IAppContent CurrentContent;
-        internal IAppContent PreviousContent;
+        
+        internal readonly List<IAppContent> PreviousContents = new();
 
         public override void OnSetup()
         {
-            // Set exit button listener
-            var exitButton = gameObject.transform.FindChild("Exit");
-            var button = exitButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                controller.OnAppExit();
-            });
-
             // Create all app contents
             AppMenu = new AppMenu(this);
             AppStocks = new AppStocks(this);
@@ -51,8 +44,7 @@ namespace SOD.StockMarket.Implementation.Cruncher
                 part.OnSetup();
 
             // Load by default the menu
-            CurrentContent = AppMenu;
-            PreviousContent = null;
+            AppMenu.Show();
         }
     }
 }
