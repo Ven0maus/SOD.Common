@@ -32,7 +32,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 throw new Exception($"Something is wrong in the asset bundle, missing slots for stocks. {_slots.Length}/7");
 
             // Setup pagination
-            _stocksPagination = Plugin.Instance.Market.GetPagination();
+            _stocksPagination = new StockPagination(Plugin.Instance.Market, 7);
 
             // Set next button listener
             var nextButton = Container.transform.Find("Next");

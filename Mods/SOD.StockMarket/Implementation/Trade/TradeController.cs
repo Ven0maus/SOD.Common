@@ -8,7 +8,7 @@ namespace SOD.StockMarket.Implementation.Trade
     /// <summary>
     /// Controller for all transactions of stocks
     /// </summary>
-    internal class TradeController
+    internal class TradeController : IStocksContainer
     {
         private readonly Market _market;
 
@@ -24,6 +24,12 @@ namespace SOD.StockMarket.Implementation.Trade
             get => GameplayController.Instance.money;
             set => GameplayController.Instance.money = value;
         }
+
+        public IReadOnlyList<Stock> Stocks => _playerStocks.Join(_market.Stocks,
+            playerStock => playerStock.Key,
+            marketStock => marketStock.Id,
+            (playerStock, marketStock) => marketStock)
+            .ToList();
 
         /// <summary>
         /// Basic constructor, can be called at game start with no save data, or when loading a new game (from first init main menu).

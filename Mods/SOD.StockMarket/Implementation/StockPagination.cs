@@ -10,12 +10,13 @@ namespace SOD.StockMarket.Implementation
     {
         internal int CurrentPage { get; private set; } = 0;
 
-        private const int MaxStocksPerPage = 7;
-        private readonly Market _market;
+        private readonly int _maxStocksPerPage;
+        private readonly IStocksContainer _stockContainer;
 
-        internal StockPagination(Market market) 
+        internal StockPagination(IStocksContainer stockContainer, int maxStocksPerPage)
         {
-            _market = market;
+            _stockContainer = stockContainer;
+            _maxStocksPerPage = maxStocksPerPage;
         }
 
         /// <summary>
@@ -25,7 +26,7 @@ namespace SOD.StockMarket.Implementation
         {
             get
             {
-                var stocks = new Stock[MaxStocksPerPage];
+                var stocks = new Stock[_maxStocksPerPage];
                 SetStocks(stocks);
                 return stocks;
             }
@@ -37,8 +38,8 @@ namespace SOD.StockMarket.Implementation
         /// <returns></returns>
         internal Stock[] Next()
         {
-            var stocks = new Stock[MaxStocksPerPage];
-            var maxPages = (int)Math.Ceiling((double)_market.Stocks.Count / MaxStocksPerPage);
+            var stocks = new Stock[_maxStocksPerPage];
+            var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
@@ -53,12 +54,12 @@ namespace SOD.StockMarket.Implementation
         }
 
         /// <summary>
-        /// Returns the previous 7 stock slots.
+        /// Returns the previous stock slots.
         /// </summary>
         /// <returns></returns>
         internal Stock[] Previous()
         {
-            var stocks = new Stock[MaxStocksPerPage];
+            var stocks = new Stock[_maxStocksPerPage];
             if (CurrentPage > 0)
             {
                 CurrentPage--;
@@ -66,7 +67,7 @@ namespace SOD.StockMarket.Implementation
             }
             else if (CurrentPage == 0)
             {
-                var maxPages = (int)Math.Ceiling((double)_market.Stocks.Count / MaxStocksPerPage);
+                var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
                 CurrentPage = maxPages - 1;
                 SetStocks(stocks);
             }
@@ -75,7 +76,7 @@ namespace SOD.StockMarket.Implementation
 
         internal Stock[] Reset()
         {
-            var stocks = new Stock[MaxStocksPerPage];
+            var stocks = new Stock[_maxStocksPerPage];
             CurrentPage = 0;
             SetStocks(stocks);
             return stocks;
@@ -83,10 +84,12 @@ namespace SOD.StockMarket.Implementation
 
         private void SetStocks(Stock[] stocks)
         {
-            var startIndex = CurrentPage * MaxStocksPerPage;
-            for (int i = 0; i < MaxStocksPerPage; i++)
+            if (_stockContainer.Stocks.Count == 0) return;
+
+            var startIndex = CurrentPage * _maxStocksPerPage;
+            for (int i = 0; i < _maxStocksPerPage; i++)
             {
-                var stock = _market.Stocks.Count > (startIndex + i) ? _market.Stocks[startIndex + i] : null;
+                var stock = _stockContainer.Stocks.Count > (startIndex + i) ? _stockContainer.Stocks[startIndex + i] : null;
                 stocks[i] = stock;
             }
         }

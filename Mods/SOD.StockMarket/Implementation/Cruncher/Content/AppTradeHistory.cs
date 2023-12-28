@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content

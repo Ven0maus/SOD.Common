@@ -26,7 +26,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
 
             // Data dump list
-            var dataDump = new List<StockDataDTO> 
+            var dataDump = new List<StockDataDTO>
             {
                 new StockDataDTO { TradeSaveData = tradeController.Export() }
             };

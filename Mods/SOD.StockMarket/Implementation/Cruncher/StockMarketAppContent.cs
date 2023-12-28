@@ -16,7 +16,7 @@ namespace SOD.StockMarket.Implementation.Cruncher
         internal AppTradeHistory AppTradeHistory;
         internal AppIntroduction AppIntroduction;
         internal IAppContent CurrentContent;
-        
+
         internal readonly List<IAppContent> PreviousContents = new();
 
         public override void OnSetup()
@@ -34,9 +34,9 @@ namespace SOD.StockMarket.Implementation.Cruncher
             AppIntroduction = new AppIntroduction(this);
 
             // Invoke setup on each content
-            var parts = new IAppContent[] 
-            { 
-                AppMenu, AppStocks, AppPortfolio, AppStock, 
+            var parts = new IAppContent[]
+            {
+                AppMenu, AppStocks, AppPortfolio, AppStock,
                 AppFundsInterface, AppBuyInterface, AppSellInterface,
                 AppNews, AppTradeHistory, AppIntroduction
             };

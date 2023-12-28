@@ -13,13 +13,13 @@ using System.Reflection;
 
 namespace SOD.StockMarket.Implementation
 {
-    internal class Market
+    internal class Market : IStocksContainer
     {
         private readonly List<Stock> _stocks;
         /// <summary>
         /// Contains all the stocks available within the stock market.
         /// </summary>
-        internal IReadOnlyList<Stock> Stocks => _stocks;
+        public IReadOnlyList<Stock> Stocks => _stocks;
 
         internal event EventHandler<EventArgs> OnCalculate, OnInitialized;
 
@@ -32,14 +32,14 @@ namespace SOD.StockMarket.Implementation
         private static int OpeningHour => Plugin.Instance.Config.OpeningHour;
         private static int ClosingHour => Plugin.Instance.Config.ClosingHour;
 
-        private readonly TradeController _tradeController;
+        internal TradeController TradeController { get; private set; }
         private readonly bool _simulation = false;
         internal Time.TimeData? SimulationTime;
 
         internal Market()
         {
             _stocks = new List<Stock>();
-            _tradeController = new TradeController(this);
+            TradeController = new TradeController(this);
 
             // Setup events
             Lib.SaveGame.OnBeforeNewGame += OnBeforeNewGame;
@@ -68,9 +68,9 @@ namespace SOD.StockMarket.Implementation
             _stocks = new List<Stock>();
             foreach (var stock in market.Stocks)
                 _stocks.Add(new Stock(stock));
-            _tradeController = new TradeController(this);
+            TradeController = new TradeController(this);
             _simulation = true;
-            SimulationTime = new Time.TimeData(1979,1,1, Plugin.Instance.Config.OpeningHour, 0);
+            SimulationTime = new Time.TimeData(1979, 1, 1, Plugin.Instance.Config.OpeningHour, 0);
             Initialized = true;
         }
 
@@ -89,23 +89,23 @@ namespace SOD.StockMarket.Implementation
             var marketOpenHours = Plugin.Instance.Config.ClosingHour - Plugin.Instance.Config.OpeningHour;
             var openingHour = Plugin.Instance.Config.OpeningHour;
 
-            for (int day=0; day < days; day++)
+            for (int day = 0; day < days; day++)
             {
-                for (int hour=0; hour < marketOpenHours; hour++)
+                for (int hour = 0; hour < marketOpenHours; hour++)
                 {
                     // The last minute we let OnHourChange do the calculation
                     for (int minute = 0; minute < 59; minute++)
                     {
-                        simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                        simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month,
                             simulation.SimulationTime.Value.Day, simulation.SimulationTime.Value.Hour, minute);
                         simulation.OnMinuteChanged(this, null);
                     }
-                    simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                    simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month,
                         simulation.SimulationTime.Value.Day, simulation.SimulationTime.Value.Hour + 1, 0);
                     simulation.OnHourChanged(this, null);
                 }
 
-                simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month, 
+                simulation.SimulationTime = new Time.TimeData(simulation.SimulationTime.Value.Year, simulation.SimulationTime.Value.Month,
                     simulation.SimulationTime.Value.Day, openingHour, 0);
                 simulation.SimulationTime = simulation.SimulationTime.Value.AddDays(1);
             }
@@ -118,7 +118,7 @@ namespace SOD.StockMarket.Implementation
         {
             // Do a full market reset
             _stocks.Clear();
-            _tradeController.Reset();
+            TradeController.Reset();
             CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
             CityConstructorPatches.CityConstructor_Finalized.Init = false;
             CompanyPatches.Company_Setup.ShownInitializingMessage = false;
@@ -127,11 +127,6 @@ namespace SOD.StockMarket.Implementation
             _cityConstructorFinalized = false;
             _citizenCreatorFinished = false;
             Initialized = false;
-        }
-
-        internal StockPagination GetPagination()
-        {
-            return new StockPagination(this);
         }
 
         /// <summary>
@@ -445,7 +440,7 @@ namespace SOD.StockMarket.Implementation
             var path = GetSaveFilePath(e.FilePath);
 
             // Export data to save file
-            StockDataIO.Export(this, _tradeController, path);
+            StockDataIO.Export(this, TradeController, path);
         }
 
         private bool _isLoading = false;
@@ -460,14 +455,14 @@ namespace SOD.StockMarket.Implementation
 
             // Clear current market
             _stocks.Clear();
-            _tradeController.Reset();
+            TradeController.Reset();
             _interiorCreatorFinished = true;
             _cityConstructorFinalized = true;
             _citizenCreatorFinished = true;
             Initialized = false;
 
             // Import data from save file
-            StockDataIO.Import(this, _tradeController, path);
+            StockDataIO.Import(this, TradeController, path);
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)
@@ -497,5 +492,10 @@ namespace SOD.StockMarket.Implementation
             var fileName = $"stocks_{savecode}{extension}";
             return Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
         }
+    }
+
+    internal interface IStocksContainer
+    {
+        IReadOnlyList<Stock> Stocks { get; }
     }
 }
