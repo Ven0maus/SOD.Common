@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using UnityEngine;
 
 namespace SOD.StockMarket.Implementation.Cruncher
@@ -42,6 +43,13 @@ namespace SOD.StockMarket.Implementation.Cruncher
         public void Hide()
         {
             Container.SetActive(false);
+        }
+
+        protected void MapButton(string name, Action action, Transform customPath = null)
+        {
+            var backButton = customPath?.Find(name) ?? Container.transform.Find(name);
+            var button = backButton.GetComponent<UnityEngine.UI.Button>();
+            button.onClick.AddListener(action);
         }
     }
 }

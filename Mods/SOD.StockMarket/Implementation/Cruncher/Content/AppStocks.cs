@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
-using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -34,29 +33,10 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             // Setup pagination
             _stocksPagination = new StockPagination(Plugin.Instance.Market, 7);
 
-            // Set next button listener
-            var nextButton = Container.transform.Find("Next");
-            var button = nextButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Next();
-            });
-
-            // Set previous button listener
-            var previousButton = Container.transform.Find("Previous");
-            button = previousButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Previous();
-            });
-
-            // Set back button listener
-            var backButton = Container.transform.Find("Back");
-            button = backButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Back();
-            });
+            // Map buttons
+            MapButton("Next", Next);
+            MapButton("Previous", Previous);
+            MapButton("Back", Back);
 
             // Set current
             SetSlots(_stocksPagination.Current);

@@ -99,7 +99,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             UpdatePortfolio();
         }
 
-        private void UpdatePortfolio()
+        internal void UpdatePortfolio()
         {
             // Set funds information
             var tradeController = Plugin.Instance.Market.TradeController;

@@ -34,8 +34,8 @@ namespace SOD.StockMarket.Implementation.Trade
             (playerStock, marketStock) => marketStock)
             .ToList();
 
-        internal decimal TotalInvestedInStocks 
-        { 
+        internal decimal TotalInvestedInStocks
+        {
             get
             {
                 decimal investment = 0;
@@ -45,7 +45,7 @@ namespace SOD.StockMarket.Implementation.Trade
                     investment += amount * item.Price;
                 }
                 return Math.Round(investment, 2);
-            } 
+            }
         }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace SOD.StockMarket.Implementation.Trade
             }
             return 0;
         }
-        
+
         private decimal GetOwnedStockValueDaysAgo(int days)
         {
             var stocks = Stocks
@@ -116,6 +116,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="money"></param>
         internal void DepositFunds(int money)
         {
+            if (money <= 0) return;
             if (Money >= money)
             {
                 AvailableFunds += money;
@@ -129,6 +130,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="money"></param>
         internal void WithdrawFunds(int money)
         {
+            if (money <= 0) return;
             if (AvailableFunds >= money)
             {
                 AvailableFunds -= money;

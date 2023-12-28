@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -13,12 +12,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         public override void OnSetup()
         {
             // Set back button listener
-            var backButton = Container.transform.Find("Back");
-            var button = backButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(() =>
-            {
-                Back();
-            });
+            MapButton("Back", Back);
         }
     }
 }
