@@ -131,7 +131,7 @@ namespace SOD.StockMarket.Implementation
 
         internal StockPagination GetPagination()
         {
-            return new StockPagination(_stocks);
+            return new StockPagination(this);
         }
 
         /// <summary>

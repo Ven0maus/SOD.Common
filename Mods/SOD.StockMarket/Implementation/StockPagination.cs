@@ -1,6 +1,5 @@
 ﻿using SOD.StockMarket.Implementation.Stocks;
 using System;
-using System.Collections.Generic;
 
 namespace SOD.StockMarket.Implementation
 {
@@ -12,11 +11,24 @@ namespace SOD.StockMarket.Implementation
         internal int CurrentPage { get; private set; } = 0;
 
         private const int MaxStocksPerPage = 7;
-        private readonly IReadOnlyList<Stock> _stocks;
+        private readonly Market _market;
 
-        internal StockPagination(IReadOnlyList<Stock> stocks) 
+        internal StockPagination(Market market) 
         {
-            _stocks = stocks;
+            _market = market;
+        }
+
+        /// <summary>
+        /// Returns the current selection
+        /// </summary>
+        internal Stock[] Current
+        {
+            get
+            {
+                var stocks = new Stock[MaxStocksPerPage];
+                SetStocks(stocks);
+                return stocks;
+            }
         }
 
         /// <summary>
@@ -26,10 +38,15 @@ namespace SOD.StockMarket.Implementation
         internal Stock[] Next()
         {
             var stocks = new Stock[MaxStocksPerPage];
-            var maxPages = (int)Math.Ceiling((double)_stocks.Count / MaxStocksPerPage);
-            if (CurrentPage < maxPages)
+            var maxPages = (int)Math.Ceiling((double)_market.Stocks.Count / MaxStocksPerPage);
+            if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
+                SetStocks(stocks);
+            }
+            else if (CurrentPage == maxPages - 1)
+            {
+                CurrentPage = 0;
                 SetStocks(stocks);
             }
             return stocks;
@@ -47,23 +64,29 @@ namespace SOD.StockMarket.Implementation
                 CurrentPage--;
                 SetStocks(stocks);
             }
+            else if (CurrentPage == 0)
+            {
+                var maxPages = (int)Math.Ceiling((double)_market.Stocks.Count / MaxStocksPerPage);
+                CurrentPage = maxPages - 1;
+                SetStocks(stocks);
+            }
             return stocks;
         }
 
-        /// <summary>
-        /// Resets the paging back to 0
-        /// </summary>
-        internal void Reset()
+        internal Stock[] Reset()
         {
+            var stocks = new Stock[MaxStocksPerPage];
             CurrentPage = 0;
+            SetStocks(stocks);
+            return stocks;
         }
 
         private void SetStocks(Stock[] stocks)
         {
             var startIndex = CurrentPage * MaxStocksPerPage;
-            for (int i = startIndex; i < MaxStocksPerPage; i++)
+            for (int i = 0; i < MaxStocksPerPage; i++)
             {
-                var stock = _stocks.Count > i ? _stocks[i] : null;
+                var stock = _market.Stocks.Count > (startIndex + i) ? _market.Stocks[startIndex + i] : null;
                 stocks[i] = stock;
             }
         }
