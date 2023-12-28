@@ -1,4 +1,5 @@
-﻿using SOD.StockMarket.Implementation.Stocks;
+﻿using SOD.Common;
+using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,10 +17,12 @@ namespace SOD.StockMarket.Implementation.Trade
         private Dictionary<int, int> _playerStocks;
         private List<TradeOrder> _playerTradeOrders;
 
+        internal int AvailableFunds { get; private set; }
+
         /// <summary>
         /// Money of the player
         /// </summary>
-        private static int Money
+        internal static int Money
         {
             get => GameplayController.Instance.money;
             set => GameplayController.Instance.money = value;
@@ -30,6 +33,20 @@ namespace SOD.StockMarket.Implementation.Trade
             marketStock => marketStock.Id,
             (playerStock, marketStock) => marketStock)
             .ToList();
+
+        internal decimal TotalInvestedInStocks 
+        { 
+            get
+            {
+                decimal investment = 0;
+                foreach (var item in Stocks)
+                {
+                    var amount = _playerStocks[item.Id];
+                    investment += amount * item.Price;
+                }
+                return Math.Round(investment, 2);
+            } 
+        }
 
         /// <summary>
         /// Basic constructor, can be called at game start with no save data, or when loading a new game (from first init main menu).
@@ -45,6 +62,45 @@ namespace SOD.StockMarket.Implementation.Trade
             Import(null);
         }
 
+        internal decimal GetPercentageChangeDaysAgoToNow(int days)
+        {
+            var daysAgoWorth = GetOwnedStockValueDaysAgo(days);
+            var nowWorth = GetOwnedStockValueDaysAgo(0);
+
+            if (daysAgoWorth != 0)
+            {
+                return Math.Round((nowWorth - daysAgoWorth) / daysAgoWorth * 100, 2);
+            }
+            return 0;
+        }
+        
+        private decimal GetOwnedStockValueDaysAgo(int days)
+        {
+            var stocks = Stocks
+                .Select(a => new { Stock = a, HistoricalEntry = GetHistoricalEntry(a, days) });
+
+            decimal totalPrice = 0;
+            foreach (var value in stocks)
+            {
+                if (value.HistoricalEntry == null)
+                    continue;
+
+                var amount = _playerStocks[value.Stock.Id];
+                totalPrice += value.HistoricalEntry.Open * amount;
+            }
+            return totalPrice;
+        }
+
+        private static StockData GetHistoricalEntry(Stock stock, int days)
+        {
+            var currentDate = Lib.Time.CurrentDate;
+            if (days == 0)
+                return new StockData { Open = stock.Price };
+            return stock.HistoricalData
+                .OrderByDescending(a => a.Date)
+                .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= days);
+        }
+
         /// <summary>
         /// Resets all trade information, call this on a new game or loadgame.
         /// </summary>
@@ -52,6 +108,32 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             _playerStocks.Clear();
             _playerTradeOrders.Clear();
+        }
+
+        /// <summary>
+        /// Adds money that can be invested into stocks into the market account
+        /// </summary>
+        /// <param name="money"></param>
+        internal void DepositFunds(int money)
+        {
+            if (Money >= money)
+            {
+                AvailableFunds += money;
+                Money -= money;
+            }
+        }
+
+        /// <summary>
+        /// Withdraws money from the market account into the games money balance
+        /// </summary>
+        /// <param name="money"></param>
+        internal void WithdrawFunds(int money)
+        {
+            if (AvailableFunds >= money)
+            {
+                AvailableFunds -= money;
+                Money += money;
+            }
         }
 
         /// <summary>

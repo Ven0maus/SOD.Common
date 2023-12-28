@@ -1,6 +1,8 @@
 ﻿using SOD.Common;
 using SOD.StockMarket.Implementation.Stocks;
+using SOD.StockMarket.Implementation.Trade;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
@@ -14,6 +16,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private StockPagination _ownedStocksPagination;
         private StockEntry[] _ownedStockSlots;
 
+        private TextMeshProUGUI _bankBalance, _availableFunds, _investedInStocks, _totalPortfolio, _daily, _weekly, _monthly;
+
         public AppPortfolio(StockMarketAppContent content) : base(content)
         { }
 
@@ -21,6 +25,15 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         public override void OnSetup()
         {
+            // Setup the portfolio info references
+            _bankBalance = Container.transform.Find("BankBalance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _availableFunds = Container.transform.Find("FreeCapital").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _investedInStocks = Container.transform.Find("InvestedInStocks").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _totalPortfolio = Container.transform.Find("TotalPortfolio").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _daily = Container.transform.Find("DailyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _weekly = Container.transform.Find("WeeklyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _monthly = Container.transform.Find("MonthlyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+
             // Setup main slots
             _ownedStockSlots = Container.transform.Find("InvestedStocksOverview").Find("Panel").GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("PortfolioEntry"))
@@ -68,6 +81,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             // Set current
             SetSlots(_ownedStocksPagination.Current);
 
+            // Update the portfolio
+            UpdatePortfolio();
+
             // Update the current set slots
             Lib.Time.OnMinuteChanged += UpdateStocks;
         }
@@ -85,7 +101,18 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         private void UpdatePortfolio()
         {
-            // TODO
+            // Set funds information
+            var tradeController = Plugin.Instance.Market.TradeController;
+            _bankBalance.text = $"€ {TradeController.Money.ToString(CultureInfo.InvariantCulture)}";
+            _availableFunds.text = $"€ {tradeController.AvailableFunds.ToString(CultureInfo.InvariantCulture)}";
+            var totalInvested = tradeController.TotalInvestedInStocks;
+            _investedInStocks.text = $"€ {totalInvested.ToString(CultureInfo.InvariantCulture)}";
+            _totalPortfolio.text = $"€ {Math.Round(tradeController.AvailableFunds + totalInvested, 2).ToString(CultureInfo.InvariantCulture)}";
+
+            // Set percentages
+            _daily.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(1).ToString(CultureInfo.InvariantCulture)} %";
+            _weekly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(7).ToString(CultureInfo.InvariantCulture)} %";
+            _monthly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(30).ToString(CultureInfo.InvariantCulture)} %";
         }
 
         internal void Next()
