@@ -1,5 +1,6 @@
 ﻿using SOD.Common;
 using SOD.StockMarket.Implementation.Trade;
+using System;
 using System.Globalization;
 using TMPro;
 using UnityEngine;
@@ -85,7 +86,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             var tradeController = Plugin.Instance.Market.TradeController;
             if (tradeController.AvailableFunds < amount)
-                amount = tradeController.AvailableFunds;
+                amount = (int)Math.Floor(tradeController.AvailableFunds);
 
             // Update the balance info
             if (amount != 0)

@@ -17,7 +17,7 @@ namespace SOD.StockMarket.Implementation.Trade
         private Dictionary<int, int> _playerStocks;
         private List<TradeOrder> _playerTradeOrders;
 
-        internal int AvailableFunds { get; private set; }
+        internal decimal AvailableFunds { get; private set; }
 
         /// <summary>
         /// Money of the player
@@ -190,7 +190,7 @@ namespace SOD.StockMarket.Implementation.Trade
             if (deductMoney)
             {
                 // Calculate price for the current stock
-                var totalPrice = (int)Math.Round(stock.Price * amount, 0);
+                var totalPrice = Math.Round(stock.Price * amount, 0);
                 AvailableFunds -= totalPrice;
             }
 
