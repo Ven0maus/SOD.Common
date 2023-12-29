@@ -63,11 +63,15 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         private void InstantBuy()
         {
+            if (_currentAmount == 0) return;
+
             var tradeController = Plugin.Instance.Market.TradeController;
-            tradeController.InstantBuy(_stock, _currentAmount);
-            Content.AppPortfolio.UpdatePortfolio();
-            Content.AppStock.UpdateInfo();
-            ResetAmount();
+            if (tradeController.InstantBuy(_stock, _currentAmount))
+            {
+                Content.AppPortfolio.UpdatePortfolio();
+                Content.AppStock.UpdateInfo();
+                ResetAmount();
+            }
         }
 
         private void BalanceAmountAndCostBasedOnCurrentPrices(int amount)

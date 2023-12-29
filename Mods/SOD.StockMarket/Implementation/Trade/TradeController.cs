@@ -11,7 +11,7 @@ namespace SOD.StockMarket.Implementation.Trade
     /// </summary>
     internal class TradeController : IStocksContainer
     {
-        private readonly Market _market;
+        internal readonly Market Market;
 
         // Player transactions
         private Dictionary<int, int> _playerStocks;
@@ -40,11 +40,13 @@ namespace SOD.StockMarket.Implementation.Trade
             }
         }
 
-        public IReadOnlyList<Stock> Stocks => _playerStocks.Join(_market.Stocks,
+        public IReadOnlyList<Stock> Stocks => _playerStocks.Join(Market.Stocks,
             playerStock => playerStock.Key,
             marketStock => marketStock.Id,
             (playerStock, marketStock) => marketStock)
             .ToList();
+
+        public IReadOnlyList<TradeOrder> TradeOrders => _playerTradeOrders;
 
         internal decimal TotalInvestedInStocks
         {
@@ -73,8 +75,8 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="saveData"></param>
         internal TradeController(Market market)
         {
-            _market = market;
-            _market.OnCalculate += Market_OnCalculate;
+            Market = market;
+            Market.OnCalculate += Market_OnCalculate;
 
             // Initial data setup
             Import(null);
@@ -314,9 +316,10 @@ namespace SOD.StockMarket.Implementation.Trade
                 if (order.Completed) continue;
 
                 // Check if order can be full-filled.
-                var stock = _market.Stocks[order.StockId];
+                var stock = Market.Stocks[order.StockId];
                 var currentPrice = stock.Price;
-                if (currentPrice >= order.Price)
+                if ((order.OrderType == OrderType.Buy && currentPrice <= order.Price) ||
+                    (order.OrderType == OrderType.Sell && currentPrice >= order.Price))
                 {
                     // Execute order
                     _ = order.OrderType switch

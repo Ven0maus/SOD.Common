@@ -1,5 +1,4 @@
-﻿using Il2CppInterop.Runtime;
-using SOD.Common;
+﻿using SOD.Common;
 using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Globalization;
@@ -64,6 +63,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
         private void InstantSell()
         {
+            if (_currentAmount == 0) return;
+
             var tradeController = Plugin.Instance.Market.TradeController;
             tradeController.InstantSell(_stock, _currentAmount);
             Content.AppPortfolio.UpdatePortfolio();

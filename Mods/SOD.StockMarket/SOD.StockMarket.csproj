@@ -33,6 +33,9 @@
     <Reference Include="AssetsTools.NET">
       <HintPath>dependencies\AssetsTools.NET.dll</HintPath>
     </Reference>
+    <Reference Include="FMODUnity">
+      <HintPath>..\..\libs\il2cpp\FMODUnity.dll</HintPath>
+    </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
     </Reference>
@@ -44,6 +47,9 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>..\..\libs\il2cpp\UnityEngine.InputLegacyModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\libs\il2cpp\UnityEngine.UI.dll</HintPath>

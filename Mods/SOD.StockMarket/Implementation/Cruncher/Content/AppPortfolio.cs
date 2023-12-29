@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
-using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -16,7 +15,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private StockPagination _ownedStocksPagination;
         private StockEntry[] _ownedStockSlots;
 
-        private TextMeshProUGUI _bankBalance, _availableFunds, _investedInStocks, _totalPortfolio, _daily, _weekly, _monthly;
+        private TextMeshProUGUI _bankBalance, _availableFunds, _investedInStocks, _ongoingLimitOrders, _daily, _weekly, _monthly;
 
         public AppPortfolio(StockMarketAppContent content) : base(content)
         { }
@@ -29,7 +28,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _bankBalance = Container.transform.Find("BankBalance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _availableFunds = Container.transform.Find("FreeCapital").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _investedInStocks = Container.transform.Find("InvestedInStocks").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
-            _totalPortfolio = Container.transform.Find("TotalPortfolio").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _ongoingLimitOrders = Container.transform.Find("OngoingLimitOrders").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _daily = Container.transform.Find("DailyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _weekly = Container.transform.Find("WeeklyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _monthly = Container.transform.Find("MonthlyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
@@ -40,17 +39,16 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 .OrderBy(a => ExtractNumber(a.name))
                 .Select(a => new StockEntry(a.gameObject))
                 .ToArray();
-            if (_ownedStockSlots.Length != 8)
-                throw new Exception($"Something is wrong in the asset bundle, missing slots for portfolio slots. {_ownedStockSlots.Length}/8");
 
             // Setup pagination
-            _ownedStocksPagination = new StockPagination(Plugin.Instance.Market.TradeController, 8);
+            _ownedStocksPagination = new StockPagination(Plugin.Instance.Market.TradeController, _ownedStockSlots.Length);
 
             // Set next button listener
             MapButton("Next", Next);
             MapButton("Previous", Previous);
             MapButton("Back", Back);
             MapButton("WithdrawDepositFunds", Content.AppFundsInterface.Show);
+            MapButton("LimitOrders", LimitOrders);
 
             // Set current
             SetSlots(_ownedStocksPagination.Current);
@@ -60,6 +58,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
             // Update the current set slots
             Lib.Time.OnMinuteChanged += UpdateStocks;
+        }
+
+        private void LimitOrders()
+        {
+            Content.AppLimitOrdersOverview.SetStock(null);
+            Content.AppLimitOrdersOverview.Show();
         }
 
         private void UpdateStocks(object sender, Common.Helpers.TimeChangedArgs e)
@@ -78,7 +82,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _availableFunds.text = $"€ {tradeController.AvailableFunds.ToString(CultureInfo.InvariantCulture)}";
             var totalInvested = tradeController.TotalInvestedInStocks;
             _investedInStocks.text = $"€ {totalInvested.ToString(CultureInfo.InvariantCulture)}";
-            _totalPortfolio.text = $"€ {Math.Round(tradeController.AvailableFunds + totalInvested, 2).ToString(CultureInfo.InvariantCulture)}";
+            _ongoingLimitOrders.text = $"€ {Math.Round(tradeController.TradeOrders.Select(a => a.Price * a.Amount).Sum(), 2).ToString(CultureInfo.InvariantCulture)}";
 
             // Set percentages
             _daily.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(1).ToString(CultureInfo.InvariantCulture)} %";

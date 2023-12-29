@@ -1,6 +1,6 @@
 ﻿namespace SOD.StockMarket.Implementation.Trade
 {
-    internal struct TradeOrder
+    internal class TradeOrder
     {
         internal int StockId { get; }
         internal decimal Price { get; }

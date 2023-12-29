@@ -16,26 +16,26 @@ namespace SOD.StockMarket.Implementation.Cruncher
         public abstract void OnSetup();
         public abstract GameObject Container { get; }
 
-        public void Show()
+        public virtual void Show()
         {
             if (Content.CurrentContent != null && !Content.CurrentContent.Equals(this))
             {
-                Content.PreviousContents.Add(Content.CurrentContent);
+                Content.AddPreviousContent(Content.CurrentContent);
                 Content.CurrentContent.Hide();
             }
-            Content.CurrentContent = this;
+            Content.SetCurrentContent(this);
             Container.SetActive(true);
         }
 
-        public void Back()
+        public virtual void Back()
         {
             // Show previous content seen
             var last = Content.PreviousContents.LastOrDefault();
             if (last != null)
             {
                 Container.SetActive(false);
-                Content.CurrentContent = last;
-                Content.PreviousContents.Remove(last);
+                Content.SetCurrentContent(last);
+                Content.RemovePreviousContent(last);
                 Content.CurrentContent.Show();
             }
         }

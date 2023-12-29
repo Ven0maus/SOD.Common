@@ -33,6 +33,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("Back", Back);
             MapButton("InstantBuy", InstantBuy);
             MapButton("InstantSell", InstantSell);
+            MapButton("BuyLimit", BuyLimit);
+            MapButton("SellLimit", SellLimit);
 
             // Update the info
             UpdateInfo();
@@ -94,6 +96,18 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             Content.AppInstantSellInterface.SetStock(_stock);
             Content.AppInstantSellInterface.Show();
+        }
+
+        private void SellLimit()
+        {
+            Content.AppSellLimitInterface.SetStock(_stock);
+            Content.AppSellLimitInterface.Show();
+        }
+
+        private void BuyLimit()
+        {
+            Content.AppBuyLimitInterface.SetStock(_stock);
+            Content.AppBuyLimitInterface.Show();
         }
     }
 }

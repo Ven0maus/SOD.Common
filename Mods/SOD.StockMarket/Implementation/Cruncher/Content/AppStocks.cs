@@ -28,11 +28,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 .OrderBy(a => ExtractNumber(a.name))
                 .Select(a => new StockEntry(this, a.gameObject))
                 .ToArray();
-            if (_slots.Length != 7)
-                throw new Exception($"Something is wrong in the asset bundle, missing slots for stocks. {_slots.Length}/7");
 
             // Setup pagination
-            _stocksPagination = new StockPagination(Plugin.Instance.Market, 7);
+            _stocksPagination = new StockPagination(Plugin.Instance.Market, _slots.Length);
 
             // Map buttons
             MapButton("Next", Next);
