@@ -1,4 +1,5 @@
-﻿using SOD.Common;
+﻿using Il2CppInterop.Runtime;
+using SOD.Common;
 using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Globalization;

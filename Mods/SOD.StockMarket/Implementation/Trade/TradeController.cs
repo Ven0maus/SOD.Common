@@ -190,7 +190,7 @@ namespace SOD.StockMarket.Implementation.Trade
             if (deductMoney)
             {
                 // Calculate price for the current stock
-                var totalPrice = Math.Round(stock.Price * amount, 0);
+                var totalPrice = Math.Round(stock.Price * amount, 2);
                 AvailableFunds -= totalPrice;
             }
 
@@ -224,7 +224,7 @@ namespace SOD.StockMarket.Implementation.Trade
             }
 
             // Calculate price for the current stock
-            var totalPrice = (int)Math.Round(stock.Price * amount, 0);
+            var totalPrice = Math.Round(stock.Price * amount, 2);
 
             // Add money
             AvailableFunds += totalPrice;
@@ -245,7 +245,7 @@ namespace SOD.StockMarket.Implementation.Trade
 
             // Since we are placing a buy limit order, we need to already deduct the money from the player
             // Calculate price for the current stock
-            var totalPrice = (int)Math.Round(stock.Price * amount, 0);
+            var totalPrice = Math.Round(stock.Price * amount, 2);
             AvailableFunds -= totalPrice;
 
             _playerTradeOrders.Add(new TradeOrder(OrderType.Buy, stock.Id, price, amount));
