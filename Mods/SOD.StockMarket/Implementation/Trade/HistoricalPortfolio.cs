@@ -17,12 +17,12 @@ namespace SOD.StockMarket.Implementation.Trade
             set { _timeData = value; }
         }
 
-        internal decimal Worth { get; private set; }
-        internal int Year { get; private set; }
-        internal int Month { get; private set; }
-        internal int Day { get; private set; }
+        public decimal Worth { get; set; }
+        public int Year { get; set; }
+        public int Month { get; set; }
+        public int Day { get; set; }
 
-        internal HistoricalPortfolio() { }
+        public HistoricalPortfolio() { }
 
         internal HistoricalPortfolio(Time.TimeData date, decimal worth)
         {

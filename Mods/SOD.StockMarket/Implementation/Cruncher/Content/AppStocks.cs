@@ -23,7 +23,8 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         public override void OnSetup()
         {
             // Setup main slots
-            _slots = Container.transform.Find("Scrollrect").Find("Panel").GetComponentsInChildren<RectTransform>()
+            var panel = Container.transform.Find("Scrollrect").Find("Panel");
+            _slots = panel.GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("StockEntry"))
                 .OrderBy(a => ExtractNumber(a.name))
                 .Select(a => new StockEntry(this, a.gameObject))
@@ -36,6 +37,15 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("Next", Next);
             MapButton("Previous", Previous);
             MapButton("Back", Back);
+
+            // Map header buttons
+            var header = panel.Find("Header");
+            MapButton("Name", () => { _stocksPagination.SortBy(a => a.Name); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Price", () => { _stocksPagination.SortBy(a => a.Price); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Today", () => { _stocksPagination.SortBy(a => a.TodayDiff); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Daily", () => { _stocksPagination.SortBy(a => a.DailyPercentage); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Weekly", () => { _stocksPagination.SortBy(a => a.WeeklyPercentage); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Monthly", () => { _stocksPagination.SortBy(a => a.MonthlyPercentage); SetSlots(_stocksPagination.Current); }, header);
 
             // Set current
             SetSlots(_stocksPagination.Current);
@@ -137,7 +147,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 _price.text = stock.Price.ToString(CultureInfo.InvariantCulture);
 
                 // Set price diff of today
-                var priceDiffToday = Math.Round(stock.Price - stock.OpeningPrice, 2);
+                var priceDiffToday = stock.TodayDiff;
                 if (priceDiffToday == 0)
                     _today.color = Color.white;
                 else if (priceDiffToday > 0)
@@ -154,7 +164,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
             private void SetDailyPercentageText(Stock stock)
             {
-                var dailyPercentage = GetPercentage(stock.Price, stock.OpeningPrice);
+                var dailyPercentage = stock.DailyPercentage;
                 if (dailyPercentage == 0)
                     _daily.color = Color.white;
                 else if (dailyPercentage > 0)
@@ -166,77 +176,42 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
             private void SetWeeklyPercentage(Stock stock)
             {
-                var currentDate = Lib.Time.CurrentDate;
-                var weekHistorical = stock.HistoricalData
-                    .OrderByDescending(a => a.Date)
-                    .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= 7);
-                if (weekHistorical == null)
+                var weeklyPercentage = stock.WeeklyPercentage;
+                if (weeklyPercentage == null)
                 {
                     _weekly.text = "/";
                     _weekly.color = Color.white;
                     return;
                 }
 
-                var weeklyPercentage = GetPercentage(stock.Price, weekHistorical.Open);
-                if (weeklyPercentage == 0)
+                var value = weeklyPercentage.Value;
+                if (value == 0)
                     _weekly.color = Color.white;
-                else if (weeklyPercentage > 0)
+                else if (value > 0)
                     _weekly.color = Color.green;
                 else
                     _weekly.color = Color.red;
-                _weekly.text = weeklyPercentage.ToString(CultureInfo.InvariantCulture) + " %";
+                _weekly.text = value.ToString(CultureInfo.InvariantCulture) + " %";
             }
 
             private void SetMonthlyPercentage(Stock stock)
             {
-                var currentDate = Lib.Time.CurrentDate;
-                var monthHistorical = stock.HistoricalData
-                    .OrderByDescending(a => a.Date)
-                    .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= 30);
-                if (monthHistorical == null)
+                var monthlyPercentage = stock.MonthlyPercentage;
+                if (monthlyPercentage == null)
                 {
                     _monthly.text = "/";
                     _monthly.color = Color.white;
                     return;
                 }
 
-                var monthlyPercentage = GetPercentage(stock.Price, monthHistorical.Open);
-                if (monthlyPercentage == 0)
+                var value = monthlyPercentage.Value;
+                if (value == 0)
                     _monthly.color = Color.white;
-                else if (monthlyPercentage > 0)
+                else if (value > 0)
                     _monthly.color = Color.green;
                 else
                     _monthly.color = Color.red;
-                _monthly.text = monthlyPercentage.ToString(CultureInfo.InvariantCulture) + " %";
-            }
-
-            private static decimal GetPercentage(decimal currentPrice, decimal openingPrice)
-            {
-                double percentageChange;
-                if (openingPrice != 0)
-                {
-                    percentageChange = (double)((currentPrice - openingPrice) / openingPrice * 100);
-                }
-                else
-                {
-                    // Handle the case when openingPrice is zero
-                    if (currentPrice > 0)
-                    {
-                        // If currentPrice is positive, consider percentage change as infinite
-                        percentageChange = double.PositiveInfinity;
-                    }
-                    else if (currentPrice < 0)
-                    {
-                        // If currentPrice is negative, consider percentage change as negative infinite
-                        percentageChange = double.NegativeInfinity;
-                    }
-                    else
-                    {
-                        // If currentPrice is also zero, consider percentage change as zero
-                        percentageChange = 0;
-                    }
-                }
-                return Math.Round((decimal)percentageChange, 2);
+                _monthly.text = value.ToString(CultureInfo.InvariantCulture) + " %";
             }
         }
     }

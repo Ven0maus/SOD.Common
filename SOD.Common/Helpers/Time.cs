@@ -277,8 +277,8 @@ namespace SOD.Common.Helpers
             public string ToString(string format)
             {
                 return format
-                    .Replace("dd", Month.ToString("00"))
-                    .Replace("MM", Day.ToString("00"))
+                    .Replace("dd", Day.ToString("00"))
+                    .Replace("MM", Month.ToString("00"))
                     .Replace("yyyy", Year.ToString())
                     .Replace("HH", Hour.ToString("00"))
                     .Replace("mm", Minute.ToString("00"));
@@ -310,9 +310,10 @@ namespace SOD.Common.Helpers
             /// <returns></returns>
             public TimeData AddDays(int days)
             {
-                DateTime currentDateTime = new(Year, Month, Day, Hour, Minute, 0);
+                DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
                 DateTime newDateTime = currentDateTime.AddDays(days);
-                return new TimeData(newDateTime.Year, newDateTime.Month, newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month -1 : newDateTime.Month, 
+                    Day == 0 ? newDateTime.Day -1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
             }
 
             public int CompareTo(TimeData other)
@@ -370,10 +371,19 @@ namespace SOD.Common.Helpers
 
             public static TimeSpan operator -(TimeData left, TimeData right)
             {
-                var dateLeft = new DateTime(left.Year, left.Month, left.Day, left.Hour, left.Minute, 0);
-                var dateRight = new DateTime(right.Year, right.Month, right.Day, right.Hour, right.Minute, 0);
-                var diff = dateLeft - dateRight;
-                return diff;
+                try
+                {
+                    var dateLeft = new DateTime(left.Year, left.Month == 0 ? left.Month + 1 : left.Month,
+                        left.Day == 0 ? left.Day + 1 : left.Day, left.Hour, left.Minute, 0);
+                    var dateRight = new DateTime(right.Year, right.Month == 0 ? right.Month + 1 : right.Month,
+                        right.Day == 0 ? right.Day + 1 : right.Day, right.Hour, right.Minute, 0);
+                    return dateLeft - dateRight;
+                }
+                catch (Exception)
+                {
+                    Plugin.Log.LogInfo("Left: " + left + " | Right: " + right);
+                    throw;
+                }
             }
         }
     }

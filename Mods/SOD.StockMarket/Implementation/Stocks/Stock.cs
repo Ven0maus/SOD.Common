@@ -3,6 +3,7 @@ using SOD.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace SOD.StockMarket.Implementation.Stocks
 {
@@ -19,6 +20,40 @@ namespace SOD.StockMarket.Implementation.Stocks
         internal decimal HighPrice { get; private set; }
         internal decimal LowPrice { get; private set; }
         internal StockTrend? Trend { get; private set; }
+
+        [JsonIgnore]
+        internal decimal TodayDiff => Math.Round(Price - OpeningPrice, 2);
+
+        [JsonIgnore]
+        internal decimal DailyPercentage => GetPercentage(Price, OpeningPrice);
+
+        [JsonIgnore]
+        internal decimal? WeeklyPercentage
+        {
+            get
+            {
+                var currentDate = Lib.Time.CurrentDate;
+                var weekHistorical = HistoricalData
+                    .OrderByDescending(a => a.Date)
+                    .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= 7);
+                if (weekHistorical == null) return null;
+                return GetPercentage(Price, weekHistorical.Open);
+            }
+        }
+
+        [JsonIgnore]
+        internal decimal? MonthlyPercentage
+        {
+            get
+            {
+                var currentDate = Lib.Time.CurrentDate;
+                var monthHistorical = HistoricalData
+                    .OrderByDescending(a => a.Date)
+                    .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= 30);
+                if (monthHistorical == null) return null;
+                return GetPercentage(Price, monthHistorical.Open);
+            }
+        }
 
         internal IReadOnlyList<StockData> HistoricalData => _historicalData;
 
@@ -97,6 +132,35 @@ namespace SOD.StockMarket.Implementation.Stocks
             _historicalData = new List<StockData>();
             _basePrice = basePrice;
             _imported = false;
+        }
+
+        private static decimal GetPercentage(decimal currentPrice, decimal openingPrice)
+        {
+            double percentageChange;
+            if (openingPrice != 0)
+            {
+                percentageChange = (double)((currentPrice - openingPrice) / openingPrice * 100);
+            }
+            else
+            {
+                // Handle the case when openingPrice is zero
+                if (currentPrice > 0)
+                {
+                    // If currentPrice is positive, consider percentage change as infinite
+                    percentageChange = double.PositiveInfinity;
+                }
+                else if (currentPrice < 0)
+                {
+                    // If currentPrice is negative, consider percentage change as negative infinite
+                    percentageChange = double.NegativeInfinity;
+                }
+                else
+                {
+                    // If currentPrice is also zero, consider percentage change as zero
+                    percentageChange = 0;
+                }
+            }
+            return Math.Round((decimal)percentageChange, 2);
         }
 
         // Total steps is 60, until it reaches the next hour

@@ -1,5 +1,7 @@
 ﻿using SOD.StockMarket.Implementation.Stocks;
 using System;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace SOD.StockMarket.Implementation
 {
@@ -82,14 +84,37 @@ namespace SOD.StockMarket.Implementation
             return stocks;
         }
 
+        private Func<Stock, object> _currentSortingProperty;
+        private bool _sortAscending = true;
+        internal void SortBy(Func<Stock, object> selector)
+        {
+            // If sorting by the same property, change order
+            if (_currentSortingProperty == selector)
+                _sortAscending = !_sortAscending;
+            else
+                _sortAscending = true;
+
+            // Set new property
+            _currentSortingProperty = selector;
+        }
+
         private void SetStocks(Stock[] stocks)
         {
             if (_stockContainer.Stocks.Count == 0) return;
 
+            // Do some sorting if applicable
+            var sortedCollection = _stockContainer.Stocks;
+            if (_currentSortingProperty != null)
+            {
+                sortedCollection = _sortAscending ? 
+                    sortedCollection.OrderBy(_currentSortingProperty).ToList() : 
+                    sortedCollection.OrderByDescending(_currentSortingProperty).ToList();
+            }
+
             var startIndex = CurrentPage * _maxStocksPerPage;
             for (int i = 0; i < _maxStocksPerPage; i++)
             {
-                var stock = _stockContainer.Stocks.Count > (startIndex + i) ? _stockContainer.Stocks[startIndex + i] : null;
+                var stock = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
                 stocks[i] = stock;
             }
         }
