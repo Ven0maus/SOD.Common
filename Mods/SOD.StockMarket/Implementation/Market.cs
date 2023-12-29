@@ -170,9 +170,9 @@ namespace SOD.StockMarket.Implementation
             {
                 // Generate the remaining stocks
                 var remainingCount = Plugin.Instance.Config.MinimumStocksInMarket - _stocks.Count;
-                for (int i=0; i <remainingCount; i++)
+                for (int i = 0; i < remainingCount; i++)
                 {
-                    var stock = new Stock(new CompanyStockData(StockNameGenerator.GenerateStockName(), 
+                    var stock = new Stock(new CompanyStockData(StockNameGenerator.GenerateStockName(),
                         Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2)));
                     InitStock(stock);
                 }

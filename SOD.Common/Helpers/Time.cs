@@ -312,8 +312,8 @@ namespace SOD.Common.Helpers
             {
                 DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
                 DateTime newDateTime = currentDateTime.AddDays(days);
-                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month -1 : newDateTime.Month, 
-                    Day == 0 ? newDateTime.Day -1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
+                    Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
             }
 
             public int CompareTo(TimeData other)

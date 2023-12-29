@@ -1,7 +1,6 @@
 ﻿using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace SOD.StockMarket.Implementation
 {
@@ -106,8 +105,8 @@ namespace SOD.StockMarket.Implementation
             var sortedCollection = _stockContainer.Stocks;
             if (_currentSortingProperty != null)
             {
-                sortedCollection = _sortAscending ? 
-                    sortedCollection.OrderBy(_currentSortingProperty).ToList() : 
+                sortedCollection = _sortAscending ?
+                    sortedCollection.OrderBy(_currentSortingProperty).ToList() :
                     sortedCollection.OrderByDescending(_currentSortingProperty).ToList();
             }
 

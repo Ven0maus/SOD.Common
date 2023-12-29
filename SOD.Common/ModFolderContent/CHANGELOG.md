@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.1.01**
+- Fix ToString() formatting for Time.TimeData
+- Fix for AddDays and - operator when month/day are 0 in Time.TimeData
+
 **1.1.0**
 Bugfixes:
 - Bugfix: loading a save game triggers the load process twice
