@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
+using UniverseLib;
 
 namespace SOD.StockMarket.Implementation.Cruncher.Content
 {
@@ -37,7 +38,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _ownedStockSlots = Container.transform.Find("InvestedStocksOverview").Find("Panel").GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("PortfolioEntry"))
                 .OrderBy(a => ExtractNumber(a.name))
-                .Select(a => new StockEntry(a.gameObject))
+                .Select(a => new StockEntry(this, a.gameObject))
                 .ToArray();
 
             // Setup pagination
@@ -132,12 +133,16 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         class StockEntry
         {
             internal bool Invalid = false;
+            private readonly AppPortfolio _appContent;
             private readonly GameObject _container;
             private readonly TextMeshProUGUI _symbol;
+            private readonly UnityEngine.UI.Button _button;
 
-            internal StockEntry(GameObject slot)
+            internal StockEntry(AppPortfolio appContent, GameObject slot)
             {
+                _appContent = appContent;
                 _container = slot;
+                _button = slot.GetComponent<UnityEngine.UI.Button>();
                 _symbol = slot.GetComponentInChildren<TextMeshProUGUI>();
             }
 
@@ -160,6 +165,14 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 var tradeController = Plugin.Instance.Market.TradeController;
                 var investedVolume = tradeController.GetInvestedVolume(stock);
                 _symbol.text = $"{stock.Symbol} ({Math.Round(stock.Price * investedVolume, 2).ToString(CultureInfo.InvariantCulture)})";
+
+                // Add listener to this specific stock
+                _button.onClick.RemoveAllListeners();
+                _button.onClick.AddListener(() =>
+                {
+                    _appContent.Content.AppStock.SetStock(stock);
+                    _appContent.Content.AppStock.Show();
+                });
             }
         }
     }
