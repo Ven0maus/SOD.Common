@@ -171,6 +171,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             _playerStocks = saveData?.PlayerStocks ?? new Dictionary<int, int>();
             _playerTradeOrders = saveData?.PlayerTradeOrders ?? new List<TradeOrder>();
+            AvailableFunds = saveData?.AvailableFunds ?? 0;
         }
 
         /// <summary>
@@ -183,7 +184,8 @@ namespace SOD.StockMarket.Implementation.Trade
             return new TradeSaveData
             {
                 PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value),
-                PlayerTradeOrders = _playerTradeOrders.ToList()
+                PlayerTradeOrders = _playerTradeOrders.ToList(),
+                AvailableFunds = AvailableFunds
             };
         }
 
