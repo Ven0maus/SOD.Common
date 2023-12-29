@@ -47,7 +47,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             UpdateInfo();
         }
 
-        private void UpdateInfo()
+        internal void UpdateInfo()
         {
             if (_stock == null) return;
 

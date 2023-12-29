@@ -66,6 +66,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             var tradeController = Plugin.Instance.Market.TradeController;
             tradeController.InstantBuy(_stock, _currentAmount);
             Content.AppPortfolio.UpdatePortfolio();
+            Content.AppStock.UpdateInfo();
             ResetAmount();
         }
 

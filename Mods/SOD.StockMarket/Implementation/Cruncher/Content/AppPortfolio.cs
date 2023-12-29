@@ -66,9 +66,6 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             if (Content.controller == null || !Content.controller.appLoaded || !ContentActive) return;
 
-            // Update the stock visuals
-            SetSlots(_ownedStocksPagination.Current);
-
             // Update also the portfolio info
             UpdatePortfolio();
         }
@@ -87,6 +84,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _daily.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(1).ToString(CultureInfo.InvariantCulture)} %";
             _weekly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(7).ToString(CultureInfo.InvariantCulture)} %";
             _monthly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(30).ToString(CultureInfo.InvariantCulture)} %";
+
+            // Update stocks
+            SetSlots(_ownedStocksPagination.Current);
         }
 
         internal void Next()
@@ -153,7 +153,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 _container.SetActive(true);
 
                 // Set name
-                _symbol.text = $"{stock.Symbol} ({stock.Price})";
+                var tradeController = Plugin.Instance.Market.TradeController;
+                var investedVolume = tradeController.GetInvestedVolume(stock);
+                _symbol.text = $"{stock.Symbol} ({Math.Round(stock.Price * investedVolume, 2).ToString(CultureInfo.InvariantCulture)})";
             }
         }
     }

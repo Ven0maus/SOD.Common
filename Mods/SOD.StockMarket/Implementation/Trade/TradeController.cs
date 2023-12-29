@@ -25,7 +25,19 @@ namespace SOD.StockMarket.Implementation.Trade
         internal static int Money
         {
             get => GameplayController.Instance.money;
-            set => GameplayController.Instance.money = value;
+            set
+            {
+                GameplayController.Instance.money = value;
+                FirstPersonItemController.Instance.PlayerMoneyCheck();
+                if (InterfaceControls.Instance.cashText != null)
+                {
+                    InterfaceControls.Instance.cashText.text = CityControls.Instance.cityCurrency + Money.ToString();
+                    if (BioScreenController.Instance.cashText != null)
+                    {
+                        BioScreenController.Instance.cashText.text = InterfaceControls.Instance.cashText.text;
+                    }
+                }
+            }
         }
 
         public IReadOnlyList<Stock> Stocks => _playerStocks.Join(_market.Stocks,
