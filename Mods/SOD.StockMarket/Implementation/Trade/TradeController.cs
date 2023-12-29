@@ -75,7 +75,12 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             get
             {
-                return Math.Round(TotalInvestedInStocks, 2);
+                // All invested stocks + available funds + ongoing buy type trade orders
+                var buyOrders = TradeOrders
+                    .Where(a => a.OrderType == OrderType.Buy)
+                    .Select(a => a.Price * a.Amount)
+                    .Sum();
+                return Math.Round(TotalInvestedInStocks + AvailableFunds + buyOrders, 2);
             }
         }
 
@@ -113,14 +118,10 @@ namespace SOD.StockMarket.Implementation.Trade
                 .OrderByDescending(a => a.Date)
                 .ToArray();
 
-            var previous = orderedEntries.FirstOrDefault(a => (currentDate - a.Date).TotalDays >= days)?.Worth ?? 0.01m;
-            if (previous == 0)
-                previous = 0.01m;
+            var previous = orderedEntries.FirstOrDefault(a => (currentDate - a.Date).TotalDays >= days)?.Worth;
+            if (previous == null || previous == 0) return null;
 
             var current = PortfolioWorth;
-
-            if (current == 0 && previous == 0.01m)
-                return 0;
 
             // Compare percentage to now
             return ((current - previous) / previous) * 100;

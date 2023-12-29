@@ -16,7 +16,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private StockPagination _ownedStocksPagination;
         private StockEntry[] _ownedStockSlots;
 
-        private TextMeshProUGUI _bankBalance, _availableFunds, _investedInStocks, _ongoingLimitOrders, _daily, _weekly, _monthly;
+        private TextMeshProUGUI _totalPortfolio, _availableFunds, _investedInStocks, _ongoingLimitOrders, _daily, _weekly, _monthly;
 
         public AppPortfolio(StockMarketAppContent content) : base(content)
         { }
@@ -26,7 +26,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         public override void OnSetup()
         {
             // Setup the portfolio info references
-            _bankBalance = Container.transform.Find("BankBalance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
+            _totalPortfolio = Container.transform.Find("TotalPortfolio").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _availableFunds = Container.transform.Find("FreeCapital").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _investedInStocks = Container.transform.Find("InvestedInStocks").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _ongoingLimitOrders = Container.transform.Find("OngoingLimitOrders").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
@@ -79,14 +79,14 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         {
             // Set funds information
             var tradeController = Plugin.Instance.Market.TradeController;
-            _bankBalance.text = $"€ {TradeController.Money.ToString(CultureInfo.InvariantCulture)}";
+            _totalPortfolio.text = $"€ {tradeController.PortfolioWorth.ToString(CultureInfo.InvariantCulture)}";
             _availableFunds.text = $"€ {tradeController.AvailableFunds.ToString(CultureInfo.InvariantCulture)}";
             var totalInvested = tradeController.TotalInvestedInStocks;
             _investedInStocks.text = $"€ {totalInvested.ToString(CultureInfo.InvariantCulture)}";
             _ongoingLimitOrders.text = $"€ {Math.Round(tradeController.TradeOrders.Select(a => a.Price * a.Amount).Sum(), 2).ToString(CultureInfo.InvariantCulture)}";
 
             // Set percentages
-            var daily = tradeController.GetPortfolioPercentageChange(1);
+            var daily = tradeController.GetPortfolioPercentageChange(0);
             _daily.text = $"{(daily == null ? "/" : daily.Value.ToLimitedString(8))} %";
             _daily.color = daily == null || daily.Value == 0 ? Color.white : daily.Value > 0 ? Color.green : Color.red;
             var weekly = tradeController.GetPortfolioPercentageChange(7);
