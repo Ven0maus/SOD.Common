@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Helpers;
 using SOD.StockMarket.Implementation.Stocks;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace SOD.StockMarket.Implementation.Trade
         // Player transactions
         private Dictionary<int, int> _playerStocks;
         private List<TradeOrder> _playerTradeOrders;
+        private List<HistoricalPortfolio> _historicalPortfolio;
 
         internal decimal AvailableFunds { get; private set; }
 
@@ -47,6 +49,19 @@ namespace SOD.StockMarket.Implementation.Trade
             .ToList();
 
         public IReadOnlyList<TradeOrder> TradeOrders => _playerTradeOrders;
+        public IReadOnlyList<HistoricalPortfolio> HistoricalPortfolioData => _historicalPortfolio;
+
+        internal class HistoricalPortfolio
+        {
+            internal Time.TimeData Date { get; private set; }
+            internal decimal Worth { get; private set; }
+
+            internal HistoricalPortfolio(Time.TimeData date, decimal worth)
+            {
+                Date = date;
+                Worth = worth;
+            }
+        }
 
         internal decimal TotalInvestedInStocks
         {
@@ -58,7 +73,21 @@ namespace SOD.StockMarket.Implementation.Trade
                     var amount = _playerStocks[item.Id];
                     investment += amount * item.Price;
                 }
+
+                // Add also the ongoing sell offers for their original market value
+                investment += TradeOrders
+                    .Where(a => a.OrderType == OrderType.Sell)
+                    .Select(a => Market.Stocks[a.StockId].Price * a.Amount)
+                    .Sum();
                 return Math.Round(investment, 2);
+            }
+        }
+
+        internal decimal PortfolioWorth
+        {
+            get
+            {
+                return Math.Round(TotalInvestedInStocks, 2);
             }
         }
 
@@ -82,50 +111,31 @@ namespace SOD.StockMarket.Implementation.Trade
             Import(null);
         }
 
-        internal decimal GetPercentageChangeDaysAgoToNow(int days)
-        {
-            var daysAgoWorth = GetOwnedStockValueDaysAgo(days);
-            var nowWorth = GetOwnedStockValueDaysAgo(0);
-
-            if (daysAgoWorth != 0)
-            {
-                return Math.Round((nowWorth - daysAgoWorth) / daysAgoWorth * 100, 2);
-            }
-            return 0;
-        }
-
-        /// <summary>
-        /// TODO: Rework into keeping historical data from when you buy the stock
-        /// It should not be possible to see weekly, monthly change if you only bought the stock a second ago.
-        /// Also the daily stock should be based on the price bought at, not at the price of opening the previous day.
-        /// </summary>
-        /// <param name="days"></param>
-        /// <returns></returns>
-        private decimal GetOwnedStockValueDaysAgo(int days)
-        {
-            var stocks = Stocks
-                .Select(a => new { Stock = a, HistoricalEntry = GetHistoricalEntry(a, days) });
-
-            decimal totalPrice = 0;
-            foreach (var value in stocks)
-            {
-                if (value.HistoricalEntry == null)
-                    continue;
-
-                var amount = _playerStocks[value.Stock.Id];
-                totalPrice += value.HistoricalEntry.Open * amount;
-            }
-            return totalPrice;
-        }
-
-        private static StockData GetHistoricalEntry(Stock stock, int days)
+        internal void CreatePortfolioHistoricalDataEntry()
         {
             var currentDate = Lib.Time.CurrentDate;
-            if (days == 0)
-                return new StockData { Open = stock.Price };
-            return stock.HistoricalData
+            if (_historicalPortfolio.Any(a => a.Date == currentDate)) return;
+            _historicalPortfolio.Add(new HistoricalPortfolio(currentDate, PortfolioWorth));
+        }
+
+        internal decimal? GetPortfolioPercentageChange(int days)
+        {
+            var currentDate = Lib.Time.CurrentDate;
+            var orderedEntries = HistoricalPortfolioData
                 .OrderByDescending(a => a.Date)
-                .FirstOrDefault(a => (currentDate - a.Date).TotalDays >= days);
+                .ToArray();
+
+            var previous = orderedEntries.FirstOrDefault(a => (currentDate - a.Date).TotalDays >= days)?.Worth ?? 0.01m;
+            if (previous == 0)
+                previous = 0.01m;
+
+            var current = PortfolioWorth;
+
+            if (current == 0 && previous == 0.01m)
+                return 0;
+
+            // Compare percentage to now
+            return ((current - previous) / previous) * 100;
         }
 
         /// <summary>
@@ -173,6 +183,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             _playerStocks = saveData?.PlayerStocks ?? new Dictionary<int, int>();
             _playerTradeOrders = saveData?.PlayerTradeOrders ?? new List<TradeOrder>();
+            _historicalPortfolio = saveData?.HistoricalPortfolio ?? new List<HistoricalPortfolio>();
             AvailableFunds = saveData?.AvailableFunds ?? 0;
         }
 
@@ -187,6 +198,7 @@ namespace SOD.StockMarket.Implementation.Trade
             {
                 PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value),
                 PlayerTradeOrders = _playerTradeOrders.ToList(),
+                HistoricalPortfolio = _historicalPortfolio.ToList(),
                 AvailableFunds = AvailableFunds
             };
         }

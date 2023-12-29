@@ -198,6 +198,9 @@ namespace SOD.StockMarket.Implementation
             // Unsubscribe after first call
             Lib.Time.OnTimeInitialized -= InitializeMarket;
 
+            // Create first portfolio historical data entry
+            TradeController.CreatePortfolioHistoricalDataEntry();
+
             // Create the initial historical data
             int totalEntries = 0;
             var currentDate = Lib.Time.CurrentDate;
@@ -344,6 +347,7 @@ namespace SOD.StockMarket.Implementation
                 a.OpeningPrice = a.ClosingPrice.Value;
                 a.ClosingPrice = null;
             });
+            TradeController.CreatePortfolioHistoricalDataEntry();
             if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
                 Plugin.Log.LogInfo("Stock market is opening.");
         }

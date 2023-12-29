@@ -86,9 +86,15 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _ongoingLimitOrders.text = $"€ {Math.Round(tradeController.TradeOrders.Select(a => a.Price * a.Amount).Sum(), 2).ToString(CultureInfo.InvariantCulture)}";
 
             // Set percentages
-            _daily.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(1).ToString(CultureInfo.InvariantCulture)} %";
-            _weekly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(7).ToString(CultureInfo.InvariantCulture)} %";
-            _monthly.text = $"{tradeController.GetPercentageChangeDaysAgoToNow(30).ToString(CultureInfo.InvariantCulture)} %";
+            var daily = tradeController.GetPortfolioPercentageChange(1);
+            _daily.text = $"{(daily == null ? "/" : daily.Value.ToLimitedString(8))} %";
+            _daily.color = daily == null || daily.Value == 0 ? Color.white : daily.Value > 0 ? Color.green : Color.red;
+            var weekly = tradeController.GetPortfolioPercentageChange(7);
+            _weekly.text = $"{(weekly == null ? "/" : weekly.Value.ToLimitedString(8))} %";
+            _weekly.color = weekly == null || weekly.Value == 0 ? Color.white : weekly.Value > 0 ? Color.green : Color.red;
+            var monthly = tradeController.GetPortfolioPercentageChange(30);
+            _monthly.text = $"{(monthly == null ? "/" : monthly.Value.ToLimitedString(8))} %";
+            _monthly.color = monthly == null || monthly.Value == 0 ? Color.white : monthly.Value > 0 ? Color.green : Color.red;
 
             // Update stocks
             SetSlots(_ownedStocksPagination.Current);
