@@ -51,18 +51,6 @@ namespace SOD.StockMarket.Implementation.Trade
         public IReadOnlyList<TradeOrder> TradeOrders => _playerTradeOrders;
         public IReadOnlyList<HistoricalPortfolio> HistoricalPortfolioData => _historicalPortfolio;
 
-        internal class HistoricalPortfolio
-        {
-            internal Time.TimeData Date { get; private set; }
-            internal decimal Worth { get; private set; }
-
-            internal HistoricalPortfolio(Time.TimeData date, decimal worth)
-            {
-                Date = date;
-                Worth = worth;
-            }
-        }
-
         internal decimal TotalInvestedInStocks
         {
             get
