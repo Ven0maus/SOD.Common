@@ -296,7 +296,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             // If buy order, give back the money and cancel the order
             if (order.OrderType == OrderType.Buy)
-                AvailableFunds += (int)Math.Round(order.Price * order.Amount, 0);
+                AvailableFunds += Math.Round(order.Price * order.Amount, 2);
             else if (order.OrderType == OrderType.Sell)
             {
                 // Add stocks back into player stocks
@@ -340,7 +340,7 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             return orderType switch
             {
-                OrderType.Buy => AvailableFunds >= (int)Math.Round(stock.Price * amount, 0),
+                OrderType.Buy => AvailableFunds >= Math.Round(stock.Price * amount, 2),
                 OrderType.Sell => _playerStocks.TryGetValue(stock.Id, out var total) && total >= amount,
                 _ => false,
             };
