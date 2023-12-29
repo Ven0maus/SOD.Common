@@ -14,6 +14,7 @@
       https://nuget.bepinex.dev/v3/index.json;
       https://nuget.samboy.dev/v3/index.json
     </RestoreAdditionalProjectSources>
+	<IncludeContentInPack>true</IncludeContentInPack>
     <RootNamespace>SOD.Common</RootNamespace>
 	<BepInExPath>$(APPDATA)\r2modmanPlus-local\ShadowsofDoubt\profiles\Default\BepInEx\</BepInExPath>
 	<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
@@ -29,12 +30,15 @@
     <Compile Remove="ModFolderContent\Builds\**" />
     <EmbeddedResource Remove="ModFolderContent\Builds\**" />
     <None Remove="ModFolderContent\Builds\**" />
+	<None Include="LICENSE.txt">
+		<Pack>True</Pack>
+		<PackagePath/>
+	</None>
+    <None Include="README.md">
+		<Pack>True</Pack>
+		<PackagePath/>
+	</None>
   </ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="LICENSE.txt" />
-	  <None Remove="README.md" />
-	</ItemGroup>
 
   <ItemGroup>
   <!-- Nugets -->
