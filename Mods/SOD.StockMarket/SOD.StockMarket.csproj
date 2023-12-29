@@ -10,6 +10,7 @@
 		https://nuget.samboy.dev/v3/index.json
 	</RestoreAdditionalProjectSources>
 	<OutputType>Library</OutputType>
+ <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +22,7 @@
   <ItemGroup>
 	<ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
 	<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
+	<PackageReference Include="Bogus" Version="35.2.0" />
   </ItemGroup>
   
   <ItemGroup>

@@ -165,6 +165,17 @@ namespace SOD.StockMarket.Implementation
             foreach (var (data, basePrice) in CustomStocks.Stocks)
                 InitStock(new Stock(data, basePrice));
 
+            if (_stocks.Count < Plugin.Instance.Config.MinimumStocksInMarket)
+            {
+                // Generate the remaining stocks
+                var remainingCount = Plugin.Instance.Config.MinimumStocksInMarket - _stocks.Count;
+                for (int i=0; i <remainingCount; i++)
+                {
+                    var stock = new Stock(new CompanyStockData(StockNameGenerator.GenerateStockName(), Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2)));
+                    InitStock(stock);
+                }
+            }
+
             // Init the stocks
             foreach (var stock in _stocks)
                 stock.Initialize();
@@ -386,7 +397,7 @@ namespace SOD.StockMarket.Implementation
             // Generate new trends
             foreach (var stock in Stocks.Where(a => a.Trend == null))
             {
-                var chance = MathHelper.Random.NextDouble() * 100 < trendChancePerStock;
+                var chance = (MathHelper.Random.NextDouble() * 100) < trendChancePerStock;
                 if (chance)
                 {
                     // Generate mean and standard deviation based on historical data
@@ -420,7 +431,16 @@ namespace SOD.StockMarket.Implementation
                     double percentage = Math.Round(MathHelper.NextGaussian(stockMean, stockStdDev));
 
                     // Skip 0 percentage differences
-                    if (((int)percentage) == 0) continue;
+                    var intPercent = (int)percentage;
+                    if (intPercent == 0) continue;
+
+                    // Not too small percentages
+                    if (Math.Abs(intPercent) < 2)
+                        percentage = percentage < 0 ? percentage - 3 : percentage + 3;
+
+                    // Small 7% chance to have a really high percentage spike
+                    if ((MathHelper.Random.NextDouble() * 100) < 7)
+                        percentage *= MathHelper.Random.Next(2, 5);
 
                     // Total steps to full-fill trend (1 step = 1 in game minute)
                     int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);

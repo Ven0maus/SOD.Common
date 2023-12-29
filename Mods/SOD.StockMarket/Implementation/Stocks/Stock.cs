@@ -151,7 +151,9 @@ namespace SOD.StockMarket.Implementation.Stocks
             if (stockPrice == null || stockPrice <= 0m)
             {
                 stockPrice = 0.01m;
-                RemoveTrend();
+
+                if (Trend != null && Trend.Value.EndPrice <= 0.01m)
+                    RemoveTrend();
             }
 
             // Set price rounded

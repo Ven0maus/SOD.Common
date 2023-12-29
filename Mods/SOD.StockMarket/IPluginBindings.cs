@@ -54,5 +54,8 @@ namespace SOD.StockMarket
 
         [Binding(Constants.PastHistoricalDataVolatility, "The base percentage of volatility the market has been for the past [DaysToKeepStockHistoricalData] on market initialization. (MIN 1.0)", "Stockmarket.Economy.PastHistoricalDataVolatility")]
         double PastHistoricalDataVolatility { get; set; }
+
+        [Binding(Constants.MinimumStocksInMarket, "The minimum amount of stocks that should be in the market on generation.", "StockMarket.Economy.MinimumStocksInMarket")]
+        int MinimumStocksInMarket { get; set; }
     }
 }
