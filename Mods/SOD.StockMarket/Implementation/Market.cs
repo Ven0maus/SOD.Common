@@ -165,13 +165,15 @@ namespace SOD.StockMarket.Implementation
             foreach (var (data, basePrice) in CustomStocks.Stocks)
                 InitStock(new Stock(data, basePrice));
 
+            // Make sure we reach the minimum stocks threshold
             if (_stocks.Count < Plugin.Instance.Config.MinimumStocksInMarket)
             {
                 // Generate the remaining stocks
                 var remainingCount = Plugin.Instance.Config.MinimumStocksInMarket - _stocks.Count;
                 for (int i=0; i <remainingCount; i++)
                 {
-                    var stock = new Stock(new CompanyStockData(StockNameGenerator.GenerateStockName(), Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2)));
+                    var stock = new Stock(new CompanyStockData(StockNameGenerator.GenerateStockName(), 
+                        Math.Round(MathHelper.Random.NextDouble(0.15d, 0.85d), 2)));
                     InitStock(stock);
                 }
             }
