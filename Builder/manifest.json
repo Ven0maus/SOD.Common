@@ -28,6 +28,7 @@
       "DestinationFolderName": "Builds",
       "ExtraFiles": [
         "bin\\Release\\net6.0\\SOD.StockMarket.dll",
+        "bin\\Release\\net6.0\\Bogus.dll",
         "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable",
         "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable.manifest.json"
       ],
