@@ -5,7 +5,7 @@ namespace SOD.StockMarket.Implementation.Trade
 {
     internal sealed class TradeSaveData
     {
-        public Dictionary<int, int> PlayerStocks { get; set; }
+        public Dictionary<int, decimal> PlayerStocks { get; set; }
         public List<TradeOrder> PlayerTradeOrders { get; set; }
         public List<HistoricalPortfolio> HistoricalPortfolio { get; set; }
         public List<TradeHistory> TradeHistory { get; set; }

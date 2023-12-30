@@ -25,15 +25,15 @@ namespace SOD.StockMarket.Implementation.Trade
         // History data
         public string StockSymbol { get; set; }
         public OrderType OrderType { get; set; }
-        public int Amount { get; set; }
+        public decimal Amount { get; set; }
         public decimal Price { get; set; }
 
         [JsonIgnore]
         public decimal Total => Math.Round(Price * Amount, 2);
 
-        internal TradeHistory() { }
+        public TradeHistory() { }
 
-        internal TradeHistory(Time.TimeData dateTime, string symbol, OrderType orderType, int amount, decimal price)
+        internal TradeHistory(Time.TimeData dateTime, string symbol, OrderType orderType, decimal amount, decimal price)
         {
             DateTime = dateTime;
 
