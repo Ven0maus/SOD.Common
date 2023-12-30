@@ -9,7 +9,7 @@ namespace SOD.Common.Custom
     /// </summary>
     public sealed class InteractableInstanceData
     {
-        public InteractableInstanceData(Interactable interactable, InteractablePreset preset)
+        internal InteractableInstanceData(Interactable interactable, InteractablePreset preset)
         {
             Interactable = interactable;
             Preset = preset;

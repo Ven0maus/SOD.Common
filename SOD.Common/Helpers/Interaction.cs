@@ -6,13 +6,33 @@ namespace SOD.Common.Helpers
     public sealed class Interaction
     {
         internal SimpleActionArgs currentPlayerInteraction;
+
         private float lastAmount = float.MaxValue;
         internal bool longActionInProgress = false;
 
+        /// <summary>
+        /// Raised just prior to when the player starts an action, whether the action is long or immediate.
+        /// </summary>
         public event EventHandler<SimpleActionArgs> OnBeforeActionStarted;
+
+        /// <summary>
+        /// Raised just after when the player starts an action, whether the action is long or immediate.
+        /// </summary>
         public event EventHandler<SimpleActionArgs> OnAfterActionStarted;
+
+        /// <summary>
+        /// Raised just after the player cancels a long action like lockpicking or searching.
+        /// </summary>
         public event EventHandler<SimpleActionArgs> OnAfterLongActionCancelled;
+
+        /// <summary>
+        /// Raised just after the player completes a long action like lockpicking or searching.
+        /// </summary>
         public event EventHandler<SimpleActionArgs> OnAfterLongActionCompleted;
+
+        /// <summary>
+        /// Raised each frame when the player has made progress on a long action (while the player is looking at a lock they are picking, for example).
+        /// </summary>
         public event EventHandler<ProgressChangedActionArgs> OnAfterLongActionProgressed;
 
         internal void OnLongActionCancelled()

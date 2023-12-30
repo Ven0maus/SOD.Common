@@ -15,12 +15,10 @@ namespace SOD.Common.Patches
         {
             [HarmonyPrefix]
             internal static void Prefix(
-                InteractionController __instance,
                 InteractablePreset.InteractionKey key,
                 Interactable newInteractable,
                 Interactable.InteractableCurrentAction newCurrentAction,
-                bool fpsItem = false,
-                int forcePriority = -1
+                bool fpsItem = false
             )
             {
                 Lib.Interaction.currentPlayerInteraction = new Interaction.SimpleActionArgs
@@ -47,17 +45,15 @@ namespace SOD.Common.Patches
         )]
         internal class Interactable_OnInteraction
         {
-            public static Interaction.SimpleActionArgs TempArgs { get; private set; }
-
             [HarmonyPrefix]
             internal static void Prefix(
                 Interactable __instance,
+                out Interaction.SimpleActionArgs __state,
                 InteractablePreset.InteractionAction action,
-                Actor who,
-                bool allowDelays,
-                float additionalDelay
+                Actor who
             )
             {
+                __state = null;
                 if (!who.isPlayer)
                 {
                     return;
@@ -75,22 +71,21 @@ namespace SOD.Common.Patches
                     return;
                 }
 
-                TempArgs = new Interaction.SimpleActionArgs
+                __state = new Interaction.SimpleActionArgs
                 {
                     Action = action,
                     InteractableInstanceData = __instance,
                     IsFpsItemTarget = false,
                 };
-                Lib.Interaction.OnActionStarted(TempArgs, false);
+                Lib.Interaction.OnActionStarted(__state, false);
             }
 
             [HarmonyPostfix]
             internal static void Postfix(
                 Interactable __instance,
+                Interaction.SimpleActionArgs __state,
                 InteractablePreset.InteractionAction action,
-                Actor who,
-                bool allowDelays,
-                float additionalDelay
+                Actor who
             )
             {
                 if (!who.isPlayer)
@@ -110,7 +105,7 @@ namespace SOD.Common.Patches
                     return;
                 }
 
-                Lib.Interaction.OnActionStarted(TempArgs, true);
+                Lib.Interaction.OnActionStarted(__state, true);
             }
         }
 
@@ -120,30 +115,26 @@ namespace SOD.Common.Patches
         )]
         internal class FirstPersonItemController_OnInteraction
         {
-            public static Interaction.SimpleActionArgs TempArgs { get; private set; }
-
             [HarmonyPrefix]
             internal static void Prefix(
                 FirstPersonItemController __instance,
+                out Interaction.SimpleActionArgs __state,
                 InteractablePreset.InteractionKey input
             )
             {
-                TempArgs = new Interaction.SimpleActionArgs
+                __state = new Interaction.SimpleActionArgs
                 {
                     Action = __instance.currentActions[input].currentAction,
                     InteractableInstanceData = Player.Instance.interactingWith,
                     IsFpsItemTarget = true,
                 };
-                Lib.Interaction.OnActionStarted(TempArgs, false);
+                Lib.Interaction.OnActionStarted(__state, false);
             }
 
             [HarmonyPostfix]
-            internal static void Postfix(
-                FirstPersonItemController __instance,
-                InteractablePreset.InteractionKey input
-            )
+            internal static void Postfix(Interaction.SimpleActionArgs __state)
             {
-                Lib.Interaction.OnActionStarted(TempArgs, true);
+                Lib.Interaction.OnActionStarted(__state, true);
             }
         }
     }
