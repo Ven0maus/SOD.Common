@@ -1,5 +1,9 @@
-﻿using SOD.StockMarket.Implementation.Cruncher.Content;
+﻿using SOD.Common;
+using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.Content;
 using System.Collections.Generic;
+using TMPro;
+using UnityEngine;
 
 namespace SOD.StockMarket.Implementation.Cruncher
 {
@@ -25,8 +29,19 @@ namespace SOD.StockMarket.Implementation.Cruncher
 
         private bool _isSetup = false;
 
+        private TextMeshProUGUI _openCloseText, _currentDate;
+
         public override void OnSetup()
         {
+            var titleDateHeader = gameObject.transform.Find("TitleDateHeader");
+            _openCloseText = titleDateHeader.Find("OpenClosed").GetComponent<TextMeshProUGUI>();
+            _currentDate = titleDateHeader.Find("Date").GetComponent<TextMeshProUGUI>();
+
+            SetTitleDateHeader(this, null);
+
+            // Hook it also
+            Lib.Time.OnMinuteChanged += SetTitleDateHeader;
+
             // Create all app contents
             AppMenu = new AppMenu(this);
             AppStocks = new AppStocks(this);
@@ -58,6 +73,29 @@ namespace SOD.StockMarket.Implementation.Cruncher
 
             // Finish setup by marking this so update can run
             _isSetup = true;
+        }
+ 
+        private void SetTitleDateHeader(object sender, TimeChangedArgs e)
+        {
+            if (_openCloseText == null || _openCloseText.gameObject == null || _currentDate == null || _currentDate.gameObject == null)
+            {
+                // Became invalid because we left the app
+                Lib.Time.OnMinuteChanged -= SetTitleDateHeader;
+                return;
+            }
+
+            var marketOpen = Plugin.Instance.Market.IsOpen();
+            _openCloseText.text = marketOpen ? "open" : "closed";
+            _openCloseText.color = marketOpen ? Color.green : Color.red;
+            _currentDate.text = $"Date: {GetCurrentDateTimeReadable()}";
+        }
+
+        private static string GetCurrentDateTimeReadable()
+        {
+            var date = Lib.Time.CurrentDateTime;
+            var day = date.DayEnum.ToString()[..3];
+            var month = date.MonthEnum.ToString()[..3];
+            return $"{day}, {month} {date.Day}, {date.Year} {date.Hour}:{date.Minute}";
         }
 
         private void Update()

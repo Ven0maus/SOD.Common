@@ -319,14 +319,14 @@ namespace SOD.StockMarket.Implementation
             }
         }
 
-        private bool IsOpen()
+        internal bool IsOpen()
         {
             if (!_simulation && !Lib.Time.IsInitialized) return false;
 
             // Check the time
             var currentTime = SimulationTime ?? Lib.Time.CurrentDateTime;
             var currentHour = currentTime.Hour;
-            if (currentHour < OpeningHour || currentHour > ClosingHour)
+            if (currentHour < OpeningHour || currentHour >= ClosingHour)
                 return false;
 
             // Check the current day
