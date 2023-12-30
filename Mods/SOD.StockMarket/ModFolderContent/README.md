@@ -25,5 +25,5 @@ Planned v2.0.0:
 - Trade history becomes available in the stockmarket app
 - Introduction becomes available in the stockmarket app
 - Balance / Economy overhaul
-- Allow buying decimal amount of stocks instead of integer amount (eg buying 0.02 amount of starch kola at price of €100 when starch kola stock price is €5000)
+- Allow buying decimal amount of stocks instead of integer amount (eg buying 0.02 amount of starch kola at price of 100 when starch kola stock price is 5000)
 - Add in-game notification alerts for limit orders that have been completed (configurable in its own menu option in stockmarket app)
