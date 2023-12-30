@@ -38,7 +38,7 @@ namespace SOD.Common.Helpers
             );
         }
 
-        private HashSet<string> queuedPlayerSpeechMessages = new HashSet<string>();
+        private readonly HashSet<string> _queuedPlayerSpeechMessages = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// Queues a message on the bottom of the screen resembling the player's internal monologue, like seen in the tutorial during the "wake up" section.
@@ -53,11 +53,11 @@ namespace SOD.Common.Helpers
             bool doNotQueueMultiple = true
         )
         {
-            if (doNotQueueMultiple && queuedPlayerSpeechMessages.Contains(message))
+            if (doNotQueueMultiple && _queuedPlayerSpeechMessages.Contains(message))
             {
                 return;
             }
-            queuedPlayerSpeechMessages.Add(message);
+            _queuedPlayerSpeechMessages.Add(message);
             Player.Instance.speechController.Speak(
                 "",
                 "temp",
@@ -66,7 +66,7 @@ namespace SOD.Common.Helpers
                 true,
                 0f,
                 true,
-                UnityEngine.Color.white
+                Color.white
             );
             UniverseLib.RuntimeHelper.StartCoroutine(
                 ShowPlayerSpeechWaitForBubble(message, durationSec)
@@ -90,7 +90,7 @@ namespace SOD.Common.Helpers
             {
                 yield return new WaitForEndOfFrame();
             }
-            queuedPlayerSpeechMessages.Remove(message);
+            _queuedPlayerSpeechMessages.Remove(message);
         }
     }
 }
