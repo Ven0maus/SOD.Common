@@ -98,7 +98,9 @@ namespace SOD.StockMarket.Implementation.Cruncher
             return $"{day}, {month} {date.Day}, {date.Year} {date.Hour}:{date.Minute}";
         }
 
+#pragma warning disable IDE0051 // Remove unused private members
         private void Update()
+#pragma warning restore IDE0051 // Remove unused private members
         {
             if (!SessionData.Instance.play || !controller.playerControlled || !_isSetup) return;
             AppBuyLimitInterface.Update();
