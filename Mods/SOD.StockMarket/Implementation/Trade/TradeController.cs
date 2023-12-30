@@ -133,6 +133,8 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             _playerStocks.Clear();
             _playerTradeOrders.Clear();
+            _historicalPortfolio.Clear();
+            AvailableFunds = 0;
         }
 
         /// <summary>
