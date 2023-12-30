@@ -477,7 +477,13 @@ namespace SOD.StockMarket.Implementation
         {
             var path = GetSaveFilePath(e.FilePath);
             if (!File.Exists(path))
+            {
+                // Savegame with no market data,
+                // Generate a custom new market economy.
+                Plugin.Log.LogInfo("Attempting to load a premod install savegame, a new market economy will be generated for this savegame.");
+                InitPreModInstallEconomyExistingSavegame(path);
                 return;
+            }
 
             if (_isLoading) return;
             _isLoading = true;
@@ -502,6 +508,51 @@ namespace SOD.StockMarket.Implementation
                 File.Delete(path);
                 return;
             }
+        }
+
+        private void InitPreModInstallEconomyExistingSavegame(string filePath)
+        {
+            // Do a full-reset
+            _stocks.Clear();
+            TradeController.Reset();
+            CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
+            CityConstructorPatches.CityConstructor_Finalized.Init = false;
+            CompanyPatches.Company_Setup.ShownInitializingMessage = false;
+            InteriorCreatorPatches.InteriorCreator_GenChunk.Init = false;
+            _interiorCreatorFinished = false;
+            _cityConstructorFinalized = false;
+            _citizenCreatorFinished = false;
+            Initialized = false;
+
+            // Start init process
+            PostStocksInitialization(typeof(CitizenCreator));
+            PostStocksInitialization(typeof(InteriorCreator));
+            PostStocksInitialization(typeof(CityConstructor));
+
+            // Set premod path
+            _afterPreModPath = filePath;
+
+            // Hook method if its not initialized yet, otherwise just call it
+            if (!Lib.Time.IsInitialized)
+            {
+                Lib.Time.OnTimeInitialized += InitializeMarket;
+                Lib.Time.OnTimeInitialized += AfterPreModInit;
+            }
+            else
+            {
+                InitializeMarket(this, null);
+                AfterPreModInit(this, null);
+            }
+        }
+
+        private string _afterPreModPath;
+        private void AfterPreModInit(object sender, TimeChangedArgs e)
+        {
+            Lib.Time.OnTimeInitialized -= AfterPreModInit;
+
+            // Export the data to this savegame
+            StockDataIO.Export(this, TradeController, _afterPreModPath);
+            _afterPreModPath = null;
         }
 
         /// <summary>
