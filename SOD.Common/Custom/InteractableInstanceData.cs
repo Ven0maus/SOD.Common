@@ -18,10 +18,7 @@ namespace SOD.Common.Custom
         /// <summary>
         /// Whether the interactable is loaded. The interactable will be unloaded while it is pooled.
         /// </summary>
-        public bool IsLoaded
-        {
-            get { return Interactable.loadedGeometry; }
-        }
+        public bool IsLoaded => Interactable.loadedGeometry;
 
         /// <summary>
         /// The interactable.
