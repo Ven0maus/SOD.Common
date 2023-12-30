@@ -29,8 +29,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
                 .Select(a => new StockEntry(this, a.gameObject))
                 .ToArray();
 
-            // Setup pagination
+            // Setup pagination and sort by default ascending on name
             _stocksPagination = new StockPagination(Plugin.Instance.Market, _slots.Length);
+            _stocksPagination.SortBy(a => a.Name, true);
 
             // Map buttons
             MapButton("Next", Next);

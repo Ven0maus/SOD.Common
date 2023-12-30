@@ -8,6 +8,7 @@ namespace SOD.StockMarket.Implementation.Trade
         public Dictionary<int, int> PlayerStocks { get; set; }
         public List<TradeOrder> PlayerTradeOrders { get; set; }
         public List<HistoricalPortfolio> HistoricalPortfolio { get; set; }
+        public List<TradeHistory> TradeHistory { get; set; }
         public decimal AvailableFunds { get; set; }
 
         internal string ToJson()

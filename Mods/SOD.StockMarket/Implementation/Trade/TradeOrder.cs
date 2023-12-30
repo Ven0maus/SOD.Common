@@ -18,11 +18,6 @@
             OrderType = orderType;
             Completed = false;
         }
-
-        internal void Complete()
-        {
-            Completed = true;
-        }
     }
 
     internal enum OrderType

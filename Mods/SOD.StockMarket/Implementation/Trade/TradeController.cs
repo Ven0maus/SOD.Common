@@ -17,6 +17,7 @@ namespace SOD.StockMarket.Implementation.Trade
         private Dictionary<int, int> _playerStocks;
         private List<TradeOrder> _playerTradeOrders;
         private List<HistoricalPortfolio> _historicalPortfolio;
+        private List<TradeHistory> _tradeHistory;
 
         internal decimal AvailableFunds { get; private set; }
 
@@ -49,6 +50,7 @@ namespace SOD.StockMarket.Implementation.Trade
 
         public IReadOnlyList<TradeOrder> TradeOrders => _playerTradeOrders;
         public IReadOnlyList<HistoricalPortfolio> HistoricalPortfolioData => _historicalPortfolio;
+        public IReadOnlyList<TradeHistory> TradeHistory => _tradeHistory;
 
         internal decimal TotalInvestedInStocks
         {
@@ -134,6 +136,7 @@ namespace SOD.StockMarket.Implementation.Trade
             _playerStocks.Clear();
             _playerTradeOrders.Clear();
             _historicalPortfolio.Clear();
+            _tradeHistory.Clear();
             AvailableFunds = 0;
         }
 
@@ -174,6 +177,7 @@ namespace SOD.StockMarket.Implementation.Trade
             _playerStocks = saveData?.PlayerStocks ?? new Dictionary<int, int>();
             _playerTradeOrders = saveData?.PlayerTradeOrders ?? new List<TradeOrder>();
             _historicalPortfolio = saveData?.HistoricalPortfolio ?? new List<HistoricalPortfolio>();
+            _tradeHistory = saveData?.TradeHistory ?? new List<TradeHistory>();
             AvailableFunds = saveData?.AvailableFunds ?? 0;
         }
 
@@ -189,6 +193,7 @@ namespace SOD.StockMarket.Implementation.Trade
                 PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value),
                 PlayerTradeOrders = _playerTradeOrders.ToList(),
                 HistoricalPortfolio = _historicalPortfolio.ToList(),
+                TradeHistory = _tradeHistory.ToList(),
                 AvailableFunds = AvailableFunds
             };
         }
@@ -218,6 +223,9 @@ namespace SOD.StockMarket.Implementation.Trade
             else
                 _playerStocks[stock.Id] = amount;
 
+            // Add new history line
+            _tradeHistory.Add(new TradeHistory(Lib.Time.CurrentDateTime, stock.Symbol, OrderType.Buy, amount, stock.Price));
+
             return true;
         }
 
@@ -246,6 +254,9 @@ namespace SOD.StockMarket.Implementation.Trade
 
             // Add money
             AvailableFunds += totalPrice;
+
+            // Add new history line
+            _tradeHistory.Add(new TradeHistory(Lib.Time.CurrentDateTime, stock.Symbol, OrderType.Sell, amount, stock.Price));
 
             return true;
         }
@@ -297,6 +308,7 @@ namespace SOD.StockMarket.Implementation.Trade
         internal void CancelOrder(TradeOrder order)
         {
             // If buy order, give back the money and cancel the order
+            if (order.Completed) return;
             if (order.OrderType == OrderType.Buy)
                 AvailableFunds += Math.Round(order.Price * order.Amount, 2);
             else if (order.OrderType == OrderType.Sell)
@@ -307,7 +319,7 @@ namespace SOD.StockMarket.Implementation.Trade
                 else
                     _playerStocks[order.StockId] = order.Amount;
             }
-            order.Complete();
+            order.Completed = true;
             _playerTradeOrders.Remove(order);
         }
 
@@ -333,11 +345,21 @@ namespace SOD.StockMarket.Implementation.Trade
                     };
 
                     // Set completed
-                    if (orderCompleted)
-                        order.Complete();
+                    order.Completed = orderCompleted;
                 }
             }
             _playerTradeOrders.RemoveAll(a => a.Completed);
+
+            // Remove history that is more than a week old
+            var currentDateTime = Lib.Time.CurrentDateTime;
+            int entries = 0;
+            entries += _tradeHistory.RemoveAll(a => (currentDateTime - a.DateTime).TotalDays >= 7);
+
+            // Remove history that is more than a month old
+            entries += _historicalPortfolio.RemoveAll(a => (currentDateTime - a.Date).TotalDays >= 32);
+
+            if (Plugin.Instance.Config.IsDebugEnabled && entries > 0)
+                Plugin.Log.LogInfo($"Deleted {entries} trade history entries.");
         }
 
         private bool IsValidOrder(OrderType orderType, Stock stock, int amount)

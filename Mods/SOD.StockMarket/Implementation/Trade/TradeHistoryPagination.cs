@@ -1,32 +1,30 @@
-﻿using System;
+﻿using SOD.StockMarket.Implementation.Stocks;
+using System;
 using System.Linq;
 
-namespace SOD.StockMarket.Implementation.Stocks
+namespace SOD.StockMarket.Implementation.Trade
 {
-    /// <summary>
-    /// Returns pages of stocks for cruncher app
-    /// </summary>
-    internal sealed class StockPagination
+    internal sealed class TradeHistoryPagination
     {
         internal int CurrentPage { get; private set; } = 0;
 
-        private readonly int _maxStocksPerPage;
-        private readonly IStocksContainer _stockContainer;
+        private readonly int _maxTradeHistoryPerPage;
+        private readonly TradeController _tradeController;
 
-        internal StockPagination(IStocksContainer stockContainer, int maxStocksPerPage)
+        internal TradeHistoryPagination(TradeController tradeController, int maxTradeHistoryPerPage)
         {
-            _stockContainer = stockContainer;
-            _maxStocksPerPage = maxStocksPerPage;
+            _tradeController = tradeController;
+            _maxTradeHistoryPerPage = maxTradeHistoryPerPage;
         }
 
         /// <summary>
         /// Returns the current selection
         /// </summary>
-        internal Stock[] Current
+        internal TradeHistory[] Current
         {
             get
             {
-                var stocks = new Stock[_maxStocksPerPage];
+                var stocks = new TradeHistory[_maxTradeHistoryPerPage];
                 SetStocks(stocks);
                 return stocks;
             }
@@ -36,10 +34,10 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// Returns the next 7 stock slots.
         /// </summary>
         /// <returns></returns>
-        internal Stock[] Next()
+        internal TradeHistory[] Next()
         {
-            var stocks = new Stock[_maxStocksPerPage];
-            var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
+            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
+            var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
@@ -57,9 +55,9 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// Returns the previous stock slots.
         /// </summary>
         /// <returns></returns>
-        internal Stock[] Previous()
+        internal TradeHistory[] Previous()
         {
-            var stocks = new Stock[_maxStocksPerPage];
+            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
             if (CurrentPage > 0)
             {
                 CurrentPage--;
@@ -67,24 +65,24 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
             else if (CurrentPage == 0)
             {
-                var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
+                var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
                 CurrentPage = maxPages - 1;
                 SetStocks(stocks);
             }
             return stocks;
         }
 
-        internal Stock[] Reset()
+        internal TradeHistory[] Reset()
         {
-            var stocks = new Stock[_maxStocksPerPage];
+            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
             CurrentPage = 0;
             SetStocks(stocks);
             return stocks;
         }
 
-        private Func<Stock, object> _currentSortingProperty;
+        private Func<TradeHistory, object> _currentSortingProperty;
         private bool _sortAscending = true;
-        internal void SortBy(Func<Stock, object> selector, bool? ascending = null)
+        internal void SortBy(Func<TradeHistory, object> selector, bool? ascending = null)
         {
             // If sorting by the same property, change order
             if (_currentSortingProperty == selector)
@@ -100,12 +98,12 @@ namespace SOD.StockMarket.Implementation.Stocks
                 _sortAscending = ascending.Value;
         }
 
-        private void SetStocks(Stock[] stocks)
+        private void SetStocks(TradeHistory[] slots)
         {
-            if (_stockContainer.Stocks.Count == 0) return;
+            if (_tradeController.TradeHistory.Count == 0) return;
 
             // Do some sorting if applicable
-            var sortedCollection = _stockContainer.Stocks;
+            var sortedCollection = _tradeController.TradeHistory;
             if (_currentSortingProperty != null)
             {
                 sortedCollection = _sortAscending ?
@@ -113,11 +111,16 @@ namespace SOD.StockMarket.Implementation.Stocks
                     sortedCollection.OrderByDescending(_currentSortingProperty).ToList();
             }
 
-            var startIndex = CurrentPage * _maxStocksPerPage;
-            for (int i = 0; i < _maxStocksPerPage; i++)
+            var startIndex = CurrentPage * _maxTradeHistoryPerPage;
+            for (int i = 0; i < _maxTradeHistoryPerPage; i++)
             {
-                var stock = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
-                stocks[i] = stock;
+                var history = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
+                if (history == null)
+                {
+                    slots[i] = null;
+                    continue;
+                }
+                slots[i] = history;
             }
         }
     }
