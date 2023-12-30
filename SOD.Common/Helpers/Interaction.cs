@@ -1,9 +1,5 @@
 using System;
-using System.Collections;
-using System.Drawing;
-using Microsoft.VisualBasic;
-using Mono.Cecil;
-using UniverseLib.Utility;
+using SOD.Common.Custom;
 
 namespace SOD.Common.Helpers
 {
@@ -54,25 +50,12 @@ namespace SOD.Common.Helpers
                 OnBeforeActionStarted?.Invoke(this, args);
         }
 
-
-        // public void OverwriteObjectNameText(System.Func<string, string> textModifyingFunc)
-        // {
-        //     var tmpComponent = InterfaceController
-        //         .Instance.gameWorldCanvas.transform.FindChild(
-        //             "GameWorldDisplay/InteractionCursor/ObjectName/ObjectNameText"
-        //         )
-        //         .GetComponent<TMPro.TextMeshProUGUI>();
-        //     var originalText = tmpComponent.text;
-        //     var result = textModifyingFunc(originalText);
-        //     tmpComponent.SetText(result);
-        // }
-
         public sealed class SimpleActionArgs : EventArgs
         {
             internal InteractablePreset.InteractionAction Action { get; set; }
             internal Interactable.InteractableCurrentAction CurrentAction { get; set; }
             internal InteractablePreset.InteractionKey Key { get; set; }
-            public Interactable Interactable { get; internal set; } // TODO: make this a safe reference
+            public InteractableInstanceData InteractableInstanceData { get; internal set; }
             public bool IsFpsItemTarget { get; internal set; }
 
             public bool TryGetAction(out InteractablePreset.InteractionAction action)

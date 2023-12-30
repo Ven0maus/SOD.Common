@@ -28,7 +28,7 @@ namespace SOD.Common.Patches
                     CurrentAction = newCurrentAction ?? null,
                     Action = newCurrentAction?.currentAction ?? null,
                     Key = key,
-                    Interactable = newInteractable,
+                    InteractableInstanceData = newInteractable,
                     IsFpsItemTarget = fpsItem
                 };
             }
@@ -68,7 +68,7 @@ namespace SOD.Common.Patches
                 if (
                     last != null
                     && last.CurrentAction?.currentAction == action
-                    && last.Interactable == __instance
+                    && last.InteractableInstanceData.Interactable == __instance
                 )
                 {
                     Lib.Interaction.OnActionStarted(last, false);
@@ -78,7 +78,7 @@ namespace SOD.Common.Patches
                 TempArgs = new Interaction.SimpleActionArgs
                 {
                     Action = action,
-                    Interactable = __instance,
+                    InteractableInstanceData = __instance,
                     IsFpsItemTarget = false,
                 };
                 Lib.Interaction.OnActionStarted(TempArgs, false);
@@ -103,7 +103,7 @@ namespace SOD.Common.Patches
                 if (
                     last != null
                     && last.CurrentAction?.currentAction == action
-                    && last.Interactable == __instance
+                    && last.InteractableInstanceData.Interactable == __instance
                 )
                 {
                     Lib.Interaction.OnActionStarted(last, true);
@@ -131,7 +131,7 @@ namespace SOD.Common.Patches
                 TempArgs = new Interaction.SimpleActionArgs
                 {
                     Action = __instance.currentActions[input].currentAction,
-                    Interactable = Player.Instance.interactingWith,
+                    InteractableInstanceData = Player.Instance.interactingWith,
                     IsFpsItemTarget = true,
                 };
                 Lib.Interaction.OnActionStarted(TempArgs, false);
