@@ -47,9 +47,17 @@ namespace SOD.StockMarket.Implementation.Cruncher
 
         protected void MapButton(string name, Action action, Transform customPath = null)
         {
-            var backButton = customPath?.Find(name) ?? Container.transform.Find(name);
-            var button = backButton.GetComponent<UnityEngine.UI.Button>();
-            button.onClick.AddListener(action);
+            try
+            {
+                var backButton = customPath?.Find(name) ?? Container.transform.Find(name);
+                var button = backButton.GetComponent<UnityEngine.UI.Button>();
+                button.onClick.AddListener(action);
+            }
+            catch (NullReferenceException)
+            {
+                Plugin.Log.LogInfo("Button name: " + name);
+                throw;
+            }
         }
     }
 }
