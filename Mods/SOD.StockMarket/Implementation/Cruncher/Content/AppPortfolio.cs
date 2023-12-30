@@ -17,6 +17,10 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private StockEntry[] _ownedStockSlots;
 
         private TextMeshProUGUI _totalPortfolio, _availableFunds, _investedInStocks, _ongoingLimitOrders, _daily, _weekly, _monthly;
+        private readonly Color _notificationsEnable = new(0, 140, 0, 1);
+        private readonly Color _notificationsDisable = new(166, 0, 0, 1);
+        private UnityEngine.UI.Image _notificationButtonImage;
+        private TextMeshProUGUI _notificationButtonText;
 
         public AppPortfolio(StockMarketAppContent content) : base(content)
         { }
@@ -34,6 +38,10 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             _weekly = Container.transform.Find("WeeklyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
             _monthly = Container.transform.Find("MonthlyPerformance").Find("Text").GetComponentInChildren<TextMeshProUGUI>();
 
+            var notificationsButton = Container.transform.Find("Notifications");
+            _notificationButtonImage = notificationsButton.GetComponent<UnityEngine.UI.Image>();
+            _notificationButtonText = notificationsButton.GetComponentInChildren<TextMeshProUGUI>();
+
             // Setup main slots
             _ownedStockSlots = Container.transform.Find("InvestedStocksOverview").Find("Panel").GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("PortfolioEntry"))
@@ -50,6 +58,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("Back", Back);
             MapButton("WithdrawDepositFunds", () => { Content.AppFundsInterface.UpdateInfo(); Content.AppFundsInterface.Show();  });
             MapButton("LimitOrders", LimitOrders);
+            MapButton("Notifications", SetNotificationAlerts);
 
             // Set current
             SetSlots(_ownedStocksPagination.Current);
@@ -59,6 +68,16 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
 
             // Update the current set slots
             Lib.Time.OnMinuteChanged += UpdateStocks;
+        }
+
+        private void SetNotificationAlerts()
+        {
+            var tradeController = Plugin.Instance.Market.TradeController;
+            tradeController.NotificationsEnabled = !tradeController.NotificationsEnabled;
+            _notificationButtonImage.color = tradeController.NotificationsEnabled ? 
+                _notificationsDisable : _notificationsEnable;
+            _notificationButtonText.text = tradeController.NotificationsEnabled ?
+                "Disable Order Notifications" : "Enable Order Notifications";
         }
 
         public override void Show()

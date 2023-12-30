@@ -19,6 +19,11 @@ namespace SOD.StockMarket.Implementation.Trade
         private List<HistoricalPortfolio> _historicalPortfolio;
         private List<TradeHistory> _tradeHistory;
 
+        /// <summary>
+        /// If true, will send an in-game notifications if a limit order has been bought/sold
+        /// </summary>
+        internal bool NotificationsEnabled { get; set; } = true;
+
         internal decimal AvailableFunds { get; private set; }
 
         /// <summary>
@@ -346,6 +351,10 @@ namespace SOD.StockMarket.Implementation.Trade
 
                     // Set completed
                     order.Completed = orderCompleted;
+
+                    // Send a notification out to the player
+                    if (order.Completed && NotificationsEnabled)
+                        Lib.GameMessage.Broadcast($"{order.OrderType} order \"({stock.Symbol}) '{order.Amount}' for target price € {order.Price}\" completed.", icon: InterfaceControls.Icon.money);
                 }
             }
             _playerTradeOrders.RemoveAll(a => a.Completed);
