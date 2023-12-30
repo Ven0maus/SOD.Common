@@ -2,11 +2,13 @@
 {
     internal class TradeOrder
     {
-        internal int StockId { get; }
-        internal decimal Price { get; }
-        internal int Amount { get; }
-        internal OrderType OrderType { get; }
-        internal bool Completed { get; private set; }
+        public int StockId { get; set; }
+        public decimal Price { get; set; }
+        public int Amount { get; set; }
+        public OrderType OrderType { get; set; }
+        public bool Completed { get; set; }
+
+        public TradeOrder() { }
 
         internal TradeOrder(OrderType orderType, int stockId, decimal price, int amount)
         {
