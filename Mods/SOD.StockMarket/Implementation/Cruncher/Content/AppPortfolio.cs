@@ -48,7 +48,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("Next", Next);
             MapButton("Previous", Previous);
             MapButton("Back", Back);
-            MapButton("WithdrawDepositFunds", Content.AppFundsInterface.Show);
+            MapButton("WithdrawDepositFunds", () => { Content.AppFundsInterface.UpdateInfo(); Content.AppFundsInterface.Show();  });
             MapButton("LimitOrders", LimitOrders);
 
             // Set current

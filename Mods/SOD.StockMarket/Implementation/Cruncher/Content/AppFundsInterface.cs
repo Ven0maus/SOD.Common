@@ -59,7 +59,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             UpdateInfo();
         }
 
-        private void UpdateInfo()
+        internal void UpdateInfo()
         {
             var tradeController = Plugin.Instance.Market.TradeController;
             _bankBalance.text = $"Bank Balance: € {TradeController.Money.ToString(CultureInfo.InvariantCulture)}";

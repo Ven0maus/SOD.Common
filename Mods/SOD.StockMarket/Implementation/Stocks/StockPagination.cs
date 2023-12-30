@@ -1,8 +1,7 @@
-﻿using SOD.StockMarket.Implementation.Stocks;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace SOD.StockMarket.Implementation
+namespace SOD.StockMarket.Implementation.Stocks
 {
     /// <summary>
     /// Returns pages of stocks for cruncher app
