@@ -32,11 +32,11 @@
     <None Remove="ModFolderContent\Builds\**" />
 	<None Include="LICENSE.txt">
 		<Pack>True</Pack>
-		<PackagePath/>
+		<PackagePath />
 	</None>
     <None Include="README.md">
 		<Pack>True</Pack>
-		<PackagePath/>
+		<PackagePath />
 	</None>
   </ItemGroup>
 
@@ -62,9 +62,6 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.UIModule">
-      <HintPath>..\libs\il2cpp\UnityEngine.UIModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.TextMeshPro">
       <HintPath>..\libs\il2cpp\Unity.TextMeshPro.dll</HintPath>

@@ -26,7 +26,7 @@ namespace SOD.Common
         /// Contains helper methods regarding input detection through Rewired.
         /// </summary>
         public static InputDetection InputDetection { get; } = new InputDetection();
-        
+
         /// <summary>
         /// Contains helper methods regarding player interactions with objects in the world.
         /// </summary>

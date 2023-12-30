@@ -1,7 +1,5 @@
-using System;
 using HarmonyLib;
 using SOD.Common.Helpers;
-using UniverseLib;
 
 namespace SOD.Common.Patches
 {
@@ -21,7 +19,7 @@ namespace SOD.Common.Patches
                 bool fpsItem = false
             )
             {
-                Lib.Interaction.currentPlayerInteraction = new Interaction.SimpleActionArgs
+                Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs
                 {
                     CurrentAction = newCurrentAction ?? null,
                     Action = newCurrentAction?.currentAction ?? null,
@@ -35,13 +33,12 @@ namespace SOD.Common.Patches
         [HarmonyPatch(
             typeof(Interactable),
             nameof(Interactable.OnInteraction),
-
-            [
+            new[] {
                 typeof(InteractablePreset.InteractionAction),
                 typeof(Actor),
                 typeof(bool),
                 typeof(float)
-            ]
+            }
         )]
         internal class Interactable_OnInteraction
         {
@@ -60,7 +57,7 @@ namespace SOD.Common.Patches
                 }
 
                 // Check if the last player interaction is the same
-                var last = Lib.Interaction.currentPlayerInteraction;
+                var last = Lib.Interaction.CurrentPlayerInteraction;
                 if (
                     last != null
                     && last.CurrentAction?.currentAction == action
@@ -94,7 +91,7 @@ namespace SOD.Common.Patches
                 }
 
                 // Check if the last player interaction is the same
-                var last = Lib.Interaction.currentPlayerInteraction;
+                var last = Lib.Interaction.CurrentPlayerInteraction;
                 if (
                     last != null
                     && last.CurrentAction?.currentAction == action
