@@ -200,7 +200,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <returns>True/False depending if call succeeded or not.</returns>
         internal bool InstantBuy(Stock stock, int amount, bool deductMoney = true)
         {
-            if (!IsValidOrder(OrderType.Buy, stock, amount)) return false;
+            if (deductMoney && !IsValidOrder(OrderType.Buy, stock, amount)) return false;
 
             // Deduct money
             if (deductMoney)
@@ -229,7 +229,7 @@ namespace SOD.StockMarket.Implementation.Trade
         internal bool InstantSell(Stock stock, int amount, bool removeStock = true)
         {
             // Check if player has this amount of stocks
-            if (!IsValidOrder(OrderType.Sell, stock, amount)) return false;
+            if (removeStock && !IsValidOrder(OrderType.Sell, stock, amount)) return false;
 
             // Remove stocks
             if (removeStock)
@@ -322,15 +322,17 @@ namespace SOD.StockMarket.Implementation.Trade
                     (order.OrderType == OrderType.Sell && currentPrice >= order.Price))
                 {
                     // Execute order
+                    bool orderCompleted = false;
                     _ = order.OrderType switch
                     {
-                        OrderType.Buy => InstantBuy(stock, order.Amount, false),
-                        OrderType.Sell => InstantSell(stock, order.Amount, false),
+                        OrderType.Buy => orderCompleted = InstantBuy(stock, order.Amount, false),
+                        OrderType.Sell => orderCompleted = InstantSell(stock, order.Amount, false),
                         _ => throw new NotImplementedException($"OrderType \"{order.OrderType}\" doesn't have an implementation."),
                     };
 
                     // Set completed
-                    order.Complete();
+                    if (orderCompleted)
+                        order.Complete();
                 }
             }
             _playerTradeOrders.RemoveAll(a => a.Completed);

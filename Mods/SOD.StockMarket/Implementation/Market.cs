@@ -50,13 +50,13 @@ namespace SOD.StockMarket.Implementation
             Lib.Time.OnHourChanged += OnHourChanged;
 
             // Trigger simulation if enabled
-            OnInitialized += (sender, args) =>
+            if (Plugin.Instance.Config.RunSimulation)
             {
-                if (Plugin.Instance.Config.RunSimulation)
+                OnInitialized += (sender, args) =>
                 {
                     Simulate(Plugin.Instance.Config.SimulationDays);
-                }
-            };
+                };
+            }
         }
 
         /// <summary>
@@ -127,6 +127,12 @@ namespace SOD.StockMarket.Implementation
             _cityConstructorFinalized = false;
             _citizenCreatorFinished = false;
             Initialized = false;
+
+            // Make sure we unhook any previous method
+            Lib.Time.OnTimeInitialized -= InitializeMarket;
+
+            // Hook the new method for the current run
+            Lib.Time.OnTimeInitialized += InitializeMarket;
         }
 
         /// <summary>
@@ -184,9 +190,6 @@ namespace SOD.StockMarket.Implementation
 
             // Clear out memory
             StockSymbolGenerator.Clear();
-
-            // Hook initialize for historical data
-            Lib.Time.OnTimeInitialized += InitializeMarket;
 
             // Market is finished initializing stocks
             if (Plugin.Instance.Config.IsDebugEnabled)
