@@ -53,6 +53,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             Lib.Time.OnMinuteChanged += UpdateStocks;
         }
 
+        public override void Show()
+        {
+            base.Show();
+            SetSlots(_stocksPagination.Current);
+        }
+
         private void UpdateStocks(object sender, Common.Helpers.TimeChangedArgs e)
         {
             if (Content.controller == null || !Content.controller.appLoaded || !ContentActive) return;

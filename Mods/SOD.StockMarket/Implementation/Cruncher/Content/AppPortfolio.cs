@@ -61,6 +61,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             Lib.Time.OnMinuteChanged += UpdateStocks;
         }
 
+        public override void Show()
+        {
+            base.Show();
+            UpdatePortfolio();
+        }
+
         private void LimitOrders()
         {
             Content.AppLimitOrdersOverview.SetStock(null);

@@ -43,6 +43,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             Lib.Time.OnMinuteChanged += UpdateInfo;
         }
 
+        public override void Show()
+        {
+            base.Show();
+            UpdateInfo();
+        }
+
         private void UpdateInfo(object sender, Common.Helpers.TimeChangedArgs e)
         {
             if (_stock == null || !ContentActive) return;

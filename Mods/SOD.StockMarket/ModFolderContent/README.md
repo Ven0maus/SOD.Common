@@ -18,10 +18,12 @@ Notes:
 - At the moment, a new game start is required to have stocks available in the stockmarket.
 (This will be addressed in an upcoming update to support existing savegames.)
 
-Planned:
+Planned v2.0.0:
 - Existing savegames support (before mod install)
 - Player actions in game will influence stock prices
 - News about stocks becomes available in the stockmarket app
 - Trade history becomes available in the stockmarket app
-- Introduction is available in the stockmarket app
-- Better balancing and economy calculations
+- Introduction becomes available in the stockmarket app
+- Balance / Economy overhaul
+- Allow buying decimal amount of stocks instead of integer amount (eg buying 0.02 amount of starch kola at price of €100 when starch kola stock price is €5000)
+- Add in-game notification alerts for limit orders that have been completed (configurable in its own menu option in stockmarket app)
