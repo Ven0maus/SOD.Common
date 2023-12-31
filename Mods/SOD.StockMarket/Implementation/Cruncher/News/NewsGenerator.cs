@@ -24,10 +24,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
         internal static void GenerateArticle(Stock stock)
         {
             var currentTime = Lib.Time.CurrentDateTime;
-
-            // TODO
-
-            _articles.Add(new Article(currentTime, $""));
+            var starter = NewsElements.VagueHeadlineStarts[MathHelper.Random.Next(NewsElements.VagueHeadlineStarts.Length)];
+            var headline = NewsElements.Headlines[MathHelper.Random.Next(NewsElements.Headlines.Length)];
+            _articles.Add(new Article(currentTime, $"{starter}: {stock.Name} ({stock.Symbol}) {headline}."));
         }
 
         /// <summary>

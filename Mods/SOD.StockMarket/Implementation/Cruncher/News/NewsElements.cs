@@ -1,8 +1,8 @@
 ﻿namespace SOD.StockMarket.Implementation.Cruncher.News
 {
-    internal class NewsElements
+    internal static class NewsElements
     {
-        internal string[] VagueHeadlineStarts = new string[]
+        internal static string[] VagueHeadlineStarts = new string[]
         {
             "Economic Puzzle",
             "Mysterious Signals",
@@ -51,7 +51,7 @@
             "Uncertain Horizons",
         };
 
-        internal string[] Headlines = new string[]
+        internal static string[] Headlines = new string[]
         {
             "Patterns Baffle Industry Observers",
             "Indicators Spark Intriguing Speculations",
