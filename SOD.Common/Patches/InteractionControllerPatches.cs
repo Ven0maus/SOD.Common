@@ -19,11 +19,20 @@ namespace SOD.Common.Patches
                 bool fpsItem = false
             )
             {
-                if (
-                    Lib.Interaction.LongActionInProgress
-                    && Lib.Interaction.CurrentPlayerInteraction != null
-                )
+                Interaction.SimpleActionArgs currentPlayerInteraction =
+                    Lib.Interaction.CurrentPlayerInteraction;
+                if (Lib.Interaction.LongActionInProgress && currentPlayerInteraction != null)
                 {
+                    return;
+                }
+                if (currentPlayerInteraction != null)
+                {
+                    // Reuse the object
+                    currentPlayerInteraction.CurrentAction = newCurrentAction ?? null;
+                    currentPlayerInteraction.Action = newCurrentAction?.currentAction ?? null;
+                    currentPlayerInteraction.Key = key;
+                    currentPlayerInteraction.InteractableInstanceData = newInteractable;
+                    currentPlayerInteraction.IsFpsItemTarget = fpsItem;
                     return;
                 }
                 Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs

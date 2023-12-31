@@ -10,6 +10,10 @@ namespace SOD.Common.Custom
     {
         internal InteractableInstanceData(Interactable interactable, InteractablePreset preset)
         {
+            if (interactable == null)
+            {
+                throw new System.NullReferenceException("Interactable is null");
+            }
             Interactable = interactable;
             Preset = preset;
         }
@@ -79,11 +83,19 @@ namespace SOD.Common.Custom
 
         public static implicit operator InteractableInstanceData(Interactable interactable)
         {
+            if (interactable.IsNullOrDestroyed(true))
+            {
+                return null;
+            }
             return new InteractableInstanceData(interactable, interactable.preset);
         }
 
         public static implicit operator InteractableInstanceData(InteractableController controller)
         {
+            if (controller.IsNullOrDestroyed(true))
+            {
+                return null;
+            }
             return new InteractableInstanceData(
                 controller.interactable,
                 controller.interactable.preset
