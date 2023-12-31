@@ -23,17 +23,15 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
 
         // Actual properties
         public string Title { get; set; }
-        public string Content { get; set; }
 
         public Article() { }
 
-        internal Article(Time.TimeData datetime, string title, string content)
+        internal Article(Time.TimeData datetime, string title)
         {
             DateTime = datetime;
 
             // Actual data
             Title = title;
-            Content = content;
 
             // Timedata serialization
             Year = datetime.Year;
