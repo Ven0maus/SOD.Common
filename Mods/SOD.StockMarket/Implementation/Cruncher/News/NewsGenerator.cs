@@ -21,16 +21,13 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
         /// Generates an article for a specific stock.
         /// </summary>
         /// <param name="stock"></param>
-        internal static void GenerateArticle(Stock stock, bool positive)
+        internal static void GenerateArticle(Stock stock)
         {
             var currentTime = Lib.Time.CurrentDateTime;
 
-            var titleEntry = NewsElements.Titles[MathHelper.Random.Next(NewsElements.Titles.Length)];
-            var titleEvent = positive ?
-                NewsElements.PositiveEvents[MathHelper.Random.Next(NewsElements.PositiveEvents.Length)] :
-                NewsElements.NegativeEvents[MathHelper.Random.Next(NewsElements.NegativeEvents.Length)];
+            // TODO
 
-            _articles.Add(new Article(currentTime, $"{titleEntry} {stock.Name} ({stock.Symbol}) {titleEvent}."));
+            _articles.Add(new Article(currentTime, $""));
         }
 
         /// <summary>
