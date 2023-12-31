@@ -42,6 +42,10 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(MurderController), nameof(MurderController.OnStartGame))]
         internal class MurderController_OnStartGame
         {
+            internal static System.Action InteractionActionCancelled = Lib.Interaction.OnLongActionCancelled;
+            internal static System.Action InteractionActionCompleted = Lib.Interaction.OnLongActionCompleted;
+            internal static System.Action<float, float> InteractionActionProgressChanged = Lib.Interaction.OnLongActionProgressed;
+
             [HarmonyPrefix]
             internal static void Prefix()
             {
@@ -57,6 +61,14 @@ namespace SOD.Common.Patches
                 var fileInfo = RestartSafeController.Instance.saveStateFileInfo;
                 string filePath = fileInfo?.FullPath;
                 Lib.SaveGame.OnLoad(filePath, true);
+
+                // Add Interaction event listeners
+                InteractionController.Instance.remove_OnInteractionActionCancelled(InteractionActionCancelled);
+                InteractionController.Instance.add_OnInteractionActionCancelled(InteractionActionCancelled);
+                InteractionController.Instance.remove_OnInteractionActionCompleted(InteractionActionCompleted);
+                InteractionController.Instance.add_OnInteractionActionCompleted(InteractionActionCompleted);
+                InteractionController.Instance.remove_OnInteractionActionProgressChange(InteractionActionProgressChanged);
+                InteractionController.Instance.add_OnInteractionActionProgressChange(InteractionActionProgressChanged);
             }
         }
 
