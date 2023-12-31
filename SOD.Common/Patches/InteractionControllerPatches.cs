@@ -19,6 +19,13 @@ namespace SOD.Common.Patches
                 bool fpsItem = false
             )
             {
+                if (
+                    Lib.Interaction.LongActionInProgress
+                    && Lib.Interaction.CurrentPlayerInteraction != null
+                )
+                {
+                    return;
+                }
                 Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs
                 {
                     CurrentAction = newCurrentAction ?? null,
@@ -33,7 +40,8 @@ namespace SOD.Common.Patches
         [HarmonyPatch(
             typeof(Interactable),
             nameof(Interactable.OnInteraction),
-            new[] {
+            new[]
+            {
                 typeof(InteractablePreset.InteractionAction),
                 typeof(Actor),
                 typeof(bool),
