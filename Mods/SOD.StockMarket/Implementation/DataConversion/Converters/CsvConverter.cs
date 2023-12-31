@@ -1,11 +1,13 @@
 ﻿using SOD.Common.Custom;
 using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Text.Json;
 
 namespace SOD.StockMarket.Implementation.DataConversion.Converters
 {
@@ -36,6 +38,9 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
 
             // Write trade save data
             writer.WriteLine(data[0].TradeSaveData.ToJson());
+
+            // Write articles
+            writer.WriteLine(JsonSerializer.Serialize(data[1].Articles, new JsonSerializerOptions { WriteIndented = false }));
 
             // Write the header
             var header = "Id,Name,Symbol,Date,Price,Open,Close,High,Low,Volatility,TrendPercentage,TrendStartPrice,TrendEndPrice,TrendSteps,Average";
@@ -89,6 +94,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 // Read trade save data
                 var tradeSaveData = TradeSaveData.FromJson(reader.ReadLine());
                 stockDataList.Add(new StockDataIO.StockDataDTO { TradeSaveData = tradeSaveData });
+
+                // Read articles
+                var articles = JsonSerializer.Deserialize<List<Article>>(reader.ReadLine());
+                stockDataList.Add(new StockDataIO.StockDataDTO { Articles = articles });
 
                 // Skip header
                 reader.ReadLine();

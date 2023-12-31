@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Trade;
 using System;
@@ -28,7 +29,8 @@ namespace SOD.StockMarket.Implementation.Stocks
             // Data dump list
             var dataDump = new List<StockDataDTO>
             {
-                new StockDataDTO { TradeSaveData = tradeController.Export() }
+                new StockDataDTO { TradeSaveData = tradeController.Export() },
+                new StockDataDTO { Articles = NewsGenerator.Articles.ToList() }
             };
 
             foreach (var stock in market.Stocks.OrderBy(a => a.Id))
@@ -116,7 +118,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
             var historicalDatas = stockDtos
-                .Where(a => a.TradeSaveData == null && a.Price == null)
+                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price == null)
                 .GroupBy(a => a.Id)
                 .Select(a =>
                 {
@@ -168,6 +170,13 @@ namespace SOD.StockMarket.Implementation.Stocks
                 tradeController.Import(tradeSaveData);
             }
 
+            var articles = stockDtos[1].Articles;
+            if (articles != null)
+            {
+                Plugin.Log.LogInfo("Loading news data..");
+                NewsGenerator.Import(articles);
+            }
+
             if (Plugin.Instance.Config.IsDebugEnabled)
             {
                 Plugin.Log.LogInfo("Stocks data loaded: " + market.Stocks.Count);
@@ -198,6 +207,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             public decimal? TrendEndPrice { get; set; }
             public int? TrendSteps { get; set; }
             public TradeSaveData TradeSaveData { get; set; }
+            public List<Article> Articles { get; set; }
             /// <summary>
             /// Only used for simulations
             /// </summary>

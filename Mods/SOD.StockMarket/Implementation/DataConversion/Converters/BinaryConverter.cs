@@ -1,9 +1,12 @@
-﻿using SOD.Common.Custom;
+﻿using Il2CppInterop.Generator.Extensions;
+using SOD.Common.Custom;
 using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 
 namespace SOD.StockMarket.Implementation.DataConversion.Converters
 {
@@ -40,6 +43,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             // Save trade save data
             var tradeSaveData = data[0].TradeSaveData.ToJson();
             writer.Write(tradeSaveData);
+
+            // Save news articles
+            var articles = JsonSerializer.Serialize(data[1].Articles, new JsonSerializerOptions { WriteIndented = false });
+            writer.Write(articles);
 
             // Save each record, start at one because 0 is trade save data
             for (int i = 1; i < data.Count; i++)
@@ -84,6 +91,10 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
                 // Read trade save data
                 var tradeSaveData = TradeSaveData.FromJson(reader.ReadString());
                 stockDataList.Add(new StockDataIO.StockDataDTO { TradeSaveData = tradeSaveData });
+
+                // Save news articles
+                var articles = JsonSerializer.Deserialize<List<Article>>(reader.ReadString());
+                stockDataList.Add(new StockDataIO.StockDataDTO { Articles = articles });
 
                 // Read each record
                 while (reader.BaseStream.Position < reader.BaseStream.Length)
