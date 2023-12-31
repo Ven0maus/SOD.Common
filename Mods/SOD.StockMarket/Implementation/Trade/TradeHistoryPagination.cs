@@ -1,5 +1,4 @@
-﻿using SOD.StockMarket.Implementation.Stocks;
-using System;
+﻿using System;
 using System.Linq;
 
 namespace SOD.StockMarket.Implementation.Trade
@@ -24,9 +23,9 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             get
             {
-                var stocks = new TradeHistory[_maxTradeHistoryPerPage];
-                SetStocks(stocks);
-                return stocks;
+                var histories = new TradeHistory[_maxTradeHistoryPerPage];
+                SetHistories(histories);
+                return histories;
             }
         }
 
@@ -36,19 +35,19 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <returns></returns>
         internal TradeHistory[] Next()
         {
-            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
+            var histories = new TradeHistory[_maxTradeHistoryPerPage];
             var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
-                SetStocks(stocks);
+                SetHistories(histories);
             }
             else if (CurrentPage == maxPages - 1)
             {
                 CurrentPage = 0;
-                SetStocks(stocks);
+                SetHistories(histories);
             }
-            return stocks;
+            return histories;
         }
 
         /// <summary>
@@ -57,27 +56,27 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <returns></returns>
         internal TradeHistory[] Previous()
         {
-            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
+            var histories = new TradeHistory[_maxTradeHistoryPerPage];
             if (CurrentPage > 0)
             {
                 CurrentPage--;
-                SetStocks(stocks);
+                SetHistories(histories);
             }
             else if (CurrentPage == 0)
             {
                 var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
                 CurrentPage = maxPages - 1;
-                SetStocks(stocks);
+                SetHistories(histories);
             }
-            return stocks;
+            return histories;
         }
 
         internal TradeHistory[] Reset()
         {
-            var stocks = new TradeHistory[_maxTradeHistoryPerPage];
+            var histories = new TradeHistory[_maxTradeHistoryPerPage];
             CurrentPage = 0;
-            SetStocks(stocks);
-            return stocks;
+            SetHistories(histories);
+            return histories;
         }
 
         private Func<TradeHistory, object> _currentSortingProperty;
@@ -98,7 +97,7 @@ namespace SOD.StockMarket.Implementation.Trade
                 _sortAscending = ascending.Value;
         }
 
-        private void SetStocks(TradeHistory[] slots)
+        private void SetHistories(TradeHistory[] slots)
         {
             if (_tradeController.TradeHistory.Count == 0) return;
 

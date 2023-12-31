@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.Common.Extensions;
 using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
@@ -119,6 +120,7 @@ namespace SOD.StockMarket.Implementation
             // Do a full market reset
             _stocks.Clear();
             TradeController.Reset();
+            NewsGenerator.Clear();
             CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
             CityConstructorPatches.CityConstructor_Finalized.Init = false;
             CompanyPatches.Company_Setup.ShownInitializingMessage = false;
@@ -455,6 +457,9 @@ namespace SOD.StockMarket.Implementation
                     stock.SetTrend(stockTrend);
                     trendsGenerated++;
 
+                    // Generate news entry
+                    NewsGenerator.GenerateArticle(stock);
+
                     if (debugModeEnabled && !_simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");
                 }
@@ -491,6 +496,7 @@ namespace SOD.StockMarket.Implementation
             // Clear current market
             _stocks.Clear();
             TradeController.Reset();
+            NewsGenerator.Clear();
             _interiorCreatorFinished = true;
             _cityConstructorFinalized = true;
             _citizenCreatorFinished = true;
@@ -515,6 +521,7 @@ namespace SOD.StockMarket.Implementation
             // Do a full-reset
             _stocks.Clear();
             TradeController.Reset();
+            NewsGenerator.Clear();
             CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
             CityConstructorPatches.CityConstructor_Finalized.Init = false;
             CompanyPatches.Company_Setup.ShownInitializingMessage = false;
