@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SOD.StockMarket.Implementation.Cruncher
+namespace SOD.StockMarket.Implementation.Cruncher.News
 {
     internal static class NewsGenerator
     {
