@@ -1,8 +1,10 @@
 # CHANGELOG
+**1.1.3**
+- Added Interaction helpers (prerelease v1.2.0)
+- 
 **1.1.2**
 - Fixed MonthEnum and DayEnum being wrong
 - Added TimeData.AddMinutes method
-- Added Interaction helpers (prerelease v1.2.0)
 
 **1.1.1**
 - Fix ToString() formatting for Time.TimeData
