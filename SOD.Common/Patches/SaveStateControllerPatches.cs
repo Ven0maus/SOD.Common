@@ -44,7 +44,6 @@ namespace SOD.Common.Patches
         {
             internal static System.Action InteractionActionCancelled = Lib.Interaction.OnLongActionCancelled;
             internal static System.Action InteractionActionCompleted = Lib.Interaction.OnLongActionCompleted;
-            internal static System.Action<float, float> InteractionActionProgressChanged = Lib.Interaction.OnLongActionProgressed;
 
             [HarmonyPrefix]
             internal static void Prefix()
@@ -67,8 +66,6 @@ namespace SOD.Common.Patches
                 InteractionController.Instance.add_OnInteractionActionCancelled(InteractionActionCancelled);
                 InteractionController.Instance.remove_OnInteractionActionCompleted(InteractionActionCompleted);
                 InteractionController.Instance.add_OnInteractionActionCompleted(InteractionActionCompleted);
-                InteractionController.Instance.remove_OnInteractionActionProgressChange(InteractionActionProgressChanged);
-                InteractionController.Instance.add_OnInteractionActionProgressChange(InteractionActionProgressChanged);
             }
         }
 

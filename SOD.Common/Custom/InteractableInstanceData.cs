@@ -66,7 +66,7 @@ namespace SOD.Common.Custom
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>False if the GameObject is null or destroyed, true otherwise.</returns>
-        public bool TryGetTransform(out GameObject gameObject)
+        public bool TryGetGameObject(out GameObject gameObject)
         {
             gameObject = null;
             if (!TryGetInteractableController(out var controller))
@@ -79,11 +79,19 @@ namespace SOD.Common.Custom
 
         public static implicit operator InteractableInstanceData(Interactable interactable)
         {
+            if (interactable.IsNullOrDestroyed(true))
+            {
+                return null;
+            }
             return new InteractableInstanceData(interactable, interactable.preset);
         }
 
         public static implicit operator InteractableInstanceData(InteractableController controller)
         {
+            if (controller.IsNullOrDestroyed(true))
+            {
+                return null;
+            }
             return new InteractableInstanceData(
                 controller.interactable,
                 controller.interactable.preset

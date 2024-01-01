@@ -1,4 +1,6 @@
 using HarmonyLib;
+using SOD.Common.Custom;
+using SOD.Common.Extensions;
 using SOD.Common.Helpers;
 
 namespace SOD.Common.Patches
@@ -19,11 +21,20 @@ namespace SOD.Common.Patches
                 bool fpsItem = false
             )
             {
-                if (
-                    Lib.Interaction.LongActionInProgress
-                    && Lib.Interaction.CurrentPlayerInteraction != null
-                )
+                Interaction.SimpleActionArgs currentPlayerInteraction =
+                    Lib.Interaction.CurrentPlayerInteraction;
+                if (Lib.Interaction.LongActionInProgress && currentPlayerInteraction != null)
                 {
+                    return;
+                }
+                if (currentPlayerInteraction != null)
+                {
+                    // Reuse the object
+                    currentPlayerInteraction.CurrentAction = newCurrentAction ?? null;
+                    currentPlayerInteraction.Action = newCurrentAction?.currentAction ?? null;
+                    currentPlayerInteraction.Key = key;
+                    currentPlayerInteraction.InteractableInstanceData = newInteractable;
+                    currentPlayerInteraction.IsFpsItemTarget = fpsItem;
                     return;
                 }
                 Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs
@@ -40,7 +51,7 @@ namespace SOD.Common.Patches
         [HarmonyPatch(
             typeof(Interactable),
             nameof(Interactable.OnInteraction),
-            new[]
+            new[] 
             {
                 typeof(InteractablePreset.InteractionAction),
                 typeof(Actor),
@@ -110,35 +121,6 @@ namespace SOD.Common.Patches
                     return;
                 }
 
-                Lib.Interaction.OnActionStarted(__state, true);
-            }
-        }
-
-        [HarmonyPatch(
-            typeof(FirstPersonItemController),
-            nameof(FirstPersonItemController.OnInteraction)
-        )]
-        internal class FirstPersonItemController_OnInteraction
-        {
-            [HarmonyPrefix]
-            internal static void Prefix(
-                FirstPersonItemController __instance,
-                out Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionKey input
-            )
-            {
-                __state = new Interaction.SimpleActionArgs
-                {
-                    Action = __instance.currentActions[input].currentAction,
-                    InteractableInstanceData = Player.Instance.interactingWith,
-                    IsFpsItemTarget = true,
-                };
-                Lib.Interaction.OnActionStarted(__state, false);
-            }
-
-            [HarmonyPostfix]
-            internal static void Postfix(Interaction.SimpleActionArgs __state)
-            {
                 Lib.Interaction.OnActionStarted(__state, true);
             }
         }
