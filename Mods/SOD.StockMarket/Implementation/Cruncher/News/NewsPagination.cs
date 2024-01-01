@@ -34,7 +34,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
         internal Article[] Next()
         {
             var articles = new Article[_maxArticlesPerPage];
-            var maxPages = (int)Math.Ceiling((double)NewsGenerator.Articles.Count / _maxArticlesPerPage);
+            var maxPages = (int)Math.Ceiling((double)NewsGenerator.ReleasedArticles.Length / _maxArticlesPerPage);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
@@ -62,7 +62,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
             }
             else if (CurrentPage == 0)
             {
-                var maxPages = (int)Math.Ceiling((double)NewsGenerator.Articles.Count / _maxArticlesPerPage);
+                var maxPages = (int)Math.Ceiling((double)NewsGenerator.ReleasedArticles.Length / _maxArticlesPerPage);
                 CurrentPage = maxPages - 1;
                 SetArticles(articles);
             }
@@ -79,10 +79,11 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
 
         private void SetArticles(Article[] slots)
         {
-            if (NewsGenerator.Articles.Count == 0) return;
+            var articles = NewsGenerator.ReleasedArticles;
+            if (articles.Length == 0) return;
 
             // Sort by latest date first
-            var sortedCollection = NewsGenerator.Articles
+            var sortedCollection = articles
                 .OrderByDescending(a => a.DateTime)
                 .ToList();
 

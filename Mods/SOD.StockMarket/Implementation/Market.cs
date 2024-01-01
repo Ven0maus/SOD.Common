@@ -283,6 +283,9 @@ namespace SOD.StockMarket.Implementation
             // Don't execute calculations when the stock market is closed
             if (!IsOpen()) return;
 
+            // Make sure unreleased articles can be released at random times
+            NewsGenerator.TickToBeReleased();
+
             // Trigger price update every in game minute
             // Hour change price updates are handled seperately
             if (args == null || !args.IsHourChanged)
@@ -311,6 +314,9 @@ namespace SOD.StockMarket.Implementation
 
             // Generate hourly trends
             GenerateTrends();
+
+            // Do a check to remove any outdated articles
+            NewsGenerator.RemoveOutdatedArticles();
 
             if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
             {
@@ -458,7 +464,7 @@ namespace SOD.StockMarket.Implementation
                     trendsGenerated++;
 
                     // Generate news entry
-                    NewsGenerator.GenerateArticle(stock);
+                    NewsGenerator.GenerateArticle(stock, stockTrend);
 
                     if (debugModeEnabled && !_simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");

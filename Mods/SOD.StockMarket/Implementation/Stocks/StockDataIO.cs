@@ -30,7 +30,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             var dataDump = new List<StockDataDTO>
             {
                 new StockDataDTO { TradeSaveData = tradeController.Export() },
-                new StockDataDTO { Articles = NewsGenerator.Articles.ToList() }
+                new StockDataDTO { Articles = NewsGenerator.AllArticles.ToList() }
             };
 
             foreach (var stock in market.Stocks.OrderBy(a => a.Id))
@@ -155,7 +155,9 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
             // Ordering by id is important to keep the random state working correctly.
-            foreach (var stockDto in stockDtos.Where(a => a.TradeSaveData == null && a.Price != null).OrderBy(a => a.Id))
+            foreach (var stockDto in stockDtos
+                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price != null)
+                .OrderBy(a => a.Id))
             {
                 // Create a stock an init it
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
@@ -170,12 +172,8 @@ namespace SOD.StockMarket.Implementation.Stocks
                 tradeController.Import(tradeSaveData);
             }
 
-            var articles = stockDtos[1].Articles;
-            if (articles != null)
-            {
-                Plugin.Log.LogInfo("Loading news data..");
-                NewsGenerator.Import(articles);
-            }
+            Plugin.Log.LogInfo("Loading news data..");
+            NewsGenerator.Import(stockDtos[1].Articles);
 
             if (Plugin.Instance.Config.IsDebugEnabled)
             {

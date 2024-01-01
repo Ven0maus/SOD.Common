@@ -23,15 +23,25 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
 
         // Actual properties
         public string Title { get; set; }
+        /// <summary>
+        /// Minutes before article is released
+        /// </summary>
+        public int MinutesLeft { get; set; }
 
         public Article() { }
 
-        internal Article(Time.TimeData datetime, string title)
+        internal Article(Time.TimeData datetime, string title, int minutes)
         {
             DateTime = datetime;
 
             // Actual data
             Title = title;
+
+            if (minutes > 0)
+            {
+                MinutesLeft = minutes;
+                DateTime = DateTime.AddMinutes(minutes);
+            }
 
             // Timedata serialization
             Year = datetime.Year;
