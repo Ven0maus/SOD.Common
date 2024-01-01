@@ -51,13 +51,12 @@ namespace SOD.Common.Patches
         [HarmonyPatch(
             typeof(Interactable),
             nameof(Interactable.OnInteraction),
-            new[]
-            {
+            [
                 typeof(InteractablePreset.InteractionAction),
                 typeof(Actor),
                 typeof(bool),
                 typeof(float)
-            }
+            ]
         )]
         internal class Interactable_OnInteraction
         {

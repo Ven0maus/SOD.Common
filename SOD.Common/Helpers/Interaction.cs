@@ -5,7 +5,6 @@ namespace SOD.Common.Helpers
 {
     public sealed class Interaction
     {
-        private float _lastAmount = float.MaxValue;
         internal SimpleActionArgs CurrentPlayerInteraction;
         internal bool LongActionInProgress = false;
 
@@ -31,11 +30,6 @@ namespace SOD.Common.Helpers
         /// </summary>
         public event EventHandler<SimpleActionArgs> OnAfterLongActionCompleted;
 
-        /// <summary>
-        /// Raised each frame when the player has made progress on a long action (while the player is looking at a lock they are picking, for example).
-        /// </summary>
-        public event EventHandler<ProgressChangedActionArgs> OnAfterLongActionProgressed;
-
         internal void OnLongActionCancelled()
         {
             LongActionInProgress = false;
@@ -46,21 +40,6 @@ namespace SOD.Common.Helpers
         {
             LongActionInProgress = false;
             OnAfterLongActionCompleted?.Invoke(this, CurrentPlayerInteraction);
-        }
-
-        internal void OnLongActionProgressed(float amountThisFrame, float amountTotal)
-        {
-            if (amountTotal < _lastAmount)
-            {
-                // Just started making progress
-                LongActionInProgress = true;
-                _lastAmount = amountTotal;
-                OnAfterActionStarted?.Invoke(this, CurrentPlayerInteraction);
-            }
-            OnAfterLongActionProgressed?.Invoke(
-                this,
-                new ProgressChangedActionArgs(CurrentPlayerInteraction, amountThisFrame, amountTotal)
-            );
         }
 
         internal void OnActionStarted(SimpleActionArgs args, bool after)
@@ -95,26 +74,6 @@ namespace SOD.Common.Helpers
                 currentAction = CurrentAction;
                 return currentAction != null;
             }
-        }
-
-        public sealed class ProgressChangedActionArgs : SimpleActionArgs
-        {
-            internal ProgressChangedActionArgs(SimpleActionArgs args, float amountThisFrame, float amountTotal)
-            {
-                // Simple action args
-                Action = args.Action;
-                CurrentAction = args.CurrentAction;
-                Key = args.Key;
-                InteractableInstanceData = args.InteractableInstanceData;
-                IsFpsItemTarget = args.IsFpsItemTarget;
-
-                // Progress changed action args
-                AmountThisFrame = amountThisFrame;
-                AmountTotal = amountTotal;
-            }
-
-            public float AmountThisFrame { get; }
-            public float AmountTotal { get; }
         }
     }
 }
