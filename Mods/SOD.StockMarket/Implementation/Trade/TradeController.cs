@@ -14,9 +14,15 @@ namespace SOD.StockMarket.Implementation.Trade
         internal readonly Market Market;
 
         // Player transactions
-        private Dictionary<int, int> _playerStocks;
+        private Dictionary<int, decimal> _playerStocks;
         private List<TradeOrder> _playerTradeOrders;
         private List<HistoricalPortfolio> _historicalPortfolio;
+        private List<TradeHistory> _tradeHistory;
+
+        /// <summary>
+        /// If true, will send an in-game notifications if a limit order has been bought/sold
+        /// </summary>
+        internal bool NotificationsEnabled { get; set; } = true;
 
         internal decimal AvailableFunds { get; private set; }
 
@@ -49,6 +55,7 @@ namespace SOD.StockMarket.Implementation.Trade
 
         public IReadOnlyList<TradeOrder> TradeOrders => _playerTradeOrders;
         public IReadOnlyList<HistoricalPortfolio> HistoricalPortfolioData => _historicalPortfolio;
+        public IReadOnlyList<TradeHistory> TradeHistory => _tradeHistory;
 
         internal decimal TotalInvestedInStocks
         {
@@ -83,10 +90,9 @@ namespace SOD.StockMarket.Implementation.Trade
             }
         }
 
-        internal int GetInvestedVolume(Stock stock)
+        internal decimal GetInvestedVolume(Stock stock)
         {
-            if (_playerStocks.TryGetValue(stock.Id, out var volume)) return volume;
-            return 0;
+            return _playerStocks.TryGetValue(stock.Id, out var volume) ? volume : 0m;
         }
 
         /// <summary>
@@ -133,6 +139,9 @@ namespace SOD.StockMarket.Implementation.Trade
         {
             _playerStocks.Clear();
             _playerTradeOrders.Clear();
+            _historicalPortfolio.Clear();
+            _tradeHistory.Clear();
+            AvailableFunds = 0;
         }
 
         /// <summary>
@@ -169,9 +178,10 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="saveData"></param>
         internal void Import(TradeSaveData saveData)
         {
-            _playerStocks = saveData?.PlayerStocks ?? new Dictionary<int, int>();
+            _playerStocks = saveData?.PlayerStocks ?? new Dictionary<int, decimal>();
             _playerTradeOrders = saveData?.PlayerTradeOrders ?? new List<TradeOrder>();
             _historicalPortfolio = saveData?.HistoricalPortfolio ?? new List<HistoricalPortfolio>();
+            _tradeHistory = saveData?.TradeHistory ?? new List<TradeHistory>();
             AvailableFunds = saveData?.AvailableFunds ?? 0;
         }
 
@@ -187,6 +197,7 @@ namespace SOD.StockMarket.Implementation.Trade
                 PlayerStocks = _playerStocks.ToDictionary(a => a.Key, a => a.Value),
                 PlayerTradeOrders = _playerTradeOrders.ToList(),
                 HistoricalPortfolio = _historicalPortfolio.ToList(),
+                TradeHistory = _tradeHistory.ToList(),
                 AvailableFunds = AvailableFunds
             };
         }
@@ -198,7 +209,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool InstantBuy(Stock stock, int amount, bool deductMoney = true)
+        internal bool InstantBuy(Stock stock, decimal amount, bool deductMoney = true)
         {
             if (deductMoney && !IsValidOrder(OrderType.Buy, stock, amount)) return false;
 
@@ -216,6 +227,9 @@ namespace SOD.StockMarket.Implementation.Trade
             else
                 _playerStocks[stock.Id] = amount;
 
+            // Add new history line
+            _tradeHistory.Add(new TradeHistory(Lib.Time.CurrentDateTime, stock.Symbol, OrderType.Buy, amount, stock.Price));
+
             return true;
         }
 
@@ -226,7 +240,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="stock"></param>
         /// <param name="amount"></param>
         /// <returns>True/False depending if call succeeded or not.</returns>
-        internal bool InstantSell(Stock stock, int amount, bool removeStock = true)
+        internal bool InstantSell(Stock stock, decimal amount, bool removeStock = true)
         {
             // Check if player has this amount of stocks
             if (removeStock && !IsValidOrder(OrderType.Sell, stock, amount)) return false;
@@ -245,6 +259,9 @@ namespace SOD.StockMarket.Implementation.Trade
             // Add money
             AvailableFunds += totalPrice;
 
+            // Add new history line
+            _tradeHistory.Add(new TradeHistory(Lib.Time.CurrentDateTime, stock.Symbol, OrderType.Sell, amount, stock.Price));
+
             return true;
         }
 
@@ -255,7 +272,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="price"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        internal bool BuyLimitOrder(Stock stock, decimal price, int amount)
+        internal bool BuyLimitOrder(Stock stock, decimal price, decimal amount)
         {
             if (!IsValidOrder(OrderType.Buy, stock, amount)) return false;
 
@@ -275,7 +292,7 @@ namespace SOD.StockMarket.Implementation.Trade
         /// <param name="price"></param>
         /// <param name="amount"></param>
         /// <returns></returns>
-        internal bool SellLimitOrder(Stock stock, decimal price, int amount)
+        internal bool SellLimitOrder(Stock stock, decimal price, decimal amount)
         {
             if (!IsValidOrder(OrderType.Sell, stock, amount)) return false;
             _playerTradeOrders.Add(new TradeOrder(OrderType.Sell, stock.Id, price, amount));
@@ -295,6 +312,7 @@ namespace SOD.StockMarket.Implementation.Trade
         internal void CancelOrder(TradeOrder order)
         {
             // If buy order, give back the money and cancel the order
+            if (order.Completed) return;
             if (order.OrderType == OrderType.Buy)
                 AvailableFunds += Math.Round(order.Price * order.Amount, 2);
             else if (order.OrderType == OrderType.Sell)
@@ -305,7 +323,7 @@ namespace SOD.StockMarket.Implementation.Trade
                 else
                     _playerStocks[order.StockId] = order.Amount;
             }
-            order.Complete();
+            order.Completed = true;
             _playerTradeOrders.Remove(order);
         }
 
@@ -331,14 +349,28 @@ namespace SOD.StockMarket.Implementation.Trade
                     };
 
                     // Set completed
-                    if (orderCompleted)
-                        order.Complete();
+                    order.Completed = orderCompleted;
+
+                    // Send a notification out to the player
+                    if (order.Completed && NotificationsEnabled)
+                        Lib.GameMessage.Broadcast($"{order.OrderType} order \"({stock.Symbol}) '{order.Amount}' for target price € {order.Price}\" completed.", icon: InterfaceControls.Icon.money);
                 }
             }
             _playerTradeOrders.RemoveAll(a => a.Completed);
+
+            // Remove history that is more than a week old
+            var currentDateTime = Lib.Time.CurrentDateTime;
+            int entries = 0;
+            entries += _tradeHistory.RemoveAll(a => (currentDateTime - a.DateTime).TotalDays >= 7);
+
+            // Remove history that is more than a month old
+            entries += _historicalPortfolio.RemoveAll(a => (currentDateTime - a.Date).TotalDays >= 32);
+
+            if (Plugin.Instance.Config.IsDebugEnabled && entries > 0)
+                Plugin.Log.LogInfo($"Deleted {entries} trade history entries.");
         }
 
-        private bool IsValidOrder(OrderType orderType, Stock stock, int amount)
+        private bool IsValidOrder(OrderType orderType, Stock stock, decimal amount)
         {
             return orderType switch
             {

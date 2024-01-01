@@ -10,13 +10,19 @@ namespace SOD.StockMarket.Implementation.Stocks
     {
         internal int CurrentPage { get; private set; } = 0;
 
-        private readonly int _maxStocksPerPage;
         private readonly IStocksContainer _stockContainer;
+        private readonly Func<int> _maxStocksPerPageFunc;
 
         internal StockPagination(IStocksContainer stockContainer, int maxStocksPerPage)
         {
             _stockContainer = stockContainer;
-            _maxStocksPerPage = maxStocksPerPage;
+            _maxStocksPerPageFunc = () => maxStocksPerPage;
+        }
+
+        internal StockPagination(IStocksContainer stockContainer, Func<int> maxStocksPerPage)
+        {
+            _stockContainer = stockContainer;
+            _maxStocksPerPageFunc = maxStocksPerPage;
         }
 
         /// <summary>
@@ -26,7 +32,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         {
             get
             {
-                var stocks = new Stock[_maxStocksPerPage];
+                var stocks = new Stock[_maxStocksPerPageFunc()];
                 SetStocks(stocks);
                 return stocks;
             }
@@ -38,8 +44,9 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// <returns></returns>
         internal Stock[] Next()
         {
-            var stocks = new Stock[_maxStocksPerPage];
-            var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
+            var maxStocks = _maxStocksPerPageFunc();
+            var stocks = new Stock[maxStocks];
+            var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / maxStocks);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
@@ -59,7 +66,8 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// <returns></returns>
         internal Stock[] Previous()
         {
-            var stocks = new Stock[_maxStocksPerPage];
+            var maxStocks = _maxStocksPerPageFunc();
+            var stocks = new Stock[maxStocks];
             if (CurrentPage > 0)
             {
                 CurrentPage--;
@@ -67,7 +75,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             }
             else if (CurrentPage == 0)
             {
-                var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / _maxStocksPerPage);
+                var maxPages = (int)Math.Ceiling((double)_stockContainer.Stocks.Count / maxStocks);
                 CurrentPage = maxPages - 1;
                 SetStocks(stocks);
             }
@@ -76,7 +84,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
         internal Stock[] Reset()
         {
-            var stocks = new Stock[_maxStocksPerPage];
+            var stocks = new Stock[_maxStocksPerPageFunc()];
             CurrentPage = 0;
             SetStocks(stocks);
             return stocks;
@@ -84,7 +92,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
         private Func<Stock, object> _currentSortingProperty;
         private bool _sortAscending = true;
-        internal void SortBy(Func<Stock, object> selector)
+        internal void SortBy(Func<Stock, object> selector, bool? ascending = null)
         {
             // If sorting by the same property, change order
             if (_currentSortingProperty == selector)
@@ -94,6 +102,10 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Set new property
             _currentSortingProperty = selector;
+
+            // Override if applicable
+            if (ascending != null)
+                _sortAscending = ascending.Value;
         }
 
         private void SetStocks(Stock[] stocks)
@@ -109,8 +121,9 @@ namespace SOD.StockMarket.Implementation.Stocks
                     sortedCollection.OrderByDescending(_currentSortingProperty).ToList();
             }
 
-            var startIndex = CurrentPage * _maxStocksPerPage;
-            for (int i = 0; i < _maxStocksPerPage; i++)
+            var maxStocks = _maxStocksPerPageFunc();
+            var startIndex = CurrentPage * maxStocks;
+            for (int i = 0; i < maxStocks; i++)
             {
                 var stock = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
                 stocks[i] = stock;

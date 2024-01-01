@@ -52,9 +52,23 @@ namespace SOD.Common.Custom
         }
 
         public static int MaxRandomInt => 0x7fffffff;
+        /// <summary>
+        /// Generates a random integer value
+        /// </summary>
+        /// <returns></returns>
         public int Next() => GenRandInt31();
+        /// <summary>
+        /// Gives a random integer which can be 0 or maxValue or any number in between. (max inclusive)
+        /// </summary>
+        /// <param name="maxValue">(inclusive)</param>
+        /// <returns></returns>
         public int Next(int maxValue) => Next(0, maxValue);
-
+        /// <summary>
+        /// Gives a random integer which can be minValue or maxValue or any number in between. (max inclusive)
+        /// </summary>
+        /// <param name="minValue"></param>
+        /// <param name="maxValue">(inclusive)</param>
+        /// <returns></returns>
         public int Next(int minValue, int maxValue)
         {
             if (minValue > maxValue)

@@ -1,5 +1,7 @@
-﻿using SOD.Common;
+﻿using Bogus.DataSets;
+using SOD.Common;
 using SOD.StockMarket.Implementation.Stocks;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,9 +14,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
     internal class AppStocks : AppContent
     {
         private StockPagination _stocksPagination;
-        private StockEntry[] _slots;
-
+        private StockEntry[] _largeSlots, _compactSlots;
+        private bool _currentViewLarge;
         public override GameObject Container => Content.gameObject.transform.Find("Stocks").gameObject;
+
+        private Transform _largeView, _compactView;
+        private TextMeshProUGUI _viewButtonText;
 
         public AppStocks(StockMarketAppContent content) : base(content)
         { }
@@ -22,23 +27,35 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         public override void OnSetup()
         {
             // Setup main slots
-            var panel = Container.transform.Find("Scrollrect").Find("Panel");
-            _slots = panel.GetComponentsInChildren<RectTransform>()
+            _largeView = Container.transform.Find("Scrollrect").Find("LargeView");
+            _compactView = Container.transform.Find("Scrollrect").Find("CompactView");
+
+            _largeSlots = _largeView.GetComponentsInChildren<RectTransform>()
+                .Where(a => a.name.StartsWith("StockEntry"))
+                .OrderBy(a => ExtractNumber(a.name))
+                .Select(a => new StockEntry(this, a.gameObject))
+                .ToArray();
+            _compactSlots = _compactView.GetComponentsInChildren<RectTransform>()
                 .Where(a => a.name.StartsWith("StockEntry"))
                 .OrderBy(a => ExtractNumber(a.name))
                 .Select(a => new StockEntry(this, a.gameObject))
                 .ToArray();
 
-            // Setup pagination
-            _stocksPagination = new StockPagination(Plugin.Instance.Market, _slots.Length);
+            // Setup pagination and sort by default ascending on name
+            _stocksPagination = new StockPagination(Plugin.Instance.Market, () => GetSlots().Length);
+            _stocksPagination.SortBy(a => a.Name, true);
 
             // Map buttons
             MapButton("Next", Next);
             MapButton("Previous", Previous);
+            MapButton("ChangeView", ChangeView);
             MapButton("Back", Back);
 
-            // Map header buttons
-            var header = panel.Find("Header");
+            // Get button text
+            _viewButtonText = Container.transform.Find("ChangeView").GetComponentInChildren<TextMeshProUGUI>();
+
+            // Map header buttons for both views
+            var header = _largeView.Find("Header");
             MapButton("Name", () => { _stocksPagination.SortBy(a => a.Name); SetSlots(_stocksPagination.Current); }, header);
             MapButton("Price", () => { _stocksPagination.SortBy(a => a.Price); SetSlots(_stocksPagination.Current); }, header);
             MapButton("Today", () => { _stocksPagination.SortBy(a => a.TodayDiff); SetSlots(_stocksPagination.Current); }, header);
@@ -46,11 +63,39 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("Weekly", () => { _stocksPagination.SortBy(a => a.WeeklyPercentage); SetSlots(_stocksPagination.Current); }, header);
             MapButton("Monthly", () => { _stocksPagination.SortBy(a => a.MonthlyPercentage); SetSlots(_stocksPagination.Current); }, header);
 
-            // Set current
-            SetSlots(_stocksPagination.Current);
+            header = _compactView.Find("Header");
+            MapButton("Name", () => { _stocksPagination.SortBy(a => a.Name); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Price", () => { _stocksPagination.SortBy(a => a.Price); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Today", () => { _stocksPagination.SortBy(a => a.TodayDiff); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Daily", () => { _stocksPagination.SortBy(a => a.DailyPercentage); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Weekly", () => { _stocksPagination.SortBy(a => a.WeeklyPercentage); SetSlots(_stocksPagination.Current); }, header);
+            MapButton("Monthly", () => { _stocksPagination.SortBy(a => a.MonthlyPercentage); SetSlots(_stocksPagination.Current); }, header);
+
+            // Set current view (to true, change view handles it)
+            _currentViewLarge = false;
+            ChangeView();
 
             // Update the current set slots
             Lib.Time.OnMinuteChanged += UpdateStocks;
+        }
+
+        private void ChangeView()
+        {
+            _currentViewLarge = !_currentViewLarge;
+            if (_currentViewLarge)
+            {
+                _compactView.gameObject.SetActive(false);
+                _largeView.gameObject.SetActive(true);
+                _viewButtonText.text = "Show compact view";
+            }
+            else
+            {
+                _compactView.gameObject.SetActive(true);
+                _largeView.gameObject.SetActive(false);
+                _viewButtonText.text = "Show normal view";
+            }
+            
+            SetSlots(_stocksPagination.Current);
         }
 
         public override void Show()
@@ -82,16 +127,23 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
         private void SetSlots(Stock[] stocks)
         {
             // Initial init
+            var slots = GetSlots();
             for (int i = 0; i < stocks.Length; i++)
-                _slots[i].SetStock(stocks[i]);
+                slots[i].SetStock(stocks[i]);
 
             // When stocks become invalid, (app is closed this instance is no longer valid)
-            if (_slots.Any(a => a.Invalid))
+            if (slots.Any(a => a.Invalid))
             {
                 Lib.Time.OnMinuteChanged -= UpdateStocks;
-                _slots = null;
+                _largeSlots = null;
+                _compactSlots = null;
                 _stocksPagination = null;
             }
+        }
+
+        private StockEntry[] GetSlots()
+        {
+            return _currentViewLarge ? _largeSlots : _compactSlots;
         }
 
         private static int ExtractNumber(string name)

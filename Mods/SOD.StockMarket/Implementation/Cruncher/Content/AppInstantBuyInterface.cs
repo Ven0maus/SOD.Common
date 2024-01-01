@@ -32,7 +32,7 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             MapButton("+10", () => IncreaseAmount(10));
             MapButton("+100", () => IncreaseAmount(100));
             MapButton("+1000", () => IncreaseAmount(1000));
-            MapButton("Max", () => IncreaseAmount(int.MaxValue));
+            MapButton("Max", () => IncreaseAmount(decimal.MaxValue));
             MapButton("Reset", ResetAmount);
             MapButton("Buy", InstantBuy);
 
@@ -42,9 +42,9 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             Lib.Time.OnMinuteChanged += UpdateInfo;
         }
 
-        private int _currentAmount = 0;
+        private decimal _currentAmount = 0;
         private decimal _currentCost = 0;
-        private void IncreaseAmount(int amount)
+        private void IncreaseAmount(decimal amount)
         {
             BalanceAmountAndCostBasedOnCurrentPrices(amount);
 
@@ -74,12 +74,12 @@ namespace SOD.StockMarket.Implementation.Cruncher.Content
             }
         }
 
-        private void BalanceAmountAndCostBasedOnCurrentPrices(int amount)
+        private void BalanceAmountAndCostBasedOnCurrentPrices(decimal amount)
         {
             var tradeController = Plugin.Instance.Market.TradeController;
-            var maxAffordableAmount = (int)Math.Floor(tradeController.AvailableFunds / _stock.Price);
+            var maxAffordableAmount = Math.Floor(tradeController.AvailableFunds / _stock.Price * 100) / 100;
 
-            var newAmount = amount == int.MaxValue ? maxAffordableAmount : (_currentAmount + amount);
+            var newAmount = amount == decimal.MaxValue ? maxAffordableAmount : (_currentAmount + amount);
             if (newAmount > maxAffordableAmount)
                 newAmount = maxAffordableAmount;
 

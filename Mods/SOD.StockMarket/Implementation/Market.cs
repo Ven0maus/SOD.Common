@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.Common.Extensions;
 using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Stocks;
 using SOD.StockMarket.Implementation.Trade;
@@ -81,10 +82,7 @@ namespace SOD.StockMarket.Implementation
         internal void Simulate(int days)
         {
             var simulation = new Market(this);
-            var tradeController = (TradeController)simulation
-                .GetType()
-                .GetField("_tradeController", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(simulation);
+            var tradeController = simulation.TradeController;
 
             var marketOpenHours = Plugin.Instance.Config.ClosingHour - Plugin.Instance.Config.OpeningHour;
             var openingHour = Plugin.Instance.Config.OpeningHour;
@@ -110,7 +108,6 @@ namespace SOD.StockMarket.Implementation
                 simulation.SimulationTime = simulation.SimulationTime.Value.AddDays(1);
             }
 
-            // TODO: Check why this isn't showing and simulation change
             StockDataIO.Export(simulation, tradeController, Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), "Simulation.csv"), this);
         }
 
@@ -119,6 +116,7 @@ namespace SOD.StockMarket.Implementation
             // Do a full market reset
             _stocks.Clear();
             TradeController.Reset();
+            NewsGenerator.Clear();
             CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
             CityConstructorPatches.CityConstructor_Finalized.Init = false;
             CompanyPatches.Company_Setup.ShownInitializingMessage = false;
@@ -215,7 +213,8 @@ namespace SOD.StockMarket.Implementation
             Lib.Time.OnTimeInitialized -= InitializeMarket;
 
             // Create first portfolio historical data entry
-            TradeController.CreatePortfolioHistoricalDataEntry();
+            if (!_simulation)
+                TradeController.CreatePortfolioHistoricalDataEntry();
 
             // Create the initial historical data
             int totalEntries = 0;
@@ -281,6 +280,9 @@ namespace SOD.StockMarket.Implementation
             // Don't execute calculations when the stock market is closed
             if (!IsOpen()) return;
 
+            // Make sure unreleased articles can be released at random times
+            NewsGenerator.TickToBeReleased();
+
             // Trigger price update every in game minute
             // Hour change price updates are handled seperately
             if (args == null || !args.IsHourChanged)
@@ -310,6 +312,9 @@ namespace SOD.StockMarket.Implementation
             // Generate hourly trends
             GenerateTrends();
 
+            // Do a check to remove any outdated articles
+            NewsGenerator.RemoveOutdatedArticles();
+
             if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
             {
                 Plugin.Log.LogInfo($"- New stock updates -");
@@ -319,14 +324,14 @@ namespace SOD.StockMarket.Implementation
             }
         }
 
-        private bool IsOpen()
+        internal bool IsOpen()
         {
             if (!_simulation && !Lib.Time.IsInitialized) return false;
 
             // Check the time
             var currentTime = SimulationTime ?? Lib.Time.CurrentDateTime;
             var currentHour = currentTime.Hour;
-            if (currentHour < OpeningHour || currentHour > ClosingHour)
+            if (currentHour < OpeningHour || currentHour >= ClosingHour)
                 return false;
 
             // Check the current day
@@ -363,7 +368,8 @@ namespace SOD.StockMarket.Implementation
                 a.OpeningPrice = a.ClosingPrice.Value;
                 a.ClosingPrice = null;
             });
-            TradeController.CreatePortfolioHistoricalDataEntry();
+            if (!_simulation)
+                TradeController.CreatePortfolioHistoricalDataEntry();
             if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
                 Plugin.Log.LogInfo("Stock market is opening.");
         }
@@ -455,6 +461,10 @@ namespace SOD.StockMarket.Implementation
                     stock.SetTrend(stockTrend);
                     trendsGenerated++;
 
+                    // Generate news entry
+                    if (!_simulation)
+                        NewsGenerator.GenerateArticle(stock, stockTrend);
+
                     if (debugModeEnabled && !_simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");
                 }
@@ -477,7 +487,13 @@ namespace SOD.StockMarket.Implementation
         {
             var path = GetSaveFilePath(e.FilePath);
             if (!File.Exists(path))
+            {
+                // Savegame with no market data,
+                // Generate a custom new market economy.
+                Plugin.Log.LogInfo("Attempting to load a premod install savegame, a new market economy will be generated for this savegame.");
+                InitPreModInstallEconomyExistingSavegame(path);
                 return;
+            }
 
             if (_isLoading) return;
             _isLoading = true;
@@ -485,6 +501,7 @@ namespace SOD.StockMarket.Implementation
             // Clear current market
             _stocks.Clear();
             TradeController.Reset();
+            NewsGenerator.Clear();
             _interiorCreatorFinished = true;
             _cityConstructorFinalized = true;
             _citizenCreatorFinished = true;
@@ -502,6 +519,52 @@ namespace SOD.StockMarket.Implementation
                 File.Delete(path);
                 return;
             }
+        }
+
+        private void InitPreModInstallEconomyExistingSavegame(string filePath)
+        {
+            // Do a full-reset
+            _stocks.Clear();
+            TradeController.Reset();
+            NewsGenerator.Clear();
+            CitizenCreatorPatches.CitizenCreator_Populate.Init = false;
+            CityConstructorPatches.CityConstructor_Finalized.Init = false;
+            CompanyPatches.Company_Setup.ShownInitializingMessage = false;
+            InteriorCreatorPatches.InteriorCreator_GenChunk.Init = false;
+            _interiorCreatorFinished = false;
+            _cityConstructorFinalized = false;
+            _citizenCreatorFinished = false;
+            Initialized = false;
+
+            // Start init process
+            PostStocksInitialization(typeof(CitizenCreator));
+            PostStocksInitialization(typeof(InteriorCreator));
+            PostStocksInitialization(typeof(CityConstructor));
+
+            // Set premod path
+            _afterPreModPath = filePath;
+
+            // Hook method if its not initialized yet, otherwise just call it
+            if (!Lib.Time.IsInitialized)
+            {
+                Lib.Time.OnTimeInitialized += InitializeMarket;
+                Lib.Time.OnTimeInitialized += AfterPreModInit;
+            }
+            else
+            {
+                InitializeMarket(this, null);
+                AfterPreModInit(this, null);
+            }
+        }
+
+        private string _afterPreModPath;
+        private void AfterPreModInit(object sender, TimeChangedArgs e)
+        {
+            Lib.Time.OnTimeInitialized -= AfterPreModInit;
+
+            // Export the data to this savegame
+            StockDataIO.Export(this, TradeController, _afterPreModPath);
+            _afterPreModPath = null;
         }
 
         /// <summary>

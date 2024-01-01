@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Helpers;
+using SOD.StockMarket.Implementation.Cruncher.News;
 using SOD.StockMarket.Implementation.DataConversion;
 using SOD.StockMarket.Implementation.Trade;
 using System;
@@ -28,7 +29,8 @@ namespace SOD.StockMarket.Implementation.Stocks
             // Data dump list
             var dataDump = new List<StockDataDTO>
             {
-                new StockDataDTO { TradeSaveData = tradeController.Export() }
+                new StockDataDTO { TradeSaveData = tradeController.Export() },
+                new StockDataDTO { Articles = NewsGenerator.AllArticles.ToList() }
             };
 
             foreach (var stock in market.Stocks.OrderBy(a => a.Id))
@@ -116,7 +118,7 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
             var historicalDatas = stockDtos
-                .Where(a => a.TradeSaveData == null && a.Price == null)
+                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price == null)
                 .GroupBy(a => a.Id)
                 .Select(a =>
                 {
@@ -153,7 +155,9 @@ namespace SOD.StockMarket.Implementation.Stocks
 
             // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
             // Ordering by id is important to keep the random state working correctly.
-            foreach (var stockDto in stockDtos.Where(a => a.TradeSaveData == null && a.Price != null).OrderBy(a => a.Id))
+            foreach (var stockDto in stockDtos
+                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price != null)
+                .OrderBy(a => a.Id))
             {
                 // Create a stock an init it
                 var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
@@ -167,6 +171,9 @@ namespace SOD.StockMarket.Implementation.Stocks
                 Plugin.Log.LogInfo("Loading trade data..");
                 tradeController.Import(tradeSaveData);
             }
+
+            Plugin.Log.LogInfo("Loading news data..");
+            NewsGenerator.Import(stockDtos[1].Articles);
 
             if (Plugin.Instance.Config.IsDebugEnabled)
             {
@@ -198,6 +205,7 @@ namespace SOD.StockMarket.Implementation.Stocks
             public decimal? TrendEndPrice { get; set; }
             public int? TrendSteps { get; set; }
             public TradeSaveData TradeSaveData { get; set; }
+            public List<Article> Articles { get; set; }
             /// <summary>
             /// Only used for simulations
             /// </summary>

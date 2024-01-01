@@ -216,12 +216,12 @@ namespace SOD.Common.Helpers
             /// <summary>
             /// Return's the game's WeekDay enum for the week day
             /// </summary>
-            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day);
+            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day-1);
 
             /// <summary>
             /// Return's the game's Month enum for the current month
             /// </summary>
-            public SessionData.Month MonthEnum => SessionData.Instance.MonthFromInt(Month);
+            public SessionData.Month MonthEnum => SessionData.Instance.MonthFromInt(Month-1);
 
             public TimeData(int year, int month, int day, int hour, int minute)
             {
@@ -312,6 +312,19 @@ namespace SOD.Common.Helpers
             {
                 DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
                 DateTime newDateTime = currentDateTime.AddDays(days);
+                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
+                    Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+            }
+
+            /// <summary>
+            /// Add's a certain amount of minutes to the TimeData
+            /// </summary>
+            /// <param name="minutes"></param>
+            /// <returns></returns>
+            public TimeData AddMinutes(int minutes)
+            {
+                DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
+                DateTime newDateTime = currentDateTime.AddMinutes(minutes);
                 return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
                     Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
             }

@@ -14,8 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ModFolderContent\Builds\**" />
-    <EmbeddedResource Remove="ModFolderContent\Builds\**" />
+    <None Remove="dependencies\**" />
     <None Remove="ModFolderContent\Builds\**" />
   </ItemGroup>
 
