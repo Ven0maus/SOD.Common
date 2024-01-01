@@ -49,7 +49,7 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             writer.Write(articles);
 
             // Save each record, start at one because 0 is trade save data
-            for (int i = 1; i < data.Count; i++)
+            for (int i = 2; i < data.Count; i++)
             {
                 var record = data[i];
                 writer.Write(record.Id);

@@ -49,8 +49,9 @@ namespace SOD.StockMarket.Implementation.DataConversion.Converters
             writer.WriteLine(header);
 
             // Write each record
-            foreach (var record in data)
+            for (int i=2; i < data.Count; i++)
             {
+                var record = data[i];
                 var recordContent = $"{record.Id}," +
                     $"{EscapeCsvField(record.Name)}," +
                     $"{EscapeCsvField(record.Symbol)}," +
