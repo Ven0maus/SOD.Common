@@ -124,47 +124,5 @@ namespace SOD.Common.Patches
                 Lib.Interaction.OnActionStarted(__state, true);
             }
         }
-
-        [HarmonyPatch(
-            typeof(FirstPersonItemController),
-            nameof(FirstPersonItemController.OnInteraction)
-        )]
-        internal class FirstPersonItemController_OnInteraction
-        {
-            private static InteractableInstanceData GetHeldItemInteractable()
-            {
-                if (FirstPersonItemController.Instance.leftHandObjectParent.TryGetInteractableInstanceData(out var data))
-                {
-                    return data;
-                }
-                else if (FirstPersonItemController.Instance.rightHandObjectParent.TryGetInteractableInstanceData(out data))
-                {
-                    return data;
-                }
-                throw new System.NullReferenceException("Couldn't find held item.");
-            }
-
-            [HarmonyPrefix]
-            internal static void Prefix(
-                FirstPersonItemController __instance,
-                out Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionKey input
-            )
-            {
-                __state = new Interaction.SimpleActionArgs
-                {
-                    Action = __instance.currentActions[input]?.currentAction,
-                    InteractableInstanceData = Player.Instance.interactingWith ?? GetHeldItemInteractable(),
-                    IsFpsItemTarget = true,
-                };
-                Lib.Interaction.OnActionStarted(__state, false);
-            }
-
-            [HarmonyPostfix]
-            internal static void Postfix(Interaction.SimpleActionArgs __state)
-            {
-                Lib.Interaction.OnActionStarted(__state, true);
-            }
-        }
     }
 }
