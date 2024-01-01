@@ -14,7 +14,7 @@ namespace SOD.QoL.Patches
             internal static bool Prefix(InputController __instance)
             {
                 if (!Plugin.Instance.Config.EndConversationPatch && !Plugin.Instance.Config.UnpauseGameOnMainMenuExit) return true;
-                if (!__instance.enabled || !ReInput.isReady) return true;
+                if (!__instance.enabled || !ReInput.isReady || PopupMessageController.Instance.active) return true;
 
                 if (__instance.player != null && __instance.player.GetButtonDown("Menu"))
                 {

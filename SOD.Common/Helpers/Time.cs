@@ -5,6 +5,8 @@ namespace SOD.Common.Helpers
 {
     public sealed class Time
     {
+        internal Time() { }
+
         private bool _initialized = false;
         /// <summary>
         /// When this property is true, you can collect time information from the game.
@@ -216,12 +218,12 @@ namespace SOD.Common.Helpers
             /// <summary>
             /// Return's the game's WeekDay enum for the week day
             /// </summary>
-            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day-1);
+            public SessionData.WeekDay DayEnum => SessionData.Instance.WeekdayFromInt(Day - 1);
 
             /// <summary>
             /// Return's the game's Month enum for the current month
             /// </summary>
-            public SessionData.Month MonthEnum => SessionData.Instance.MonthFromInt(Month-1);
+            public SessionData.Month MonthEnum => SessionData.Instance.MonthFromInt(Month - 1);
 
             public TimeData(int year, int month, int day, int hour, int minute)
             {

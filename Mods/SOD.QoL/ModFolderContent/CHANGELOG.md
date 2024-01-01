@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.6**
+- Bugfix: overwriting a savegame and pressing ESC would get the interface stuck
+
 **1.0.5**
 - The current plotted route is now overriden when plotting a new route instead of canceling it. (to cancel it, plot the same route again)
 

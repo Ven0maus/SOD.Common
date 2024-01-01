@@ -4,6 +4,7 @@ namespace SOD.Common.Helpers
 {
     public sealed class InputDetection
     {
+        internal InputDetection() { }
         /// <summary>
         /// Raised when a button's state changes from up/released to down/pressed and vice versa.
         /// </summary>
