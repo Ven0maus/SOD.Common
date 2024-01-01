@@ -1,4 +1,6 @@
 using HarmonyLib;
+using SOD.Common.Custom;
+using SOD.Common.Extensions;
 using SOD.Common.Helpers;
 
 namespace SOD.Common.Patches
@@ -129,6 +131,19 @@ namespace SOD.Common.Patches
         )]
         internal class FirstPersonItemController_OnInteraction
         {
+            private static InteractableInstanceData GetHeldItemInteractable()
+            {
+                if (FirstPersonItemController.Instance.leftHandObjectParent.TryGetInteractableInstanceData(out var data))
+                {
+                    return data;
+                }
+                else if (FirstPersonItemController.Instance.rightHandObjectParent.TryGetInteractableInstanceData(out data))
+                {
+                    return data;
+                }
+                throw new System.NullReferenceException("Couldn't find held item.");
+            }
+
             [HarmonyPrefix]
             internal static void Prefix(
                 FirstPersonItemController __instance,
@@ -138,8 +153,8 @@ namespace SOD.Common.Patches
             {
                 __state = new Interaction.SimpleActionArgs
                 {
-                    Action = __instance.currentActions[input].currentAction,
-                    InteractableInstanceData = Player.Instance.interactingWith,
+                    Action = __instance.currentActions[input]?.currentAction,
+                    InteractableInstanceData = Player.Instance.interactingWith ?? GetHeldItemInteractable(),
                     IsFpsItemTarget = true,
                 };
                 Lib.Interaction.OnActionStarted(__state, false);

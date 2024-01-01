@@ -10,10 +10,6 @@ namespace SOD.Common.Custom
     {
         internal InteractableInstanceData(Interactable interactable, InteractablePreset preset)
         {
-            if (interactable == null)
-            {
-                throw new System.NullReferenceException("Interactable is null");
-            }
             Interactable = interactable;
             Preset = preset;
         }
@@ -70,7 +66,7 @@ namespace SOD.Common.Custom
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>False if the GameObject is null or destroyed, true otherwise.</returns>
-        public bool TryGetTransform(out GameObject gameObject)
+        public bool TryGetGameObject(out GameObject gameObject)
         {
             gameObject = null;
             if (!TryGetInteractableController(out var controller))

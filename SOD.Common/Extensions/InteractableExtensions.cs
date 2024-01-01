@@ -32,19 +32,18 @@ namespace SOD.Common.Extensions
         /// </summary>
         /// <param name="transform"></param>
         /// <returns>An object that allows safe access to the interactable, its preset, and its controller.</returns>
-        public static InteractableInstanceData GetInteractableInstanceData(Transform transform)
+        public static bool TryGetInteractableInstanceData(this Transform transform, out InteractableInstanceData data)
         {
-            // TODO: not certain if we should include inactive or not, decided not for now
             var controller = transform.GetComponentInChildren<InteractableController>(
-                includeInactive: false
+                includeInactive: true
             );
-            if (!controller)
+            if (controller == null)
             {
-                throw new System.NullReferenceException(
-                    $"Could not find InteractableController on Transform {transform.name} or any of its children."
-                );
+                data = null;
+                return false;
             }
-            return controller; // utilize implicit operator logic
+            data = controller; // utilize implicit operator logic
+            return true;
         }
 
         /// <summary>
@@ -52,9 +51,9 @@ namespace SOD.Common.Extensions
         /// </summary>
         /// <param name="gameObject"></param>
         /// <returns>An object that allows safe access to the interactable, its preset, and its controller.</returns>
-        public static InteractableInstanceData GetInteractableInstanceData(GameObject gameObject)
+        public static bool TryGetInteractableInstanceData(this GameObject gameObject, out InteractableInstanceData data)
         {
-            return GetInteractableInstanceData(gameObject.transform);
+            return gameObject.transform.TryGetInteractableInstanceData(out data);
         }
     }
 }
