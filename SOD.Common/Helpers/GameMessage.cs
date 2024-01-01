@@ -8,6 +8,7 @@ namespace SOD.Common.Helpers
 {
     public sealed class GameMessage
     {
+        internal GameMessage() { }
         /// <summary>
         /// Broadcasts a message to be shown on the screen.
         /// </summary>

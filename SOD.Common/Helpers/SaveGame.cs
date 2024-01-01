@@ -6,6 +6,8 @@ namespace SOD.Common.Helpers
 {
     public sealed class SaveGame
     {
+        internal SaveGame() { }
+
         /// <summary>
         /// Raised right before a savegame is saved.
         /// <br>Note: StateSaveData is unavailable in the before event.</br>

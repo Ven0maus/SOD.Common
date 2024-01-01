@@ -5,6 +5,8 @@ namespace SOD.Common.Helpers
 {
     public sealed class Time
     {
+        internal Time() { }
+
         private bool _initialized = false;
         /// <summary>
         /// When this property is true, you can collect time information from the game.

@@ -9,6 +9,8 @@ namespace SOD.Common.Helpers
         internal SimpleActionArgs CurrentPlayerInteraction;
         internal bool LongActionInProgress = false;
 
+        internal Interaction() { }
+
         /// <summary>
         /// Raised just prior to when the player starts an action, whether the action is long or immediate.
         /// </summary>
