@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>SOD.Common</AssemblyName>
     <Description>Common library for SOD modding.</Description>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
 	<Authors>Venomaus, Spyraxi</Authors>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>

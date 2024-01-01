@@ -15,7 +15,7 @@ namespace SOD.StockMarket
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.StockMarket";
         public const string PLUGIN_NAME = "StockMarket";
-        public const string PLUGIN_VERSION = "1.0.4";
+        public const string PLUGIN_VERSION = "2.0.0";
 
         /// <summary>
         /// The stockmarket running during the game, used to do all calculations
@@ -26,13 +26,14 @@ namespace SOD.StockMarket
         {
             // Register app content
             ClassInjector.RegisterTypeInIl2Cpp<StockMarketAppContent>();
-
-            Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Log.LogInfo("Plugin is patched.");
+            Log.LogInfo("Plugin registered custom types into IL2CPP domain.");
 
             // Initialize market object
             Market = new Market();
-            Log.LogInfo("Initialized stock market hooks.");
+            Log.LogInfo("Plugin initialized stock market hooks.");
+
+            Harmony.PatchAll(Assembly.GetExecutingAssembly());
+            Log.LogInfo("Plugin is patched.");
         }
 
         public override void OnConfigureBindings()
@@ -70,9 +71,7 @@ namespace SOD.StockMarket
             // Fallback to default format
             var stockDataSaveFormat = Config.StockDataSaveFormat;
             if (!Enum.TryParse<DataSaveFormat>(stockDataSaveFormat.Trim(), true, out _))
-            {
                 Config.StockDataSaveFormat = Constants.StockDataSaveFormat;
-            }
         }
     }
 }

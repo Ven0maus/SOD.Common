@@ -316,6 +316,19 @@ namespace SOD.Common.Helpers
                     Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
             }
 
+            /// <summary>
+            /// Add's a certain amount of minutes to the TimeData
+            /// </summary>
+            /// <param name="minutes"></param>
+            /// <returns></returns>
+            public TimeData AddMinutes(int minutes)
+            {
+                DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
+                DateTime newDateTime = currentDateTime.AddMinutes(minutes);
+                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
+                    Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+            }
+
             public int CompareTo(TimeData other)
             {
                 // Compare by year
