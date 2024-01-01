@@ -82,10 +82,7 @@ namespace SOD.StockMarket.Implementation
         internal void Simulate(int days)
         {
             var simulation = new Market(this);
-            var tradeController = (TradeController)simulation
-                .GetType()
-                .GetField("_tradeController", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(simulation);
+            var tradeController = simulation.TradeController;
 
             var marketOpenHours = Plugin.Instance.Config.ClosingHour - Plugin.Instance.Config.OpeningHour;
             var openingHour = Plugin.Instance.Config.OpeningHour;
@@ -111,7 +108,6 @@ namespace SOD.StockMarket.Implementation
                 simulation.SimulationTime = simulation.SimulationTime.Value.AddDays(1);
             }
 
-            // TODO: Check why this isn't showing and simulation change
             StockDataIO.Export(simulation, tradeController, Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), "Simulation.csv"), this);
         }
 
@@ -464,7 +460,8 @@ namespace SOD.StockMarket.Implementation
                     trendsGenerated++;
 
                     // Generate news entry
-                    NewsGenerator.GenerateArticle(stock, stockTrend);
+                    if (!_simulation)
+                        NewsGenerator.GenerateArticle(stock, stockTrend);
 
                     if (debugModeEnabled && !_simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");
