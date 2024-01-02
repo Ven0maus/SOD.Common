@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.7**
+- Fixed using menu key on crunchers making the cruncher no longer interactable until turned off/on again
+
 **1.0.6**
 - Bugfix: overwriting a savegame and pressing ESC would get the interface stuck
 
