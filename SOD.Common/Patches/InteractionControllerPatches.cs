@@ -58,23 +58,12 @@ namespace SOD.Common.Patches
         internal class Interactable_OnInteraction
         {
             [HarmonyPrefix]
-            internal static void Prefix(
-                Interactable __instance,
-                out Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionAction action,
-                Actor who)
+            internal static void Prefix(Interactable __instance, out Interaction.SimpleActionArgs __state,
+                InteractablePreset.InteractionAction action, Actor who)
             {
                 __state = null;
                 if (who == null || !who.isPlayer)
                     return;
-
-                // Check if the last player interaction is the same
-                if (IsSameAsLastPlayerInteraction(__instance, action, out var last))
-                {
-                    Plugin.Log.LogInfo("Before Same as last");
-                    Lib.Interaction.OnActionStarted(last, false);
-                    return;
-                }
 
                 __state = new Interaction.SimpleActionArgs
                 {
@@ -86,33 +75,12 @@ namespace SOD.Common.Patches
             }
 
             [HarmonyPostfix]
-            internal static void Postfix(
-                Interactable __instance,
-                Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionAction action,
-                Actor who)
+            internal static void Postfix(Interaction.SimpleActionArgs __state, Actor who)
             {
                 if (__state == null || who == null || !who.isPlayer)
                     return;
 
-                // Check if the last player interaction is the same
-                if (IsSameAsLastPlayerInteraction(__instance, action, out var last))
-                {
-                    Plugin.Log.LogInfo("After Same as last");
-                    Lib.Interaction.OnActionStarted(last, true);
-                    return;
-                }
-
                 Lib.Interaction.OnActionStarted(__state, true);
-            }
-
-            private static bool IsSameAsLastPlayerInteraction(Interactable interactable, InteractablePreset.InteractionAction action, out Interaction.SimpleActionArgs last)
-            {
-                last = Lib.Interaction.CurrentPlayerInteraction;
-                Plugin.Log.LogInfo($"Current: {interactable.id} | Action: {action != null} | {action?.interactionName}");
-                Plugin.Log.LogInfo($"Last: {last != null} | currentAction: {last.CurrentAction?.currentAction?.interactionName} | Interactable: {last.InteractableInstanceData?.Interactable?.id}");
-                return last != null && last.CurrentAction?.currentAction == action && 
-                       last.InteractableInstanceData?.Interactable == interactable;
             }
         }
     }
