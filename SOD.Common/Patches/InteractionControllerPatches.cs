@@ -1,6 +1,4 @@
 using HarmonyLib;
-using SOD.Common.Custom;
-using SOD.Common.Extensions;
 using SOD.Common.Helpers;
 
 namespace SOD.Common.Patches
@@ -18,15 +16,12 @@ namespace SOD.Common.Patches
                 InteractablePreset.InteractionKey key,
                 Interactable newInteractable,
                 Interactable.InteractableCurrentAction newCurrentAction,
-                bool fpsItem = false
-            )
+                bool fpsItem = false)
             {
-                Interaction.SimpleActionArgs currentPlayerInteraction =
-                    Lib.Interaction.CurrentPlayerInteraction;
+                Interaction.SimpleActionArgs currentPlayerInteraction = Lib.Interaction.CurrentPlayerInteraction;
                 if (Lib.Interaction.LongActionInProgress && currentPlayerInteraction != null)
-                {
                     return;
-                }
+
                 if (currentPlayerInteraction != null)
                 {
                     // Reuse the object
@@ -37,6 +32,7 @@ namespace SOD.Common.Patches
                     currentPlayerInteraction.IsFpsItemTarget = fpsItem;
                     return;
                 }
+
                 Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs
                 {
                     CurrentAction = newCurrentAction ?? null,
@@ -66,23 +62,16 @@ namespace SOD.Common.Patches
                 Interactable __instance,
                 out Interaction.SimpleActionArgs __state,
                 InteractablePreset.InteractionAction action,
-                Actor who
-            )
+                Actor who)
             {
                 __state = null;
-                if (!who.isPlayer)
-                {
+                if (who == null || !who.isPlayer)
                     return;
-                }
 
                 // Check if the last player interaction is the same
-                var last = Lib.Interaction.CurrentPlayerInteraction;
-                if (
-                    last != null
-                    && last.CurrentAction?.currentAction == action
-                    && last.InteractableInstanceData.Interactable == __instance
-                )
+                if (IsSameAsLastPlayerInteraction(__instance, action, out var last))
                 {
+                    Plugin.Log.LogInfo("Before Same as last");
                     Lib.Interaction.OnActionStarted(last, false);
                     return;
                 }
@@ -101,27 +90,29 @@ namespace SOD.Common.Patches
                 Interactable __instance,
                 Interaction.SimpleActionArgs __state,
                 InteractablePreset.InteractionAction action,
-                Actor who
-            )
+                Actor who)
             {
-                if (!who.isPlayer)
-                {
+                if (__state == null || who == null || !who.isPlayer)
                     return;
-                }
 
                 // Check if the last player interaction is the same
-                var last = Lib.Interaction.CurrentPlayerInteraction;
-                if (
-                    last != null
-                    && last.CurrentAction?.currentAction == action
-                    && last.InteractableInstanceData.Interactable == __instance
-                )
+                if (IsSameAsLastPlayerInteraction(__instance, action, out var last))
                 {
+                    Plugin.Log.LogInfo("After Same as last");
                     Lib.Interaction.OnActionStarted(last, true);
                     return;
                 }
 
                 Lib.Interaction.OnActionStarted(__state, true);
+            }
+
+            private static bool IsSameAsLastPlayerInteraction(Interactable interactable, InteractablePreset.InteractionAction action, out Interaction.SimpleActionArgs last)
+            {
+                last = Lib.Interaction.CurrentPlayerInteraction;
+                Plugin.Log.LogInfo($"Current: {interactable.id} | Action: {action != null} | {action?.interactionName}");
+                Plugin.Log.LogInfo($"Last: {last != null} | currentAction: {last.CurrentAction?.currentAction?.interactionName} | Interactable: {last.InteractableInstanceData?.Interactable?.id}");
+                return last != null && last.CurrentAction?.currentAction == action && 
+                       last.InteractableInstanceData?.Interactable == interactable;
             }
         }
     }
