@@ -1,6 +1,4 @@
 using HarmonyLib;
-using SOD.Common.Custom;
-using SOD.Common.Extensions;
 using SOD.Common.Helpers;
 
 namespace SOD.Common.Patches
@@ -18,15 +16,12 @@ namespace SOD.Common.Patches
                 InteractablePreset.InteractionKey key,
                 Interactable newInteractable,
                 Interactable.InteractableCurrentAction newCurrentAction,
-                bool fpsItem = false
-            )
+                bool fpsItem = false)
             {
-                Interaction.SimpleActionArgs currentPlayerInteraction =
-                    Lib.Interaction.CurrentPlayerInteraction;
+                Interaction.SimpleActionArgs currentPlayerInteraction = Lib.Interaction.CurrentPlayerInteraction;
                 if (Lib.Interaction.LongActionInProgress && currentPlayerInteraction != null)
-                {
                     return;
-                }
+
                 if (currentPlayerInteraction != null)
                 {
                     // Reuse the object
@@ -37,6 +32,7 @@ namespace SOD.Common.Patches
                     currentPlayerInteraction.IsFpsItemTarget = fpsItem;
                     return;
                 }
+
                 Lib.Interaction.CurrentPlayerInteraction = new Interaction.SimpleActionArgs
                 {
                     CurrentAction = newCurrentAction ?? null,
@@ -62,30 +58,12 @@ namespace SOD.Common.Patches
         internal class Interactable_OnInteraction
         {
             [HarmonyPrefix]
-            internal static void Prefix(
-                Interactable __instance,
-                out Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionAction action,
-                Actor who
-            )
+            internal static void Prefix(Interactable __instance, out Interaction.SimpleActionArgs __state,
+                InteractablePreset.InteractionAction action, Actor who)
             {
                 __state = null;
-                if (!who.isPlayer)
-                {
+                if (who == null || !who.isPlayer)
                     return;
-                }
-
-                // Check if the last player interaction is the same
-                var last = Lib.Interaction.CurrentPlayerInteraction;
-                if (
-                    last != null
-                    && last.CurrentAction?.currentAction == action
-                    && last.InteractableInstanceData.Interactable == __instance
-                )
-                {
-                    Lib.Interaction.OnActionStarted(last, false);
-                    return;
-                }
 
                 __state = new Interaction.SimpleActionArgs
                 {
@@ -97,29 +75,10 @@ namespace SOD.Common.Patches
             }
 
             [HarmonyPostfix]
-            internal static void Postfix(
-                Interactable __instance,
-                Interaction.SimpleActionArgs __state,
-                InteractablePreset.InteractionAction action,
-                Actor who
-            )
+            internal static void Postfix(Interaction.SimpleActionArgs __state, Actor who)
             {
-                if (!who.isPlayer)
-                {
+                if (__state == null || who == null || !who.isPlayer)
                     return;
-                }
-
-                // Check if the last player interaction is the same
-                var last = Lib.Interaction.CurrentPlayerInteraction;
-                if (
-                    last != null
-                    && last.CurrentAction?.currentAction == action
-                    && last.InteractableInstanceData.Interactable == __instance
-                )
-                {
-                    Lib.Interaction.OnActionStarted(last, true);
-                    return;
-                }
 
                 Lib.Interaction.OnActionStarted(__state, true);
             }

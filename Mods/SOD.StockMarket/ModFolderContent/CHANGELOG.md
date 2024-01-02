@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.0.1**
+- Fixed stockmarket data not initializing properly when starting a new game from an ongoing game
+- Added fallback for incompatible savegames when loading an old savegame from pre v2.0.0
+
 **2.0.0**
 Bugfixes:
 - Fixed bug where loading a savegame would not take over trade orders

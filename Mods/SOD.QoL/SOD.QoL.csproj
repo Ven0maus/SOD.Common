@@ -42,5 +42,8 @@
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\libs\il2cpp\UnityEngine.UI.dll</HintPath>
     </Reference>
+    <Reference Include="UniverseLib.IL2CPP.Interop">
+      <HintPath>..\..\SOD.Common\UniverseLib.IL2CPP.Interop.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

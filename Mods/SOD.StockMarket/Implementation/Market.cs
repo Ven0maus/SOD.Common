@@ -153,7 +153,6 @@ namespace SOD.StockMarket.Implementation
                 _cityConstructorFinalized = true;
                 Initialized = true;
                 _isLoading = false;
-                Plugin.Log.LogInfo("Stock market loaded.");
                 OnInitialized?.Invoke(this, EventArgs.Empty);
                 return;
             }
@@ -491,7 +490,7 @@ namespace SOD.StockMarket.Implementation
                 // Savegame with no market data,
                 // Generate a custom new market economy.
                 Plugin.Log.LogInfo("Attempting to load a premod install savegame, a new market economy will be generated for this savegame.");
-                InitPreModInstallEconomyExistingSavegame(path);
+                InitPreModInstallEconomyExistingSavegame(path, true);
                 return;
             }
 
@@ -508,7 +507,11 @@ namespace SOD.StockMarket.Implementation
             Initialized = false;
 
             // Import data from save file
-            StockDataIO.Import(this, TradeController, path);
+            if (!StockDataIO.Import(this, TradeController, path))
+            {
+                _isLoading = false;
+                InitPreModInstallEconomyExistingSavegame(path, false);
+            }
         }
 
         private void OnFileDelete(object sender, SaveGameArgs e)
@@ -521,7 +524,7 @@ namespace SOD.StockMarket.Implementation
             }
         }
 
-        private void InitPreModInstallEconomyExistingSavegame(string filePath)
+        private void InitPreModInstallEconomyExistingSavegame(string filePath, bool saveImmediately)
         {
             // Do a full-reset
             _stocks.Clear();
@@ -548,12 +551,18 @@ namespace SOD.StockMarket.Implementation
             if (!Lib.Time.IsInitialized)
             {
                 Lib.Time.OnTimeInitialized += InitializeMarket;
-                Lib.Time.OnTimeInitialized += AfterPreModInit;
+                if (saveImmediately)
+                    Lib.Time.OnTimeInitialized += AfterPreModInit;
+                else
+                    _afterPreModPath = null;
             }
             else
             {
                 InitializeMarket(this, null);
-                AfterPreModInit(this, null);
+                if (saveImmediately)
+                    AfterPreModInit(this, null);
+                else
+                    _afterPreModPath = null;
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Rewired;
+using SOD.Common.Extensions;
 
 namespace SOD.QoL.Patches
 {
@@ -22,7 +23,8 @@ namespace SOD.QoL.Patches
                     if (Plugin.Instance.Config.EndConversationPatch &&
                         SessionData.Instance.startedGame && SessionData.Instance.play && !MainMenuController.Instance.mainMenuActive)
                     {
-                        if (Player.Instance.interactingWith != null)
+                        if (Player.Instance.interactingWith != null && Player.Instance.interactingWith.objectRef != null &&
+                            Player.Instance.interactingWith.objectRef.IsAssignableFrom(typeof(Actor)))
                         {
                             ActionController.Instance.Return(null, null, Player.Instance);
                             return false;

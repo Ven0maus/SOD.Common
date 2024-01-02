@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace SOD.Common.Extensions.Internal
 {
-    internal static class TypeExtensions
+    internal static class ProxyExtensions
     {
         /// <summary>
         /// Expand interfaces hierarchy of the given interface

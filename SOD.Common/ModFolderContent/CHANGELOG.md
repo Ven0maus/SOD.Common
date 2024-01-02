@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.1.4**
+- Fixed null reference errors regarding interaction helpers
+- Fixed time not re-initializing when triggering a new game from an ongoing game
+
 **1.1.3**
 - Added Interaction helpers (prerelease v1.2.0)
 
