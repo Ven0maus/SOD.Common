@@ -22,7 +22,7 @@ namespace SOD.StockMarket.Implementation.Stocks
         {
             if (!market.Initialized)
             {
-                Plugin.Log.LogWarning("Cannot export stock market data, market not yet initialized.");
+                Plugin.Log.LogInfo("Cannot export stock market data, market not yet initialized.");
                 return;
             }
 
@@ -102,89 +102,100 @@ namespace SOD.StockMarket.Implementation.Stocks
         /// </summary>
         /// <param name="market"></param>
         /// <param name="path"></param>
-        internal static void Import(Market market, TradeController tradeController, string path)
+        internal static bool Import(Market market, TradeController tradeController, string path)
         {
             if (market.Initialized)
             {
-                Plugin.Log.LogWarning("Cannot import stock market data, market is already initialized.");
-                return;
+                Plugin.Log.LogInfo("Cannot import stock market data, market is already initialized.");
+                return true;
             }
 
-            Plugin.Log.LogInfo("Loading stock data..");
+            try
+            {
+                Plugin.Log.LogInfo("Loading stock data..");
 
-            // Convert and import data
-            var converter = ConverterFactory.Get(path);
-            var stockDtos = converter.Load(path);
+                // Convert and import data
+                var converter = ConverterFactory.Get(path);
+                var stockDtos = converter.Load(path);
 
-            // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
-            var historicalDatas = stockDtos
-                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price == null)
-                .GroupBy(a => a.Id)
-                .Select(a =>
-                {
-                    // Order from oldest to newest (last entry is the newest)
-                    var stockDatas = a
-                        .OrderBy(a => a.Date)
-                        .Select(a =>
+                // Each stock dto that doesn't have a price is a historical data entry, create a dictionary lookup on stock Id.
+                var historicalDatas = stockDtos
+                    .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price == null)
+                    .GroupBy(a => a.Id)
+                    .Select(a =>
                     {
-                        var data = new StockData
+                        // Order from oldest to newest (last entry is the newest)
+                        var stockDatas = a
+                            .OrderBy(a => a.Date)
+                            .Select(a =>
                         {
-                            Close = a.Close,
-                            High = a.High,
-                            Low = a.Low,
-                            Date = a.Date.Value,
-                            Open = a.Open,
-                        };
-                        if (a.TrendPercentage != null && a.TrendStartPrice != null &&
-                            a.TrendEndPrice != null && a.TrendSteps != null)
-                        {
-                            var trend = new StockTrend
+                            var data = new StockData
                             {
-                                Percentage = a.TrendPercentage.Value,
-                                StartPrice = a.TrendStartPrice.Value,
-                                EndPrice = a.TrendEndPrice.Value,
-                                Steps = a.TrendSteps.Value
+                                Close = a.Close,
+                                High = a.High,
+                                Low = a.Low,
+                                Date = a.Date.Value,
+                                Open = a.Open,
                             };
-                            data.Trend = trend;
-                        }
-                        return data;
-                    });
-                    return new { a.Key, Data = stockDatas.ToArray() };
-                })
-                .ToDictionary(a => a.Key, a => a.Data);
+                            if (a.TrendPercentage != null && a.TrendStartPrice != null &&
+                                a.TrendEndPrice != null && a.TrendSteps != null)
+                            {
+                                var trend = new StockTrend
+                                {
+                                    Percentage = a.TrendPercentage.Value,
+                                    StartPrice = a.TrendStartPrice.Value,
+                                    EndPrice = a.TrendEndPrice.Value,
+                                    Steps = a.TrendSteps.Value
+                                };
+                                data.Trend = trend;
+                            }
+                            return data;
+                        });
+                        return new { a.Key, Data = stockDatas.ToArray() };
+                    })
+                    .ToDictionary(a => a.Key, a => a.Data);
 
-            // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
-            // Ordering by id is important to keep the random state working correctly.
-            foreach (var stockDto in stockDtos
-                .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price != null)
-                .OrderBy(a => a.Id))
-            {
-                // Create a stock an init it
-                var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
-                market.InitStock(stock);
+                // Import the actual stocks, each stock dto that has a price is the "most recent" version of the stock.
+                // Ordering by id is important to keep the random state working correctly.
+                foreach (var stockDto in stockDtos
+                    .Where(a => a.TradeSaveData == null && a.Articles == null && a.Price != null)
+                    .OrderBy(a => a.Id))
+                {
+                    // Create a stock an init it
+                    var stock = new Stock(stockDto, historicalDatas[stockDto.Id]);
+                    market.InitStock(stock);
+                }
+
+                // Import data into trade controller
+                var tradeSaveData = stockDtos[0].TradeSaveData;
+                if (tradeSaveData != null)
+                {
+                    Plugin.Log.LogInfo("Loading trade data..");
+                    tradeController.Import(tradeSaveData);
+                }
+
+                Plugin.Log.LogInfo("Loading news data..");
+                NewsGenerator.Import(stockDtos[1].Articles);
+
+                if (Plugin.Instance.Config.IsDebugEnabled)
+                {
+                    Plugin.Log.LogInfo("Stocks data loaded: " + market.Stocks.Count);
+                    Plugin.Log.LogInfo($"- Loaded stocks -");
+                    foreach (var stock in market.Stocks.OrderBy(a => a.Id))
+                        Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
+                    Plugin.Log.LogInfo($"- End of Stocks -");
+                }
+
+                Plugin.Log.LogInfo("Stock market loaded.");
             }
-
-            // Import data into trade controller
-            var tradeSaveData = stockDtos[0].TradeSaveData;
-            if (tradeSaveData != null)
+            catch (Exception)
             {
-                Plugin.Log.LogInfo("Loading trade data..");
-                tradeController.Import(tradeSaveData);
-            }
-
-            Plugin.Log.LogInfo("Loading news data..");
-            NewsGenerator.Import(stockDtos[1].Articles);
-
-            if (Plugin.Instance.Config.IsDebugEnabled)
-            {
-                Plugin.Log.LogInfo("Stocks data loaded: " + market.Stocks.Count);
-                Plugin.Log.LogInfo($"- Loaded stocks -");
-                foreach (var stock in market.Stocks.OrderBy(a => a.Id))
-                    Plugin.Log.LogInfo($"Stock: \"({stock.Symbol}) {stock.Name}\" | Price: {stock.Price}.");
-                Plugin.Log.LogInfo($"- End of Stocks -");
+                Plugin.Log.LogInfo($"The savefile is not compatible with \"Stockmarket v{Plugin.PLUGIN_VERSION}\", skipped loading stockmarket data.");
+                return false;
             }
 
             market.PostStocksInitialization(typeof(StockDataIO));
+            return true;
         }
 
         internal sealed class StockDataDTO
