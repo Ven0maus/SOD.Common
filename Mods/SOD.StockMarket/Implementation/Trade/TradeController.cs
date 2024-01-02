@@ -69,9 +69,10 @@ namespace SOD.StockMarket.Implementation.Trade
                 }
 
                 // Add also the ongoing sell offers for their original market value
+                var stocks = Market.Stocks.ToDictionary(a => a.Id, a => a);
                 investment += TradeOrders
                     .Where(a => a.OrderType == OrderType.Sell)
-                    .Select(a => Market.Stocks[a.StockId].Price * a.Amount)
+                    .Select(a => stocks[a.StockId].Price * a.Amount)
                     .Sum();
                 return Math.Round(investment, 2);
             }
@@ -334,7 +335,13 @@ namespace SOD.StockMarket.Implementation.Trade
                 if (order.Completed) continue;
 
                 // Check if order can be full-filled.
-                var stock = Market.Stocks[order.StockId];
+                var stock = Market.Stocks.FirstOrDefault(a => a.Id == order.StockId);
+                if (stock == null)
+                {
+                    order.Completed = true;
+                    continue;
+                }
+
                 var currentPrice = stock.Price;
                 if ((order.OrderType == OrderType.Buy && currentPrice <= order.Price) ||
                     (order.OrderType == OrderType.Sell && currentPrice >= order.Price))
