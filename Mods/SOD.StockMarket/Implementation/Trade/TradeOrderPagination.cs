@@ -104,7 +104,13 @@ namespace SOD.StockMarket.Implementation.Trade
                     continue;
                 }
 
-                var stock = _tradeController.Market.Stocks[order.StockId];
+                var stock = _tradeController.Market.Stocks.FirstOrDefault(a => a.Id == order.StockId);
+                if (stock == null)
+                {
+                    stocks[i] = null;
+                    continue;
+                }
+
                 stocks[i] = new StockOrder(stock, order);
             }
         }
