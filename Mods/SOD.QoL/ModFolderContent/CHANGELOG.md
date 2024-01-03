@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.8**
+- Skips the "press any key" screen at start game, immediately loading the mainmenu
+
 **1.0.7**
 - Fixed using menu key on crunchers making the cruncher no longer interactable until turned off/on again
 
