@@ -17,8 +17,12 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <summary>
         /// True if the sync disk is available in game.
         /// </summary>
-        public bool RegisteredInGame { get; internal set; } = false;
-        internal SyncDiskPreset Preset { get; private set; }
+        public bool RegisteredInGame { get { return Toolbox.Instance.allSyncDisks.Contains(Preset); } }
+
+        /// <summary>
+        /// The preset tied to this sync disk.
+        /// </summary>
+        public SyncDiskPreset Preset { get; private set; }
 
         /// <summary>
         /// Registers the sync disk so that it can be used in-game.
@@ -32,22 +36,17 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             // No options: default options
             registrationOptions ??= new RegistrationOptions();
 
-            // Add to world generation
-            if (registrationOptions.AddToWorldGeneration)
-                Toolbox.Instance.allSyncDisks.Add(Preset);
+            // TODO: Configure options
 
-            // Set that this sync disk is registered so it cannot be registered again in the future.
-            RegisteredInGame = true;
+            // Add to game so it can be used as sync disk
+            Toolbox.Instance.allSyncDisks.Add(Preset);
         }
 
-        internal static bool IsRegistered(SyncDiskPreset syncDiskPreset)
-        {
-            // TODO: Add all validation steps, to see if the sync disk preset is already registered in game.
-            // This should also handle sync disks which were converted from a preset that was not created through a mod.
-            // (Eg. an already existing game sync disk preset should also be seen as registered already.)
-            return false;
-        }
-
+        /// <summary>
+        /// Converts a sync disk builder instance into a sync disk object.
+        /// </summary>
+        /// <param name="builder"></param>
+        /// <returns></returns>
         internal static SyncDisk ConvertFrom(SyncDiskBuilder builder)
         {
             // Set basic properties
@@ -66,7 +65,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <returns></returns>
         internal static SyncDisk ConvertFrom(SyncDiskPreset preset)
         {
-            return new SyncDisk(false) { Preset = preset, RegisteredInGame = IsRegistered(preset) };
+            return new SyncDisk(false) { Preset = preset };
         }
     }
 }
