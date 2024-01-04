@@ -31,5 +31,10 @@ namespace SOD.Common
         /// Contains helper methods regarding player interactions with objects in the world.
         /// </summary>
         public static Interaction Interaction { get; } = new Interaction();
+
+        /// <summary>
+        /// Contains helper methods regarding sync disks
+        /// </summary>
+        public static SyncDisks SyncDisks { get; } = new SyncDisks();
     }
 }
