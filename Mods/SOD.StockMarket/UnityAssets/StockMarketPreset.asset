@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: -731687374, guid: 34dbb99afe9d0774ba685b3ff21205e7, type: 3}
+  m_Name: StockMarketPreset
+  m_EditorClassIdentifier: 
+  loadBackground: {fileID: 2100000, guid: 61acd306c2c5c6f448ca3160a86e5f6e, type: 2}
+  loadedBackground: {fileID: 2100000, guid: 61acd306c2c5c6f448ca3160a86e5f6e, type: 2}
+  useCursor: 1
+  cursorSprite: {fileID: 21300000, guid: 56763511f6738314f92ea41141562f81, type: 2}
+  useTimer: 0
+  timerLength: 3
+  loadTime: 1
+  loadDemand: 0.33
+  alwaysLoad: 0
+  alwaysLoadDemand: 0.33
+  desktopIcon: {fileID: 21300000, guid: 01e266eaf4200544e943cbb55dea38c5, type: 2}
+  screenLightColourOnLoad: {r: 0.33490568, g: 0.7986794, b: 1, a: 1}
+  screenLightColourOnFinishLoad: {r: 0.6018734, g: 0.4575472, b: 1, a: 1}
+  alwaysInstalled: 1
+  onlyIfCorporateSabotageSkill: 0
+  companyOnly: 0
+  salesRecordsOnly: 0
+  onlyIfOwner: 0
+  installationConditions: []
+  onlyInAddresses: []
+  onlyIfResidential: 0
+  appContent:
+  - {fileID: 7030591295545787872, guid: 665eaf030e07b8f4c9c28e6a9a331c7e, type: 3}
+  onStartSound: {fileID: 11400000, guid: b9cb4128db6b6944680b448b2758b03c, type: 2}
+  onExitSound: {fileID: 0}
+  onFinishedLoadingSound: {fileID: 0}
+  openOnEnd: {fileID: 11400000, guid: 54f858a5c1c40fe4cb65b750ffb24e1f, type: 2}
