@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using Rewired;
 using SOD.Common.Extensions;
+using System;
 
 namespace SOD.QoL.Patches
 {
@@ -14,34 +15,41 @@ namespace SOD.QoL.Patches
             [HarmonyPrefix]
             internal static bool Prefix(InputController __instance)
             {
-                if (!Plugin.Instance.Config.EndConversationPatch && !Plugin.Instance.Config.UnpauseGameOnMainMenuExit) return true;
-                if (!__instance.enabled || !ReInput.isReady || PopupMessageController.Instance.active) return true;
-
-                if (__instance.player != null && __instance.player.GetButtonDown("Menu"))
+                try
                 {
-                    // This allows ending conversations with the menu key
-                    if (Plugin.Instance.Config.EndConversationPatch &&
-                        SessionData.Instance.startedGame && SessionData.Instance.play && !MainMenuController.Instance.mainMenuActive)
+                    if (!Plugin.Instance.Config.EndConversationPatch && !Plugin.Instance.Config.UnpauseGameOnMainMenuExit) return true;
+                    if (!__instance.enabled || !ReInput.isReady || PopupMessageController.Instance.active) return true;
+
+                    if (__instance.player != null && __instance.player.GetButtonDown("Menu"))
                     {
-                        if (Player.Instance.interactingWith != null && Player.Instance.interactingWith.objectRef != null &&
-                            Player.Instance.interactingWith.objectRef.IsAssignableFrom(typeof(Actor)))
+                        // This allows ending conversations with the menu key
+                        if (Plugin.Instance.Config.EndConversationPatch &&
+                            SessionData.Instance.startedGame && SessionData.Instance.play && !MainMenuController.Instance.mainMenuActive)
                         {
-                            ActionController.Instance.Return(null, null, Player.Instance);
+                            if (Player.Instance.interactingWith != null && Player.Instance.interactingWith.objectRef != null &&
+                                Player.Instance.interactingWith.objectRef.IsAssignableFrom(typeof(Actor)))
+                            {
+                                ActionController.Instance.Return(null, null, Player.Instance);
+                                return false;
+                            }
+                        }
+
+                        // This fixes the fact that the game is still paused after you exit the menu with the menu key
+                        if (Plugin.Instance.Config.UnpauseGameOnMainMenuExit &&
+                            SessionData.Instance.startedGame && !SessionData.Instance.play && MainMenuController.Instance.mainMenuActive &&
+                            (CityConstructor.Instance == null || !CityConstructor.Instance.preSimActive))
+                        {
+                            SessionData.Instance.ResumeGame();
+                            MainMenuController.Instance.EnableMainMenu(false, true, true, MainMenuController.Component.mainMenuButtons);
                             return false;
                         }
                     }
-
-                    // This fixes the fact that the game is still paused after you exit the menu with the menu key
-                    if (Plugin.Instance.Config.UnpauseGameOnMainMenuExit &&
-                        SessionData.Instance.startedGame && !SessionData.Instance.play && MainMenuController.Instance.mainMenuActive &&
-                        (CityConstructor.Instance == null || !CityConstructor.Instance.preSimActive))
-                    {
-                        SessionData.Instance.ResumeGame();
-                        MainMenuController.Instance.EnableMainMenu(false, true, true, MainMenuController.Component.mainMenuButtons);
-                        return false;
-                    }
+                    return true;
                 }
-                return true;
+                catch(Exception)
+                {
+                    return true;
+                }
             }
         }
     }
