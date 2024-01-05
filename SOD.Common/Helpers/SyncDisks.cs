@@ -28,14 +28,14 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// All the effects in here have been registered by mods and are available in the game.
+        /// All the registered sync disks in the game by mods.
         /// </summary>
-        internal static HashSet<Effect> RegisteredEffects = new();
+        internal static List<SyncDisk> RegisteredSyncDisks = new();
 
         /// <summary>
-        /// Returns a set of all the known effects that have so far been registered by mods using SOD.Common Sync Disks helper functionality.
+        /// Returns a list of all the known sync disks that have so far been registered by mods using SOD.Common Sync Disks helper functionality.
         /// </summary>
-        public static IReadOnlySet<Effect> KnownModEffects => RegisteredEffects;
+        public static IReadOnlyList<SyncDisk> KnownModSyncDisks => RegisteredSyncDisks;
 
         /// <summary>
         /// Raised before a new sync disk is installed on the player.

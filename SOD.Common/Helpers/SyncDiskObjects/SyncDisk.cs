@@ -78,13 +78,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             // Configure options
             Preset.canBeSideJobReward = registrationOptions.CanBeSideJobReward;
 
-            // Register the effect ids in SOD.Common so other mods can also be aware of it, if needed.
-            foreach (var effect in Effects)
-                SyncDisks.RegisteredEffects.Add(effect);
-            if (SideEffect != null)
-                SyncDisks.RegisteredEffects.Add(SideEffect.Value);
-
             // Add to game so it can be used as sync disk, set also sync disk number to the latest
+            SyncDisks.RegisteredSyncDisks.Add(this);
             Preset.syncDiskNumber = Toolbox.Instance.allSyncDisks.Count + 1;
             Toolbox.Instance.allSyncDisks.Add(Preset);
         }
