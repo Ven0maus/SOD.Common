@@ -30,12 +30,12 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// All the registered sync disks in the game by mods.
         /// </summary>
-        internal static List<SyncDisk> RegisteredSyncDisks = new();
+        internal List<SyncDisk> RegisteredSyncDisks = new();
 
         /// <summary>
         /// Returns a list of all the known sync disks that have so far been registered by mods using SOD.Common Sync Disks helper functionality.
         /// </summary>
-        public static IReadOnlyList<SyncDisk> KnownModSyncDisks => RegisteredSyncDisks;
+        public IReadOnlyList<SyncDisk> KnownModSyncDisks => RegisteredSyncDisks;
 
         /// <summary>
         /// Raised before a new sync disk is installed on the player.

@@ -16,13 +16,20 @@ namespace SOD.Common.Patches
             private static bool _loaded = false;
 
             [HarmonyPostfix]
-            internal static void Postfix(List<ScriptableObject> __result)
+            internal static void Postfix(Il2CppSystem.Collections.Generic.List<ScriptableObject> __result)
             {
                 if (_loaded) return;
                 _loaded = true;
 
                 // Insert all the registered sync disk presets
-                __result.AddRange(SyncDisks.RegisteredSyncDisks.Select(a => a.Preset));
+                foreach (var preset in Lib.SyncDisks.RegisteredSyncDisks.Select(a => a.Preset))
+                {
+                    // Set the interactable and add it to the game
+                    preset.interactable = SyncDisk.SyncDiskInteractablePreset.Value;
+
+                    // Also include it in the asset loader
+                    __result.Add(preset);
+                }
             }
         }
 
@@ -38,7 +45,7 @@ namespace SOD.Common.Patches
                 _loaded = true;
 
                 // Load Sync disks into menu presets if applicable
-                AddToMenuPresets(SyncDisks.RegisteredSyncDisks.Where(a => a.RegistrationOptions.SaleLocations.Count > 0));
+                AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.RegistrationOptions.SaleLocations.Count > 0));
             }
 
             /// <summary>

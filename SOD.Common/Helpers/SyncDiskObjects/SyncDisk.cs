@@ -34,12 +34,41 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <summary>
         /// True if the sync disk is available in game.
         /// </summary>
-        public bool RegisteredInGame { get { return Toolbox.Instance.allSyncDisks.Contains(Preset); } }
+        public bool RegisteredInGame 
+        { 
+            get 
+            {
+                if (Toolbox.Instance == null) return false;
+                if (Toolbox.Instance.allSyncDisks == null) return false;
+                if (Preset == null) return false;
+                return Toolbox.Instance.allSyncDisks.Contains(Preset); 
+            } 
+        }
 
         /// <summary>
         /// The preset tied to this sync disk.
         /// </summary>
         public SyncDiskPreset Preset { get; private set; }
+
+        /// <summary>
+        /// The sync disk's name.
+        /// </summary>
+        public string Name => Preset.presetName;
+
+        /// <summary>
+        /// The sync disk's price.
+        /// </summary>
+        public int Price => Preset.price;
+
+        /// <summary>
+        /// The sync disk's rarity.
+        /// </summary>
+        public SyncDiskPreset.Rarity Rarity => Preset.rarity;
+
+        /// <summary>
+        /// The sync disk's manufacturer.
+        /// </summary>
+        public SyncDiskPreset.Manufacturer Manufacturer => Preset.manufacturer;
 
         /// <summary>
         /// The effects in the correct order (effect 1, 2, 3)
@@ -86,9 +115,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             Preset.canBeSideJobReward = RegistrationOptions.CanBeSideJobReward;
 
             // Add to game so it can be used as sync disk, set also sync disk number to the latest
-            SyncDisks.RegisteredSyncDisks.Add(this);
-            Preset.syncDiskNumber = Toolbox.Instance.allSyncDisks.Count + 1;
-            Toolbox.Instance.allSyncDisks.Add(Preset);
+            Lib.SyncDisks.RegisteredSyncDisks.Add(this);
+            Preset.syncDiskNumber = Lib.SyncDisks.RegisteredSyncDisks.Count;
         }
 
         /// <summary>
@@ -105,7 +133,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
             syncDisk.Preset.manufacturer = builder.Manufacturer;
-            syncDisk.Preset.interactable = SyncDiskInteractablePreset.Value;
 
             for (int i=0; i < builder.Effects.Count; i++)
             {
