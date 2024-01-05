@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -38,6 +39,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         { 
             get 
             {
+                if (Lib.SyncDisks.RegisteredSyncDisks.Contains(this)) return true;
                 if (Toolbox.Instance == null) return false;
                 if (Toolbox.Instance.allSyncDisks == null) return false;
                 if (Preset == null) return false;
@@ -97,22 +99,16 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             }
         }
 
-        internal RegistrationOptions RegistrationOptions { get; private set; }
+        internal HashSet<string> MenuPresetLocations { get; set; }
 
         /// <summary>
         /// Registers the sync disk so that it can be used in-game.
         /// <br>Has optional registration options that allow you to define exactly how it can be used in game.</br>
         /// </summary>
         /// <param name="registrationOptions"></param>
-        public void Register(RegistrationOptions registrationOptions = null)
+        public void Register()
         {
             if (RegisteredInGame) return;
-
-            // Set and store registration options
-            RegistrationOptions = registrationOptions ?? new RegistrationOptions();
-
-            // Configure options
-            Preset.canBeSideJobReward = RegistrationOptions.CanBeSideJobReward;
 
             // Add to game so it can be used as sync disk, set also sync disk number to the latest
             Lib.SyncDisks.RegisteredSyncDisks.Add(this);
@@ -133,6 +129,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
             syncDisk.Preset.manufacturer = builder.Manufacturer;
+            syncDisk.Preset.canBeSideJobReward = builder.CanBeSideJobReward;
+            syncDisk.MenuPresetLocations = builder.MenuPresetLocations;
 
             for (int i=0; i < builder.Effects.Count; i++)
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
 {
@@ -11,11 +12,14 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal SyncDiskPreset.Manufacturer Manufacturer { get; private set; }
         internal List<Effect> Effects { get; private set; }
         internal Effect SideEffect { get; private set; }
+        internal HashSet<string> MenuPresetLocations { get; private set; }
+        internal bool CanBeSideJobReward { get; private set; }
 
         internal SyncDiskBuilder(string syncDiskName) 
         {
             Name = syncDiskName;
             Effects = new List<Effect>(3);
+            MenuPresetLocations = new HashSet<string>();
         }
 
         /// <summary>
@@ -50,6 +54,17 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public SyncDiskBuilder SetManufacturer(SyncDiskPreset.Manufacturer manufacturer)
         {
             Manufacturer = manufacturer;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets true/false if this can be retrieved from a side job reward.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder SetCanBeSideJobReward(bool value)
+        {
+            CanBeSideJobReward = value;
             return this;
         }
 
@@ -96,6 +111,34 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         }
 
         /// <summary>
+        /// Add's locations where the sync disk can be retrieved from.
+        /// <br>These are all menu locations.</br>
+        /// </summary>
+        /// <param name="saleLocations"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder AddSaleLocation(params RegistrationOptions.SyncDiskSaleLocation[] saleLocations)
+        {
+            foreach (var saleLocation in saleLocations.Select(a => a.ToString()))
+                MenuPresetLocations.Add(saleLocation);
+            return this;
+        }
+
+        /// <summary>
+        /// Add's locations where the sync disk can be retrieved from.
+        /// <br>These are all menu locations.</br>
+        /// <br>This method is a string variant, which takes the menu presetName.</br>
+        /// <br>It exists to set location for a custom menu presets.</br>
+        /// </summary>
+        /// <param name="saleLocations"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder AddSaleLocation(params string[] saleLocations)
+        {
+            foreach (var saleLocation in saleLocations)
+                MenuPresetLocations.Add(saleLocation);
+            return this;
+        }
+
+        /// <summary>
         /// Creates a new Sync Disk based on the current builder configuration.
         /// </summary>
         /// <returns></returns>
@@ -109,10 +152,10 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// </summary>
         /// <param name="registrationOptions"></param>
         /// <returns></returns>
-        public SyncDisk CreateAndRegister(RegistrationOptions registrationOptions = null)
+        public SyncDisk CreateAndRegister()
         {
             var syncDisk = SyncDisk.ConvertFrom(this);
-            syncDisk.Register(registrationOptions);
+            syncDisk.Register();
             return syncDisk;
         }
 

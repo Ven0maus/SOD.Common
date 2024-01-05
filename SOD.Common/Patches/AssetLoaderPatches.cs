@@ -44,15 +44,19 @@ namespace SOD.Common.Patches
                 if (_loaded) return;
                 _loaded = true;
 
+
+                LoadDDSEntries();
+
                 // Load Sync disks into menu presets if applicable
-                AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.RegistrationOptions.SaleLocations.Count > 0));
+                AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.MenuPresetLocations.Count > 0));
             }
 
             /// <summary>
-            /// Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
+            /// Add's any custom dds entries into the game
             /// </summary>
             private static void LoadDDSEntries()
             {
+                // Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
                 foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
                 {
                     // TODO: use dds strings helper to insert content
@@ -66,24 +70,25 @@ namespace SOD.Common.Patches
             private static void AddToMenuPresets(IEnumerable<SyncDisk> syncDisk)
             {
                 var groupedPresets = syncDisk
-                    .SelectMany(a => a.RegistrationOptions.SaleLocations.Select(saleLocation => new { a.Preset, SaleLocation = saleLocation }))
+                    .SelectMany(a => a.MenuPresetLocations.Select(saleLocation => new { a.Preset, SaleLocation = saleLocation }))
                     .GroupBy(x => x.SaleLocation)
                     .ToDictionary(group => group.Key, group => group.Select(item => item.Preset).ToArray());
                 if (groupedPresets.Count == 0) return;
 
                 var menus = Resources.FindObjectsOfTypeAll<MenuPreset>();
-                var enumType = typeof(RegistrationOptions.SyncDiskSaleLocation);
                 foreach (var menu in menus)
                 {
                     var menuPresetName = menu.GetPresetName();
-                    if (Enum.TryParse(menuPresetName, true, out RegistrationOptions.SyncDiskSaleLocation location) &&
-                        groupedPresets.TryGetValue(location, out var syncDiskPresets))
+                    if (groupedPresets.TryGetValue(menuPresetName, out var syncDiskPresets))
                     {
                         // Add sync disk presets to this menu preset
                         foreach (var syncDiskPreset in syncDiskPresets)
                             menu.syncDisks.Add(syncDiskPreset);
                     }
                 }
+
+                // Remove the memory usage of this, no longer needed
+                Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.MenuPresetLocations = null);
             }
         }
     }
