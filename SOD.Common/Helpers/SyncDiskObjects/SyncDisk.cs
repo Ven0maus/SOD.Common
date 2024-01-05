@@ -63,6 +63,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             }
         }
 
+        internal RegistrationOptions RegistrationOptions { get; private set; }
+
         /// <summary>
         /// Registers the sync disk so that it can be used in-game.
         /// <br>Has optional registration options that allow you to define exactly how it can be used in game.</br>
@@ -72,11 +74,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         {
             if (RegisteredInGame) return;
 
-            // No options: default options
-            registrationOptions ??= new RegistrationOptions();
+            // Set and store registration options
+            RegistrationOptions = registrationOptions ?? new RegistrationOptions();
 
             // Configure options
-            Preset.canBeSideJobReward = registrationOptions.CanBeSideJobReward;
+            Preset.canBeSideJobReward = RegistrationOptions.CanBeSideJobReward;
 
             // Add to game so it can be used as sync disk, set also sync disk number to the latest
             SyncDisks.RegisteredSyncDisks.Add(this);
