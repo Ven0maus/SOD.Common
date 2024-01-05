@@ -1,11 +1,41 @@
 ﻿using SOD.Common.Helpers.SyncDiskObjects;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Common.Helpers
 {
     public sealed class SyncDisks
     {
         internal SyncDisks() { }
+
+        private static int? _currentSyncDiskEffectId = null;
+        /// <summary>
+        /// Adds a new number at the end of the available effects,
+        /// <br>This should automatically increase if the game adds new effects.</br>
+        /// <br>All mods will then always get the right effect ids.</br>
+        /// </summary>
+        /// <returns></returns>
+        internal static int GetNewSyncDiskEffectId()
+        {
+            if (_currentSyncDiskEffectId == null)
+            {
+                int[] values = (int[])Enum.GetValues(typeof(SyncDiskPreset.Effect));
+                _currentSyncDiskEffectId = values.DefaultIfEmpty().Max();
+            }
+            _currentSyncDiskEffectId++;
+            return _currentSyncDiskEffectId.Value;
+        }
+
+        /// <summary>
+        /// All the effects in here have been registered by mods and are available in the game.
+        /// </summary>
+        internal static HashSet<Effect> RegisteredEffects = new();
+
+        /// <summary>
+        /// Returns a set of all the known effects that have so far been registered by mods using SOD.Common Sync Disks helper functionality.
+        /// </summary>
+        public static IReadOnlySet<Effect> KnownModEffects => RegisteredEffects;
 
         /// <summary>
         /// Raised before a new sync disk is installed on the player.
@@ -76,6 +106,43 @@ namespace SOD.Common.Helpers
             OnInstall,
             OnUninstall,
             OnUpgrade
+        }
+
+        public readonly struct Effect : IEquatable<Effect>
+        {
+            public readonly int Id;
+            public readonly string Name;
+
+            public Effect(int id, string name)
+            {
+                Id = id;
+                Name = name;
+            }
+
+            public bool Equals(Effect other)
+            {
+                return Id == other.Id;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is Effect effect && Equals(effect);
+            }
+
+            public static bool operator ==(Effect left, Effect right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(Effect left, Effect right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                return Id.GetHashCode();
+            }
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Linq;
+using UnityEngine;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
 {
@@ -7,6 +9,16 @@ namespace SOD.Common.Helpers.SyncDiskObjects
     /// </summary>
     public sealed class SyncDisk
     {
+        /// <summary>
+        /// Lazy loaded interactable preset for the sync disk
+        /// </summary>
+        internal static Lazy<InteractablePreset> SyncDiskInteractablePreset = new(() =>
+        {
+            return Resources.FindObjectsOfTypeAll<InteractablePreset>()
+               .Where(preset => preset.presetName == "SyncDisk")
+               .LastOrDefault();
+        });
+
         private SyncDisk(bool createPresetInstance = true)
         {
             // Assign a new sync disk preset
@@ -25,6 +37,33 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public SyncDiskPreset Preset { get; private set; }
 
         /// <summary>
+        /// The effects in the correct order (effect 1, 2, 3)
+        /// <br>Note if this sync disk has only one effect, the array will be also of length 1</br>
+        /// </summary>
+        public SyncDisks.Effect[] Effects => new[]
+        {
+            new SyncDisks.Effect((int)Preset.mainEffect1, Preset.mainEffect1Name),
+            new SyncDisks.Effect((int)Preset.mainEffect2, Preset.mainEffect2Name),
+            new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
+        }
+        .Where(a => a.Id != 0)
+        .ToArray();
+
+        private SyncDisks.Effect? _sideEffect;
+        /// <summary>
+        /// The unique side effect of the sync disk if there is one.
+        /// </summary>
+        public SyncDisks.Effect? SideEffect
+        {
+            get
+            {
+                if (_sideEffect == null && Preset.sideEffect != 0)
+                    _sideEffect ??= new SyncDisks.Effect((int)Preset.sideEffect, Preset.sideEffectDescription);
+                return _sideEffect;
+            }
+        }
+
+        /// <summary>
         /// Registers the sync disk so that it can be used in-game.
         /// <br>Has optional registration options that allow you to define exactly how it can be used in game.</br>
         /// </summary>
@@ -36,9 +75,17 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             // No options: default options
             registrationOptions ??= new RegistrationOptions();
 
-            // TODO: Configure options
+            // Configure options
+            Preset.canBeSideJobReward = registrationOptions.CanBeSideJobReward;
 
-            // Add to game so it can be used as sync disk
+            // Register the effect ids in SOD.Common so other mods can also be aware of it, if needed.
+            foreach (var effect in Effects)
+                SyncDisks.RegisteredEffects.Add(effect);
+            if (SideEffect != null)
+                SyncDisks.RegisteredEffects.Add(SideEffect.Value);
+
+            // Add to game so it can be used as sync disk, set also sync disk number to the latest
+            Preset.syncDiskNumber = Toolbox.Instance.allSyncDisks.Count + 1;
             Toolbox.Instance.allSyncDisks.Add(Preset);
         }
 
@@ -53,8 +100,41 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             var syncDisk = new SyncDisk();
             syncDisk.Preset.name = $"syncdiskpreset_{builder.Name}";
             syncDisk.Preset.presetName = builder.Name;
+            syncDisk.Preset.price = builder.Price;
+            syncDisk.Preset.rarity = builder.Rarity;
+            syncDisk.Preset.manufacturer = builder.Manufacturer;
+            syncDisk.Preset.interactable = SyncDiskInteractablePreset.Value;
 
-            // TODO: Set custom properties based on the builder properties
+            for (int i=0; i < builder.Effects.Count; i++)
+            {
+                var effect = builder.Effects[i];
+                if (i == 0)
+                {
+                    syncDisk.Preset.mainEffect1 = effect.EffectValue;
+                    syncDisk.Preset.mainEffect1Name = effect.Name;
+                    syncDisk.Preset.mainEffect1Description = effect.Description;
+                }
+                else if (i == 1)
+                {
+                    syncDisk.Preset.mainEffect2 = effect.EffectValue;
+                    syncDisk.Preset.mainEffect2Name = effect.Name;
+                    syncDisk.Preset.mainEffect2Description = effect.Description;
+                }
+                else
+                {
+                    syncDisk.Preset.mainEffect3 = effect.EffectValue;
+                    syncDisk.Preset.mainEffect3Name = effect.Name;
+                    syncDisk.Preset.mainEffect3Description = effect.Description;
+                }
+            }
+
+            if (builder.SideEffect != null)
+            {
+                syncDisk.Preset.sideEffect = builder.SideEffect.EffectValue;
+                syncDisk.Preset.sideEffectDescription = builder.SideEffect.Description;
+                syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, builder.SideEffect.Name);
+            }
+
             return syncDisk;
         }
 

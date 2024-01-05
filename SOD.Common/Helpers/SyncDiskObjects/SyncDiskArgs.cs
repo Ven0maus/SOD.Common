@@ -5,20 +5,38 @@ namespace SOD.Common.Helpers.SyncDiskObjects
     public abstract class SyncDiskArgs : EventArgs
     {
         /// <summary>
-        /// This is considered the game's sync disk object that was installed/upgraded/uninstalled,
-        /// <br>This contains all the properties, it is prefered to use <see cref="SyncDisk"/> property instead as it is more streamlined.</br>
+        /// This is considered the change applied to the sync disk object that was installed/upgraded/uninstalled
         /// </summary>
-        public UpgradesController.Upgrades GameSyncDisk { get; }
+        public UpgradesController.Upgrades SyncDiskChange { get; }
 
         /// <summary>
         /// The sync disk wrapper related to this event.
         /// </summary>
         public SyncDisk SyncDisk { get; }
 
+        /// <summary>
+        /// The effect of the sync disk related to this event.
+        /// <br>This will be one of the 3 main effects.</br>
+        /// </summary>
+        public SyncDisks.Effect? Effect { get; }
+
         internal SyncDiskArgs(UpgradesController.Upgrades upgrades)
         {
-            GameSyncDisk = upgrades;
+            SyncDiskChange = upgrades;
             SyncDisk = SyncDisk.ConvertFrom(upgrades.preset);
+
+            // Set the effect properly
+            var option = (int)upgrades.state;
+            if (option == 0)
+            {
+                Effect = null;
+            }
+            else
+            {
+                var realOptionArrayId = option - 1;
+                if (SyncDisk.Effects.Length > realOptionArrayId)
+                    Effect = SyncDisk.Effects[realOptionArrayId];
+            }
         }
     }
 
