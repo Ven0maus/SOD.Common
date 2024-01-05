@@ -33,8 +33,13 @@ namespace SOD.Common
         public static Interaction Interaction { get; } = new Interaction();
 
         /// <summary>
-        /// Contains helper methods regarding sync disks
+        /// Contains helper methods regarding sync disks.
         /// </summary>
         public static SyncDisks SyncDisks { get; } = new SyncDisks();
+
+        /// <summary>
+        /// Contains helper methods and indexers regarding in-game DdsStrings.
+        /// </summary>
+        public static DdsStrings DdsStrings { get; } = new DdsStrings();
     }
 }

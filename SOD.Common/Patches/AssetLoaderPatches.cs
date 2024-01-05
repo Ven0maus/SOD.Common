@@ -21,14 +21,44 @@ namespace SOD.Common.Patches
                 if (_loaded) return;
                 _loaded = true;
 
+                LoadDDSEntries();
+
                 // Insert all the registered sync disk presets
                 foreach (var preset in Lib.SyncDisks.RegisteredSyncDisks.Select(a => a.Preset))
                 {
                     // Set the interactable and add it to the game
                     preset.interactable = SyncDisk.SyncDiskInteractablePreset.Value;
 
+                    Plugin.Log.LogInfo("Added sync disk: " + preset.name);
+
                     // Also include it in the asset loader
                     __result.Add(preset);
+                }
+            }
+
+            /// <summary>
+            /// Add's any custom dds entries into the game
+            /// </summary>
+            private static void LoadDDSEntries()
+            {
+                // Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
+                const string syncDiskDds = "evidence.syncdisks";
+                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
+                {
+                    Lib.DdsStrings[syncDiskDds, syncDisk.Preset.name] = syncDisk.Name;
+                    for (int i = 0; i < syncDisk.Effects.Length; i++)
+                    {
+                        var name = i == 0 ? syncDisk.Preset.mainEffect1Name : i == 1 ? syncDisk.Preset.mainEffect2Name : syncDisk.Preset.mainEffect3Name;
+                        var description = i == 0 ? syncDisk.Preset.mainEffect1Description : i == 1 ? syncDisk.Preset.mainEffect2Description : syncDisk.Preset.mainEffect3Description;
+
+                        // Add the dds entries
+                        Lib.DdsStrings.AddOrUpdateEntries(syncDiskDds,
+                            (name, name["custom_".Length..]),
+                            (description, description["custom_".Length..]));
+                    }
+
+                    if (syncDisk.SideEffect != null)
+                        Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
                 }
             }
         }
@@ -44,23 +74,8 @@ namespace SOD.Common.Patches
                 if (_loaded) return;
                 _loaded = true;
 
-
-                LoadDDSEntries();
-
                 // Load Sync disks into menu presets if applicable
                 AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.MenuPresetLocations.Count > 0));
-            }
-
-            /// <summary>
-            /// Add's any custom dds entries into the game
-            /// </summary>
-            private static void LoadDDSEntries()
-            {
-                // Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
-                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
-                {
-                    // TODO: use dds strings helper to insert content
-                }
             }
 
             /// <summary>

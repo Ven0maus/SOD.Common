@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
@@ -55,7 +56,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <summary>
         /// The sync disk's name.
         /// </summary>
-        public string Name => Preset.presetName;
+        public string Name { get; private set; }
 
         /// <summary>
         /// The sync disk's price.
@@ -83,6 +84,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
         }
         .Where(a => a.Id != 0)
+        .Select(a => new SyncDisks.Effect(a.Id, a.Name["custom_".Length..]))
         .ToArray();
 
         private SyncDisks.Effect? _sideEffect;
@@ -94,7 +96,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             get
             {
                 if (_sideEffect == null && Preset.sideEffect != 0)
-                    _sideEffect ??= new SyncDisks.Effect((int)Preset.sideEffect, Preset.sideEffectDescription);
+                    _sideEffect ??= new SyncDisks.Effect((int)Preset.sideEffect, Preset.sideEffectDescription["custom_".Length..]);
                 return _sideEffect;
             }
         }
@@ -124,8 +126,9 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         {
             // Set basic properties
             var syncDisk = new SyncDisk();
-            syncDisk.Preset.name = $"syncdiskpreset_{builder.Name}";
-            syncDisk.Preset.presetName = builder.Name;
+            syncDisk.Preset.name = $"custom_{builder.Name}";
+            syncDisk.Preset.presetName = syncDisk.Preset.name;
+            syncDisk.Name = builder.Name;
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
             syncDisk.Preset.manufacturer = builder.Manufacturer;
@@ -138,28 +141,28 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 if (i == 0)
                 {
                     syncDisk.Preset.mainEffect1 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect1Name = effect.Name;
-                    syncDisk.Preset.mainEffect1Description = effect.Description;
+                    syncDisk.Preset.mainEffect1Name = $"custom_{effect.Name}";
+                    syncDisk.Preset.mainEffect1Description = $"custom_{effect.Description}";
                 }
                 else if (i == 1)
                 {
                     syncDisk.Preset.mainEffect2 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect2Name = effect.Name;
-                    syncDisk.Preset.mainEffect2Description = effect.Description;
+                    syncDisk.Preset.mainEffect2Name = $"custom_{effect.Name}";
+                    syncDisk.Preset.mainEffect2Description = $"custom_{effect.Description}";
                 }
                 else
                 {
                     syncDisk.Preset.mainEffect3 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect3Name = effect.Name;
-                    syncDisk.Preset.mainEffect3Description = effect.Description;
+                    syncDisk.Preset.mainEffect3Name = $"custom_{effect.Name}";
+                    syncDisk.Preset.mainEffect3Description = $"custom_{effect.Description}";
                 }
             }
 
             if (builder.SideEffect != null)
             {
                 syncDisk.Preset.sideEffect = builder.SideEffect.EffectValue;
-                syncDisk.Preset.sideEffectDescription = builder.SideEffect.Description;
-                syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, builder.SideEffect.Name);
+                syncDisk.Preset.sideEffectDescription = $"custom_{builder.SideEffect.Description}";
+                syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, builder.SideEffect.Description);
             }
 
             return syncDisk;
@@ -172,7 +175,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <returns></returns>
         internal static SyncDisk ConvertFrom(SyncDiskPreset preset)
         {
-            return new SyncDisk(false) { Preset = preset };
+            return new SyncDisk(false) { Name = preset.name, Preset = preset };
         }
     }
 }
