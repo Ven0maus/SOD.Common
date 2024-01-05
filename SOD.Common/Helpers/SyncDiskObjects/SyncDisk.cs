@@ -14,9 +14,14 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// </summary>
         internal static Lazy<InteractablePreset> SyncDiskInteractablePreset = new(() =>
         {
-            return Resources.FindObjectsOfTypeAll<InteractablePreset>()
+            var syncDisk = Resources.FindObjectsOfTypeAll<InteractablePreset>()
                .Where(preset => preset.presetName == "SyncDisk")
                .LastOrDefault();
+#pragma warning disable IDE0029 // Use coalesce expression
+            return syncDisk == null
+                ? throw new Exception("Could not find sync disk interactable, did something change in this game version?")
+                : syncDisk;
+#pragma warning restore IDE0029 // Use coalesce expression
         });
 
         private SyncDisk(bool createPresetInstance = true)
