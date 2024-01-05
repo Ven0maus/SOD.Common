@@ -116,7 +116,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// </summary>
         /// <param name="saleLocations"></param>
         /// <returns></returns>
-        public SyncDiskBuilder AddSaleLocation(params RegistrationOptions.SyncDiskSaleLocation[] saleLocations)
+        public SyncDiskBuilder AddSaleLocation(params SyncDiskSaleLocation[] saleLocations)
         {
             foreach (var saleLocation in saleLocations.Select(a => a.ToString()))
                 MenuPresetLocations.Add(saleLocation);
@@ -171,6 +171,36 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 Name = name;
                 Description = description;
             }
+        }
+
+        public enum SyncDiskSaleLocation
+        {
+            CigaretteMachine,
+            AmericanDiner,
+            SupermarketFridge,
+            CoffeeMachine,
+            BlackmarketSyncClinic,
+            StreetVendorSnacks,
+            ElGenMachine,
+            PawnShop,
+            KolaMachine,
+            SupermarketMagazines,
+            AmericanBar,
+            SupermarketFruit,
+            Chinese,
+            Newsstand,
+            Supermarket,
+            Chemist,
+            Hardware,
+            SupermarketDrinksCooler,
+            SupermarketShelf,
+            PoliceAutomat,
+            SupermarketFreezer,
+            HomeCoffee,
+            NewspaperBox,
+            BlackmarketTrader,
+            WeaponsDealer,
+            SyncClinic,
         }
     }
 }
