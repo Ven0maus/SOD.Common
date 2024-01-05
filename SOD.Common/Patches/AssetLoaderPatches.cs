@@ -49,6 +49,17 @@ namespace SOD.Common.Patches
             }
 
             /// <summary>
+            /// Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
+            /// </summary>
+            private static void LoadDDSEntries()
+            {
+                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
+                {
+                    // TODO: use dds strings helper to insert content
+                }
+            }
+
+            /// <summary>
             /// Potentially adds sync disk presets to menu presets if they need to be there based on the registration options
             /// </summary>
             /// <param name="syncDisk"></param>
