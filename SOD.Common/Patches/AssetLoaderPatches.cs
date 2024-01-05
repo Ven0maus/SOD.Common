@@ -1,5 +1,4 @@
-﻿using BepInEx.Logging;
-using HarmonyLib;
+﻿using HarmonyLib;
 using SOD.Common.Helpers;
 using SOD.Common.Helpers.SyncDiskObjects;
 using System;
@@ -38,11 +37,7 @@ namespace SOD.Common.Patches
                 if (_loaded) return;
                 _loaded = true;
 
-                // Load all the data into the game properly
-
-
-
-                // Sync disks
+                // Load Sync disks into menu presets if applicable
                 AddToMenuPresets(SyncDisks.RegisteredSyncDisks.Where(a => a.RegistrationOptions.SaleLocations.Count > 0));
             }
 
