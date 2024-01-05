@@ -127,7 +127,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// Add's locations where the sync disk can be retrieved from.
         /// <br>These are all menu locations.</br>
         /// <br>This method is a string variant, which takes the menu presetName.</br>
-        /// <br>It exists to set location for a custom menu presets.</br>
+        /// <br>It exists to set location for custom menu presets.</br>
         /// </summary>
         /// <param name="saleLocations"></param>
         /// <returns></returns>
