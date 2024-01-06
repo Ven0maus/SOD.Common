@@ -4,6 +4,8 @@ namespace SOD.Common.Helpers
 {
     public sealed class DdsStrings
     {
+        internal DdsStrings() { }
+
         /// <summary>
         /// Indexer to retrieve a dds entry.
         /// </summary>
@@ -75,8 +77,6 @@ namespace SOD.Common.Helpers
                 Plugin.Log.LogInfo($"Set: \"{dictionaryLower}\" | \"{keyLower}\" |-> \"{value}\"");
             }
         }
-
-        internal DdsStrings() { }
 
         /// <summary>
         /// Add's or updates a value in the dds entries.
