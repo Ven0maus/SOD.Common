@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using SOD.Common.Helpers;
 using SOD.Common.Helpers.SyncDiskObjects;
 using System;
 using System.Collections.Generic;
@@ -73,7 +72,10 @@ namespace SOD.Common.Patches
                 const string syncDiskDds = "evidence.syncdisks";
                 foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
                 {
+                    // Add dds entry for sync disk name
                     Lib.DdsStrings[syncDiskDds, syncDisk.Preset.name] = syncDisk.Name;
+
+                    // Add dds entries for effects
                     for (int i = 0; i < syncDisk.Effects.Length; i++)
                     {
                         var name = i == 0 ? syncDisk.Preset.mainEffect1Name : i == 1 ? syncDisk.Preset.mainEffect2Name : syncDisk.Preset.mainEffect3Name;
@@ -85,6 +87,17 @@ namespace SOD.Common.Patches
                             (description, description["custom_".Length..]));
                     }
 
+                    // Add dds entries for upgrades
+                    for (int i=0; i < syncDisk.UpgradeOptions.Length; i++)
+                    {
+                        var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
+
+                        // Add the dds entries
+                        for (int y=0; y < nameReferences.Count; y++)
+                            Lib.DdsStrings[syncDiskDds, nameReferences[y]] = nameReferences[y]["custom_".Length..];
+                    }
+
+                    // Add dds entry for side effect
                     if (syncDisk.SideEffect != null)
                         Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
                 }

@@ -84,7 +84,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
         }
         .Where(a => a.Id != 0)
-        .Select(a => new SyncDisks.Effect(a.Id, a.Name["custom_".Length..]))
+        .Select(a => new SyncDisks.Effect(a.Id, a.Name.StartsWith("custom_") ? a.Name["custom_".Length..] : a.Name))
         .ToArray();
 
         private SyncDisks.Effect? _sideEffect;
@@ -100,6 +100,20 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 return _sideEffect;
             }
         }
+
+        /// <summary>
+        /// The upgrade options in the correct order (effect 1, 2, 3)
+        /// <br>Note if this sync disk has only one effect, the array will be also of length 1</br>
+        /// </summary>
+        public SyncDisks.UpgradeOption[] UpgradeOptions => new[]
+        {
+            new SyncDisks.UpgradeOption(new SyncDiskBuilder.Options(Preset, 1)),
+            new SyncDisks.UpgradeOption(new SyncDiskBuilder.Options(Preset, 2)),
+            new SyncDisks.UpgradeOption(new SyncDiskBuilder.Options(Preset, 3))
+        }
+        .Where(a => a.HasOptions)
+        .Select(a => new SyncDisks.UpgradeOption(a.Options, true))
+        .ToArray();
 
         internal HashSet<string> MenuPresetLocations { get; set; }
         internal string[] Icons;
@@ -134,7 +148,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.manufacturer = builder.Manufacturer;
             syncDisk.Preset.canBeSideJobReward = builder.CanBeSideJobReward;
             syncDisk.MenuPresetLocations = builder.MenuPresetLocations;
-
+            
+            // Add effects
             syncDisk.Icons = new string[builder.Effects.Count];
             for (int i=0; i < builder.Effects.Count; i++)
             {
@@ -161,11 +176,36 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 }
             }
 
+            // Add side effect
             if (builder.SideEffect != null)
             {
                 syncDisk.Preset.sideEffect = builder.SideEffect.EffectValue;
                 syncDisk.Preset.sideEffectDescription = $"custom_{builder.SideEffect.Description}";
                 syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, builder.SideEffect.Description);
+            }
+
+            // Add upgrade options
+            for (int i=0; i < builder.UpgradeOptions.Count; i++)
+            {
+                var options = builder.UpgradeOptions[i];
+                var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
+                var upgradeEffects = i == 0 ? syncDisk.Preset.option1UpgradeEffects : i == 1 ? syncDisk.Preset.option2UpgradeEffects : syncDisk.Preset.option3UpgradeEffects;
+
+                if (!string.IsNullOrWhiteSpace(options.Option1))
+                {
+                    nameReferences.Add($"custom_{options.Option1}");
+                    upgradeEffects.Add(options.Option1Effect);
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option2))
+                {
+                    nameReferences.Add($"custom_{options.Option2}");
+                    upgradeEffects.Add(options.Option2Effect);
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option3))
+                {
+                    nameReferences.Add($"custom_{options.Option3}");
+                    upgradeEffects.Add(options.Option3Effect);
+                }
             }
 
             return syncDisk;

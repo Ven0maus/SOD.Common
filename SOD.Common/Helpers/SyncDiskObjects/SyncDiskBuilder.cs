@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
 {
@@ -12,6 +13,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal SyncDiskPreset.Manufacturer Manufacturer { get; private set; }
         internal List<Effect> Effects { get; private set; }
         internal Effect SideEffect { get; private set; }
+        internal List<Options> UpgradeOptions { get; private set; }
         internal HashSet<string> MenuPresetLocations { get; private set; }
         internal bool CanBeSideJobReward { get; private set; }
 
@@ -19,6 +21,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         {
             Name = syncDiskName;
             Effects = new List<Effect>(3);
+            UpgradeOptions = new List<Options>(3);
             MenuPresetLocations = new HashSet<string>();
         }
 
@@ -72,14 +75,13 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <summary>
         /// Add's a new custom effect to the sync disk, this method can be called up to a max of 3 times.
         /// <br>Setting effect 1, 2, 3</br>
-        /// <br>The <paramref name="uniqueEffectId"/> is id, that the SyncDisk events will return on install/uninstall/upgrade.</br>
+        /// <br>The <paramref name="uniqueEffectId"/> is the id, that the SyncDisk events will return on install/uninstall/upgrade.</br>
         /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
         /// <param name="uniqueEffectId"></param>
         /// <param name="iconSpriteName">A valid sprite name to be used from the game.</param>
         /// <returns></returns>
-        /// <exception cref="Exception"></exception>
         public SyncDiskBuilder AddEffect(string name, string description, out int uniqueEffectId, string iconSpriteName = null)
         {
             if (Effects.Count == 3)
@@ -96,7 +98,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
 
         /// <summary>
         /// (Optional) Add's a side effect to the sync disk, this method can only be called once.
-        /// <br>The <paramref name="uniqueSideEffectId"/> is id, that the SyncDisk events will return on install/uninstall/upgrade.</br>
+        /// <br>The <paramref name="uniqueSideEffectId"/> is the id, that the SyncDisk events will return on install/uninstall/upgrade.</br>
         /// </summary>
         /// <param name="name"></param>
         /// <param name="description"></param>
@@ -112,6 +114,28 @@ namespace SOD.Common.Helpers.SyncDiskObjects
 
             // Create and store the side effect
             SideEffect = new Effect(uniqueSideEffectId, name, description, null);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Add's a new custom upgrade option to the sync disk, this method can be called up to a max of 3 times.
+        /// <br>Setting upgrade options for effect 1, 2, 3</br>
+        /// <br>The <paramref name="uniqueOptionIds"/> are the ids, that the SyncDisk events will return on install/uninstall/upgrade.</br>
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="uniqueOptionIds"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder AddUpgradeOption(Options options, out OptionIds uniqueOptionIds)
+        {
+            if (UpgradeOptions.Count == 3)
+                throw new Exception("This sync disk already contains 3 upgrade options.");
+
+            // Get a new unique effect id that can be used by mods
+            uniqueOptionIds = new OptionIds(options);
+
+            // Create and store the effect
+            UpgradeOptions.Add(options);
 
             return this;
         }
@@ -180,6 +204,62 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 Name = name;
                 Description = description;
                 Icon = !string.IsNullOrWhiteSpace(icon) ? icon : DefaultSprite;
+            }
+        }
+
+        public struct Options
+        {
+            public readonly string Option1, Option2, Option3;
+            internal SyncDiskPreset.UpgradeEffect Option1Effect, Option2Effect, Option3Effect;
+
+            internal Options(SyncDiskPreset preset, int count)
+            {
+                var nameReferences = count == 1 ? preset.option1UpgradeNameReferences : count == 2 ? preset.option2UpgradeNameReferences : preset.option3UpgradeNameReferences;
+                var effects = count == 1 ? preset.option1UpgradeEffects : count == 2 ? preset.option2UpgradeEffects : preset.option3UpgradeEffects;
+
+                if (nameReferences.Count >= 1)
+                {
+                    Option1 = nameReferences[0];
+                    Option1Effect = effects[0];
+                }
+                if (nameReferences.Count >= 2)
+                {
+                    Option2 = nameReferences[1];
+                    Option2Effect = effects[1];
+                }
+                if (nameReferences.Count == 3)
+                {
+                    Option3 = nameReferences[2];
+                    Option3Effect = effects[2];
+                }
+            }
+
+            public Options(string option1) { Option1 = option1; }
+            public Options(string option1, string option2) : this(option1) { Option2 = option2; }
+            public Options(string option1, string option2, string option3) : this(option1, option2) { Option3 = option3; }
+        }
+
+        public readonly struct OptionIds
+        {
+            public readonly int Option1Id, Option2Id, Option3Id;
+
+            internal OptionIds(Options options)
+            {
+                if (!string.IsNullOrWhiteSpace(options.Option1))
+                {
+                    Option1Id = SyncDisks.GetNewSyncDiskOptionId();
+                    options.Option1Effect = (SyncDiskPreset.UpgradeEffect)Option1Id;
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option2))
+                {
+                    Option2Id = SyncDisks.GetNewSyncDiskOptionId();
+                    options.Option2Effect = (SyncDiskPreset.UpgradeEffect)Option2Id;
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option3))
+                {
+                    Option3Id = SyncDisks.GetNewSyncDiskOptionId();
+                    options.Option3Effect = (SyncDiskPreset.UpgradeEffect)Option3Id;
+                }
             }
         }
 

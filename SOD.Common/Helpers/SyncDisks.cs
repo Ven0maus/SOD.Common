@@ -27,6 +27,24 @@ namespace SOD.Common.Helpers
             return _currentSyncDiskEffectId.Value;
         }
 
+        private static int? _currentSyncDiskOptionId = null;
+        /// <summary>
+        /// Adds a new number at the end of the available upgrade options,
+        /// <br>This should automatically increase if the game adds new options.</br>
+        /// <br>All mods will then always get the right option ids.</br>
+        /// </summary>
+        /// <returns></returns>
+        internal static int GetNewSyncDiskOptionId()
+        {
+            if (_currentSyncDiskOptionId == null)
+            {
+                int[] values = (int[])Enum.GetValues(typeof(SyncDiskPreset.UpgradeEffect));
+                _currentSyncDiskOptionId = values.DefaultIfEmpty().Max();
+            }
+            _currentSyncDiskOptionId++;
+            return _currentSyncDiskOptionId.Value;
+        }
+
         /// <summary>
         /// All the registered sync disks in the game by mods.
         /// </summary>
@@ -142,6 +160,60 @@ namespace SOD.Common.Helpers
             public override int GetHashCode()
             {
                 return Id.GetHashCode();
+            }
+        }
+
+        public readonly struct UpgradeOption : IEquatable<UpgradeOption>
+        {
+            public readonly int Id1, Id2, Id3;
+            public readonly string Name1, Name2, Name3;
+
+            internal readonly bool HasOptions => !string.IsNullOrWhiteSpace(Name1) || !string.IsNullOrWhiteSpace(Name2) || !string.IsNullOrWhiteSpace(Name3);
+            internal readonly SyncDiskBuilder.Options Options;
+
+            public UpgradeOption(SyncDiskBuilder.Options options, bool stripCustom = false)
+            {
+                Options = options;
+                if (!string.IsNullOrWhiteSpace(options.Option1))
+                {
+                    Id1 = (int)options.Option1Effect;
+                    Name1 = stripCustom && options.Option1.StartsWith("custom_") ? options.Option1["custom_".Length..] : options.Option1;
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option2))
+                {
+                    Id2 = (int)options.Option2Effect;
+                    Name2 = stripCustom && options.Option2.StartsWith("custom_") ? options.Option2["custom_".Length..] : options.Option2;
+                }
+                if (!string.IsNullOrWhiteSpace(options.Option3))
+                {
+                    Id3 = (int)options.Option3Effect;
+                    Name3 = stripCustom && options.Option3.StartsWith("custom_") ? options.Option3["custom_".Length..] : options.Option3;
+                }
+            }
+
+            public bool Equals(UpgradeOption other)
+            {
+                return Id1 == other.Id1 && Id2 == other.Id2 && Id3 == other.Id3;
+            }
+
+            public override bool Equals(object obj)
+            {
+                return obj is UpgradeOption effect && Equals(effect);
+            }
+
+            public static bool operator ==(UpgradeOption left, UpgradeOption right)
+            {
+                return left.Equals(right);
+            }
+
+            public static bool operator !=(UpgradeOption left, UpgradeOption right)
+            {
+                return !(left == right);
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Id1, Id2, Id3);
             }
         }
     }
