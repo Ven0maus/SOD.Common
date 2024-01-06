@@ -12,3 +12,4 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Helpers.SaveGame.GetUniqueString(System.String)~System.String")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Helpers.Time.ResumeGame")]
 [assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Helpers.Time.PauseGame(System.Boolean,System.Boolean,System.Boolean)")]
+[assembly: SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "<Pending>", Scope = "member", Target = "~M:SOD.Common.Helpers.SyncDisks.Builder(System.String)~SOD.Common.Helpers.SyncDiskObjects.SyncDiskBuilder")]

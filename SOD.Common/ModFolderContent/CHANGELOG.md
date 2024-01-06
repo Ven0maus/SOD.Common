@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.1.5**
+- Added DdsStrings helper to add DDS strings directly in the game.
+- Added SyncDisk helper class to very easily create new sync disks and hook events
+
 **1.1.4**
 - Fixed null reference errors regarding interaction helpers
 - Fixed time not re-initializing when triggering a new game from an ongoing game
