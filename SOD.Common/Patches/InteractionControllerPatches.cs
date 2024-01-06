@@ -47,7 +47,7 @@ namespace SOD.Common.Patches
         [HarmonyPatch(
             typeof(Interactable),
             nameof(Interactable.OnInteraction),
-            new[] 
+            new[]
             {
                 typeof(InteractablePreset.InteractionAction),
                 typeof(Actor),
