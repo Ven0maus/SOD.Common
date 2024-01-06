@@ -24,17 +24,44 @@ namespace SOD.Common.Patches
 
                 LoadDDSEntries();
 
+                var sprites = Lib.SyncDisks.RegisteredSyncDisks
+                    .SelectMany(a => a.Icons)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                var gameSprites = Resources.FindObjectsOfTypeAll<Sprite>()
+                    .Where(a => sprites.Contains(a.name))
+                    .GroupBy(a => a.name)
+                    .ToDictionary(a => a.Key, a => a.First());
+
                 // Insert all the registered sync disk presets
-                foreach (var preset in Lib.SyncDisks.RegisteredSyncDisks.Select(a => a.Preset))
+                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
                 {
+                    var preset = syncDisk.Preset;
                     _createdSyncDiskPresets.Add(preset);
 
                     // Set the interactable and add it to the game
                     preset.interactable = SyncDisk.SyncDiskInteractablePreset.Value;
 
+                    // Set icons
+                    if (preset.mainEffect1 != SyncDiskPreset.Effect.none)
+                        preset.mainEffect1Icon = GetSprite(gameSprites, syncDisk.Icons[0]);
+                    if (preset.mainEffect2 != SyncDiskPreset.Effect.none)
+                        preset.mainEffect2Icon = GetSprite(gameSprites, syncDisk.Icons[1]);
+                    if (preset.mainEffect3 != SyncDiskPreset.Effect.none)
+                        preset.mainEffect3Icon = GetSprite(gameSprites, syncDisk.Icons[2]);
+
                     // Also include it in the asset loader
                     __result.Add(preset);
                 }
+
+                // Clear out memory usage for icons as its no longer used
+                Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.Icons = null);
+            }
+
+            private static Sprite GetSprite(Dictionary<string, Sprite> gameSprites, string spriteName)
+            {
+                if (!gameSprites.TryGetValue(spriteName, out var sprite))
+                    Plugin.Log.LogError($"Could not find sprite with name \"{spriteName}\", falling back to default dna sprite.");
+                return sprite ?? gameSprites[SyncDiskBuilder.Effect.DefaultSprite];
             }
 
             /// <summary>
@@ -79,7 +106,7 @@ namespace SOD.Common.Patches
                 var total = Toolbox.Instance.allSyncDisks.Count;
                 foreach (var loadedPreset in _createdSyncDiskPresets)
                 {
-                    loadedPreset.syncDiskNumber = ++total;
+                    loadedPreset.syncDiskNumber = total++;
                 }
                 _createdSyncDiskPresets = null;
 

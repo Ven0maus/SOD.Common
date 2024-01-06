@@ -68,13 +68,19 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             return this;
         }
 
+
         /// <summary>
         /// Add's a new custom effect to the sync disk, this method can be called up to a max of 3 times.
         /// <br>Setting effect 1, 2, 3</br>
         /// <br>The <paramref name="uniqueEffectId"/> is id, that the SyncDisk events will return on install/uninstall/upgrade.</br>
         /// </summary>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="uniqueEffectId"></param>
+        /// <param name="iconSpriteName">A valid sprite name to be used from the game.</param>
         /// <returns></returns>
-        public SyncDiskBuilder AddEffect(string name, string description, out int uniqueEffectId)
+        /// <exception cref="Exception"></exception>
+        public SyncDiskBuilder AddEffect(string name, string description, out int uniqueEffectId, string iconSpriteName = null)
         {
             if (Effects.Count == 3)
                 throw new Exception("This sync disk already contains 3 effects.");
@@ -83,7 +89,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             uniqueEffectId = SyncDisks.GetNewSyncDiskEffectId();
 
             // Create and store the effect
-            Effects.Add(new Effect(uniqueEffectId, name, description));
+            Effects.Add(new Effect(uniqueEffectId, name, description, iconSpriteName));
 
             return this;
         }
@@ -105,7 +111,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             uniqueSideEffectId = SyncDisks.GetNewSyncDiskEffectId();
 
             // Create and store the side effect
-            SideEffect = new Effect(uniqueSideEffectId, name, description);
+            SideEffect = new Effect(uniqueSideEffectId, name, description, null);
 
             return this;
         }
@@ -163,13 +169,17 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         {
             public string Name { get; }
             public string Description { get; }
+            public string Icon { get; }
             public SyncDiskPreset.Effect EffectValue { get; }
 
-            internal Effect(int id, string name, string description)
+            internal const string DefaultSprite = "IconDNA";
+
+            internal Effect(int id, string name, string description, string icon)
             {
                 EffectValue = (SyncDiskPreset.Effect)id;
                 Name = name;
                 Description = description;
+                Icon = !string.IsNullOrWhiteSpace(icon) ? icon : DefaultSprite;
             }
         }
 

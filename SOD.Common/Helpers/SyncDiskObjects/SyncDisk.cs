@@ -102,6 +102,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         }
 
         internal HashSet<string> MenuPresetLocations { get; set; }
+        internal string[] Icons;
 
         /// <summary>
         /// Registers the sync disk so that it can be used in-game.
@@ -134,9 +135,12 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.canBeSideJobReward = builder.CanBeSideJobReward;
             syncDisk.MenuPresetLocations = builder.MenuPresetLocations;
 
+            syncDisk.Icons = new string[builder.Effects.Count];
             for (int i=0; i < builder.Effects.Count; i++)
             {
                 var effect = builder.Effects[i];
+                syncDisk.Icons[i] = effect.Icon;
+
                 if (i == 0)
                 {
                     syncDisk.Preset.mainEffect1 = effect.EffectValue;
