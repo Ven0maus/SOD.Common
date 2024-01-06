@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
@@ -57,6 +56,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// The sync disk's name.
         /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// The sync disk's number.
+        /// </summary>
+        public int Number => Preset.syncDiskNumber;
 
         /// <summary>
         /// The sync disk's price.
@@ -190,21 +194,25 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 var options = builder.UpgradeOptions[i];
                 var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
                 var upgradeEffects = i == 0 ? syncDisk.Preset.option1UpgradeEffects : i == 1 ? syncDisk.Preset.option2UpgradeEffects : syncDisk.Preset.option3UpgradeEffects;
+                var upgradeValues = i == 0 ? syncDisk.Preset.option1UpgradeValues : i == 1 ? syncDisk.Preset.option2UpgradeValues : syncDisk.Preset.option3UpgradeValues;
 
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {
                     nameReferences.Add($"custom_{options.Option1}");
                     upgradeEffects.Add(options.Option1Effect);
+                    upgradeValues.Add(0f);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option2))
                 {
                     nameReferences.Add($"custom_{options.Option2}");
                     upgradeEffects.Add(options.Option2Effect);
+                    upgradeValues.Add(0f);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option3))
                 {
                     nameReferences.Add($"custom_{options.Option3}");
                     upgradeEffects.Add(options.Option3Effect);
+                    upgradeValues.Add(0f);
                 }
             }
 

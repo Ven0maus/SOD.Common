@@ -73,8 +73,6 @@ namespace SOD.Common.Helpers
                     dict.Add(keyLower, new Strings.DisplayString { displayStr = value });
                     Strings.stringTable.Add(dictionaryLower, dict);
                 }
-
-                Plugin.Log.LogInfo($"Set: \"{dictionaryLower}\" | \"{keyLower}\" |-> \"{value}\"");
             }
         }
 

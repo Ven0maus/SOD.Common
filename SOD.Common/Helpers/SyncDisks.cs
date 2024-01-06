@@ -58,19 +58,19 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// Raised before a new sync disk is installed on the player.
         /// </summary>
-        public event EventHandler<SyncDiskInstallUpgradeArgs> OnBeforeSyncDiskInstalled;
+        public event EventHandler<SyncDiskArgs> OnBeforeSyncDiskInstalled;
         /// <summary>
         /// Raised after a new sync disk is installed on the player.
         /// </summary>
-        public event EventHandler<SyncDiskInstallUpgradeArgs> OnAfterSyncDiskInstalled;
+        public event EventHandler<SyncDiskArgs> OnAfterSyncDiskInstalled;
         /// <summary>
         /// Raised before an existing sync disk is upgraded on the player.
         /// </summary>
-        public event EventHandler<SyncDiskInstallUpgradeArgs> OnBeforeSyncDiskUpgraded;
+        public event EventHandler<SyncDiskArgs> OnBeforeSyncDiskUpgraded;
         /// <summary>
         /// Raised after an existing sync disk is upgraded on the player.
         /// </summary>
-        public event EventHandler<SyncDiskInstallUpgradeArgs> OnAfterSyncDiskUpgraded;
+        public event EventHandler<SyncDiskArgs> OnAfterSyncDiskUpgraded;
         /// <summary>
         /// Raised before an existing sync disk is uninstalled on the player.
         /// </summary>
@@ -92,27 +92,27 @@ namespace SOD.Common.Helpers
             return new SyncDiskBuilder(syncDiskName);
         }
 
-        internal void RaiseSyncDiskEvent(SyncDiskEvent syncDiskEvent, bool after, UpgradesController.Upgrades upgrade, int? option = null)
+        internal void RaiseSyncDiskEvent(SyncDiskEvent syncDiskEvent, bool after, UpgradesController.Upgrades upgrade)
         {
             switch (syncDiskEvent)
             {
                 case SyncDiskEvent.OnInstall:
                     if (after)
-                        OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade, option));
+                        OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
                     else
-                        OnBeforeSyncDiskInstalled?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade, option));
+                        OnBeforeSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
                     break;
                 case SyncDiskEvent.OnUninstall:
                     if (after)
-                        OnAfterSyncDiskUninstalled?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade));
+                        OnAfterSyncDiskUninstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
                     else
-                        OnBeforeSyncDiskUninstalled?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade));
+                        OnBeforeSyncDiskUninstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
                     break;
                 case SyncDiskEvent.OnUpgrade:
                     if (after)
-                        OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade));
+                        OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(upgrade));
                     else
-                        OnBeforeSyncDiskUpgraded?.Invoke(this, new SyncDiskInstallUpgradeArgs(upgrade));
+                        OnBeforeSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(upgrade));
                     break;
                 default:
                     throw new NotSupportedException($"Invalid event: {syncDiskEvent}");

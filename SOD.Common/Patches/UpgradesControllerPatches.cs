@@ -9,17 +9,17 @@ namespace SOD.Common.Patches
         internal class InstallSyncDiskHook
         {
             [HarmonyPrefix]
-            internal static void Prefix(UpgradesController.Upgrades application, int option)
+            internal static void Prefix(UpgradesController.Upgrades application)
             {
                 if (application == null || application.preset == null) return;
-                Lib.SyncDisks.RaiseSyncDiskEvent(SyncDisks.SyncDiskEvent.OnInstall, false, application, option);
+                Lib.SyncDisks.RaiseSyncDiskEvent(SyncDisks.SyncDiskEvent.OnInstall, false, application);
             }
 
             [HarmonyPostfix]
-            public static void Postfix(UpgradesController.Upgrades application, int option)
+            public static void Postfix(UpgradesController.Upgrades application)
             {
                 if (application == null || application.preset == null) return;
-                Lib.SyncDisks.RaiseSyncDiskEvent(SyncDisks.SyncDiskEvent.OnInstall, true, application, option);
+                Lib.SyncDisks.RaiseSyncDiskEvent(SyncDisks.SyncDiskEvent.OnInstall, true, application);
             }
         }
 
