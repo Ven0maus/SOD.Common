@@ -23,8 +23,8 @@ namespace SOD.Common.Helpers
                     Strings.Instance.LoadTextFiles();
                 }
 
-                if (Strings.stringTable.TryGetValue(dictionary, out var table) &&
-                    table.TryGetValue(key, out var ddsString))
+                if (Strings.stringTable.TryGetValue(dictionary.ToLower(), out var table) &&
+                    table.TryGetValue(key.ToLower(), out var ddsString))
                     return ddsString.displayStr;
                 return string.Empty;
             }
@@ -38,15 +38,17 @@ namespace SOD.Common.Helpers
                     Strings.Instance.LoadTextFiles();
                 }
 
-                if (Strings.stringTable.TryGetValue(dictionary, out var table))
+                var dictionaryLower = dictionary.ToLower();
+                var keyLower = key.ToLower();
+                if (Strings.stringTable.TryGetValue(dictionaryLower, out var table))
                 {
-                    if (table.TryGetValue(key, out var ddsString))
+                    if (table.TryGetValue(keyLower, out var ddsString))
                     {
                         if (value == null)
                         {
-                            table.Remove(key);
+                            table.Remove(keyLower);
                             if (table.Count == 0)
-                                Strings.stringTable.Remove(dictionary);
+                                Strings.stringTable.Remove(dictionaryLower);
                             return;
                         }    
                         ddsString.displayStr = value;
@@ -56,21 +58,21 @@ namespace SOD.Common.Helpers
                         if (value == null)
                         {
                             if (table.Count == 0)
-                                Strings.stringTable.Remove(dictionary);
+                                Strings.stringTable.Remove(dictionaryLower);
                             return;
                         }
-                        table[dictionary] = new Strings.DisplayString() { displayStr = value };
+                        table[keyLower] = new Strings.DisplayString() { displayStr = value };
                     }
                 }
                 else
                 {
                     if (value == null) return;
                     var dict = new Il2CppSystem.Collections.Generic.Dictionary<string, Strings.DisplayString>();
-                    dict.Add(key, new Strings.DisplayString { displayStr = value });
-                    Strings.stringTable.Add(dictionary, dict);
+                    dict.Add(keyLower, new Strings.DisplayString { displayStr = value });
+                    Strings.stringTable.Add(dictionaryLower, dict);
                 }
 
-                Plugin.Log.LogInfo($"Set: \"{dictionary}\" | \"{key}\" |-> \"{value}\"");
+                Plugin.Log.LogInfo($"Set: \"{dictionaryLower}\" | \"{keyLower}\" |-> \"{value}\"");
             }
         }
 

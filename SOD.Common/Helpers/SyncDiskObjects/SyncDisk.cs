@@ -114,7 +114,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
 
             // Add to game so it can be used as sync disk, set also sync disk number to the latest
             Lib.SyncDisks.RegisteredSyncDisks.Add(this);
-            Preset.syncDiskNumber = Lib.SyncDisks.RegisteredSyncDisks.Count;
         }
 
         /// <summary>

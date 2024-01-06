@@ -10,6 +10,7 @@ namespace SOD.Common.Patches
 {
     internal class AssetLoaderPatches
     {
+        internal static List<SyncDiskPreset> _createdSyncDiskPresets = new();
         [HarmonyPatch(typeof(AssetLoader), nameof(AssetLoader.GetAllPresets))]
         internal static class AssetLoader_GetAllPresets
         {
@@ -26,10 +27,10 @@ namespace SOD.Common.Patches
                 // Insert all the registered sync disk presets
                 foreach (var preset in Lib.SyncDisks.RegisteredSyncDisks.Select(a => a.Preset))
                 {
+                    _createdSyncDiskPresets.Add(preset);
+
                     // Set the interactable and add it to the game
                     preset.interactable = SyncDisk.SyncDiskInteractablePreset.Value;
-
-                    Plugin.Log.LogInfo("Added sync disk: " + preset.name);
 
                     // Also include it in the asset loader
                     __result.Add(preset);
@@ -73,6 +74,14 @@ namespace SOD.Common.Patches
             {
                 if (_loaded) return;
                 _loaded = true;
+
+                // Set sync disk numbers
+                var total = Toolbox.Instance.allSyncDisks.Count;
+                foreach (var loadedPreset in _createdSyncDiskPresets)
+                {
+                    loadedPreset.syncDiskNumber = ++total;
+                }
+                _createdSyncDiskPresets = null;
 
                 // Load Sync disks into menu presets if applicable
                 AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.MenuPresetLocations.Count > 0));
