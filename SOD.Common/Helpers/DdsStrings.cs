@@ -15,9 +15,9 @@ namespace SOD.Common.Helpers
         /// <exception cref="Exception"></exception>
         public string this[string dictionary, string key]
         {
-            get 
+            get
             {
-                if (Strings.Instance == null || Strings.stringTable == null) 
+                if (Strings.Instance == null || Strings.stringTable == null)
                     return string.Empty;
 
                 if (!Strings.textFilesLoaded)
@@ -30,7 +30,7 @@ namespace SOD.Common.Helpers
                     return ddsString.displayStr;
                 return string.Empty;
             }
-            set 
+            set
             {
                 if (Strings.Instance == null || Strings.stringTable == null)
                     throw new Exception("DDS Strings are not yet initialized at this point.");
@@ -52,7 +52,7 @@ namespace SOD.Common.Helpers
                             if (table.Count == 0)
                                 Strings.stringTable.Remove(dictionaryLower);
                             return;
-                        }    
+                        }
                         ddsString.displayStr = value;
                     }
                     else

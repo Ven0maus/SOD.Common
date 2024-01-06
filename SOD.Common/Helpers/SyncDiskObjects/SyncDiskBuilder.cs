@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 
 namespace SOD.Common.Helpers.SyncDiskObjects
 {
@@ -17,7 +16,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal HashSet<string> MenuPresetLocations { get; private set; }
         internal bool CanBeSideJobReward { get; private set; }
 
-        internal SyncDiskBuilder(string syncDiskName) 
+        internal SyncDiskBuilder(string syncDiskName)
         {
             Name = syncDiskName;
             Effects = new List<Effect>(3);

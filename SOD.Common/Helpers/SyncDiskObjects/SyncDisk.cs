@@ -35,16 +35,16 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <summary>
         /// True if the sync disk is available in game.
         /// </summary>
-        public bool RegisteredInGame 
-        { 
-            get 
+        public bool RegisteredInGame
+        {
+            get
             {
                 if (Lib.SyncDisks.RegisteredSyncDisks.Contains(this)) return true;
                 if (Toolbox.Instance == null) return false;
                 if (Toolbox.Instance.allSyncDisks == null) return false;
                 if (Preset == null) return false;
-                return Toolbox.Instance.allSyncDisks.Contains(Preset); 
-            } 
+                return Toolbox.Instance.allSyncDisks.Contains(Preset);
+            }
         }
 
         /// <summary>
@@ -152,10 +152,10 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.manufacturer = builder.Manufacturer;
             syncDisk.Preset.canBeSideJobReward = builder.CanBeSideJobReward;
             syncDisk.MenuPresetLocations = builder.MenuPresetLocations;
-            
+
             // Add effects
             syncDisk.Icons = new string[builder.Effects.Count];
-            for (int i=0; i < builder.Effects.Count; i++)
+            for (int i = 0; i < builder.Effects.Count; i++)
             {
                 var effect = builder.Effects[i];
                 syncDisk.Icons[i] = effect.Icon;
@@ -189,7 +189,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             }
 
             // Add upgrade options
-            for (int i=0; i < builder.UpgradeOptions.Count; i++)
+            for (int i = 0; i < builder.UpgradeOptions.Count; i++)
             {
                 var options = builder.UpgradeOptions[i];
                 var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
