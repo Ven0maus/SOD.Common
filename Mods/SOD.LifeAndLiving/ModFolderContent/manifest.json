@@ -1,0 +1,10 @@
+{
+  "name": "SODLifeAndLiving",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.LifeAndLiving",
+  "description": "Add's a lot more immersion to the lifestyle of a detective in a city.'",
+  "author": "Venomaus",
+  "dependencies": [
+    "Venomaus-SODCommon-1.1.5"
+  ]
+}
