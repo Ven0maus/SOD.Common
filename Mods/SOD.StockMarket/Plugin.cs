@@ -1,6 +1,5 @@
 ﻿using BepInEx;
 using Il2CppInterop.Runtime.Injection;
-using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.StockMarket.Implementation;
 using SOD.StockMarket.Implementation.Cruncher;

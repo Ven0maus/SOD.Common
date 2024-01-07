@@ -5,17 +5,19 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
 	<RestoreAdditionalProjectSources>
-		https://api.nuget.org/v3/index.json;
+        https://api.nuget.org/v3/index.json;
 		https://nuget.bepinex.dev/v3/index.json;
 		https://nuget.samboy.dev/v3/index.json
 	</RestoreAdditionalProjectSources>
 	<OutputType>Library</OutputType>
- <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="dependencies\**" />
-    <None Remove="ModFolderContent\Builds\**" />
+	<Compile Remove="ModFolderContent\Builds\**" />
+	<EmbeddedResource Remove="ModFolderContent\Builds\**" />
+	<None Remove="ModFolderContent\Builds\**" />
   </ItemGroup>
 
   <ItemGroup>
