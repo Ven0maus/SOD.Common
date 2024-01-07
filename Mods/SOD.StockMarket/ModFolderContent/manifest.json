@@ -1,12 +1,11 @@
 {
   "name": "SODStockMarket",
-  "version_number": "2.0.2",
+  "version_number": "2.0.3",
   "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.StockMarket",
   "description": "Adds a fully functional stock market into the game.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.1.4",
-    "Piepieonline-Asset_Bundle_Loader-1.0.4",
-    "Piepieonline-DDSLoader-1.0.4"
+    "Venomaus-SODCommon-1.1.5",
+    "Piepieonline-Asset_Bundle_Loader-1.0.4"
   ]
 }

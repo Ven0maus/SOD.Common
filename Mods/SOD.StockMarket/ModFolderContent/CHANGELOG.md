@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.3**
+- Remove ddsloader dependency, use SOD.Common DdsStrings functionality instead
+
 **2.0.2**
 - Several fixes regarding purchasing stocks through trade orders
 

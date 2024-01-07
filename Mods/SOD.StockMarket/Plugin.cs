@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using Il2CppInterop.Runtime.Injection;
+using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.StockMarket.Implementation;
 using SOD.StockMarket.Implementation.Cruncher;
@@ -15,7 +16,7 @@ namespace SOD.StockMarket
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.StockMarket";
         public const string PLUGIN_NAME = "StockMarket";
-        public const string PLUGIN_VERSION = "2.0.2";
+        public const string PLUGIN_VERSION = "2.0.3";
 
         /// <summary>
         /// The stockmarket running during the game, used to do all calculations

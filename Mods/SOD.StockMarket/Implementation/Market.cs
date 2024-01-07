@@ -192,6 +192,9 @@ namespace SOD.StockMarket.Implementation
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo("Stocks created: " + _stocks.Count);
 
+            // Set the dds entry for the app's name
+            Lib.DdsStrings["computer", "stockmarketpreset"] = "Stock Market";
+
             Plugin.Log.LogInfo("Stock market initialized.");
             Initialized = true;
         }
