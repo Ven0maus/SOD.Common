@@ -66,12 +66,12 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                     if (SyncDisk.UpgradeOptions.Length > realOptionArrayId)
                     {
                         var selectedOption = SyncDisk.UpgradeOptions[realOptionArrayId];
-                        if (option == 1)
-                            UpgradeOption = new Option(selectedOption.Id1, selectedOption.Name1);
-                        else if (option == 2)
-                            UpgradeOption = new Option(selectedOption.Id2, selectedOption.Name2);
-                        else if (option == 3)
-                            UpgradeOption = new Option(selectedOption.Id3, selectedOption.Name3);
+                        if (option == 1 && selectedOption.Id1.HasValue)
+                            UpgradeOption = new Option(selectedOption.Id1.Value, selectedOption.Name1);
+                        else if (option == 2 && selectedOption.Id2.HasValue)
+                            UpgradeOption = new Option(selectedOption.Id2.Value, selectedOption.Name2);
+                        else if (option == 3 && selectedOption.Id3.HasValue)
+                            UpgradeOption = new Option(selectedOption.Id3.Value, selectedOption.Name3);
                     }
                 }
             }

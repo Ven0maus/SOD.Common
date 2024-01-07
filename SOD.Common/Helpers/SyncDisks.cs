@@ -131,7 +131,7 @@ namespace SOD.Common.Helpers
             public readonly int Id;
             public readonly string Name;
 
-            public Effect(int id, string name)
+            internal Effect(int id, string name)
             {
                 Id = id;
                 Name = name;
@@ -165,13 +165,13 @@ namespace SOD.Common.Helpers
 
         public readonly struct UpgradeOption : IEquatable<UpgradeOption>
         {
-            public readonly int Id1, Id2, Id3;
+            public readonly int? Id1, Id2, Id3;
             public readonly string Name1, Name2, Name3;
 
             internal readonly bool HasOptions => !string.IsNullOrWhiteSpace(Name1) || !string.IsNullOrWhiteSpace(Name2) || !string.IsNullOrWhiteSpace(Name3);
             internal readonly SyncDiskBuilder.Options Options;
 
-            public UpgradeOption(SyncDiskBuilder.Options options, bool stripCustom = false)
+            internal UpgradeOption(SyncDiskBuilder.Options options, bool stripCustom = false)
             {
                 Options = options;
                 if (!string.IsNullOrWhiteSpace(options.Option1))
