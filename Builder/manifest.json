@@ -34,6 +34,16 @@
       ],
       "DDSContent": "bin\\Release\\net6.0\\plugins",
       "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods",
+      "ProjectName": "SOD.LifeAndLiving",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "ExtraFiles": [
+        "bin\\Release\\net6.0\\SOD.LifeAndLiving.dll"
+      ],
+      "Package": true
     }
   ]
 }
