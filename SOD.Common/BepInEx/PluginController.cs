@@ -145,7 +145,7 @@ namespace SOD.Common.BepInEx
             }
             catch (Exception ex)
             {
-                Log.LogError($"[Binding({info.Name})]: {ex.Message}");
+                Log.LogError($"[Binding({info.Name})]: {ex.InnerException?.Message ?? ex.Message}");
                 return true;
             }
             return false;
