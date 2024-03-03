@@ -89,7 +89,7 @@ namespace SOD.LifeAndLiving.Patches
                 foreach (var item in __instance.objectPresetDictionary)
                 {
                     var preset = item.value;
-                    if (preset != null)
+                    if (preset != null && preset.value.y > 0)
                     {
                         // Set min
                         int minValue = Math.Max(minItemValue, (int)preset.value.x);
