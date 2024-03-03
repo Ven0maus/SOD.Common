@@ -15,7 +15,7 @@ Features:
 - Reduce the spawn rate of sync disks
 - Increase cost of apartment
 - Increase cost of hotel suites
-- Set adjustable max sell price for items to general/blackmarket
+- Set adjustable max sell price for items to general/blackmarket (diamonds excluded)
 - Adjust item value and store prices
 - Adjust cost price of furniture
 - Adjust cost price of dialog (guest pass, codes, etc..)
