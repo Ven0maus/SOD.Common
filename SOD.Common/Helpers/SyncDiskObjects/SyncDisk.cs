@@ -58,6 +58,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal string ModHash { get; private set; }
 
         /// <summary>
+        /// Used to re raise events on save load
+        /// </summary>
+        internal bool ReRaiseEventsOnSaveLoad { get; private set; }
+
+        /// <summary>
         /// The sync disk's name.
         /// </summary>
         public string Name { get; private set; }
@@ -151,10 +156,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             var syncDisk = new SyncDisk
             {
                 Name = builder.Name,
-                ModHash = Lib.SaveGame.GetUniqueString(builder.PluginGuid)
+                ModHash = Lib.SaveGame.GetUniqueString(builder.PluginGuid),
+                ReRaiseEventsOnSaveLoad = builder.ReRaiseEventsOnSaveLoad
             };
 
-            syncDisk.Preset.name = $"custom_{builder.Name}_{syncDisk.ModHash}";
+            syncDisk.Preset.name = $"custom_{builder.Name}_{syncDisk.ModHash}_{syncDisk.ReRaiseEventsOnSaveLoad}";
             syncDisk.Preset.presetName = syncDisk.Preset.name;
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
@@ -238,8 +244,9 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             var split = preset.name.Split('_');
             var isCustomSyncDisk = split.Length > 1 && split[0].Equals("custom");
             var name = isCustomSyncDisk ? split[1] : split[0];
-            var modHash = isCustomSyncDisk ? split[^1] : null;
-            return new SyncDisk(false) { Name = name, Preset = preset, ModHash = modHash };
+            var modHash = isCustomSyncDisk ? split[^2] : null;
+            var reRaiseEvents = isCustomSyncDisk && bool.Parse(split[^1]);
+            return new SyncDisk(false) { Name = name, Preset = preset, ModHash = modHash, ReRaiseEventsOnSaveLoad = reRaiseEvents };
         }
     }
 }

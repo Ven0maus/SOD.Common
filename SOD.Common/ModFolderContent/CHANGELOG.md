@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.7**
+- Made sync disk re-raise events optional (extra parameter in builder, default true)
+
 **1.1.6**
 - Lib.SyncDisks.Builder method signature changed, (added extra parameter)
 - Custom installed syncdisks will now re-raise their install and upgrade events on loading a savegame

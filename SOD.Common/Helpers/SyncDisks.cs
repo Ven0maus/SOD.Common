@@ -108,14 +108,15 @@ namespace SOD.Common.Helpers
         /// </summary>
         /// <param name="syncDiskName">The name of the sync disk</param>
         /// <param name="pluginGuid">The mod's plugin guid</param>
+        /// <param name="reRaiseEventsOnSaveLoad">Should the install/upgrade events re-raise when a savefile is loaded that has this disk installed?</param>
         /// <returns></returns>
-        public SyncDiskBuilder Builder(string syncDiskName, string pluginGuid)
+        public SyncDiskBuilder Builder(string syncDiskName, string pluginGuid, bool reRaiseEventsOnSaveLoad = true)
         {
             if (string.IsNullOrWhiteSpace(syncDiskName))
                 throw new ArgumentException("Parameter cannot be empty or whitespace.", nameof(syncDiskName));
             if (string.IsNullOrWhiteSpace(pluginGuid))
                 throw new ArgumentException("Parameter cannot be empty or whitespace.", nameof(pluginGuid));
-            return new SyncDiskBuilder(syncDiskName, pluginGuid);
+            return new SyncDiskBuilder(syncDiskName, pluginGuid, reRaiseEventsOnSaveLoad);
         }
 
         internal void CheckForSyncDiskData(bool onLoad, string saveFilePath)
@@ -207,7 +208,7 @@ namespace SOD.Common.Helpers
                     // Add to dictionary that it is installed
                     if (after)
                     {
-                        if (!installArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (!installArgs.SyncDisk.Preset.name.StartsWith("custom") || !installArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (installArgs.Effect != null)
                         {
                             if (!InstalledSyncDisks.TryGetValue(installArgs.SyncDisk.Preset.name, out var disks1))
@@ -229,7 +230,7 @@ namespace SOD.Common.Helpers
                     if (after)
                     {
                         // Remove from installed sync disks
-                        if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith("custom") || !uninstallArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(uninstallArgs.SyncDisk.Preset.name, out var disks2))
                         {
                             Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
@@ -258,7 +259,7 @@ namespace SOD.Common.Helpers
 
                     if (after)
                     {
-                        if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith("custom") || !upgradeArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(upgradeArgs.SyncDisk.Preset.name, out var disks3))
                         {
                             Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
