@@ -15,6 +15,7 @@ Features:
 - Increase cost of apartments
 - Adjust item value and store prices
 - Adjust cost price of furniture
+- Adjust cost price of dialog (guest pass, codes, etc..)
 
 Features to come (not implemented yet):
 - More social engagement with other civilians

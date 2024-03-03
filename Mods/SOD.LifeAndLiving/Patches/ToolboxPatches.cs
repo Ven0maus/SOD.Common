@@ -22,9 +22,27 @@ namespace SOD.LifeAndLiving.Patches
                 // Adjust cost prices of furniture
                 AdjustFurnitureCostPrices(__instance);
 
+                // Adjust cost prices of dialog such as guest pass
+                AdjustDialogCostPrices(__instance);
+
                 // Adjusts all the item purchase and selling prices
                 AdjustItemPrices(__instance);
                 AdjustCompanyItemSellMultipliers(__instance);
+            }
+
+            private static void AdjustDialogCostPrices(Toolbox __instance)
+            {
+                var percentage = Plugin.Instance.Config.DialogCostPricePercentage;
+                int count = 0;
+                foreach (var dialogPreset in __instance.allDialog)
+                {
+                    if (dialogPreset.cost > 0)
+                    {
+                        dialogPreset.cost += dialogPreset.cost / 100 * percentage;
+                        count++;
+                    }
+                }
+                Plugin.Log.LogInfo($"Adjusted \"{count}\" dialog cost prices.");
             }
 
             private static void AdjustFurnitureCostPrices(Toolbox __instance)
@@ -33,8 +51,11 @@ namespace SOD.LifeAndLiving.Patches
                 int count = 0;
                 foreach (var furniturePreset in __instance.allFurniture)
                 {
-                    furniturePreset.cost += furniturePreset.cost / 100 * percentage;
-                    count++;
+                    if (furniturePreset.cost > 0)
+                    {
+                        furniturePreset.cost += furniturePreset.cost / 100 * percentage;
+                        count++;
+                    }
                 }
                 Plugin.Log.LogInfo($"Adjusted \"{count}\" furniture cost prices.");
             }

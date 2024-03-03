@@ -2,8 +2,14 @@
 
 namespace SOD.LifeAndLiving
 {
-    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, IApartementBindings, IMoneyBindings, IShopBindings
+    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, IApartementBindings, IMoneyBindings, IShopBindings, IDialogBindings
     { }
+
+    public interface IDialogBindings
+    {
+        [Binding(40, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Dialog.DialogCostPricePercentage")]
+        public int DialogCostPricePercentage { get; set; }
+    }
 
     public interface IJobBindings
     {
