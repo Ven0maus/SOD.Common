@@ -73,13 +73,19 @@ namespace SOD.LifeAndLiving
         [Binding(40, "The percentage the value should increase of items.", "LifeAndLiving.Shop.PercentageValueIncrease")]
         public int PercentageValueIncrease { get; set; }
 
-        [Binding(20, "The minimum value of an item.", "LifeAndLiving.Shop.MinItemValue")]
+        [Binding(32, "The minimum value of an item.", "LifeAndLiving.Shop.MinItemValue")]
         public int MinItemValue { get; set; }
 
-        [Binding(25, "The percentage of purchase price is taken for sale price for general stores (default game is 50%)", "LifeAndLiving.Shop.PercentageSalePriceGeneral")]
+        [Binding(25, "The percentage of item value that is taken for selling items to general stores (default game is 50%)", "LifeAndLiving.Shop.PercentageSalePriceGeneral")]
         public int PercentageSalePriceGeneral { get; set; }
 
-        [Binding(50, "The percentage of purchase price is taken for sale price for blackmarket (default game is 80%)", "LifeAndLiving.Shop.PercentageSalePriceBlackMarket")]
+        [Binding(50, "The percentage of item value that is taken for selling items to blackmarket (default game is 80%)", "LifeAndLiving.Shop.PercentageSalePriceBlackMarket")]
         public int PercentageSalePriceBlackMarket { get; set; }
+
+        [Binding(400, "The minimum value of a diamond.", "LifeAndLiving.Shop.MinDiamondValue")]
+        public int MinDiamondValue { get; set; }
+
+        [Binding(1000, "The maximum value of a diamond.", "LifeAndLiving.Shop.MaxDiamondValue")]
+        public int MaxDiamondValue { get; set; }
     }
 }

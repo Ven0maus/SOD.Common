@@ -50,25 +50,22 @@ namespace SOD.LifeAndLiving.Patches
                 var minItemValue = Plugin.Instance.Config.MinItemValue;
                 var random = new Random();
                 int count = 0;
-                foreach (var item in __instance.allItems)
+                foreach (var item in __instance.objectPresetDictionary)
                 {
-                    var preset = item.itemPreset;
+                    var preset = item.value;
                     if (preset != null)
                     {
-                        int minValue = (int)preset.value.x;
-                        if (minValue < minItemValue)
-                        {
-                            var newMin = minItemValue + (minValue / 100 * percentageValueIncrease);
-                            minValue = random.Next(newMin, newMin + minValue + 1);
-                        }
+                        // Set min
+                        int minValue = Math.Max(minItemValue, (int)preset.value.x);
+                        var adjustment = minValue + (minValue / 100 * percentageValueIncrease);
+                        minValue = random.Next(adjustment, (adjustment * 2) + 1);
 
-                        int maxValue = (int)preset.value.y;
-                        if (maxValue < minValue)
-                        {
-                            var newMin = minValue + (maxValue / 100 * percentageValueIncrease);
-                            maxValue = random.Next(minValue + 1, newMin + 1);
-                        }
+                        // Set max
+                        int maxValue = Math.Max(minValue, (int)preset.value.y);
+                        adjustment = maxValue + (maxValue / 100 * percentageValueIncrease);
+                        maxValue = random.Next(minValue + 1, adjustment + 1);
 
+                        // Set value
                         preset.value = new UnityEngine.Vector2(minValue, maxValue);
                         count++;
                     }
@@ -108,6 +105,8 @@ namespace SOD.LifeAndLiving.Patches
                 diamondPreset.perAddressLimit = 1;
                 diamondPreset.limitPerRoom = true;
                 diamondPreset.limitPerAddress = true;
+                // Adjust value of diamond
+                diamondPreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinDiamondValue, Plugin.Instance.Config.MaxDiamondValue);
                 if (Plugin.Instance.Config.SpawnDiamondsOnlyInApartements)
                     diamondPreset.autoPlacement = InteractablePreset.AutoPlacement.onlyInHomes;
 

@@ -35,21 +35,21 @@ namespace SOD.LifeAndLiving.Patches
                 _apartementPriceCache.Add(__instance.seed, __result);
             }
 
-            private static int RoundToNearestInterval(int number, int interval1, int interval2)
+            private static int RoundToNearestInterval(int number, int lowerInterval, int higherInterval)
             {
-                int roundedToInterval1 = (int)Math.Round(number / (double)interval1) * interval1;
-                int roundedToInterval2 = (int)Math.Round(number / (double)interval2) * interval2;
+                int roundedToLowerInterval = (int)Math.Round(number / (double)lowerInterval) * lowerInterval;
+                int roundedToHigherInterval = (int)Math.Round(number / (double)higherInterval) * higherInterval;
 
-                int difference1 = Math.Abs(number - roundedToInterval1);
-                int difference2 = Math.Abs(number - roundedToInterval2);
+                int difference1 = Math.Abs(number - roundedToLowerInterval);
+                int difference2 = Math.Abs(number - roundedToHigherInterval);
 
                 if (difference1 < difference2)
                 {
-                    return roundedToInterval1;
+                    return roundedToLowerInterval;
                 }
                 else
                 {
-                    return roundedToInterval2;
+                    return roundedToHigherInterval;
                 }
             }
         }
