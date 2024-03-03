@@ -22,12 +22,16 @@ namespace SOD.LifeAndLiving.Patches
                 bool updates = false;
                 foreach (var component in value)
                 {
-                    var prev = component.price;
-                    component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
-                    if (prev != component.price)
+                    // Only for sale prices
+                    if (component.sellInteractable != null && component.sellMode)
                     {
-                        component.UpdateButtonText();
-                        updates = true;
+                        var prev = component.price;
+                        component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
+                        if (prev != component.price)
+                        {
+                            component.UpdateButtonText();
+                            updates = true;
+                        }
                     }
                 }
 
