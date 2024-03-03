@@ -10,12 +10,12 @@ namespace SOD.LifeAndLiving.Patches
         internal class NewGameLocation_GetPrice
         {
             private static readonly Random _valueRandom = new();
-            private static readonly Dictionary<string, int> _apartementPriceCache = new();
+            internal static readonly Dictionary<string, int> ApartementPriceCache = new();
 
             [HarmonyPostfix]
             internal static void Postfix(NewGameLocation __instance, ref int __result)
             {
-                if (_apartementPriceCache.TryGetValue(__instance.seed, out int newValue))
+                if (ApartementPriceCache.TryGetValue(__instance.seed, out int newValue))
                 {
                     __result = newValue;
                     return;
@@ -32,7 +32,7 @@ namespace SOD.LifeAndLiving.Patches
                     __result = RoundToNearestInterval(_valueRandom.Next(half, half + smallPercentage) * 2, 50, 100);
                 }
 
-                _apartementPriceCache.Add(__instance.seed, __result);
+                ApartementPriceCache.Add(__instance.seed, __result);
             }
 
             private static int RoundToNearestInterval(int number, int lowerInterval, int higherInterval)
