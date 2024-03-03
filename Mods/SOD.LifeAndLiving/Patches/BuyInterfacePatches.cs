@@ -23,9 +23,10 @@ namespace SOD.LifeAndLiving.Patches
                 foreach (var component in value)
                 {
                     // Only for sale prices
-                    if (component.sellInteractable != null && component.sellMode)
+                    if (component.sellInteractable != null && component.sellMode && !component.sellInteractable.preset.presetName.Equals("Diamond"))
                     {
                         var prev = component.price;
+                        
                         component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
                         if (prev != component.price)
                         {

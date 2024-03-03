@@ -82,10 +82,10 @@ namespace SOD.LifeAndLiving
         [Binding(50, "The percentage of item value that is taken for selling items to blackmarket (default game is 80%)", "LifeAndLiving.Economy.PercentageSalePriceBlackMarket")]
         public int PercentageSalePriceBlackMarket { get; set; }
 
-        [Binding(85, "The max price an item can be sold for in general stores.", "LifeAndLiving.Economy.MaxSellPriceAllItemsGeneral")]
+        [Binding(85, "The max price an item can be sold for in general stores. (diamond excluded)", "LifeAndLiving.Economy.MaxSellPriceAllItemsGeneral")]
         public int MaxSellPriceAllItemsGeneral { get; set; }
 
-        [Binding(225, "The max price an item can be sold for in blackmarket.", "LifeAndLiving.Economy.MaxSellPriceAllItemsBlackMarket")]
+        [Binding(225, "The max price an item can be sold for in blackmarket. (diamond excluded)", "LifeAndLiving.Economy.MaxSellPriceAllItemsBlackMarket")]
         public int MaxSellPriceAllItemsBlackMarket { get; set; }
 
         [Binding(400, "The minimum value of a diamond.", "LifeAndLiving.Economy.MinDiamondValue")]
