@@ -2,8 +2,8 @@
 
 namespace SOD.LifeAndLiving
 {
-    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, 
-        IApartementBindings, IMoneyBindings, IShopBindings, IDialogBindings
+    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings,
+        IHousingBindings, IMoneyBindings, IShopBindings, IDialogBindings
     { }
 
     public interface IDialogBindings
@@ -14,7 +14,7 @@ namespace SOD.LifeAndLiving
 
     public interface IJobBindings
     {
-        [Binding(80, "The percentage reduction of job resolve payouts.", "LifeAndLiving.Jobs.PayoutReductionJobs")]
+        [Binding(90, "The percentage reduction of job resolve payouts.", "LifeAndLiving.Jobs.PayoutReductionJobs")]
         public int PayoutReductionJobs { get; set; }
 
         [Binding(10, "The minimum amount a side job resolve question should pay (these are all added up to calculate the full side job price).", "LifeAndLiving.Jobs.MinSideJob")]
@@ -48,19 +48,25 @@ namespace SOD.LifeAndLiving
         public bool LimitPaperclipToOfficeOnly { get; set; }
     }
 
-    public interface IApartementBindings
+    public interface IHousingBindings
     {
-        [Binding(60, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Apartements.ApartementCostPercentage")]
+        [Binding(60, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Housing.ApartementCostPercentage")]
         public int ApartementCostPercentage { get; set; }
 
-        [Binding(3000, "The minimum $ cost of an apartement, if the percentage increase does not cover this minimum it will be adjusted.", "LifeAndLiving.Apartements.MinimumApartementCost")]
+        [Binding(3000, "The minimum $ cost of an apartement, if the percentage increase does not cover this minimum it will be adjusted.", "LifeAndLiving.Housing.MinimumApartementCost")]
         public int MinimumApartementCost { get; set; }
 
-        [Binding(true, "Should diamonds only spawn in apartements.", "LifeAndLiving.Apartements.SpawnDiamondsOnlyInApartements")]
+        [Binding(true, "Should diamonds only spawn in apartements.", "LifeAndLiving.Housing.SpawnDiamondsOnlyInApartements")]
         public bool SpawnDiamondsOnlyInApartements { get; set; }
 
-        [Binding(40, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Apartements.FurniteCostPercentage")]
+        [Binding(40, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Housing.FurniteCostPercentage")]
         public int FurniteCostPercentage { get; set; }
+
+        [Binding(250, "The cost of a lower suite in a hotel per day.", "LifeAndLiving.Housing.CostLowerSuiteHotel")]
+        public int CostLowerSuiteHotel { get; set; }
+
+        [Binding(500, "The cost of a higher suite in a hotel per day.", "LifeAndLiving.Housing.CostHigherSuiteHotel")]
+        public int CostHigherSuiteHotel { get; set; }
     }
 
     public interface IMoneyBindings

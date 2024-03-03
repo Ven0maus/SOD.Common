@@ -15,7 +15,8 @@ namespace SOD.LifeAndLiving.Patches
             [HarmonyPostfix]
             internal static void Postfix(NewGameLocation __instance, ref int __result)
             {
-                if (ApartementPriceCache.TryGetValue(__instance.seed, out int newValue))
+                var key = __instance.building.buildingID + "_" + __instance.residenceNumber;
+                if (ApartementPriceCache.TryGetValue(key, out int newValue))
                 {
                     __result = newValue;
                     return;
@@ -32,7 +33,7 @@ namespace SOD.LifeAndLiving.Patches
                     __result = RoundToNearestInterval(_valueRandom.Next(half, half + smallPercentage) * 2, 50, 100);
                 }
 
-                ApartementPriceCache.Add(__instance.seed, __result);
+                ApartementPriceCache.Add(key, __result);
             }
 
             private static int RoundToNearestInterval(int number, int lowerInterval, int higherInterval)
