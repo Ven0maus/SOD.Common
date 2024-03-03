@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Linq;
 
 namespace SOD.LifeAndLiving.Patches
@@ -23,12 +24,13 @@ namespace SOD.LifeAndLiving.Patches
                 var sideJobs = __instance.allSideJobs;
                 var reduction = Plugin.Instance.Config.PayoutReductionJobs;
                 int jobCount = 0;
+                var minSideJobResolveQuestion = Plugin.Instance.Config.MinSideJobResolveQuestion;
                 foreach (var sideJob in sideJobs)
                 {
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var min = resolveQuestion.rewardRange.x - (resolveQuestion.rewardRange.x / 100 * reduction);
-                        var max = resolveQuestion.rewardRange.y - (resolveQuestion.rewardRange.y / 100 * reduction);
+                        var min = Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.x - (resolveQuestion.rewardRange.x / 100 * reduction));
+                        var max = Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.y - (resolveQuestion.rewardRange.y / 100 * reduction));
                         resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
                     }
                     jobCount++;
