@@ -102,5 +102,8 @@ namespace SOD.LifeAndLiving
 
         [Binding(true, "This severly reduces spawn rate of sync disk upgrade modules.", "LifeAndLiving.Economy.LimitSpawnrateSyncDiskUpgradeModules")]
         public bool LimitSpawnrateSyncDiskUpgradeModules { get; set; }
+
+        [Binding(true, "This severly reduces spawn rate of sync disks.", "LifeAndLiving.Economy.LimitSpawnrateSyncDisks")]
+        public bool LimitSpawnrateSyncDisks { get; set; }
     }
 }

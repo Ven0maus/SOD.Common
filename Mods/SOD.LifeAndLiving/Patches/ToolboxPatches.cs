@@ -134,6 +134,7 @@ namespace SOD.LifeAndLiving.Patches
                 var hairPinPreset = __instance.GetInteractablePreset("Hairpin");
                 var paperClipPreset = __instance.GetInteractablePreset("Paperclip");
                 var syncDiskModulePreset = __instance.GetInteractablePreset("SyncDiskUpgrade");
+                var syncDiskPreset = __instance.GetInteractablePreset("SyncDisk");
                 var looseChange = new[] { "M1", "M2", "M3", "M4" }
                     .Select(a => __instance.GetInteractablePreset(a))
                     .ToArray();
@@ -167,6 +168,18 @@ namespace SOD.LifeAndLiving.Patches
                 // Set value
                 syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue, 
                     Plugin.Instance.Config.MaxSyncDiskUpgradeModuleValue);
+
+                if (Plugin.Instance.Config.LimitSpawnrateSyncDisks)
+                {
+                    syncDiskPreset.perRoomLimit = 1;
+                    syncDiskPreset.perAddressLimit = 1;
+                    syncDiskPreset.perObjectLimit = 1;
+                    syncDiskPreset.perCommercialLimit = 1;
+                    syncDiskPreset.limitInCommercial = true;
+                    syncDiskPreset.limitPerRoom = true;
+                    syncDiskPreset.limitPerAddress = true;
+                    syncDiskPreset.limitPerObject = true;
+                }
 
                 // Lockpicks
                 AdjustHairPins(hairPinPreset);

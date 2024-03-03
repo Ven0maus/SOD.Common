@@ -13,6 +13,7 @@ Features:
 - Reduce the value of loose change
 - Reduce the spawn rate of loose change
 - Reduce the spawn rate of sync disks upgrade modules
+- Reduce the spawn rate of sync disks
 - Increase cost of apartment
 - Increase cost of hotel suites
 - Set adjustable max sell price for items to general/blackmarket (diamonds excluded)
