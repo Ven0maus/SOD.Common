@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using static SOD.Common.Helpers.SyncDiskObjects.SyncDiskArgs;
 
 namespace SOD.Common.Helpers
 {
@@ -217,7 +216,6 @@ namespace SOD.Common.Helpers
                                 InstalledSyncDisks.Add(installArgs.SyncDisk.Preset.name, disks1);
                             }
                             disks1.Add(new InstalledSyncDiskData(installArgs.SyncDisk.Preset.name, installArgs.Effect.Value.Name));
-                            Plugin.Log.LogInfo($"Added sync disk install \"{installArgs.SyncDisk.Preset.name}\" with effect \"{installArgs.Effect.Value.Name}\".");
                         }
                     }
                     break;
@@ -249,8 +247,6 @@ namespace SOD.Common.Helpers
                         disks2.Remove(correctEffect);
                         if (disks2.Count == 0)
                             InstalledSyncDisks.Remove(uninstallArgs.SyncDisk.Preset.name);
-
-                        Plugin.Log.LogInfo($"Uninstalled sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
                     }
                     break;
                 case SyncDiskEvent.OnUpgrade:
@@ -278,7 +274,6 @@ namespace SOD.Common.Helpers
                         }
 
                         cEffect.UpgradeOptions.Add(upgradeArgs.UpgradeOption.Value.Name);
-                        Plugin.Log.LogInfo($"Upgrade sync disk \"{upgradeArgs.SyncDisk.Preset.name}\" with option \"{upgradeArgs.UpgradeOption.Value.Name}\".");
                     }
                     break;
                 default:
