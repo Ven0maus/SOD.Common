@@ -12,8 +12,8 @@ Features:
 - Reduce the value of loose change
 - Reduce the spawn rate of loose change
 - Increase cost of apartments
+- Adjust item value and store prices
 
 Features to come (not implemented yet):
-- Reduce selling prices of items
 - More social engagement with other civilians
 - A more immersive and impactful hunger / thirst system
