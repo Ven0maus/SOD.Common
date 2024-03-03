@@ -1,4 +1,9 @@
 # CHANGELOG
+**1.1.6**
+- Lib.SyncDisks.Builder method signature changed, (added extra parameter)
+- Custom installed syncdisks will now re-raise their install and upgrade events on loading a savegame
+- Inner exception message is now shown when an error occurs in plugin-bindings proxy.
+
 **1.1.5**
 - Added DdsStrings helper to add DDS strings directly in the game.
 - Added SyncDisk helper class to very easily create new sync disks and hook events

@@ -112,6 +112,10 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public SyncDiskBuilder Builder(string syncDiskName, string pluginGuid)
         {
+            if (string.IsNullOrWhiteSpace(syncDiskName))
+                throw new ArgumentException("Parameter cannot be empty or whitespace.", nameof(syncDiskName));
+            if (string.IsNullOrWhiteSpace(pluginGuid))
+                throw new ArgumentException("Parameter cannot be empty or whitespace.", nameof(pluginGuid));
             return new SyncDiskBuilder(syncDiskName, pluginGuid);
         }
 
