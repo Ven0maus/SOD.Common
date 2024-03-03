@@ -20,6 +20,7 @@ namespace SOD.LifeAndLiving.Patches
                 var maxSellPriceBlackMarket = Plugin.Instance.Config.MaxSellPriceAllItemsBlackMarket;
 
                 bool updates = false;
+                int count = 0;
                 foreach (var component in value)
                 {
                     // Only for sale prices
@@ -32,12 +33,16 @@ namespace SOD.LifeAndLiving.Patches
                         {
                             component.UpdateButtonText();
                             updates = true;
+                            count++;
                         }
                     }
                 }
 
                 if (updates)
+                {
                     __instance.UpdatePurchaseAbility();
+                    Plugin.Log.LogInfo($"Capped sale price of \"{count}\" items at store interface.");
+                }
             }
         }
     }
