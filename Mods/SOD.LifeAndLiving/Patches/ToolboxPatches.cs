@@ -187,6 +187,8 @@ namespace SOD.LifeAndLiving.Patches
 
                 // Loose change laying around
                 AdjustLooseChange(looseChange);
+
+                Plugin.Log.LogInfo("Adjusted spawn rate of interactables.");
             }
 
             private static void AdjustLooseChange(InteractablePreset[] looseChange)
