@@ -2,7 +2,7 @@
 
 namespace SOD.LifeAndLiving
 {
-    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, IApartementBindings, IMoneyBindings
+    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, IApartementBindings, IMoneyBindings, IShopBindings
     { }
 
     public interface IJobBindings
@@ -66,5 +66,20 @@ namespace SOD.LifeAndLiving
 
         [Binding(true, "Should loose change only spawn in apartements.", "LifeAndLiving.Money.LimitLooseMoneyToApartementsOnly")]
         public bool LimitLooseMoneyToApartementsOnly { get; set; }
+    }
+
+    public interface IShopBindings
+    {
+        [Binding(40, "The percentage the value should increase of items.", "LifeAndLiving.Shop.PercentageValueIncrease")]
+        public int PercentageValueIncrease { get; set; }
+
+        [Binding(20, "The minimum value of an item.", "LifeAndLiving.Shop.MinItemValue")]
+        public int MinItemValue { get; set; }
+
+        [Binding(25, "The percentage of purchase price is taken for sale price for general stores (default game is 50%)", "LifeAndLiving.Shop.PercentageSalePriceGeneral")]
+        public int PercentageSalePriceGeneral { get; set; }
+
+        [Binding(50, "The percentage of purchase price is taken for sale price for blackmarket (default game is 80%)", "LifeAndLiving.Shop.PercentageSalePriceBlackMarket")]
+        public int PercentageSalePriceBlackMarket { get; set; }
     }
 }
