@@ -138,9 +138,14 @@ namespace SOD.LifeAndLiving.Patches
                     .ToArray();
 
                 // Diamonds, only one per address instead of 2
-                diamondPreset.perAddressLimit = 1;
-                diamondPreset.limitPerRoom = true;
-                diamondPreset.limitPerAddress = true;
+                if (Plugin.Instance.Config.ReduceDiamondSpawnPerAddress)
+                {
+                    diamondPreset.perRoomLimit = 1;
+                    diamondPreset.perAddressLimit = 1;
+                    diamondPreset.limitPerRoom = true;
+                    diamondPreset.limitPerAddress = true;
+                }
+
                 // Adjust value of diamond
                 diamondPreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinDiamondValue, Plugin.Instance.Config.MaxDiamondValue);
                 if (Plugin.Instance.Config.SpawnDiamondsOnlyInApartements)

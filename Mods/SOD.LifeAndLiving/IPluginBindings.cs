@@ -35,6 +35,9 @@ namespace SOD.LifeAndLiving
         [Binding(true, "This drastically reduces lockpicks per address", "LifeAndLiving.Lockpicks.ReduceLockPickSpawnPerAddress")]
         public bool ReduceLockPickSpawnPerAddress { get; set; }
 
+        [Binding(true, "This drastically reduces diamonds spawned per address", "LifeAndLiving.Lockpicks.ReduceDiamondSpawnPerAddress")]
+        public bool ReduceDiamondSpawnPerAddress { get; set; }
+
         [Binding(5, "The amount of lockpicks the buyable kit should give", "LifeAndLiving.Lockpicks.LockPickKitAmount")]
         public int LockPickKitAmount { get; set; }
 
