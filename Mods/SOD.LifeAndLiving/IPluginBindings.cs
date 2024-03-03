@@ -2,7 +2,8 @@
 
 namespace SOD.LifeAndLiving
 {
-    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, IApartementBindings, IMoneyBindings, IShopBindings, IDialogBindings
+    public interface IPluginBindings : IJobBindings, IMurderBindings, ILockPickBindings, 
+        IApartementBindings, IMoneyBindings, IShopBindings, IDialogBindings
     { }
 
     public interface IDialogBindings
@@ -79,7 +80,7 @@ namespace SOD.LifeAndLiving
 
     public interface IShopBindings
     {
-        [Binding(40, "The percentage the value should increase of items.", "LifeAndLiving.Shop.PercentageValueIncrease")]
+        [Binding(60, "The percentage the value should increase of items.", "LifeAndLiving.Shop.PercentageValueIncrease")]
         public int PercentageValueIncrease { get; set; }
 
         [Binding(32, "The minimum value of an item.", "LifeAndLiving.Shop.MinItemValue")]
