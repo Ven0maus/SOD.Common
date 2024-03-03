@@ -48,6 +48,9 @@ namespace SOD.LifeAndLiving
 
         [Binding(true, "Should diamonds only spawn in apartements.", "LifeAndLiving.Apartements.SpawnDiamondsOnlyInApartements")]
         public bool SpawnDiamondsOnlyInApartements { get; set; }
+
+        [Binding(40, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Apartements.FurniteCostPercentage")]
+        public int FurniteCostPercentage { get; set; }
     }
 
     public interface IMoneyBindings

@@ -19,9 +19,24 @@ namespace SOD.LifeAndLiving.Patches
                 // Reduce spawn rates of certain interactables
                 AdjustInteractableSpawns(__instance);
 
+                // Adjust cost prices of furniture
+                AdjustFurnitureCostPrices(__instance);
+
                 // Adjusts all the item purchase and selling prices
                 AdjustItemPrices(__instance);
                 AdjustCompanyItemSellMultipliers(__instance);
+            }
+
+            private static void AdjustFurnitureCostPrices(Toolbox __instance)
+            {
+                var percentage = Plugin.Instance.Config.FurniteCostPercentage;
+                int count = 0;
+                foreach (var furniturePreset in __instance.allFurniture)
+                {
+                    furniturePreset.cost += furniturePreset.cost / 100 * percentage;
+                    count++;
+                }
+                Plugin.Log.LogInfo($"Adjusted \"{count}\" furniture cost prices.");
             }
 
             private static void AdjustCompanyItemSellMultipliers(Toolbox __instance)

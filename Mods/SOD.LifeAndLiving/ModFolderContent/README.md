@@ -14,6 +14,7 @@ Features:
 - Reduce the spawn rate of loose change
 - Increase cost of apartments
 - Adjust item value and store prices
+- Adjust cost price of furniture
 
 Features to come (not implemented yet):
 - More social engagement with other civilians
