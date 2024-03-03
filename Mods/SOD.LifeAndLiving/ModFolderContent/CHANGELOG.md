@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.1**
+- Fix bindings
+
 **1.0.0**
 - Reduce payout of side jobs
 - Reduce payout of murder cases
