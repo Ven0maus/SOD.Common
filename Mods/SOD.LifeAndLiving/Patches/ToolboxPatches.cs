@@ -133,6 +133,7 @@ namespace SOD.LifeAndLiving.Patches
                 var diamondPreset = __instance.GetInteractablePreset("Diamond");
                 var hairPinPreset = __instance.GetInteractablePreset("Hairpin");
                 var paperClipPreset = __instance.GetInteractablePreset("Paperclip");
+                var syncDiskModulePreset = __instance.GetInteractablePreset("SyncDiskUpgrade");
                 var looseChange = new[] { "M1", "M2", "M3", "M4" }
                     .Select(a => __instance.GetInteractablePreset(a))
                     .ToArray();
@@ -150,6 +151,22 @@ namespace SOD.LifeAndLiving.Patches
                 diamondPreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinDiamondValue, Plugin.Instance.Config.MaxDiamondValue);
                 if (Plugin.Instance.Config.SpawnDiamondsOnlyInApartements)
                     diamondPreset.autoPlacement = InteractablePreset.AutoPlacement.onlyInHomes;
+
+                if (Plugin.Instance.Config.LimitSpawnrateSyncDiskUpgradeModules)
+                {
+                    syncDiskModulePreset.perRoomLimit = 1;
+                    syncDiskModulePreset.perAddressLimit = 1;
+                    syncDiskModulePreset.perObjectLimit = 1;
+                    syncDiskModulePreset.perCommercialLimit = 1;
+                    syncDiskModulePreset.limitInCommercial = true;
+                    syncDiskModulePreset.limitPerRoom = true;
+                    syncDiskModulePreset.limitPerAddress = true;
+                    syncDiskModulePreset.limitPerObject = true;
+                }
+
+                // Set value
+                syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue, 
+                    Plugin.Instance.Config.MaxSyncDiskUpgradeModuleValue);
 
                 // Lockpicks
                 AdjustHairPins(hairPinPreset);

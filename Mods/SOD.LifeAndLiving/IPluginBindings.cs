@@ -82,10 +82,25 @@ namespace SOD.LifeAndLiving
         [Binding(50, "The percentage of item value that is taken for selling items to blackmarket (default game is 80%)", "LifeAndLiving.Economy.PercentageSalePriceBlackMarket")]
         public int PercentageSalePriceBlackMarket { get; set; }
 
+        [Binding(85, "The max price an item can be sold for in general stores.", "LifeAndLiving.Economy.MaxSellPriceAllItemsGeneral")]
+        public int MaxSellPriceAllItemsGeneral { get; set; }
+
+        [Binding(225, "The max price an item can be sold for in blackmarket.", "LifeAndLiving.Economy.MaxSellPriceAllItemsBlackMarket")]
+        public int MaxSellPriceAllItemsBlackMarket { get; set; }
+
         [Binding(400, "The minimum value of a diamond.", "LifeAndLiving.Economy.MinDiamondValue")]
         public int MinDiamondValue { get; set; }
 
         [Binding(1000, "The maximum value of a diamond.", "LifeAndLiving.Economy.MaxDiamondValue")]
         public int MaxDiamondValue { get; set; }
+
+        [Binding(750, "The minimum value of a sync disk upgrade module.", "LifeAndLiving.Economy.MinSyncDiskUpgradeModuleValue")]
+        public int MinSyncDiskUpgradeModuleValue { get; set; }
+
+        [Binding(1000, "The maximum value of a sync disk upgrade module.", "LifeAndLiving.Economy.MaxSyncDiskUpgradeModuleValue")]
+        public int MaxSyncDiskUpgradeModuleValue { get; set; }
+
+        [Binding(true, "This severly reduces spawn rate of sync disk upgrade modules.", "LifeAndLiving.Economy.LimitSpawnrateSyncDiskUpgradeModules")]
+        public bool LimitSpawnrateSyncDiskUpgradeModules { get; set; }
     }
 }
