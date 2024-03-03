@@ -53,6 +53,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public SyncDiskPreset Preset { get; private set; }
 
         /// <summary>
+        /// A unique hash based on the plugin guid
+        /// </summary>
+        internal string ModHash { get; private set; }
+
+        /// <summary>
         /// The sync disk's name.
         /// </summary>
         public string Name { get; private set; }
@@ -143,10 +148,14 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal static SyncDisk ConvertFrom(SyncDiskBuilder builder)
         {
             // Set basic properties
-            var syncDisk = new SyncDisk();
-            syncDisk.Preset.name = $"custom_{builder.Name}";
+            var syncDisk = new SyncDisk
+            {
+                Name = builder.Name,
+                ModHash = Lib.SaveGame.GetUniqueString(builder.PluginGuid)
+            };
+
+            syncDisk.Preset.name = $"custom_{builder.Name}_{syncDisk.ModHash}";
             syncDisk.Preset.presetName = syncDisk.Preset.name;
-            syncDisk.Name = builder.Name;
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
             syncDisk.Preset.manufacturer = builder.Manufacturer;
@@ -226,7 +235,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <returns></returns>
         internal static SyncDisk ConvertFrom(SyncDiskPreset preset)
         {
-            return new SyncDisk(false) { Name = preset.name, Preset = preset };
+            var split = preset.name.Split('_');
+            var isCustomSyncDisk = split.Length > 1 && split[0].Equals("custom");
+            var name = isCustomSyncDisk ? split[1] : split[0];
+            var modHash = isCustomSyncDisk ? split[^1] : null;
+            return new SyncDisk(false) { Name = name, Preset = preset, ModHash = modHash };
         }
     }
 }

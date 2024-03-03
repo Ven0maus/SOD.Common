@@ -6,6 +6,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
     {
         /// <summary>
         /// This is considered the change applied to the sync disk object that was installed/upgraded/uninstalled
+        /// <br>NOTE: When a savegame is loaded, install and upgrade events will be raised for each installed sync disk, in this case this property will be null.</br>
         /// </summary>
         public UpgradesController.Upgrades SyncDiskChange { get; }
 
@@ -30,6 +31,13 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <br>This will be one of the 3 main upgrade options.</br>
         /// </summary>
         public Option? UpgradeOption { get; }
+
+        internal SyncDiskArgs(SyncDisk syncDisk, SyncDisks.Effect effect, Option? option = null)
+        {
+            SyncDisk = syncDisk;
+            Effect = effect;
+            UpgradeOption = option;
+        }
 
         internal SyncDiskArgs(UpgradesController.Upgrades upgrades, bool setEffect = true, bool setUpgradeOption = true)
         {

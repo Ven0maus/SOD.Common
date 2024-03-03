@@ -1,7 +1,11 @@
 ﻿using SOD.Common.Helpers.SyncDiskObjects;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using static SOD.Common.Helpers.SyncDiskObjects.SyncDiskArgs;
 
 namespace SOD.Common.Helpers
 {
@@ -45,6 +49,24 @@ namespace SOD.Common.Helpers
             return _currentSyncDiskOptionId.Value;
         }
 
+        internal readonly Dictionary<string, List<InstalledSyncDiskData>> InstalledSyncDisks = new();
+
+        internal class InstalledSyncDiskData
+        {
+            public string SyncDiskName { get; set; }
+            public string Effect { get; set; }
+            public List<string> UpgradeOptions { get; set; }
+
+            public InstalledSyncDiskData() { }
+
+            internal InstalledSyncDiskData(string name, string effectName)
+            {
+                SyncDiskName = name;
+                Effect = effectName;
+                UpgradeOptions = new();
+            }
+        }
+
         /// <summary>
         /// All the registered sync disks in the game by mods.
         /// </summary>
@@ -85,11 +107,87 @@ namespace SOD.Common.Helpers
         /// <br>When finished setting up your properties on the builder, call builder.Create();</br>
         /// <br>This will return a SyncDisk object which you can call .Register() on the register it into the game.</br>
         /// </summary>
-        /// <param name="name"></param>
+        /// <param name="syncDiskName">The name of the sync disk</param>
+        /// <param name="pluginGuid">The mod's plugin guid</param>
         /// <returns></returns>
-        public SyncDiskBuilder Builder(string syncDiskName)
+        public SyncDiskBuilder Builder(string syncDiskName, string pluginGuid)
         {
-            return new SyncDiskBuilder(syncDiskName);
+            return new SyncDiskBuilder(syncDiskName, pluginGuid);
+        }
+
+        internal void CheckForSyncDiskData(bool onLoad, string saveFilePath)
+        {
+            if (onLoad)
+                InstalledSyncDisks.Clear();
+
+            var hash = Lib.SaveGame.GetUniqueString(saveFilePath);
+            var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+            if (onLoad && !File.Exists(path)) return;
+
+            if (onLoad)
+            {
+                // On load, raise all correct events of installed effects and upgrades
+                var json = File.ReadAllText(path);
+                var data = JsonSerializer.Deserialize<SyncDiskJsonData>(json);
+                if (data == null || data.SyncDiskData == null) return;
+
+                foreach (var disk in data.SyncDiskData)
+                {
+                    // Raise correct events for each sync disk
+                    var syncDisk = RegisteredSyncDisks.FirstOrDefault(a => a.Preset.name.Equals(disk.SyncDiskName));
+                    // Get correct effect with right ID
+                    var realEffect = syncDisk.Effects.First(a => a.Name.Equals(disk.Effect));
+                    var index = Array.IndexOf(syncDisk.Effects, realEffect);
+                    OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect));
+                    Plugin.Log.LogInfo($"Loaded savegame, raised install event for custom disk: {disk.SyncDiskName} | {realEffect.Name}");
+
+                    if (disk.UpgradeOptions != null)
+                    {
+                        // Options for the given effect index
+                        var realOptions = syncDisk.UpgradeOptions[index];
+                        foreach (var option in disk.UpgradeOptions)
+                        {
+                            // Get real option id
+                            var realOption = realOptions.Name1 != null && realOptions.Name1.Equals(option) ? realOptions.Id1 :
+                                realOptions.Name2 != null && realOptions.Name2.Equals(option) ? realOptions.Id2 : realOptions.Id3;
+                            if (realOption == null) continue;
+                            OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect, new SyncDiskArgs.Option(realOption.Value, option)));
+                            Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {disk.SyncDiskName} | {realEffect.Name} | {option}");
+                        }
+                    }
+                    
+                    if (!InstalledSyncDisks.TryGetValue(disk.SyncDiskName, out List<InstalledSyncDiskData> disks)) 
+                    {
+                        disks = new();
+                        InstalledSyncDisks.Add(disk.SyncDiskName, disks);
+                    }
+
+                    disks.Add(disk);
+                }
+            }
+            else
+            {
+                // Don't need to create a file if there are no custom sync disks installed
+                if (InstalledSyncDisks.Count == 0)
+                {
+                    // If the file exists (from previous save, then delete it because there are no more custom installed disks in this save)
+                    if (File.Exists(path))
+                        File.Delete(path);
+                    return;
+                }
+
+                // On save, serialize all sync disk data
+                var toBeSaved = new SyncDiskJsonData() { SyncDiskData = InstalledSyncDisks.Values.SelectMany(a => a).OrderBy(a => a.SyncDiskName).ToList() };
+                var json = JsonSerializer.Serialize(toBeSaved, new JsonSerializerOptions { WriteIndented = false });
+                File.WriteAllText(path, json);
+
+                Plugin.Log.LogInfo($"Saving game, writing custom sync disk data to common savestore.");
+            }
+        }
+
+        internal class SyncDiskJsonData
+        {
+            public List<InstalledSyncDiskData> SyncDiskData { get; set; }
         }
 
         internal void RaiseSyncDiskEvent(SyncDiskEvent syncDiskEvent, bool after, UpgradesController.Upgrades upgrade)
@@ -97,22 +195,87 @@ namespace SOD.Common.Helpers
             switch (syncDiskEvent)
             {
                 case SyncDiskEvent.OnInstall:
+                    var installArgs = new SyncDiskArgs(upgrade, true, false);
                     if (after)
-                        OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
+                        OnAfterSyncDiskInstalled?.Invoke(this, installArgs);
                     else
-                        OnBeforeSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
+                        OnBeforeSyncDiskInstalled?.Invoke(this, installArgs);
+
+                    // Add to dictionary that it is installed
+                    if (after)
+                    {
+                        if (!installArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (installArgs.Effect != null)
+                        {
+                            if (!InstalledSyncDisks.TryGetValue(installArgs.SyncDisk.Preset.name, out var disks1))
+                            {
+                                disks1 = new List<InstalledSyncDiskData>();
+                                InstalledSyncDisks.Add(installArgs.SyncDisk.Preset.name, disks1);
+                            }
+                            disks1.Add(new InstalledSyncDiskData(installArgs.SyncDisk.Preset.name, installArgs.Effect.Value.Name));
+                            Plugin.Log.LogInfo($"Added sync disk install \"{installArgs.SyncDisk.Preset.name}\" with effect \"{installArgs.Effect.Value.Name}\".");
+                        }
+                    }
                     break;
                 case SyncDiskEvent.OnUninstall:
+                    var uninstallArgs = new SyncDiskArgs(upgrade, true, false);
                     if (after)
-                        OnAfterSyncDiskUninstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
+                        OnAfterSyncDiskUninstalled?.Invoke(this, uninstallArgs);
                     else
-                        OnBeforeSyncDiskUninstalled?.Invoke(this, new SyncDiskArgs(upgrade, true, false));
+                        OnBeforeSyncDiskUninstalled?.Invoke(this, uninstallArgs);
+
+                    if (after)
+                    {
+                        // Remove from installed sync disks
+                        if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (!InstalledSyncDisks.TryGetValue(uninstallArgs.SyncDisk.Preset.name, out var disks2))
+                        {
+                            Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
+                            break;
+                        }
+
+                        // Compare on name because ids might change when changing mod order, and this will be save in save file
+                        var correctEffect = disks2.FirstOrDefault(a => a.Effect.Equals(uninstallArgs.Effect.Value.Name));
+                        if (correctEffect == null)
+                        {
+                            Plugin.Log.LogWarning($"Could not find uninstall effect data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
+                            break;
+                        }
+
+                        disks2.Remove(correctEffect);
+                        if (disks2.Count == 0)
+                            InstalledSyncDisks.Remove(uninstallArgs.SyncDisk.Preset.name);
+
+                        Plugin.Log.LogInfo($"Uninstalled sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
+                    }
                     break;
                 case SyncDiskEvent.OnUpgrade:
+                    var upgradeArgs = new SyncDiskArgs(upgrade);
                     if (after)
-                        OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(upgrade));
+                        OnAfterSyncDiskUpgraded?.Invoke(this, upgradeArgs);
                     else
-                        OnBeforeSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(upgrade));
+                        OnBeforeSyncDiskUpgraded?.Invoke(this, upgradeArgs);
+
+                    if (after)
+                    {
+                        if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith("custom")) break;
+                        if (!InstalledSyncDisks.TryGetValue(upgradeArgs.SyncDisk.Preset.name, out var disks3))
+                        {
+                            Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
+                            break;
+                        }
+
+                        // Compare on name because ids might change when changing mod order, and this will be save in save file
+                        var cEffect = disks3.FirstOrDefault(a => a.Effect.Equals(upgradeArgs.Effect.Value.Name));
+                        if (upgradeArgs.UpgradeOption == null || cEffect == null)
+                        {
+                            Plugin.Log.LogWarning($"Could not find {(upgradeArgs.UpgradeOption == null ? "upgrade option" : "effect")} data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
+                            break;
+                        }
+
+                        cEffect.UpgradeOptions.Add(upgradeArgs.UpgradeOption.Value.Name);
+                        Plugin.Log.LogInfo($"Upgrade sync disk \"{upgradeArgs.SyncDisk.Preset.name}\" with option \"{upgradeArgs.UpgradeOption.Value.Name}\".");
+                    }
                     break;
                 default:
                     throw new NotSupportedException($"Invalid event: {syncDiskEvent}");

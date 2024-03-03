@@ -103,6 +103,10 @@ namespace SOD.Common.Helpers
                 OnAfterSave?.Invoke(this, new SaveGameArgs(path));
             else
                 OnBeforeSave?.Invoke(this, new SaveGameArgs(path));
+
+            // Handle sync disk data install/upgrade
+            if (after)
+                Lib.SyncDisks.CheckForSyncDiskData(false, path);
         }
 
         internal void OnLoad(string path, bool after)
@@ -111,6 +115,10 @@ namespace SOD.Common.Helpers
                 OnAfterLoad?.Invoke(this, new SaveGameArgs(path));
             else
                 OnBeforeLoad?.Invoke(this, new SaveGameArgs(path));
+
+            // Handle sync disk data install/upgrade
+            if (after)
+                Lib.SyncDisks.CheckForSyncDiskData(true, path);
         }
 
         internal void OnDelete(string path, bool after)
@@ -119,6 +127,12 @@ namespace SOD.Common.Helpers
                 OnAfterDelete?.Invoke(this, new SaveGameArgs(path));
             else
                 OnBeforeDelete?.Invoke(this, new SaveGameArgs(path));
+
+            // Delete sync disk data for this save
+            var hash = Lib.SaveGame.GetUniqueString(path);
+            var syncDiskDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+            if (File.Exists(syncDiskDataPath))
+                File.Delete(syncDiskDataPath);
         }
 
         internal void OnNewGame(bool after)
@@ -127,6 +141,9 @@ namespace SOD.Common.Helpers
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
             else
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
+
+            // Clear installed sync disks
+            Lib.SyncDisks.InstalledSyncDisks.Clear();
         }
     }
 

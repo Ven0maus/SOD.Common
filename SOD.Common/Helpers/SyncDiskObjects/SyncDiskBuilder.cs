@@ -7,6 +7,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
     public sealed class SyncDiskBuilder
     {
         internal string Name { get; private set; }
+        internal string PluginGuid { get; private set; }
         internal int Price { get; private set; }
         internal SyncDiskPreset.Rarity Rarity { get; private set; }
         internal SyncDiskPreset.Manufacturer Manufacturer { get; private set; }
@@ -16,9 +17,10 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal HashSet<string> MenuPresetLocations { get; private set; }
         internal bool CanBeSideJobReward { get; private set; }
 
-        internal SyncDiskBuilder(string syncDiskName)
+        internal SyncDiskBuilder(string syncDiskName, string pluginGuid)
         {
             Name = syncDiskName;
+            PluginGuid = pluginGuid;
             Effects = new List<Effect>(3);
             UpgradeOptions = new List<Options>(3);
             MenuPresetLocations = new HashSet<string>();
