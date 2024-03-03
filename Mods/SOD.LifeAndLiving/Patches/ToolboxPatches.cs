@@ -156,9 +156,9 @@ namespace SOD.LifeAndLiving.Patches
                 if (Plugin.Instance.Config.LimitSpawnrateSyncDiskUpgradeModules)
                 {
                     syncDiskModulePreset.perRoomLimit = 1;
-                    syncDiskModulePreset.perAddressLimit = 1;
+                    syncDiskModulePreset.perAddressLimit = 2;
                     syncDiskModulePreset.perObjectLimit = 1;
-                    syncDiskModulePreset.perCommercialLimit = 1;
+                    syncDiskModulePreset.perCommercialLimit = 2;
                     syncDiskModulePreset.limitInCommercial = true;
                     syncDiskModulePreset.limitPerRoom = true;
                     syncDiskModulePreset.limitPerAddress = true;
@@ -172,9 +172,9 @@ namespace SOD.LifeAndLiving.Patches
                 if (Plugin.Instance.Config.LimitSpawnrateSyncDisks)
                 {
                     syncDiskPreset.perRoomLimit = 1;
-                    syncDiskPreset.perAddressLimit = 1;
+                    syncDiskPreset.perAddressLimit = 2;
                     syncDiskPreset.perObjectLimit = 1;
-                    syncDiskPreset.perCommercialLimit = 1;
+                    syncDiskPreset.perCommercialLimit = 2;
                     syncDiskPreset.limitInCommercial = true;
                     syncDiskPreset.limitPerRoom = true;
                     syncDiskPreset.limitPerAddress = true;
