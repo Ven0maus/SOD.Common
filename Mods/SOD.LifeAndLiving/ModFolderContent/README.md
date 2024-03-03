@@ -1,7 +1,8 @@
 # SOD.LifeAndLiving
 
 SOD.LifeAndLiving is a mod designed to provide a more immersive lifestyle experience for life as a detective in the city.
-The mod focuses on enhancing the day-to-day aspects of city living, introducing features like:
+The mod focuses on enhancing the day-to-day aspects of city living.
+Improving things such as economy balance, social experience, daily needs and more.
 
 Features:
 - Reduce payout of side jobs

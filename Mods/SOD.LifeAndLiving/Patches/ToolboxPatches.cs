@@ -83,8 +83,8 @@ namespace SOD.LifeAndLiving.Patches
                 {
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var min = Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.x - (resolveQuestion.rewardRange.x / 100 * reduction));
-                        var max = Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.y - (resolveQuestion.rewardRange.y / 100 * reduction));
+                        var min = (int)Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.x - (resolveQuestion.rewardRange.x / 100 * reduction));
+                        var max = (int)Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.y - (resolveQuestion.rewardRange.y / 100 * reduction));
                         resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
                     }
                     jobCount++;
