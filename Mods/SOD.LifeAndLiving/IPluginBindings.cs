@@ -37,7 +37,7 @@ namespace SOD.LifeAndLiving
         [Binding(true, "Should paper clips only spawn in office buildings?", "LifeAndLiving.Economy.LimitPaperclipToOfficeOnly")]
         public bool LimitPaperclipToOfficeOnly { get; set; }
 
-        [Binding(60, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Economy.ApartementCostPercentage")]
+        [Binding(50, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Economy.ApartementCostPercentage")]
         public int ApartementCostPercentage { get; set; }
 
         [Binding(3000, "The minimum $ cost of an apartement, if the percentage increase does not cover this minimum it will be adjusted.", "LifeAndLiving.Economy.MinimumApartementCost")]
@@ -73,7 +73,7 @@ namespace SOD.LifeAndLiving
         [Binding(60, "The percentage the value should increase of items.", "LifeAndLiving.Economy.PercentageValueIncrease")]
         public int PercentageValueIncrease { get; set; }
 
-        [Binding(32, "The minimum value of an item.", "LifeAndLiving.Economy.MinItemValue")]
+        [Binding(20, "The minimum value of an item.", "LifeAndLiving.Economy.MinItemValue")]
         public int MinItemValue { get; set; }
 
         [Binding(25, "The percentage of item value that is taken for selling items to general stores (default game is 50%)", "LifeAndLiving.Economy.PercentageSalePriceGeneral")]

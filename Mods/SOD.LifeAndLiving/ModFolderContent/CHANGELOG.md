@@ -1,6 +1,11 @@
 # CHANGELOG
 **1.0.3**
 - Bugfix: Side jobs occassionaly paid nothing, it will now atleast pay 50 crows.
+- Bugfix: Solved murder cases could potentially pay nothing, it will now atleast pay 50 crows.
+- Bugfix: Diamond and SyncDiskModuleUpgrade prices now respect their configuration values
+- Reworked item price calculation to be more robust and uniform (not too much price changes)
+- Changed item price percentage from 60 to 40 as default value
+- Changed min item price from 32 to 20 as default value
 
 **1.0.2**
 - Change thunderstore icon to correct one

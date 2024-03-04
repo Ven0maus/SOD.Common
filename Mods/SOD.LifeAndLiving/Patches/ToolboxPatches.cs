@@ -83,26 +83,40 @@ namespace SOD.LifeAndLiving.Patches
             private static void AdjustItemPrices(Toolbox __instance)
             {
                 var percentageValueIncrease = Plugin.Instance.Config.PercentageValueIncrease;
+                var percentage = (percentageValueIncrease / 100f) + 1;
                 var minItemValue = Plugin.Instance.Config.MinItemValue;
-                var random = new Random();
+                // Static seed because the LoadAll is ran at startup of the game exe
+                // The city gen will randomize it properly
+                var random = new Random(1000);
                 int count = 0;
                 foreach (var item in __instance.objectPresetDictionary)
                 {
                     var preset = item.value;
                     if (preset != null && preset.value.y > 0)
                     {
-                        // Set min
-                        int minValue = Math.Max(minItemValue, (int)preset.value.x);
-                        var adjustment = minValue + (minValue / 100 * percentageValueIncrease);
-                        minValue = random.Next(adjustment, (adjustment * 2) + 1);
+                        // Both these cases are hardcoded to certain values
+                        if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
+                            continue;
 
-                        // Set max
-                        int maxValue = Math.Max(minValue, (int)preset.value.y);
-                        adjustment = maxValue + (maxValue / 100 * percentageValueIncrease);
-                        maxValue = random.Next(minValue + 1, adjustment + 1);
+                        // Calculate initial min and max values
+                        var initialMinValue = Math.Max(minItemValue, (int)preset.value.x);
+                        var initialMaxValue = Math.Max(initialMinValue + ((int)preset.value.y - (int)preset.value.x), (int)preset.value.y);
+
+                        // Apply percentages
+                        initialMinValue = (int)(initialMinValue * percentage);
+                        initialMaxValue = (int)(initialMaxValue * percentage);
+
+                        // Add some random off-set to min value
+                        // First calculate how much we can max off-set
+                        var diff = initialMinValue - minItemValue;
+                        if (diff > 0)
+                            initialMinValue -= random.Next(0, Math.Min(diff, 15) + 1);
+
+                        // Add some random off-set to max value
+                        initialMaxValue += random.Next(0, 16);
 
                         // Set value
-                        preset.value = new UnityEngine.Vector2(minValue, maxValue);
+                        preset.value = new UnityEngine.Vector2(initialMinValue, initialMaxValue);
                         count++;
                     }
                 }
