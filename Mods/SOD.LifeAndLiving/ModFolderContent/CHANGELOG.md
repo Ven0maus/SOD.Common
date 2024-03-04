@@ -1,4 +1,11 @@
 # CHANGELOG
+**1.0.4**
+- Modified the reward calculation logic for side jobs to allow non-multiples of 50
+- Modified the reward calculation logic for murder resolution questions to allow non-multiples of 50
+- Added configuration option to define minimum value for a murder resolve question reward price
+- Bugfix: calculate penalty properly for sidejobs and murder cases
+- Reworked configuration file (added categories)
+
 **1.0.3**
 - Bugfix: Side jobs occassionaly paid nothing, it will now atleast pay 50 crows.
 - Bugfix: Solved murder cases could potentially pay nothing, it will now atleast pay 50 crows.

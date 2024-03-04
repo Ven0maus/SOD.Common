@@ -17,19 +17,20 @@ namespace SOD.LifeAndLiving.Patches
             private static void ReduceMurderPayouts(GameplayControls __instance)
             {
                 var reduction = Plugin.Instance.Config.PayoutReductionMurders;
+                var minPayout = Plugin.Instance.Config.MinimumMurderResolveQuestionPayout;
                 int count = 0;
                 foreach (var resolveQuestion in __instance.murderResolveQuestions)
                 {
                     // Reduce reward
-                    var min = Math.Max(50, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
-                    var max = Math.Max(50, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
+                    var min = Math.Max(minPayout, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
+                    var max = Math.Max(minPayout, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
                     resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
 
                     // Increase penalty by 1/4 the reduction if applicable
                     if (resolveQuestion.penaltyRange.x > 0 && resolveQuestion.penaltyRange.y > 0)
                     {
-                        min = Math.Max(50, (int)resolveQuestion.penaltyRange.x + (int)(resolveQuestion.penaltyRange.x / 100 * (reduction / 4)));
-                        max = Math.Max(50, (int)resolveQuestion.penaltyRange.y + (int)(resolveQuestion.penaltyRange.y / 100 * (reduction / 4)));
+                        min = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.x + (int)(resolveQuestion.penaltyRange.x / 100 * (reduction / 4)));
+                        max = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.y + (int)(resolveQuestion.penaltyRange.y / 100 * (reduction / 4)));
                         resolveQuestion.penaltyRange = new UnityEngine.Vector2(min, max);
                     }
                     count++;
