@@ -8,13 +8,10 @@ namespace SOD.LifeAndLiving
 
     public interface ISideJobBindings
     {
-        [Binding(20, "The minimum amount a side job resolve question should pay (these are all added up to calculate the full side job price).", "LifeAndLiving.SideJobs.MinSideJob")]
-        public int MinSideJobResolveQuestion { get; set; }
-
         [Binding(50, "The minimum amount a side job should reward.", "LifeAndLiving.SideJobs.MinSideJobReward")]
         public int MinSideJobReward { get; set; }
 
-        [Binding(80, "The percentage reduction of job resolve payouts.", "LifeAndLiving.SideJobs.PayoutReductionJobs")]
+        [Binding(85, "The percentage reduction of job resolve payouts.", "LifeAndLiving.SideJobs.PayoutReductionJobs")]
         public int PayoutReductionJobs { get; set; }
     }
 

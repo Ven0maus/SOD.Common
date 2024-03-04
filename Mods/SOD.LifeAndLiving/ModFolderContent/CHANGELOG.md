@@ -3,6 +3,7 @@
 - Modified the reward calculation logic for side jobs to allow non-multiples of 50
 - Modified the reward calculation logic for murder resolution questions to allow non-multiples of 50
 - Added configuration option to define minimum value for a murder resolve question reward price
+- Removed MinSideJobResolveQuestion configuration, replaced by MinSideJobReward
 - Bugfix: calculate penalty properly for sidejobs and murder cases
 - Reworked configuration file (added categories)
 
