@@ -10,10 +10,10 @@ namespace SOD.LifeAndLiving
         [Binding(40, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Economy.DialogCostPricePercentage")]
         public int DialogCostPricePercentage { get; set; }
 
-        [Binding(90, "The percentage reduction of job resolve payouts.", "LifeAndLiving.Economy.PayoutReductionJobs")]
+        [Binding(87, "The percentage reduction of job resolve payouts.", "LifeAndLiving.Economy.PayoutReductionJobs")]
         public int PayoutReductionJobs { get; set; }
 
-        [Binding(10, "The minimum amount a side job resolve question should pay (these are all added up to calculate the full side job price).", "LifeAndLiving.Economy.MinSideJob")]
+        [Binding(15, "The minimum amount a side job resolve question should pay (these are all added up to calculate the full side job price).", "LifeAndLiving.Economy.MinSideJob")]
         public int MinSideJobResolveQuestion { get; set; }
 
         [Binding(90, "The percentage reduction of murder case resolve payouts.", "LifeAndLiving.Economy.PayoutReductionMurders")]

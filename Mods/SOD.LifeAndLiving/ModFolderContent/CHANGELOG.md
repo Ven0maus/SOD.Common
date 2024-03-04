@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.0.2**
+- Change thunderstore icon to correct one
+- Balance side job price to be a little higher
+
 **1.0.1**
 - Fix bindings
 
