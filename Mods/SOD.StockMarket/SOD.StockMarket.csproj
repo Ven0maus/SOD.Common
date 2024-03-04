@@ -7,7 +7,6 @@
 	<RestoreAdditionalProjectSources>
         https://api.nuget.org/v3/index.json;
 		https://nuget.bepinex.dev/v3/index.json;
-		<!--https://nuget.samboy.dev/v3/index.json-->
 	</RestoreAdditionalProjectSources>
 	<OutputType>Library</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
