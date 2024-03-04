@@ -18,24 +18,23 @@ namespace SOD.LifeAndLiving.Patches
             {
                 var reduction = Plugin.Instance.Config.PayoutReductionMurders;
                 int count = 0;
-                int totalMin = 0, totalMax = 0;
                 foreach (var resolveQuestion in __instance.murderResolveQuestions)
                 {
-                    var min = (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction);
-                    var max = (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction);
+                    // Reduce reward
+                    var min = Math.Max(50, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
+                    var max = Math.Max(50, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
                     resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
-                    totalMin += min;
-                    totalMax += max;
+
+                    // Increase penalty by 1/4 the reduction if applicable
+                    if (resolveQuestion.penaltyRange.x > 0 && resolveQuestion.penaltyRange.y > 0)
+                    {
+                        min = Math.Max(50, (int)resolveQuestion.penaltyRange.x + (int)(resolveQuestion.penaltyRange.x / 100 * (reduction / 4)));
+                        max = Math.Max(50, (int)resolveQuestion.penaltyRange.y + (int)(resolveQuestion.penaltyRange.y / 100 * (reduction / 4)));
+                        resolveQuestion.penaltyRange = new UnityEngine.Vector2(min, max);
+                    }
                     count++;
                 }
 
-                // Fall-back to make murder reward atleast 50€
-                if (totalMin < 50 || totalMax < 50)
-                {
-                    var totalPerQuestion = (int)Math.Ceiling(50f / __instance.murderResolveQuestions.Count);
-                    foreach (var resolveQuestion in __instance.murderResolveQuestions)
-                        resolveQuestion.rewardRange = new UnityEngine.Vector2(totalPerQuestion, totalPerQuestion);
-                }
                 Plugin.Log.LogInfo($"Reduced \"{count}\" murder resolve question payouts.");
             }
         }
