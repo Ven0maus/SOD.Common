@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.9**
+- Businesses that are supposed to be open according to business hours now no longer have their doors locked on a new game.
+
 **1.0.8**
 - Skips the "press any key" screen at start game, immediately loading the mainmenu
 
