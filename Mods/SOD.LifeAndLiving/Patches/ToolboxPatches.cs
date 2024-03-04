@@ -117,12 +117,24 @@ namespace SOD.LifeAndLiving.Patches
                 var minSideJobResolveQuestion = Plugin.Instance.Config.MinSideJobResolveQuestion;
                 foreach (var sideJob in sideJobs)
                 {
+                    int totalMin = 0, totalMax = 0;
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var min = (int)Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.x - (resolveQuestion.rewardRange.x / 100 * reduction));
-                        var max = (int)Math.Max(minSideJobResolveQuestion, resolveQuestion.rewardRange.y - (resolveQuestion.rewardRange.y / 100 * reduction));
+                        var min = Math.Max(minSideJobResolveQuestion, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
+                        var max = Math.Max(minSideJobResolveQuestion, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
                         resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
+                        totalMin += min;
+                        totalMax += max;
                     }
+
+                    // Fall-back to make side job atleast 50€
+                    if (totalMin < 50 || totalMax < 50)
+                    {
+                        var totalPerQuestion = (int)Math.Ceiling(50f / sideJob.resolveQuestions.Count);
+                        foreach (var resolveQuestion in sideJob.resolveQuestions)
+                            resolveQuestion.rewardRange = new UnityEngine.Vector2(totalPerQuestion, totalPerQuestion);
+                    }
+                    
                     jobCount++;
                 }
                 Plugin.Log.LogInfo($"Reduced \"{jobCount}\" job payouts.");

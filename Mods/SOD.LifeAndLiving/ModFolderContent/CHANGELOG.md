@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.3**
+- Bugfix: Side jobs occassionaly paid nothing, it will now atleast pay 50 crows.
+
 **1.0.2**
 - Change thunderstore icon to correct one
 - Balance side job price to be a little higher
