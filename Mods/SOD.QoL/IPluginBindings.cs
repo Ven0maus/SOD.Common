@@ -15,6 +15,9 @@ namespace SOD.QoL
     {
         [Binding(true, "Resume the game from paused state when exiting the mainmenu with menu key", "QoL.MainMenu.UnpauseGameWithMenuKey")]
         bool UnpauseGameOnMainMenuExit { get; set; }
+
+        [Binding(true, "Skips the press any key screen at the start of the game if no joysticks are connected.", "QoL.MainMenu.SkipPressAnyKeyScreenIfNotUsingJoysticks")]
+        bool SkipPressAnyKeyScreenIfNotUsingJoysticks { get; set; }
     }
 
     public interface IMapBindings

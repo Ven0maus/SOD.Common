@@ -13,11 +13,18 @@ namespace SOD.QoL.Patches
             [HarmonyPrefix]
             private static void Prefix(ControlDetectController __instance)
             {
-                __instance.loadSceneTriggered = true;
+                if (!Plugin.Instance.Config.SkipPressAnyKeyScreenIfNotUsingJoysticks) return;
 
-                // Set control method to mouse&keyboard or joystick
+                // If a joystick is connected, we cannot skip the screen because we need to know what is accessing.
                 var joystickNames = Input.GetJoystickNames();
-                PlayerPrefs.SetInt("controlMethod", (joystickNames == null || joystickNames.Length == 0) ? 1 : 0);
+                if (joystickNames != null && joystickNames.Length > 0)
+                {
+                    __instance.loadSceneTriggered = false;
+                    return;
+                }
+
+                PlayerPrefs.SetInt("controlMethod", 1);
+                __instance.loadSceneTriggered = true;
             }
         }
     }

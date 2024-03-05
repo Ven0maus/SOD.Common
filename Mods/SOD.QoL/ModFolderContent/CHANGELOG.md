@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.0**
+- Fix mouse not responding to input when you have joystick connected but not using joystick to play the game.
+
 **1.0.9**
 - Businesses that are supposed to be open according to business hours now no longer have their doors locked on a new game.
 
