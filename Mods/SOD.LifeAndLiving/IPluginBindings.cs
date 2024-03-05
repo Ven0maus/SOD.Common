@@ -59,10 +59,10 @@ namespace SOD.LifeAndLiving
         [Binding(50, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Housing.ApartementCostPercentage")]
         public int ApartementCostPercentage { get; set; }
 
-        [Binding(3000, "The minimum $ cost of an apartement, if the percentage increase does not cover this minimum it will be adjusted.", "LifeAndLiving.Housing.MinimumApartementCost")]
+        [Binding(5000, "The minimum $ cost of an apartement, if the percentage increase does not cover this minimum it will be adjusted.", "LifeAndLiving.Housing.MinimumApartementCost")]
         public int MinimumApartementCost { get; set; }
 
-        [Binding(40, "The percentage increase of apartement cost based on the existing price", "LifeAndLiving.Housing.FurniteCostPercentage")]
+        [Binding(40, "The percentage increase of furniture cost based on the existing price", "LifeAndLiving.Housing.FurniteCostPercentage")]
         public int FurniteCostPercentage { get; set; }
 
         [Binding(250, "The cost of a lower suite in a hotel per day.", "LifeAndLiving.Housing.CostLowerSuiteHotel")]
@@ -74,7 +74,7 @@ namespace SOD.LifeAndLiving
 
     public interface IDialogBindings
     {
-        [Binding(40, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Economy.DialogCostPricePercentage")]
+        [Binding(80, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Economy.DialogCostPricePercentage")]
         public int DialogCostPricePercentage { get; set; }
     }
 
@@ -98,28 +98,28 @@ namespace SOD.LifeAndLiving
         [Binding(5, "The amount of lockpicks the buyable kit should give", "LifeAndLiving.Shops.LockPickKitAmount")]
         public int LockPickKitAmount { get; set; }
 
-        [Binding(25, "The percentage of item value that is taken for selling items to general stores (default game is 50%)", "LifeAndLiving.Shops.PercentageSalePriceGeneral")]
+        [Binding(15, "The percentage of item value that is taken for selling items to general stores (default game is 50%)", "LifeAndLiving.Shops.PercentageSalePriceGeneral")]
         public int PercentageSalePriceGeneral { get; set; }
 
-        [Binding(50, "The percentage of item value that is taken for selling items to blackmarket (default game is 80%)", "LifeAndLiving.Shops.PercentageSalePriceBlackMarket")]
+        [Binding(40, "The percentage of item value that is taken for selling items to blackmarket (default game is 80%)", "LifeAndLiving.Shops.PercentageSalePriceBlackMarket")]
         public int PercentageSalePriceBlackMarket { get; set; }
 
-        [Binding(85, "The max price an item can be sold for in general stores. (diamond excluded)", "LifeAndLiving.Shops.MaxSellPriceAllItemsGeneral")]
+        [Binding(70, "The max price an item can be sold for in general stores. (diamond excluded)", "LifeAndLiving.Shops.MaxSellPriceAllItemsGeneral")]
         public int MaxSellPriceAllItemsGeneral { get; set; }
 
-        [Binding(225, "The max price an item can be sold for in blackmarket. (diamond excluded)", "LifeAndLiving.Shops.MaxSellPriceAllItemsBlackMarket")]
+        [Binding(200, "The max price an item can be sold for in blackmarket. (diamond excluded)", "LifeAndLiving.Shops.MaxSellPriceAllItemsBlackMarket")]
         public int MaxSellPriceAllItemsBlackMarket { get; set; }
     }
 
     public interface IItemPriceBindings
     {
-        [Binding(60, "The percentage the value should increase of items.", "LifeAndLiving.ItemPrice.PercentageValueIncrease")]
+        [Binding(65, "The percentage the value should increase of items.", "LifeAndLiving.ItemPrice.PercentageValueIncrease")]
         public int PercentageValueIncrease { get; set; }
 
-        [Binding(20, "The minimum value of an item.", "LifeAndLiving.ItemPrice.MinItemValue")]
+        [Binding(25, "The minimum value of an item.", "LifeAndLiving.ItemPrice.MinItemValue")]
         public int MinItemValue { get; set; }
 
-        [Binding(400, "The minimum value of a diamond.", "LifeAndLiving.ItemPrice.MinDiamondValue")]
+        [Binding(300, "The minimum value of a diamond.", "LifeAndLiving.ItemPrice.MinDiamondValue")]
         public int MinDiamondValue { get; set; }
 
         [Binding(1000, "The maximum value of a diamond.", "LifeAndLiving.ItemPrice.MaxDiamondValue")]
