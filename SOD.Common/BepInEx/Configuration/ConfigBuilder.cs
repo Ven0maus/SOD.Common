@@ -1,4 +1,5 @@
 ﻿using BepInEx.Configuration;
+using SOD.Common.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,36 +54,34 @@ namespace SOD.Common.BepInEx.Configuration
         }
 
         /// <summary>
-        /// Get an existing entry out of the configuration builder
-        /// <br>If you want the <see cref="ConfigEntryBase"/> object, use <see cref="ConfigEntryBase"/> as generic type.</br>
+        /// Add a new non-generic entry to the configuration builder
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="defaultValue"></param>
         /// <param name="identifier"></param>
+        /// <param name="description"></param>
         /// <returns></returns>
-        public T Get<T>(string identifier)
+        public ConfigBuilder Add(object defaultValue, string identifier, string description)
         {
             var (section, key) = SplitIdentifier(identifier);
-            return Get<T>(section, key);
+            return Add(defaultValue, section, key, description);
         }
 
         /// <summary>
-        /// Get an existing entry out of the configuration builder
-        /// <br>If you want the <see cref="ConfigEntryBase"/> object, use <see cref="ConfigEntryBase"/> as generic type.</br>
+        /// Add a new non-generic entry to the configuration builder
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="defaultValue"></param>
         /// <param name="section"></param>
         /// <param name="key"></param>
+        /// <param name="description"></param>
         /// <returns></returns>
-        public T Get<T>(string section, string key)
+        public ConfigBuilder Add(object defaultValue, string section, string key, string description)
         {
-            if (_configuration.TryGetValue(section, out var entries) && entries.TryGetValue(key, out var entry))
-            {
-                if (typeof(T) == typeof(ConfigEntryBase))
-                    return (T)entry;
-                else
-                    return ((ConfigEntry<T>)entry).Value;
-            }
-            throw new Exception($"No configuration entry exists for section \"{section}\" and key \"{key}\".");
+            if (!_configuration.TryGetValue(section, out var entries))
+                _configuration.Add(section, entries = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase));
+
+            if (!entries.ContainsKey(key))
+                entries.Add(key, File.Bind(defaultValue, section, key, description));
+            return this;
         }
 
         /// <summary>
@@ -114,6 +113,32 @@ namespace SOD.Common.BepInEx.Configuration
         }
 
         /// <summary>
+        /// Set an existing non-generic entry to a new value in the configuration builder
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <exception cref="Exception"></exception>
+        public void Set(object value, string section, string key)
+        {
+            if (ExistsInternal(section, key, out var entry))
+                entry.BoxedValue = value;
+            else
+                throw new Exception($"No configuration entry exists for section \"{section}\" and key \"{key}\".");
+        }
+
+        /// <summary>
+        /// Set an existing non-generic entry to a new value in the configuration builder
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="identifier"></param>
+        public void Set(object value, string identifier)
+        {
+            var (section, key) = SplitIdentifier(identifier);
+            Set(value, section, key);
+        }
+
+        /// <summary>
         /// Check if a binding exists in the configuration builder
         /// </summary>
         /// <typeparam name="T"></typeparam>
@@ -139,6 +164,33 @@ namespace SOD.Common.BepInEx.Configuration
         {
             var exists = ExistsInternal<T>(section, key, out var config);
             entry = exists ? config.Value : default;
+            return exists;
+        }
+
+        /// <summary>
+        /// Check if a non-generic binding exists in the configuration builder
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool Exists(out object entry, string section, string key)
+        {
+            var exists = ExistsInternal(section, key, out var config);
+            entry = exists ? config.BoxedValue : default;
+            return exists;
+        }
+
+        /// <summary>
+        /// Check if a non-generic binding exists in the configuration builder
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <param name="identifier"></param>
+        /// <returns></returns>
+        public bool Exists(out object entry, string identifier)
+        {
+            var exists = ExistsInternal(identifier, out var config);
+            entry = exists ? config.BoxedValue : default;
             return exists;
         }
 

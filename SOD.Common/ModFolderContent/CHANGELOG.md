@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.1.8**
+- Added non-generic bind extension for BepInEx configuration
+- Added support for enum values in interface bindings
+
 **1.1.7**
 - Made sync disk re-raise events optional (extra parameter in builder, default true)
 
