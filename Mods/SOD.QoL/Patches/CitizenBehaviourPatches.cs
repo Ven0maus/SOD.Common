@@ -42,7 +42,7 @@ namespace SOD.QoL.Patches
                 Player.Instance.wellRested = __state.WellRested;
 
                 // Re-calculate the alertness, energy and wellRested value modifications
-                if (Player.Instance.spendingTimeMode && InteractionController.Instance.lockedInInteraction != null && 
+                if (Player.Instance.spendingTimeMode && InteractionController.Instance.lockedInInteraction != null &&
                     InteractionController.Instance.lockedInInteraction.preset.specialCaseFlag == InteractablePreset.SpecialCase.sleepPosition)
                 {
                     if (Player.Instance.energy >= 0.8f)

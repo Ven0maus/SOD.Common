@@ -46,7 +46,7 @@ namespace SOD.QoL.Patches
                     }
                     return true;
                 }
-                catch(Exception)
+                catch (Exception)
                 {
                     return true;
                 }

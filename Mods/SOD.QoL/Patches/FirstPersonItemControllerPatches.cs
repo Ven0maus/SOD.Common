@@ -28,7 +28,7 @@ namespace SOD.QoL.Patches
             internal static void Prefix(FirstPersonItemController __instance, ref PlayerState __state)
             {
                 if (!Plugin.Instance.Config.FixTiredness) return;
-                if (__instance.isConsuming && !__instance.takeOneActive && BioScreenController.Instance.selectedSlot != null && 
+                if (__instance.isConsuming && !__instance.takeOneActive && BioScreenController.Instance.selectedSlot != null &&
                     BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
                     Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
