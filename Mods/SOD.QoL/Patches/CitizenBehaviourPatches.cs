@@ -27,6 +27,7 @@ namespace SOD.QoL.Patches
             [HarmonyPrefix]
             internal static void Prefix(CitizenBehaviour __instance, ref PlayerState __state)
             {
+                if (!Plugin.Instance.Config.FixTiredness) return;
                 var tickRate = SessionData.Instance.gameTime - __instance.timeOnLastGameWorldUpdate;
                 __state = new PlayerState(Player.Instance.energy, Player.Instance.wellRested, Player.Instance.alertness, tickRate);
             }
@@ -34,6 +35,7 @@ namespace SOD.QoL.Patches
             [HarmonyPostfix]
             internal static void Postfix(ref PlayerState __state)
             {
+                if (!Plugin.Instance.Config.FixTiredness) return;
                 // Reset alertness, energy and wellRested back to original values before this frame's modification
                 Player.Instance.energy = __state.Energy;
                 Player.Instance.alertness = __state.Alertness;

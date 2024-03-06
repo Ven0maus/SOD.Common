@@ -2,13 +2,16 @@
 
 namespace SOD.QoL
 {
-    public interface IPluginBindings : IConversationBindings, IMainMenuBindings, IMapBindings
+    public interface IPluginBindings : IConversationBindings, IMainMenuBindings, IMapBindings, IGameplayPatchBindings
     { }
 
     public interface IGameplayPatchBindings
     {
         [Binding(true, "Fixes the player never getting tired.", "QoL.Gameplay.FixTiredness")]
         bool FixTiredness { get; set; }
+
+        [Binding(12, "The percentage that is taken of alertness and added to energy restore for caffeine items. (12 seems balanced)", "QoL.Gameplay.PercentageEnergyRestore")]
+        int PercentageEnergyRestore { get; set; }
     }
 
     public interface IConversationBindings

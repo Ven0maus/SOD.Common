@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -26,6 +27,7 @@ namespace SOD.QoL.Patches
             [HarmonyPrefix]
             internal static void Prefix(FirstPersonItemController __instance, ref PlayerState __state)
             {
+                if (!Plugin.Instance.Config.FixTiredness) return;
                 if (__instance.isConsuming && !__instance.takeOneActive && BioScreenController.Instance.selectedSlot != null && 
                     BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
@@ -42,6 +44,7 @@ namespace SOD.QoL.Patches
             [HarmonyPostfix]
             internal static void Postfix(ref PlayerState __state)
             {
+                if (!Plugin.Instance.Config.FixTiredness) return;
                 // Reset alertness to original values before this frame's modification
                 Player.Instance.alertness = __state.Alertness;
                 Player.Instance.energy = __state.Energy;
@@ -56,6 +59,13 @@ namespace SOD.QoL.Patches
                         Player.Instance.alertness += interactable.preset.retailItem.alertness / interactable.preset.consumableAmount * Time.deltaTime;
                         Player.Instance.alertness = Mathf.Clamp01(Player.Instance.alertness);
                         Player.Instance.StatusCheckEndOfFrame();
+
+                        if (interactable.preset.retailItem.desireCategory == CompanyPreset.CompanyCategory.caffeine &&
+                            interactable.preset.retailItem.energy <= 0f)
+                        {
+                            // Adjust retailItem energy if it is not yet set properly for caffeine item. (support for existing saves)
+                            interactable.preset.retailItem.energy = (float)Math.Round(interactable.preset.retailItem.alertness / 100 * Plugin.Instance.Config.PercentageEnergyRestore, 2);
+                        }
 
                         // Set energy properly
                         Player.Instance.energy += interactable.preset.retailItem.energy / interactable.preset.consumableAmount * Time.deltaTime;
@@ -72,6 +82,7 @@ namespace SOD.QoL.Patches
             [HarmonyPrefix]
             internal static bool Prefix(FirstPersonItemController __instance)
             {
+                if (!Plugin.Instance.Config.FixTiredness) return true;
                 if (BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
                     Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
@@ -161,6 +172,13 @@ namespace SOD.QoL.Patches
                 Player.Instance.alertness += consumable.preset.retailItem.alertness * num;
                 Player.Instance.alertness = Mathf.Clamp01(Player.Instance.alertness);
                 Player.Instance.StatusCheckEndOfFrame();
+
+                if (consumable.preset.retailItem.desireCategory == CompanyPreset.CompanyCategory.caffeine &&
+                    consumable.preset.retailItem.energy <= 0f)
+                {
+                    // Adjust retailItem energy if it is not yet set properly for caffeine item. (support for existing saves)
+                    consumable.preset.retailItem.energy = (float)Math.Round(consumable.preset.retailItem.alertness / 100 * Plugin.Instance.Config.PercentageEnergyRestore, 2);
+                }
 
                 // Set energy properly
                 Player.Instance.energy += consumable.preset.retailItem.energy * num;
