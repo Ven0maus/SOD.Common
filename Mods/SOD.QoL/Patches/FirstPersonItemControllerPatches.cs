@@ -1,5 +1,4 @@
 ﻿using HarmonyLib;
-using SOD.Common.Custom;
 using System.Collections;
 using UnityEngine;
 
@@ -67,57 +66,106 @@ namespace SOD.QoL.Patches
             }
         }
 
-        [HarmonyPatch(typeof(FirstPersonItemController), nameof(FirstPersonItemController.TakeOneExecute))]
-        internal class FirstPersonItemController_TakeOneExecute
+        [HarmonyPatch(typeof(FirstPersonItemController), nameof(FirstPersonItemController.TakeOne))]
+        internal class FirstPersonItemController_TakeOne
         {
-            private static float _alertness = 0f;
-            private static float _energy = 0f;
-            private static Interactable _consumable;
-
-            [HarmonyPostfix]
-            internal static void Postfix(ref IEnumerator __result)
+            [HarmonyPrefix]
+            internal static bool Prefix(FirstPersonItemController __instance)
             {
-                __result = EnumeratorWrapper.Wrap(__result, PrefixAction, PostfixAction, PreYieldReturnAction);
-            }
-
-            private static void PrefixAction()
-            {
-                _alertness = Player.Instance.alertness;
-                _energy = Player.Instance.energy;
-
-                // set consumable
                 if (BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
-                    _consumable = BioScreenController.Instance.selectedSlot.GetInteractable();
+                    Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
+                    if (interactable.preset.takeOneEvent != null)
+                    {
+                        AudioController.Instance.Play2DSound(interactable.preset.takeOneEvent, null, 1f);
+                    }
                 }
+                if (!__instance.takeOneActive)
+                    UniverseLib.RuntimeHelper.StartCoroutine(TakeOneExecute(__instance));
+                return false;
             }
 
-            private static void PreYieldReturnAction(object returnValue)
+            private static IEnumerator TakeOneExecute(FirstPersonItemController __instance)
             {
-                Player.Instance.alertness = _alertness;
-                Player.Instance.energy = _energy;
+                float progress = 0f;
+                __instance.takeOneActive = true;
+                __instance.SetConsuming(true);
+                Interactable consumable = null;
+                if (BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1)
+                {
+                    consumable = BioScreenController.Instance.selectedSlot.GetInteractable();
+                }
 
-                // Set alertness properly
-                if (_consumable != null && _consumable.preset.retailItem != null)
+                while (progress < 1f && consumable != null && consumable.cs > 0f)
                 {
                     float num = Time.deltaTime / 1.8f;
-                    Player.Instance.alertness += _consumable.preset.retailItem.alertness * num;
-                    Player.Instance.alertness = Mathf.Clamp01(Player.Instance.alertness);
-                    Player.Instance.StatusCheckEndOfFrame();
+                    if (consumable.preset.retailItem != null)
+                    {
+                        Player.Instance.AddNourishment(consumable.preset.retailItem.nourishment * num);
+                        Player.Instance.AddHydration(consumable.preset.retailItem.hydration * num);
 
-                    // Set energy properly
-                    Player.Instance.energy += _consumable.preset.retailItem.energy * num;
-                    Player.Instance.energy = Mathf.Clamp01(Player.Instance.energy);
-                    Player.Instance.StatusCheckEndOfFrame();
+                        // Handle energy and alertness seperately
+                        HandleEnergyAndAlertness(consumable, num);
+
+                        Player.Instance.AddExcitement(consumable.preset.retailItem.excitement * num);
+                        Player.Instance.AddChores(consumable.preset.retailItem.chores * num);
+                        Player.Instance.AddHygiene(consumable.preset.retailItem.hygiene * num);
+                        Player.Instance.AddBladder(consumable.preset.retailItem.bladder * num);
+                        Player.Instance.AddHeat(consumable.preset.retailItem.heat * num);
+                        Player.Instance.AddDrunk(consumable.preset.retailItem.drunk * num);
+                        Player.Instance.AddSick(consumable.preset.retailItem.sick * num);
+                        Player.Instance.AddHeadache(consumable.preset.retailItem.headache * num);
+                        Player.Instance.AddWet(consumable.preset.retailItem.wet * num);
+                        Player.Instance.AddBrokenLeg(consumable.preset.retailItem.brokenLeg * num);
+                        Player.Instance.AddBruised(consumable.preset.retailItem.bruised * num);
+                        Player.Instance.AddBlackEye(consumable.preset.retailItem.blackEye * num);
+                        Player.Instance.AddBlackedOut(consumable.preset.retailItem.blackedOut * num);
+                        Player.Instance.AddNumb(consumable.preset.retailItem.numb * num);
+                        Player.Instance.AddBleeding(consumable.preset.retailItem.bleeding * num);
+                        Player.Instance.AddBreath(consumable.preset.retailItem.breath * num);
+                        Player.Instance.AddStarchAddiction(consumable.preset.retailItem.starchAddiction * num);
+                        Player.Instance.AddPoisoned(consumable.preset.retailItem.poisoned * num, null);
+                        Player.Instance.AddHealth(consumable.preset.retailItem.health * num, true, false);
+                    }
+                    progress += num;
+                    yield return null;
                 }
-
-                _alertness = Player.Instance.alertness;
-                _energy = Player.Instance.energy;
+                if (consumable != null)
+                {
+                    consumable.cs -= 1f;
+                    if (consumable.cs <= 0f)
+                    {
+                        __instance.OnConsumableFinished(consumable);
+                        if (consumable.preset.destroyWhenAllConsumed)
+                        {
+                            __instance.EmptySlot(BioScreenController.Instance.selectedSlot, false, true, true, false);
+                            foreach (object obj in __instance.rightHandObjectParent)
+                            {
+                                UnityEngine.Object.Destroy(((Transform)obj).gameObject);
+                            }
+                        }
+                    }
+                }
+                __instance.takeOneActive = false;
+                __instance.SetConsuming(false);
+                if (consumable.cs <= 0f)
+                {
+                    __instance.RefreshHeldObjects();
+                }
+                yield break;
             }
 
-            private static void PostfixAction()
+            private static void HandleEnergyAndAlertness(Interactable consumable, float num)
             {
-                _consumable = null;
+                // Set alertness properly
+                Player.Instance.alertness += consumable.preset.retailItem.alertness * num;
+                Player.Instance.alertness = Mathf.Clamp01(Player.Instance.alertness);
+                Player.Instance.StatusCheckEndOfFrame();
+
+                // Set energy properly
+                Player.Instance.energy += consumable.preset.retailItem.energy * num;
+                Player.Instance.energy = Mathf.Clamp01(Player.Instance.energy);
+                Player.Instance.StatusCheckEndOfFrame();
             }
         }
     }

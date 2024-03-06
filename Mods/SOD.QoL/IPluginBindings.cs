@@ -5,6 +5,12 @@ namespace SOD.QoL
     public interface IPluginBindings : IConversationBindings, IMainMenuBindings, IMapBindings
     { }
 
+    public interface IGameplayPatchBindings
+    {
+        [Binding(true, "Fixes the player never getting tired.", "QoL.Gameplay.FixTiredness")]
+        bool FixTiredness { get; set; }
+    }
+
     public interface IConversationBindings
     {
         [Binding(true, "Allow ending conversations with menu key", "QoL.Conversations.CanEndWithMenuKey")]
