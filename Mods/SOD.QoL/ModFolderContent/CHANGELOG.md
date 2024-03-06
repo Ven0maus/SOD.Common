@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.1**
+- Fixed player never getting tired and adjusted energy restore from caffeine drinks to be more balanced
+
 **1.1.0**
 - Fix mouse not responding to input when you have joystick connected but not using joystick to play the game.
 

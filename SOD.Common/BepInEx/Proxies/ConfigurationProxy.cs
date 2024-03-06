@@ -156,6 +156,13 @@ namespace SOD.Common.BepInEx.Proxies
                 else
                     builder.Set(name, (decimal)value);
             }
+            else if (type.IsEnum)
+            {
+                if (!builder.ExistsInternal(name, out _))
+                    builder.Add(TryConvert(configurationAttribute.DefaultValue, type), name, configurationAttribute.Description);
+                else
+                    builder.Set(value, name);
+            }
             else
             {
                 throw new Exception($"Configuration type {type.Name} is not supported.");
