@@ -11,3 +11,4 @@
 - Center on player button now properly zooms in to the player after zooming and moving camera
 - The current plotted route is now overriden when plotting a new route instead of canceling the current route and not plotting a new route.
 - Businesses that are supposed to be open according to business hours now no longer have their doors locked on a new game.
+- Fixed player never getting tired and adjusted energy restore from caffeine drinks to be more balanced
