@@ -1,6 +1,6 @@
 # CHANGELOG
 **1.1.8**
-- Added non-generic bind extension for BepInEx configuration
+- Added non-generic bind extension on BepInEx ConfigFile object
 - Added support for enum values in interface bindings
 
 **1.1.7**
