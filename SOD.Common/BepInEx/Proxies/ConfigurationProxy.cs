@@ -64,7 +64,7 @@ namespace SOD.Common.BepInEx.Proxies
         private static void SetByType(Type type, ConfigBuilder builder, BindingAttribute configurationAttribute, string name, object value)
         {
             // Supported types by BepInEx config file:
-            /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, decimal, enum */
+            /* string, bool, byte, sbyte, short, ushort, int, uint, long, ulong, float, double, enum */
             if (type == typeof(string))
             {
                 if (!builder.ExistsInternal(name, out _))
@@ -148,13 +148,6 @@ namespace SOD.Common.BepInEx.Proxies
                     builder.Add(name, configurationAttribute.Description, (double)TryConvert(configurationAttribute.DefaultValue, typeof(double)));
                 else
                     builder.Set(name, (double)value);
-            }
-            else if (type == typeof(decimal))
-            {
-                if (!builder.ExistsInternal(name, out _))
-                    builder.Add(name, configurationAttribute.Description, (decimal)TryConvert(configurationAttribute.DefaultValue, typeof(decimal)));
-                else
-                    builder.Set(name, (decimal)value);
             }
             else if (type.IsEnum)
             {
