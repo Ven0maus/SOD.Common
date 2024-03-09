@@ -23,4 +23,9 @@ Features:
 
 Features to come (not implemented yet):
 - More social engagement with other civilians
+(Different dialog options based on standing with citizens) 
+(eg. bartender could recognize you and ask, same as usual?)
+
 - A more immersive and impactful hunger / thirst system
+- Certain new actions and requirements to introduce some more realism
+(eg. screwdriver required to open vents)

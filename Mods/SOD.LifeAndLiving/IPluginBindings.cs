@@ -74,7 +74,7 @@ namespace SOD.LifeAndLiving
 
     public interface IDialogBindings
     {
-        [Binding(80, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Economy.DialogCostPricePercentage")]
+        [Binding(80, "The percentage increase of things such as guest pass cost, things within dialogs.", "LifeAndLiving.Dialog.DialogCostPricePercentage")]
         public int DialogCostPricePercentage { get; set; }
     }
 
