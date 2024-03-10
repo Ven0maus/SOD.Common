@@ -113,11 +113,17 @@ namespace SOD.LifeAndLiving
 
     public interface IItemPriceBindings
     {
-        [Binding(65, "The percentage the value should increase of items.", "LifeAndLiving.ItemPrice.PercentageValueIncrease")]
-        public int PercentageValueIncrease { get; set; }
+        [Binding(65, "The percentage the value should increase of general items that isn't food.", "LifeAndLiving.ItemPrice.PercentageValueIncreaseGeneral")]
+        public int PercentageValueIncreaseGeneral { get; set; }
 
-        [Binding(25, "The minimum value of an item.", "LifeAndLiving.ItemPrice.MinItemValue")]
-        public int MinItemValue { get; set; }
+        [Binding(25, "The percentage the value should increase of edible food items.", "LifeAndLiving.ItemPrice.PercentageValueIncreaseFood")]
+        public int PercentageValueIncreaseFood { get; set; }
+
+        [Binding(25, "The minimum value of a general item that isn't food.", "LifeAndLiving.ItemPrice.MinGeneralItemValue")]
+        public int MinGeneralItemValue { get; set; }
+
+        [Binding(10, "The minimum value of an edible food item.", "LifeAndLiving.ItemPrice.MinFoodItemValue")]
+        public int MinFoodItemValue { get; set; }
 
         [Binding(300, "The minimum value of a diamond.", "LifeAndLiving.ItemPrice.MinDiamondValue")]
         public int MinDiamondValue { get; set; }
