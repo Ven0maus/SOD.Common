@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.2**
+- Bugfix: Minor fix regarding player check for murder
+
 **1.0.1**
 - Bugfix: murder happened a little too early.
 

@@ -10,9 +10,10 @@ namespace SOD.LethalActionReborn.Patches
             private static bool _hasKilled = false;
 
             [HarmonyPrefix]
-            internal static void Prefix(Citizen __instance, float amount)
+            internal static void Prefix(Citizen __instance, float amount, Actor fromWho)
             {
-                _hasKilled = __instance.currentHealth - amount <= 0;
+                if (fromWho == Player.Instance)
+                    _hasKilled = __instance.currentHealth - amount <= 0;
             }
 
             [HarmonyPostfix]
