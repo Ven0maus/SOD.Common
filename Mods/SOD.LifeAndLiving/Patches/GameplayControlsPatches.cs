@@ -8,9 +8,14 @@ namespace SOD.LifeAndLiving.Patches
         [HarmonyPatch(typeof(GameplayControls), nameof(GameplayControls.Awake))]
         internal class GameplayControls_Awake
         {
+            private static bool _appliedOnce = false;
+
             [HarmonyPostfix]
             internal static void Postfix(GameplayControls __instance)
             {
+                if (_appliedOnce) return;
+                _appliedOnce = true;
+
                 ReduceMurderPayouts(__instance);
             }
 

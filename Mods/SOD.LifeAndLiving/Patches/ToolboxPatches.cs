@@ -10,9 +10,14 @@ namespace SOD.LifeAndLiving.Patches
         [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.LoadAll))]
         internal class Toolbox_LoadAll
         {
+            private static bool _appliedOnce = false;
+
             [HarmonyPostfix]
             internal static void Postfix(Toolbox __instance)
             {
+                if (_appliedOnce) return;
+                _appliedOnce = true;
+
                 // Reduces job payouts from rewards by a percentage
                 ReduceJobPayouts(__instance);
 
