@@ -32,7 +32,6 @@
         "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable",
         "bin\\Release\\net6.0\\AssetBundles\\stockmarketbundle_stable.manifest.json"
       ],
-      "DDSContent": "bin\\Release\\net6.0\\plugins",
       "Package": true
     },
     {
@@ -42,6 +41,16 @@
       "DestinationFolderName": "Builds",
       "ExtraFiles": [
         "bin\\Release\\net6.0\\SOD.LifeAndLiving.dll"
+      ],
+      "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods",
+      "ProjectName": "SOD.LethalActionReborn",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "ExtraFiles": [
+        "bin\\Release\\net6.0\\SOD.LethalActionReborn.dll"
       ],
       "Package": true
     }
