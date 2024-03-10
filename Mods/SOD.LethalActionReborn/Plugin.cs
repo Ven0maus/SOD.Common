@@ -6,7 +6,7 @@ namespace SOD.LethalActionReborn
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
-    public class Plugin : PluginController<Plugin, IPluginBindings>
+    public class Plugin : PluginController<Plugin>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LethalActionReborn";
         public const string PLUGIN_NAME = "LethalActionReborn";
