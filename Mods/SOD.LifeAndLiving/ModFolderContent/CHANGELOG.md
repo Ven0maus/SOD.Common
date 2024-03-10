@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.5**
+- Bugfix: Life and Living applies item cost increases to vendors multiple times (thx to PatchyDragon)
+
 **1.0.4**
 - Modified the reward calculation logic for side jobs to allow non-multiples of 50
 - Modified the reward calculation logic for murder resolution questions to allow non-multiples of 50
