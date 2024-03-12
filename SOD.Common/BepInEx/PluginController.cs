@@ -154,7 +154,7 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public void UpdateConfigFileLayout()
         {
-            if (!File.Exists(ConfigFile.ConfigFilePath)) return;
+            if (string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
             if (!HasConfigurationBindings())
             {
                 File.Delete(ConfigFile.ConfigFilePath);
