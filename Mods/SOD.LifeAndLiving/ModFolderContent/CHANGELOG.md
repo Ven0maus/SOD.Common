@@ -1,4 +1,8 @@
 # CHANGELOG
+**1.0.6**
+- Configuration file now changes its layout dynamically if the mod changes it in the future
+- Seperated prices of food items from general items in the configuration file
+
 **1.0.5**
 - Bugfix: Life and Living applies item cost increases to vendors multiple times (thx to PatchyDragon)
 

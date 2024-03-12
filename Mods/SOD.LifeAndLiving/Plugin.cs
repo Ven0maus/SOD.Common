@@ -27,6 +27,12 @@ namespace SOD.LifeAndLiving
             Log.LogInfo("Plugin is patched.");
         }
 
+        public override void OnConfigureBindings()
+        {
+            base.OnConfigureBindings();
+            UpdateConfigFileLayout();
+        }
+
         private void SaveGame_OnBeforeDelete(object sender, Common.Helpers.SaveGameArgs e)
         {
             var hash = Lib.SaveGame.GetUniqueString(e.FilePath);

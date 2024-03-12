@@ -2,6 +2,7 @@
 **1.1.8**
 - Added non-generic bind extension on BepInEx ConfigFile object
 - Added support for enum values in interface bindings
+- Added method "UpdateConfigFileLayout" to PluginController
 
 **1.1.7**
 - Made sync disk re-raise events optional (extra parameter in builder, default true)
