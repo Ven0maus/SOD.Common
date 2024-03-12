@@ -158,6 +158,7 @@ namespace SOD.Common.BepInEx
             if (!HasConfigurationBindings())
             {
                 File.Delete(ConfigFile.ConfigFilePath);
+                Plugin.Log.LogInfo($"Deleted outdated configuration file for mod \"{PluginGUID}\".");
                 return;
             }
 
@@ -188,7 +189,11 @@ namespace SOD.Common.BepInEx
                 }
             }
 
-            helper.Update();
+            if (helper.IsModified)
+            {
+                helper.Update();
+                Plugin.Log.LogInfo($"Updated outdated configuration file layout for mod \"{PluginGUID}\".");
+            }
         }
 
         private bool OnValidateBinding(PropertyInfo info)
