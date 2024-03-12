@@ -8,12 +8,13 @@ namespace SOD.Common.BepInEx.Configuration
     /// <summary>
     /// A class to easily make changes to the bepinex config file.
     /// </summary>
-    internal class ConfigHelper
+    internal sealed class ConfigHelper
     {
         private readonly string _filePath;
         private readonly List<string> _fileInfo = new();
         private readonly Dictionary<string, List<ConfigSetting>> _configEntries = new(StringComparer.OrdinalIgnoreCase);
-        private bool _isModified = false;
+
+        public bool IsModified { get; private set; } = false;
 
         internal ConfigHelper(string filePath)
         {
@@ -83,7 +84,7 @@ namespace SOD.Common.BepInEx.Configuration
         internal void RemoveSection(string section)
         {
             if (_configEntries.Remove(section))
-                _isModified = true;
+                IsModified = true;
         }
 
         internal static (string section, string key) SplitIdentifier(string identifier)
@@ -116,10 +117,10 @@ namespace SOD.Common.BepInEx.Configuration
             if (!string.IsNullOrWhiteSpace(section) && _configEntries.TryGetValue(section, out var configEntries))
             {
                 if (configEntries.RemoveAll(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
-                    _isModified = true;
+                    IsModified = true;
                 if (configEntries.Count == 0)
                     if (_configEntries.Remove(section))
-                        _isModified = true;
+                        IsModified = true;
             }
             else
             {
@@ -128,13 +129,13 @@ namespace SOD.Common.BepInEx.Configuration
                 {
                     var list = kvp.Value;
                     if (list.RemoveAll(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) > 0)
-                        _isModified = true;
+                        IsModified = true;
                     if (list.Count == 0)
                         toBeRemoved.Add(kvp.Key);
                 }
                 foreach (var key in toBeRemoved)
                     if (_configEntries.Remove(key))
-                        _isModified = true;
+                        IsModified = true;
             }
         }
 
@@ -146,7 +147,7 @@ namespace SOD.Common.BepInEx.Configuration
                 return;
             }
 
-            if (!_isModified) return;
+            if (!IsModified) return;
 
             using StreamWriter writer = new(_filePath, false);
 
@@ -177,6 +178,8 @@ namespace SOD.Common.BepInEx.Configuration
                     writer.WriteLine();
                 }
             }
+
+            IsModified = false;
         }
 
         internal class ConfigSetting
