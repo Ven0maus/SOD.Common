@@ -55,9 +55,21 @@ namespace SOD.StockMarket.Implementation
             {
                 OnInitialized += (sender, args) =>
                 {
-                    Simulate(Plugin.Instance.Config.SimulationDays);
+                    // Simulate on time init, for loading savegame
+                    if (!Lib.Time.IsInitialized)
+                        Lib.Time.OnTimeInitialized += OnTimeInit;
+                    else
+                        Simulate(Plugin.Instance.Config.SimulationDays);
                 };
             }
+        }
+
+        private void OnTimeInit(object sender, TimeChangedArgs args)
+        {
+            // Simulate economy
+            if (Plugin.Instance.Config.RunSimulation)
+                Simulate(Plugin.Instance.Config.SimulationDays);
+            Lib.Time.OnTimeInitialized -= OnTimeInit;
         }
 
         /// <summary>
