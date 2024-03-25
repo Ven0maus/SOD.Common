@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SOD.QoL.Patches
@@ -150,10 +151,13 @@ namespace SOD.QoL.Patches
                         if (consumable.preset.destroyWhenAllConsumed)
                         {
                             __instance.EmptySlot(BioScreenController.Instance.selectedSlot, false, true, true, false);
-                            foreach (object obj in __instance.rightHandObjectParent)
-                            {
-                                UnityEngine.Object.Destroy(((Transform)obj).gameObject);
-                            }
+
+                            var childCount = __instance.rightHandObjectParent.GetChildCount();
+                            var children = new List<Transform>();
+                            for (int i = 0; i < childCount; i++)
+                                children.Add(__instance.rightHandObjectParent.GetChild(i));
+                            foreach (var obj in children)
+                                UnityEngine.Object.Destroy(obj.gameObject);
                         }
                     }
                 }
