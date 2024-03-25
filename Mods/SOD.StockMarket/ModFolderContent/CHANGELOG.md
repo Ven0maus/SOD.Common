@@ -1,6 +1,7 @@
 # CHANGELOG
 **2.0.3**
 - Remove ddsloader dependency, use SOD.Common DdsStrings functionality instead
+- Fixed issue with Run Simulation parameter freezing game when loading a save
 
 **2.0.2**
 - Several fixes regarding purchasing stocks through trade orders
