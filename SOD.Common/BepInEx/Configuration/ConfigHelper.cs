@@ -74,6 +74,10 @@ namespace SOD.Common.BepInEx.Configuration
                     currentSetting = null;
                 }
             }
+
+            // Make sure to include the last entry
+            if (currentSetting != null && !string.IsNullOrWhiteSpace(currentSection) && !_configEntries[currentSection].Contains(currentSetting))
+                _configEntries[currentSection].Add(currentSetting);
         }
 
         internal IReadOnlyDictionary<string, string[]> GetConfigEntries()
