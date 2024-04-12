@@ -159,49 +159,57 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public void UpdateConfigFileLayout()
         {
-            if (_createdNewConfigFile || string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
-            if (!HasConfigurationBindings())
+            try
             {
-                File.Delete(ConfigFile.ConfigFilePath);
-                Plugin.Log.LogInfo($"Deleted outdated configuration file for mod \"{PluginGUID}\".");
-                return;
-            }
-
-            var helper = new ConfigHelper(ConfigFile.ConfigFilePath);
-            var configEntries = helper.GetConfigEntries();
-            var properties = Config
-                .GetType()
-                .ExpandInheritedInterfaces()
-                .SelectMany(a => a.GetProperties())
-                .Where(a => a.GetCustomAttribute<BindingAttribute>() != null)
-                .Select(a =>
+                if (_createdNewConfigFile || string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
+                if (!HasConfigurationBindings())
                 {
-                    var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name);
-                    return new { Section = section, Key = key };
-                })
-                .GroupBy(a => a.Section)
-                .ToDictionary(a => a.Key, a => a.Select(b => b.Key).ToArray(), StringComparer.OrdinalIgnoreCase);
-
-            foreach (var configEntry in configEntries)
-            {
-                // If configEntry is not in properties remove it
-                var section = configEntry.Key;
-                if (properties.TryGetValue(section, out var validValues))
-                {
-                    var invalidValues = configEntry.Value.Except(validValues);
-                    foreach (var value in invalidValues)
-                        helper.RemoveEntry(value, section);
+                    File.Delete(ConfigFile.ConfigFilePath);
+                    Plugin.Log.LogInfo($"Deleted outdated configuration file for mod \"{PluginGUID}\".");
+                    return;
                 }
-                else
+
+                var helper = new ConfigHelper(ConfigFile.ConfigFilePath);
+                var configEntries = helper.GetConfigEntries();
+                var properties = Config
+                    .GetType()
+                    .ExpandInheritedInterfaces()
+                    .SelectMany(a => a.GetProperties())
+                    .Where(a => a.GetCustomAttribute<BindingAttribute>() != null)
+                    .Select(a =>
+                    {
+                        var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name);
+                        return new { Section = section, Key = key };
+                    })
+                    .GroupBy(a => a.Section)
+                    .ToDictionary(a => a.Key, a => a.Select(b => b.Key).ToArray(), StringComparer.OrdinalIgnoreCase);
+
+                foreach (var configEntry in configEntries)
                 {
-                    helper.RemoveSection(section);
+                    // If configEntry is not in properties remove it
+                    var section = configEntry.Key;
+                    if (properties.TryGetValue(section, out var validValues))
+                    {
+                        var invalidValues = configEntry.Value.Except(validValues);
+                        foreach (var value in invalidValues)
+                            helper.RemoveEntry(value, section);
+                    }
+                    else
+                    {
+                        helper.RemoveSection(section);
+                    }
+                }
+
+                if (helper.IsModified)
+                {
+                    helper.Update();
+                    Plugin.Log.LogInfo($"Updated outdated configuration file layout for mod \"{PluginGUID}\".");
                 }
             }
-
-            if (helper.IsModified)
+            catch (Exception ex)
             {
-                helper.Update();
-                Plugin.Log.LogInfo($"Updated outdated configuration file layout for mod \"{PluginGUID}\".");
+                Plugin.Log.LogInfo($"Caught an exception while attemping to clean up an outdated config file for mod \"{PluginGUID}\": {ex.Message}");
+                Plugin.Log.LogInfo($"Manually delete the config file if you wish to generate a new one.");
             }
         }
 
