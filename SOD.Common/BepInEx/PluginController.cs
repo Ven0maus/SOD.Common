@@ -115,11 +115,13 @@ namespace SOD.Common.BepInEx
         public override void Load()
         { }
 
+        private bool _createdNewConfigFile = false;
         /// <summary>
         /// This method is used to setup configuration bindings.
         /// </summary>
         public virtual void OnConfigureBindings()
         {
+            var configFileExists = File.Exists(ConfigFile.ConfigFilePath);
             ConfigFile.SaveOnConfigSet = false;
             // This accesses the proxy of each property which binds the configuration of that property
             var properties = Config.GetType().ExpandInheritedInterfaces().SelectMany(a => a.GetProperties());
@@ -134,6 +136,9 @@ namespace SOD.Common.BepInEx
             // Do a save once after setting all config
             ConfigFile.Save();
             ConfigFile.SaveOnConfigSet = true;
+
+            if (!configFileExists && File.Exists(ConfigFile.ConfigFilePath))
+                _createdNewConfigFile = true;
         }
 
         /// <summary>
@@ -154,7 +159,7 @@ namespace SOD.Common.BepInEx
         /// </summary>
         public void UpdateConfigFileLayout()
         {
-            if (string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
+            if (_createdNewConfigFile || string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
             if (!HasConfigurationBindings())
             {
                 File.Delete(ConfigFile.ConfigFilePath);
