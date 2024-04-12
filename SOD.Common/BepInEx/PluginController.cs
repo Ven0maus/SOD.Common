@@ -187,6 +187,10 @@ namespace SOD.Common.BepInEx
                     foreach (var value in invalidValues)
                         helper.RemoveEntry(value, section);
                 }
+                else
+                {
+                    helper.RemoveSection(section);
+                }
             }
 
             if (helper.IsModified)
