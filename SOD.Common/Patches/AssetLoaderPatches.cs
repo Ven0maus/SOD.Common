@@ -52,6 +52,9 @@ namespace SOD.Common.Patches
                     __result.Add(preset);
                 }
 
+                if (Lib.SyncDisks.RegisteredSyncDisks.Count > 0)
+                    Plugin.Log.LogInfo($"Loaded {Lib.SyncDisks.RegisteredSyncDisks} custom sync disks.");
+
                 // Clear out memory usage for icons as its no longer used
                 Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.Icons = null);
             }
@@ -100,6 +103,15 @@ namespace SOD.Common.Patches
                     // Add dds entry for side effect
                     if (syncDisk.SideEffect != null)
                         Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
+                }
+
+                // Add dialog dds strings
+                const string dialogDds = "dds.blocks";
+                foreach (var dialog in Lib.Dialog.RegisteredDialogs)
+                {
+                    Lib.DdsStrings[dialogDds, dialog.Id] = dialog.Text;
+                    foreach (var response in dialog.Responses)
+                        Lib.DdsStrings[dialogDds, response.Id] = response.Text;
                 }
             }
         }
@@ -153,6 +165,29 @@ namespace SOD.Common.Patches
 
                 // Remove the memory usage of this, no longer needed
                 Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.MenuPresetLocations = null);
+            }
+        }
+
+        [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.Start))]
+        internal static class Toolbox_Start
+        {
+            private static bool _loaded = false;
+
+            [HarmonyPostfix]
+            internal static void Postfix()
+            {
+                if (_loaded) return;
+                _loaded = true;
+
+                // Add dialog blocks
+                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
+                foreach (var block in blocks)
+                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
+
+                // Add dialog messages
+                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
+                foreach (var message in messages)
+                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
             }
         }
     }
