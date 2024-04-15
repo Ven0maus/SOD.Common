@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class NewGameLocationPatches
     {

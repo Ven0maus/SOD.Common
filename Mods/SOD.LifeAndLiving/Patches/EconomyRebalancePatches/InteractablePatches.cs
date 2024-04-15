@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class InteractablePatches
     {
@@ -13,7 +13,7 @@ namespace SOD.LifeAndLiving.Patches
             {
                 if (__instance.preset == null) return;
 
-                var moneyPresets = new Dictionary<string, int> 
+                var moneyPresets = new Dictionary<string, int>
                 {
                     { "M1", Plugin.Instance.Config.MaxM1Crows },
                     { "M2", Plugin.Instance.Config.MaxM2Crows },

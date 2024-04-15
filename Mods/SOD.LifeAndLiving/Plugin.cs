@@ -2,11 +2,11 @@
 using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.LifeAndLiving.Relations;
-using SOD.LifeAndLiving.Patches;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text.Json;
+using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
 
 namespace SOD.LifeAndLiving
 {

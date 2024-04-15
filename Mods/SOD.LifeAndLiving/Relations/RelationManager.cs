@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
 
 namespace SOD.LifeAndLiving.Relations
 {
@@ -72,7 +75,13 @@ namespace SOD.LifeAndLiving.Relations
         /// <param name="filePath"></param>
         public void Load(string filePath)
         {
+            if (_relationMatrixes.Count > 0)
+                _relationMatrixes.Clear();
 
+            var json = File.ReadAllText(filePath);
+            var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(json);
+            foreach (var citizenRelation in citizenRelations)
+                _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
         }
 
         /// <summary>
@@ -81,7 +90,15 @@ namespace SOD.LifeAndLiving.Relations
         /// <param name="filePath"></param>
         public void Save(string filePath)
         {
+            if (!_relationMatrixes.Any())
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+                return;
+            }
 
+            var json = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
+            File.WriteAllText(filePath, json);
         }
     }
 }

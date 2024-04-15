@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class GameplayControlsPatches
     {

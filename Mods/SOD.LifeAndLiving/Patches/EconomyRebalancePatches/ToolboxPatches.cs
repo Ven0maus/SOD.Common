@@ -3,7 +3,7 @@ using SOD.Common.Extensions;
 using System;
 using System.Linq;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class ToolboxPatches
     {
@@ -117,7 +117,7 @@ namespace SOD.LifeAndLiving.Patches
                             }
                         }
 
-                        var percentage = (percentageValueIncrease / 100f) + 1;
+                        var percentage = percentageValueIncrease / 100f + 1;
 
                         // Calculate initial min and max values
                         var initialMinValue = Math.Max(minItemValue, (int)preset.value.x);
@@ -169,7 +169,7 @@ namespace SOD.LifeAndLiving.Patches
                         foreach (var resolveQuestion in sideJob.resolveQuestions)
                             resolveQuestion.rewardRange = new UnityEngine.Vector2(totalPerQuestion, totalPerQuestion);
                     }
-                    
+
                     jobCount++;
                 }
                 Plugin.Log.LogInfo($"Reduced \"{jobCount}\" job payouts.");
@@ -213,7 +213,7 @@ namespace SOD.LifeAndLiving.Patches
                 }
 
                 // Set value
-                syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue, 
+                syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue,
                     Plugin.Instance.Config.MaxSyncDiskUpgradeModuleValue);
 
                 if (Plugin.Instance.Config.LimitSpawnrateSyncDisks)
