@@ -40,6 +40,9 @@
 		<Reference Include="UnityEngine.InputLegacyModule">
 			<HintPath>..\..\libs\il2cpp\UnityEngine.InputLegacyModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+		  <HintPath>..\..\libs\il2cpp\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>..\..\libs\il2cpp\UnityEngine.UI.dll</HintPath>
 		</Reference>
