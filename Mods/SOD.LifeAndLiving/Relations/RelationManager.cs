@@ -19,7 +19,23 @@ namespace SOD.LifeAndLiving.Relations
         /// </summary>
         private readonly Dictionary<int, CitizenRelation> _relationMatrixes = new();
 
-        private RelationManager() 
+        /// <summary>
+        /// Custom indexer to Get/Set citizen relations.
+        /// </summary>
+        /// <param name="citizenId"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public CitizenRelation this[int citizenId]
+        {
+            get { return Get(citizenId); }
+            set 
+            { 
+                Set(citizenId, (value as CrInstruction)?.Instruction ?? 
+                throw new Exception("Setter argument must be a CrInstruction.")); 
+            }
+        }
+
+        private RelationManager()
         { }
 
         /// <summary>
@@ -32,6 +48,13 @@ namespace SOD.LifeAndLiving.Relations
             if (!_relationMatrixes.TryGetValue(citizenId, out var relationMatrix))
                 _relationMatrixes[citizenId] = relationMatrix = new CitizenRelation();
             info.Invoke(relationMatrix);
+        }
+
+        public CitizenRelation Get(int citizenId)
+        {
+            if (!_relationMatrixes.TryGetValue(citizenId, out var relationMatrix))
+                _relationMatrixes[citizenId] = relationMatrix = new CitizenRelation();
+            return relationMatrix;
         }
 
         /// <summary>
