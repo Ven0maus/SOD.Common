@@ -47,12 +47,12 @@ namespace SOD.Common.Helpers.DialogObjects
             };
         }
 
-        public DialogResponse(string name, string text)
+        public DialogResponse(string text, string name = null)
             : this(text)
         {
             ResponseInfo = new AIActionPreset.AISpeechPreset
             {
-                dictionaryString = name,
+                dictionaryString = name ?? Guid.NewGuid().ToString(),
                 endsDialog = true,
                 isSuccessful = true,
                 useParsing = true,

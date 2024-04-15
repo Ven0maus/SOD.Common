@@ -64,7 +64,7 @@ namespace SOD.Common.Helpers.DialogObjects
         /// </summary>
         /// <param name="text"></param>
         public DialogBuilder AddResponse(string text)
-            => AddResponse(new DialogResponse(Guid.NewGuid().ToString(), text));
+            => AddResponse(new DialogResponse(text, null));
 
         /// <summary>
         /// Allows modificiation of the dialog options.
