@@ -20,30 +20,96 @@ namespace SOD.LifeAndLiving.Relations
             { 30, Relation.Friend },
         };
 
+        private int _interactedAtWork;
         /// <summary>
-        /// How many times the player has interacted with this citizen.
+        /// How many times the player has interacted with this citizen at work.
         /// </summary>
-        public int Interacted { get; set; }
+        public int InteractedAtWork
+        { 
+            get => _interactedAtWork;
+            set
+            {
+                if (_interactedAtWork != value)
+                {
+                    _interactedAtWork = value;
+                    Calculate();
+                }
+            }
+        }
+
+        private int _interactedOutsideOfWork;
+        /// <summary>
+        /// How many times the player has interacted with this citizen outside of work.
+        /// </summary>
+        public int InteractedOutsideOfWork
+        {
+            get => _interactedOutsideOfWork;
+            set
+            {
+                if (_interactedOutsideOfWork != value)
+                {
+                    _interactedOutsideOfWork = value;
+                    Calculate();
+                }
+            }
+        }
+
+        private int _seenAtWork;
+        /// <summary>
+        /// How many times the player has seen this citizen while at work.
+        /// </summary>
+        public int SeenAtWork
+        {
+            get => _seenAtWork;
+            set
+            {
+                if (_seenAtWork != value)
+                {
+                    _seenAtWork = value;
+                    Calculate();
+                }
+            }
+        }
+
+        private int _seenOutsideOfWork;
+        /// <summary>
+        /// How many times the player has seen this citizen outside of work.
+        /// </summary>
+        public int SeenOutsideOfWork
+        {
+            get => _seenOutsideOfWork;
+            set
+            {
+                if (_seenOutsideOfWork != value)
+                {
+                    _seenOutsideOfWork = value;
+                    Calculate();
+                }
+            }
+        }
+
         /// <summary>
         /// The last time the player interacted with this citizen.
         /// </summary>
         public DateTime? LastInteraction { get; set; }
         /// <summary>
-        /// How many times the player has seen this citizen.
-        /// </summary>
-        public int Seen { get; set; }
-        /// <summary>
         /// The last time the player has seen this citizen.
         /// </summary>
         public DateTime? LastSeen { get; set; }
-        /// <summary>
-        /// Defines the relation level, increases / decreases based on interactions
-        /// </summary>
-        public int Points { get; set; }
+
         /// <summary>
         /// The relation between the player and the citizen.
         /// </summary>
         public Relation Relation { get; set; }
+
+        private void Calculate()
+        {
+            if (RelationManager.Instance.IsLoading)
+                return;
+
+            if (Relation == Relation.Stranger && LastSeen != null)
+                Relation = Relation.Neutral;
+        }
     }
 
     /// <summary>

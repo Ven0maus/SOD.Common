@@ -38,6 +38,11 @@ namespace SOD.LifeAndLiving.Relations
             }
         }
 
+        /// <summary>
+        /// Determines if the relation manager is loading serialized data.
+        /// </summary>
+        public bool IsLoading { get; internal set; } = false;
+
         private RelationManager()
         { }
 
@@ -75,6 +80,7 @@ namespace SOD.LifeAndLiving.Relations
         /// <param name="filePath"></param>
         public void Load(string filePath)
         {
+            IsLoading = true;
             if (_relationMatrixes.Count > 0)
                 _relationMatrixes.Clear();
 
@@ -82,6 +88,7 @@ namespace SOD.LifeAndLiving.Relations
             var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(json);
             foreach (var citizenRelation in citizenRelations)
                 _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+            IsLoading = false;
         }
 
         /// <summary>

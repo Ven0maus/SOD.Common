@@ -34,7 +34,11 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                         _lastSeenTimings[__instance.humanID] = DateTime.Now;
                         var relation = RelationManager.Instance[__instance.humanID];
                         relation.LastSeen = time;
-                        relation.Seen++;
+
+                        if (__instance.isAtWork)
+                            relation.SeenAtWork++;
+                        else
+                            relation.SeenOutsideOfWork++;
                     }
                 }
             }
