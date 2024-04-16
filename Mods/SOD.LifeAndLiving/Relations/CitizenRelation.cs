@@ -54,6 +54,23 @@ namespace SOD.LifeAndLiving.Relations
             }
         }
 
+        private int _interactedAtHome;
+        /// <summary>
+        /// How many times the player has interacted with this citizen at home.
+        /// </summary>
+        public int InteractedAtHome
+        {
+            get => _interactedAtHome;
+            set
+            {
+                if (_interactedAtHome != value)
+                {
+                    _interactedAtHome = value;
+                    Calculate();
+                }
+            }
+        }
+
         private int _seenAtWork;
         /// <summary>
         /// How many times the player has seen this citizen while at work.
@@ -88,6 +105,23 @@ namespace SOD.LifeAndLiving.Relations
             }
         }
 
+        private int _seenAtHome;
+        /// <summary>
+        /// How many times the player has seen this citizen at home.
+        /// </summary>
+        public int SeenAtHome
+        {
+            get => _seenAtHome;
+            set
+            {
+                if (_seenAtHome != value)
+                {
+                    _seenAtHome = value;
+                    Calculate();
+                }
+            }
+        }
+
         /// <summary>
         /// The last time the player interacted with this citizen.
         /// </summary>
@@ -97,18 +131,29 @@ namespace SOD.LifeAndLiving.Relations
         /// </summary>
         public DateTime? LastSeen { get; set; }
 
+        private Relation _relation;
         /// <summary>
         /// The relation between the player and the citizen.
         /// </summary>
-        public Relation Relation { get; set; }
+        public Relation Relation
+        {
+            get { return _relation; }
+            set
+            {
+                if (_relation != value) 
+                {
+                    Plugin.Log.LogInfo($"Adjusted relation from \"{_relation}\" to \"{value}\".");
+                    _relation = value;
+                }
+            }
+        }
 
         private void Calculate()
         {
             if (RelationManager.Instance.IsLoading)
                 return;
 
-            if (Relation == Relation.Stranger && LastSeen != null)
-                Relation = Relation.Neutral;
+
         }
     }
 
@@ -133,15 +178,15 @@ namespace SOD.LifeAndLiving.Relations
     public enum Relation
     {
         /// <summary>
-        /// Player is unaware of the citizen
-        /// </summary>
-        Stranger,
-        /// <summary>
         /// Player is aware of the citizen
         /// </summary>
         Neutral,
         /// <summary>
-        /// Player has only briefly met them and interacted
+        /// Player has been around the citizen often
+        /// </summary>
+        Familiar,
+        /// <summary>
+        /// Player has met them and interacted often
         /// </summary>
         Acquaintance,
         /// <summary>

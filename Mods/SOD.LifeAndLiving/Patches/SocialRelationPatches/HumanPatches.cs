@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using SOD.LifeAndLiving.Relations;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
@@ -11,8 +10,6 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
         [HarmonyPatch(typeof(Human), nameof(Human.UpdateLastSighting))]
         internal static class Human_UpdateLastSighting
         {
-            private static readonly Dictionary<int, DateTime> _lastSeenTimings = new();
-
             [HarmonyPrefix]
             internal static void Prefix(Human __instance, Human citizen)
             {
@@ -24,21 +21,28 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                 if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
                     __instance.ActorRaycastCheck(citizen, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
                 {
-                    if (!_lastSeenTimings.TryGetValue(__instance.humanID, out var time))
-                    {
-                        _lastSeenTimings.Add(__instance.humanID, time = DateTime.Now.AddMinutes(-2));
-                    }
+                    var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
+                    var inInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
 
-                    if (time.AddMinutes(1) < DateTime.Now)
+                    var relation = RelationManager.Instance[__instance.humanID];
+                    if (relation.LastSeen == null || relation.LastSeen.Value.AddMinutes(1) < DateTime.Now)
                     {
-                        _lastSeenTimings[__instance.humanID] = DateTime.Now;
-                        var relation = RelationManager.Instance[__instance.humanID];
-                        relation.LastSeen = DateTime.Now;
-
-                        if (__instance.isAtWork)
+                        // At work and in the same room
+                        if (__instance.isAtWork && isInTheSameRoom)
+                        {
+                            relation.LastSeen = DateTime.Now;
                             relation.SeenAtWork++;
+                        }
+                        else if (__instance.isHome && inInTheSameBuilding)
+                        {
+                            relation.LastSeen = DateTime.Now;
+                            relation.SeenAtHome++;
+                        }
                         else
+                        {
+                            relation.LastSeen = DateTime.Now;
                             relation.SeenOutsideOfWork++;
+                        }
                     }
                 }
             }
