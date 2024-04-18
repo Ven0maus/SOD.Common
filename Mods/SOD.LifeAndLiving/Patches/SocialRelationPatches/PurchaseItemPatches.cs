@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SOD.Common.Extensions;
 using SOD.LifeAndLiving.Relations;
+using System;
 using System.Linq;
 
 namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
@@ -8,6 +9,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
     internal class PurchaseItemPatches
     {
         private static Actor _purchasedFrom = null;
+        private static Action _resetFieldAction = null;
 
         [HarmonyPatch(typeof(ShopSelectButtonController), nameof(ShopSelectButtonController.PurchaseExecute))]
         internal static class ShopSelectButtonController_PurchaseExecute
@@ -40,7 +42,21 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                     RelationManager.Instance.PlayerInterests.RecordPurchasedItem(company.companyID, __instance.preset.presetName, _purchasedFrom);
                 }
 
-                _purchasedFrom = null;
+                if (_purchasedFrom != null)
+                {
+                    if (_resetFieldAction == null)
+                    {
+                        _resetFieldAction = () =>
+                        {
+                            _purchasedFrom = null;
+                            __instance.thisWindow.remove_OnWindowClosed(_resetFieldAction);
+                            _resetFieldAction = null;
+                        };
+
+                        // Reset _purchasedFrom to null when the window is closed
+                        __instance.thisWindow.add_OnWindowClosed(_resetFieldAction);
+                    }
+                }
             }
         }
 

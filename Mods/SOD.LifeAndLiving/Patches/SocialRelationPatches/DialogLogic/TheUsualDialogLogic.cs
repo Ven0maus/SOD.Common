@@ -10,6 +10,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches.DialogLogic
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
             // Check if this citizen has sold items to us before, and if one of them was sold more or equal than 5 times
+            if (!saysTo.isAtWork) return false;
             if (!RelationManager.Instance.PlayerInterests.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
             return items.Any(a => a.Value >= 5);
@@ -43,6 +44,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches.DialogLogic
             {
                 // TODO: Buy this item for the player
                 // Have a small chance to receive a discounted price, or a free one.
+                Plugin.Log.LogInfo("Bought something special!");
             }
         }
 
