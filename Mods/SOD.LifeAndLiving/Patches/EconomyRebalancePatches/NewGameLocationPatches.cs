@@ -1,6 +1,10 @@
 ﻿using HarmonyLib;
+using SOD.Common;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
+using System.Text.Json;
 
 namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
@@ -51,6 +55,42 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                 else
                 {
                     return roundedToHigherInterval;
+                }
+            }
+
+            internal static void Load(string hash)
+            {
+                ApartementPriceCache.Clear();
+
+                var apartmentPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+                if (File.Exists(apartmentPath))
+                {
+                    var json = File.ReadAllText(apartmentPath);
+                    var jsonContent = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
+                    foreach (var value in jsonContent)
+                        ApartementPriceCache.Add(value.Key, value.Value);
+                    Plugin.Log.LogInfo("Loaded apartment price cache.");
+                }
+            }
+
+            internal static void Save(string hash)
+            {
+                if (ApartementPriceCache.Count > 0)
+                {
+                    var apartmentFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+                    var json = JsonSerializer.Serialize(ApartementPriceCache, new JsonSerializerOptions { WriteIndented = false });
+                    File.WriteAllText(apartmentFilePath, json);
+                    Plugin.Log.LogInfo("Saved apartment price cache.");
+                }
+            }
+
+            internal static void Delete(string hash)
+            {
+                var apartmentFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+                if (File.Exists(apartmentFilePath))
+                {
+                    File.Delete(apartmentFilePath);
+                    Plugin.Log.LogInfo("Deleted apartment price cache.");
                 }
             }
         }

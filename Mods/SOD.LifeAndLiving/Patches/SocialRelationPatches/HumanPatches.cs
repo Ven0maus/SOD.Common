@@ -22,23 +22,22 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                     __instance.ActorRaycastCheck(citizen, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
                 {
                     var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
-                    var inInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
+                    var isInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
 
                     var relation = RelationManager.Instance[__instance.humanID];
                     if (relation.LastSeen == null || relation.LastSeen.Value.AddMinutes(1) < DateTime.Now)
                     {
-                        // At work and in the same room
                         if (__instance.isAtWork && isInTheSameRoom)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtWork++;
                         }
-                        else if (__instance.isHome && inInTheSameBuilding)
+                        else if (__instance.isHome && isInTheSameBuilding)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtHome++;
                         }
-                        else
+                        else if ((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenOutsideOfWork++;

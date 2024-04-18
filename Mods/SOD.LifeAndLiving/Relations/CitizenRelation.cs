@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace SOD.LifeAndLiving.Relations
 {
@@ -8,69 +7,6 @@ namespace SOD.LifeAndLiving.Relations
     /// </summary>
     public class CitizenRelation
     {
-        /// <summary>
-        /// An overview how the points are distributed for the relations.
-        /// </summary>
-        public static readonly Dictionary<int, Relation> RelationPoints = new()
-        {
-            { -30, Relation.Hostile },
-            { -10, Relation.Antagonistic },
-            { 0, Relation.Neutral },
-            { 10, Relation.Acquaintance },
-            { 30, Relation.Friend },
-        };
-
-        private int _interactedAtWork;
-        /// <summary>
-        /// How many times the player has interacted with this citizen at work.
-        /// </summary>
-        public int InteractedAtWork
-        { 
-            get => _interactedAtWork;
-            set
-            {
-                if (_interactedAtWork != value)
-                {
-                    _interactedAtWork = value;
-                    Calculate();
-                }
-            }
-        }
-
-        private int _interactedOutsideOfWork;
-        /// <summary>
-        /// How many times the player has interacted with this citizen outside of work.
-        /// </summary>
-        public int InteractedOutsideOfWork
-        {
-            get => _interactedOutsideOfWork;
-            set
-            {
-                if (_interactedOutsideOfWork != value)
-                {
-                    _interactedOutsideOfWork = value;
-                    Calculate();
-                }
-            }
-        }
-
-        private int _interactedAtHome;
-        /// <summary>
-        /// How many times the player has interacted with this citizen at home.
-        /// </summary>
-        public int InteractedAtHome
-        {
-            get => _interactedAtHome;
-            set
-            {
-                if (_interactedAtHome != value)
-                {
-                    _interactedAtHome = value;
-                    Calculate();
-                }
-            }
-        }
-
         private int _seenAtWork;
         /// <summary>
         /// How many times the player has seen this citizen while at work.
@@ -122,10 +58,6 @@ namespace SOD.LifeAndLiving.Relations
             }
         }
 
-        /// <summary>
-        /// The last time the player interacted with this citizen.
-        /// </summary>
-        public DateTime? LastInteraction { get; set; }
         /// <summary>
         /// The last time the player has seen this citizen.
         /// </summary>
@@ -182,7 +114,7 @@ namespace SOD.LifeAndLiving.Relations
         /// </summary>
         Neutral,
         /// <summary>
-        /// Player has been around the citizen often
+        /// Player has been around the citizen a few times
         /// </summary>
         Familiar,
         /// <summary>
@@ -196,10 +128,6 @@ namespace SOD.LifeAndLiving.Relations
         /// <summary>
         /// Player and the citizen are in dislike of each other
         /// </summary>
-        Antagonistic,
-        /// <summary>
-        /// Player and the citizen are hostile towards each other
-        /// </summary>
-        Hostile
+        Antagonistic
     }
 }

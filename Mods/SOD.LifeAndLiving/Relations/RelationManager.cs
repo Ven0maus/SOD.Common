@@ -1,8 +1,11 @@
-﻿using System;
+﻿using SOD.Common;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
+using UnityEngine;
 
 namespace SOD.LifeAndLiving.Relations
 {
@@ -37,6 +40,8 @@ namespace SOD.LifeAndLiving.Relations
                 throw new Exception("Setter argument must be a CrInstruction.")); 
             }
         }
+
+        public PlayerInterests PlayerInterests { get; private set; } = new PlayerInterests();
 
         /// <summary>
         /// Determines if the relation manager is loading serialized data.
@@ -77,35 +82,86 @@ namespace SOD.LifeAndLiving.Relations
         /// <summary>
         /// Loads all citizen relation information from a save file.
         /// </summary>
-        /// <param name="filePath"></param>
-        public void Load(string filePath)
+        /// <param name="relationMatrixPath"></param>
+        public void Load(string hash)
         {
             IsLoading = true;
+
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
+
             if (_relationMatrixes.Count > 0)
                 _relationMatrixes.Clear();
 
-            var json = File.ReadAllText(filePath);
-            var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(json);
-            foreach (var citizenRelation in citizenRelations)
-                _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+            // Relation matrix loading
+            if (File.Exists(relationMatrixPath))
+            {
+                var relationMatrixJson = File.ReadAllText(relationMatrixPath);
+                var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(relationMatrixJson);
+                foreach (var citizenRelation in citizenRelations)
+                    _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+            }
+
+            // Player interests loading
+            if (File.Exists(playerInterestsPath))
+            {
+                var playerInterestsJson = File.ReadAllText(playerInterestsPath);
+                PlayerInterests = JsonSerializer.Deserialize<PlayerInterests>(playerInterestsJson);
+            }
+
             IsLoading = false;
+
+            Plugin.Log.LogInfo("Loaded citizen relations and player interests information.");
         }
 
         /// <summary>
         /// Saves all citizen relation information to a save file.
         /// </summary>
         /// <param name="filePath"></param>
-        public void Save(string filePath)
+        public void Save(string hash)
         {
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
+
             if (!_relationMatrixes.Any())
             {
-                if (File.Exists(filePath))
-                    File.Delete(filePath);
-                return;
+                if (File.Exists(relationMatrixPath))
+                    File.Delete(relationMatrixPath);
+            }
+            else
+            {
+                // Relation matrixes
+                var relationMatrixJson = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
+                File.WriteAllText(relationMatrixPath, relationMatrixJson);
             }
 
-            var json = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
-            File.WriteAllText(filePath, json);
+            if (!PlayerInterests.ContainsContent)
+            {
+                if (File.Exists(playerInterestsPath))
+                    File.Delete(playerInterestsPath);
+            }
+            else
+            {
+                // Player interests
+                var playerInterestsJson = JsonSerializer.Serialize(PlayerInterests, new JsonSerializerOptions { WriteIndented = false });
+                File.WriteAllText(playerInterestsPath, playerInterestsJson);
+            }
+
+            Plugin.Log.LogInfo("Saved citizen relations and player interests information.");
+        }
+
+        public void Delete(string hash)
+        {
+            var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
+
+            if (File.Exists(relationFilePath))
+                File.Delete(relationFilePath);
+
+            if (File.Exists(playerInterestsPath))
+                File.Delete(playerInterestsPath);
+
+            Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
         }
     }
 }
