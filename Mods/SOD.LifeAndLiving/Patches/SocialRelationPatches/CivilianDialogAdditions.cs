@@ -16,8 +16,8 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
         private static void AddPurchaseRelatedDialog()
         {
             _ = Lib.Dialog.Builder("TheUsualPurchase")
-                .SetText("You already know what I want.")
-                .AddResponse("Ahh yes, the usual for you good sir.")
+                .SetText("The usual please.")
+                .AddResponse("Ahh yes, coming right up sir!")
                 .ModifyDialogOptions((a) => 
                 {
                     a.useSuccessTest = false;
