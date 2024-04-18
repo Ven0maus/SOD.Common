@@ -18,6 +18,11 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
             _ = Lib.Dialog.Builder("TheUsualPurchase")
                 .SetText("You already know what I want.")
                 .AddResponse("Ahh yes, the usual for you good sir.")
+                .ModifyDialogOptions((a) => 
+                {
+                    a.useSuccessTest = false;
+                    a.ranking = 100;
+                })
                 .SetDialogLogic(new TheUsualDialogLogic())
                 .CreateAndRegister();
         }
