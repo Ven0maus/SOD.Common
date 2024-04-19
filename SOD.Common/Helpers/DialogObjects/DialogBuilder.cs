@@ -77,6 +77,27 @@ namespace SOD.Common.Helpers.DialogObjects
             => AddResponse(new DialogResponse(text, isSuccesful, endsDialog));
 
         /// <summary>
+        /// Add's a new custom response that can only be triggered by code.
+        /// <br>Example of triggering it: "citizen.speechController.Speak(responseGuid);"</br>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="responseGuid">The guid that you generate, so you can trigger it yourself.</param>
+        public DialogBuilder AddCustomResponse(string text, Guid responseGuid)
+            => AddResponse(new DialogResponse(responseGuid, text));
+
+        /// <summary>
+        /// Add's new custom responses that can only be triggered by code.
+        /// <br>Example of triggering it: "citizen.speechController.Speak(responseGuid);"</br>
+        /// </summary>
+        /// <param name="responses"></param>
+        public DialogBuilder AddCustomResponses(Dictionary<Guid, string> responses)
+        {
+            foreach (var kvp in responses)
+                AddResponse(new DialogResponse(kvp.Key, kvp.Value));
+            return this;
+        }
+
+        /// <summary>
         /// Allows modificiation of the dialog options.
         /// </summary>
         /// <param name="action"></param>
