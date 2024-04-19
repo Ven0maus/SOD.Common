@@ -29,7 +29,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                         citizen.currentGameLocation.thisAsAddress == __instance.home;
 
                     var relation = RelationManager.Instance[__instance.humanID];
-                    if (relation.LastSeen == null || relation.LastSeen.Value.AddMinutes(1) < DateTime.Now)
+                    if (relation.LastSeen == null || relation.LastSeen.Value.AddSeconds(45) < DateTime.Now)
                     {
                         if (__instance.isAtWork && isInTheSameRoom)
                         {
