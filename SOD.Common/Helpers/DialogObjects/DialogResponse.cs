@@ -37,8 +37,6 @@ namespace SOD.Common.Helpers.DialogObjects
             Id = Guid.NewGuid().ToString();
             Text = text;
 
-            // The internal one doesn't use response info.
-
             // Create dds block
             Block = new DDSSaveClasses.DDSBlockSave
             {
@@ -47,17 +45,26 @@ namespace SOD.Common.Helpers.DialogObjects
             };
         }
 
-        public DialogResponse(string text, string name = null)
+        public DialogResponse(string text, Action<AIActionPreset.AISpeechPreset> action = null)
             : this(text)
         {
             ResponseInfo = new AIActionPreset.AISpeechPreset
             {
-                dictionaryString = name ?? Guid.NewGuid().ToString(),
+                dictionaryString = Guid.NewGuid().ToString(),
                 endsDialog = true,
                 isSuccessful = true,
                 useParsing = true,
                 chance = 1,
             };
+            action?.Invoke(ResponseInfo);
         }
+
+        public DialogResponse(string text, bool isSuccesful, bool endsDialog)
+            : this(text, (a) =>
+            {
+                a.isSuccessful = isSuccesful;
+                a.endsDialog = endsDialog;
+            })
+        { }
     }
 }
