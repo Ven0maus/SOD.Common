@@ -12,9 +12,13 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(DialogController), nameof(DialogController.Start))]
         internal static class DialogController_Start
         {
+            private static bool _loaded = false;
             [HarmonyPostfix]
             internal static void Postfix(DialogController __instance)
             {
+                if (_loaded) return;
+                _loaded = true;
+
                 foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
                 {
                     Toolbox.Instance.allDialog.Add(customDialog.Preset);
