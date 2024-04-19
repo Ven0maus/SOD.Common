@@ -70,6 +70,11 @@ namespace SOD.LifeAndLiving.Relations
             return relationMatrix;
         }
 
+        public bool Exists(int citizenId)
+        {
+            return _relationMatrixes.ContainsKey(citizenId);
+        }
+
         /// <summary>
         /// Delete's relation information of a citizen.
         /// </summary>

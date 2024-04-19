@@ -43,13 +43,20 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
-            // Check if this citizen has sold items to us before, and if one of them was sold more or equal than 5 times
-            // And if the player has a slot available
-            if (saysTo == null || !saysTo.isAtWork || saysTo.job?.employer == null || !FirstPersonItemController.Instance.IsSlotAvailable()) 
+            // Check if they have seen the player at work 4 or more times
+            if (!RelationManager.Instance.Exists(saysTo.humanID) || RelationManager.Instance[saysTo.humanID].SeenAtWork < 4) 
                 return false;
+
+            // Check if the citizen is at work and if the player has a free slot available
+            if (saysTo == null || !saysTo.isAtWork || saysTo.job?.employer == null || !FirstPersonItemController.Instance.IsSlotAvailable())
+                return false;
+
+            // Check if we have purchased items from this citizen
             if (!RelationManager.Instance.PlayerInterests.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
-            return items.Any(a => a.Value >= 5);
+
+            // Check if any item was purchased 4 or more times by the player
+            return items.Any(a => a.Value >= 4);
         }
 
         public void OnDialogExecute(DialogController instance, Citizen saysTo, Interactable saysToInteractable, NewNode where, Actor saidBy, bool success, NewRoom roomRef, SideJob jobRef)
