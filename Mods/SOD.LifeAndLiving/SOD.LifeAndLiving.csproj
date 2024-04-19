@@ -28,6 +28,9 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\libs\il2cpp\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="FMODUnity">
+		  <HintPath>..\..\libs\il2cpp\FMODUnity.dll</HintPath>
+		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
 		</Reference>

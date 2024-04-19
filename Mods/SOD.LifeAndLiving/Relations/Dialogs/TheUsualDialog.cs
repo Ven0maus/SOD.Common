@@ -1,5 +1,4 @@
-﻿using Rewired;
-using SOD.Common;
+﻿using SOD.Common;
 using SOD.Common.Helpers.DialogObjects;
 using System;
 using System.Collections.Generic;
@@ -9,9 +8,12 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 {
     internal class TheUsualDialog : IDialogLogic
     {
-        private static readonly Guid _positiveResponse = Guid.NewGuid();
-        private static readonly Guid _positiveDiscountResponse = Guid.NewGuid();
-        private static readonly Guid _positiveFreeResponse = Guid.NewGuid();
+        private static Guid _positiveResponse;
+        private static Guid _positiveDiscountResponse;
+        private static Guid _positiveFreeResponse;
+
+        private Item _item = null;
+        private readonly Dictionary<int, (int Hash, bool Received)> _discountCache = new();
 
         // TODO: Move to configuration bindings
         private const int DiscountPercentage = 35;
@@ -25,9 +27,9 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         {
             _ = Lib.Dialog.Builder($"{Plugin.PLUGIN_GUID.GetHashCode()}_TheUsualPurchase")
                 .SetText("The usual please.")
-                .AddCustomResponse("Ahh yes, coming right up sir!", _positiveResponse)
-                .AddCustomResponse("You're lucky, this last one is 50% off the price!", _positiveDiscountResponse)
-                .AddCustomResponse("Coming right up, this one's on the house!", _positiveFreeResponse)
+                .AddCustomResponse("Ahh yes, coming right up!", out _positiveResponse)
+                .AddCustomResponse("You're lucky, they're 50% discounted now!", out _positiveDiscountResponse)
+                .AddCustomResponse("Coming right up, this one's on the house!", out _positiveFreeResponse)
                 .AddResponse("Looks like you can't afford it today.", isSuccesful: false)
                 .ModifyDialogOptions((a) =>
                 {
@@ -38,13 +40,12 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 .CreateAndRegister();
         }
 
-        private Item _item = null;
-
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
             // Check if this citizen has sold items to us before, and if one of them was sold more or equal than 5 times
-            if (saysTo == null || !saysTo.isAtWork) return false;
-            // TODO: Check also if the player has a free inventory slot!
+            // And if the player has a slot available
+            if (saysTo == null || !saysTo.isAtWork || saysTo.job?.employer == null || !FirstPersonItemController.Instance.IsSlotAvailable()) 
+                return false;
             if (!RelationManager.Instance.PlayerInterests.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
             return items.Any(a => a.Value >= 5);
@@ -55,24 +56,59 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             // Collect most purchased item
             if (success && _item != null)
             {
-                // TODO: Give item to the player
-
-                // Pay for the item if its not free, and provide a custom response
-                if (_item.Price > 0)
+                // Spawn interactable to give to the player
+                Interactable interactable = InteractableCreator.Instance.CreateWorldInteractable(
+                    _item.Preset, 
+                    Player.Instance, 
+                    Player.Instance, 
+                    null, 
+                    Player.Instance.transform.position + new UnityEngine.Vector3(0f, 3.5f, 0f),
+                    Player.Instance.transform.eulerAngles, null, null, "");
+                if (interactable != null)
                 {
-                    GameplayController.Instance.AddMoney(-_item.Price, false, "Purchase");
-                    saysTo.speechController.Speak(_item.Discount ? _positiveDiscountResponse.ToString() : _positiveResponse.ToString());
+                    HandleInteractableLogic(interactable);
+
+                    // Pay for the item if its not free, and provide a custom response
+                    if (_item.Price > 0)
+                    {
+                        GameplayController.Instance.AddMoney(-_item.Price, false, "Purchase");
+                        saysTo.speechController.Speak("dds.blocks", _item.Discount ? 
+                            _positiveDiscountResponse.ToString() : _positiveResponse.ToString(), endsDialog: true);
+                    }
+                    else if (_item.Price == 0)
+                    {
+                        saysTo.speechController.Speak("dds.blocks", _positiveFreeResponse.ToString(), endsDialog: true);
+                    }
                 }
-                else if (_item.Price == 0)
+                else
                 {
-                    saysTo.speechController.Speak(_positiveFreeResponse.ToString());
+                    Plugin.Log.LogInfo("Could not create interactable.");
                 }
-
-                Plugin.Log.LogInfo("Received item: " + _item.Name);
-
-                // Reset to null for next dialogue
-                _item = null;
             }
+
+            // Reset to null for next dialogue
+            _item = null;
+        }
+
+        private static void HandleInteractableLogic(Interactable interactable)
+        {
+            interactable.SetSpawnPositionRelevent(false);
+            if (Player.Instance.currentGameLocation != null &&
+                Player.Instance.currentGameLocation.thisAsAddress != null &&
+                Player.Instance.currentGameLocation.thisAsAddress.company != null &&
+                Player.Instance.currentGameLocation.thisAsAddress.company.preset.enableLoiteringBehaviour)
+            {
+                Player.Instance.currentGameLocation.LoiteringPurchase();
+            }
+
+            if (!FirstPersonItemController.Instance.PickUpItem(interactable, true, false, true, true, false))
+            {
+                Plugin.Log.LogInfo("Unable to pickup item: " + interactable.name);
+                interactable.Delete();
+                return;
+            }
+            AudioController.Instance.Play2DSound(AudioControls.Instance.purchaseItem, null, 1f);
+            interactable.MarkAsTrash(true, false, 0f);
         }
 
         public DialogController.ForceSuccess ShouldDialogSucceedOverride(DialogController instance, EvidenceWitness.DialogOption dialog, Citizen saysTo, NewNode where, Actor saidBy)
@@ -80,21 +116,43 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             if (!saysTo)
                 return DialogController.ForceSuccess.none;
 
-            _item = CollectMostPurchasedItem(RelationManager.Instance.PlayerInterests.PurchasedItemsFrom[saysTo.humanID]);
+            _item = CollectMostPurchasedItem(RelationManager.Instance.PlayerInterests.PurchasedItemsFrom[saysTo.humanID], saysTo.job.employer);
             if (_item == null)
             {
                 Plugin.Log.LogInfo("Could not find item, this should not have happened.");
                 return DialogController.ForceSuccess.fail;
             }
 
-            // Check for discounts
-            var rand = Toolbox.Instance.Rand(0, 100, true);
-            if (rand < FreeChance)
-                _item.Price = 0;
-            else if (rand < DiscountChance)
+            var currentTime = Lib.Time.CurrentDateTime;
+            var hash = HashCode.Combine(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, saysTo.humanID);
+
+            // Check if this npc gave a discount before for this hash
+            if (!_discountCache.TryGetValue(saysTo.humanID, out var discount))
+                _discountCache[saysTo.humanID] = discount = (hash, false);
+
+            if (discount.Hash != hash)
             {
-                _item.Price -= (int)Math.Round(_item.Price / 100 * (float)DiscountPercentage);
-                _item.Discount = true;
+                // Have another chance at a discount or free
+                _discountCache[saysTo.humanID] = discount = (hash, false);
+            }
+
+            // Check for discounts
+            if (!discount.Received)
+            {
+                // Use a new random with a custom hash seed based on the in-game time and citizen
+                // So u cannot just spam the dialog until you get lucky, but that its predetermined what you get per in game hour.
+                var rand = new Random(hash).Next(0, 100);
+                if (rand < FreeChance)
+                {
+                    _item.Price = 0;
+                    _discountCache[saysTo.humanID] = (hash, true);
+                }
+                else if (rand < DiscountChance)
+                {
+                    _item.Price -= (int)Math.Round(_item.Price / 100 * (float)DiscountPercentage);
+                    _item.Discount = true;
+                    _discountCache[saysTo.humanID] = (hash, true);
+                }
             }
 
             // Make sure we don't go below 0
@@ -108,7 +166,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             return DialogController.ForceSuccess.none;
         }
 
-        private static Item CollectMostPurchasedItem(Dictionary<int, int> items)
+        private static Item CollectMostPurchasedItem(Dictionary<int, int> items, Company company)
         {
             var mostPurchasedItemCode = items
                 .Where(a => a.Value >= 5)
@@ -134,23 +192,35 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                     break;
             }
 
-            // TODO: See if we can find interactable / preset
-            // TODO: See if we can find the price of this item
+            return GetItem(itemName, company);
+        }
 
-            return itemName == null ? null : new Item(itemName, null, 0);
+        private static Item GetItem(string itemName, Company company)
+        {
+            if (itemName == null) return null;
+
+            foreach (var item in company.prices)
+            {
+                if (item.key.presetName == itemName)
+                {
+                    return new Item(itemName, item.Key, item.Value);
+                }
+            }
+
+            return null;
         }
 
         class Item
         {
             public string Name { get; }
-            public Interactable Interactable { get; }
+            public InteractablePreset Preset { get; }
             public int Price { get; set; }
             public bool Discount { get; set; } = false;
 
-            public Item(string itemName, Interactable interactable, int price)
+            public Item(string itemName, InteractablePreset preset, int price)
             {
                 Name = itemName;
-                Interactable = interactable;
+                Preset = preset;
                 Price = price;
             }
         }
