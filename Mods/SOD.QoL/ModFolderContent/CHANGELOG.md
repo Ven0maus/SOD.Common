@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.2**
+- Fixed issue regarding consuming food breaking after using heatpacks
+
 **1.1.1**
 - Fixed player never getting tired and adjusted energy restore from caffeine drinks to be more balanced
 
