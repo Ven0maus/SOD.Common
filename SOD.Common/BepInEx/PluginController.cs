@@ -3,10 +3,12 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
+using Internal.Cryptography;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
 using SOD.Common.Extensions.Internal;
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -89,14 +91,22 @@ namespace SOD.Common.BepInEx
             Harmony = new Harmony(PluginGUID);
 
             // There is no point in setting up empty bindings
-            var bindingsType = typeof(TBindings).ExpandInheritedInterfaces();
-            var properties = bindingsType.SelectMany(a => a.GetProperties());
-            if (properties.Any())
+            if (HasConfigurationBindings())
             {
                 Config = ConfigurationProxy<TBindings>.Create(new ConfigBuilder(base.Config));
                 Log.LogInfo($"Setting up configuration bindings.");
                 OnConfigureBindings();
             }
+        }
+
+        /// <summary>
+        /// Returns true/false if there are configuration bindings defined.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasConfigurationBindings()
+        {
+            var bindingsType = typeof(TBindings).ExpandInheritedInterfaces();
+            return bindingsType.SelectMany(a => a.GetProperties()).Any();
         }
 
         /// <summary>
@@ -135,6 +145,50 @@ namespace SOD.Common.BepInEx
             Harmony.UnpatchSelf();
             Log.LogInfo($"Plugin is unloaded.");
             return true;
+        }
+
+        /// <summary>
+        /// When changes have happened in the config bindings, this will adjust the layout properly again.
+        /// <br>Ideally this method is called in override of OnConfigureBindings after base method execution.</br>
+        /// <br>Do not use this method when you have manually adjusted the ConfigFile using Bind.</br>
+        /// </summary>
+        public void UpdateConfigFileLayout()
+        {
+            if (!File.Exists(ConfigFile.ConfigFilePath)) return;
+            if (!HasConfigurationBindings())
+            {
+                File.Delete(ConfigFile.ConfigFilePath);
+                return;
+            }
+
+            var helper = new ConfigHelper(ConfigFile.ConfigFilePath);
+            var configEntries = helper.GetConfigEntries();
+            var properties = Config
+                .GetType()
+                .ExpandInheritedInterfaces()
+                .SelectMany(a => a.GetProperties())
+                .Where(a => a.GetCustomAttribute<BindingAttribute>() != null)
+                .Select(a =>
+                {
+                    var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name);
+                    return new { Section = section, Key = key };
+                })
+                .GroupBy(a => a.Section)
+                .ToDictionary(a => a.Key, a => a.Select(b => b.Key).ToArray(), StringComparer.OrdinalIgnoreCase);
+
+            foreach (var configEntry in configEntries)
+            {
+                // If configEntry is not in properties remove it
+                var section = configEntry.Key;
+                if (properties.TryGetValue(section, out var validValues))
+                {
+                    var invalidValues = configEntry.Value.Except(validValues);
+                    foreach (var value in invalidValues)
+                        helper.RemoveEntry(value, section);
+                }
+            }
+
+            helper.Update();
         }
 
         private bool OnValidateBinding(PropertyInfo info)

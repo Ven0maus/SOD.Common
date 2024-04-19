@@ -30,7 +30,7 @@ namespace SOD.Common.BepInEx.Configuration
         /// <returns></returns>
         public ConfigBuilder Add<T>(string identifier, string description, T defaultValue = default)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             return Add(section, key, description, defaultValue);
         }
 
@@ -62,7 +62,7 @@ namespace SOD.Common.BepInEx.Configuration
         /// <returns></returns>
         public ConfigBuilder Add(object defaultValue, string identifier, string description)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             return Add(defaultValue, section, key, description);
         }
 
@@ -92,7 +92,7 @@ namespace SOD.Common.BepInEx.Configuration
         /// <param name="value"></param>
         public void Set<T>(string identifier, T value)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             Set(section, key, value);
         }
 
@@ -134,7 +134,7 @@ namespace SOD.Common.BepInEx.Configuration
         /// <param name="identifier"></param>
         public void Set(object value, string identifier)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             Set(value, section, key);
         }
 
@@ -196,7 +196,7 @@ namespace SOD.Common.BepInEx.Configuration
 
         internal bool ExistsInternal<T>(string identifier, out ConfigEntry<T> config)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             return ExistsInternal(section, key, out config);
         }
 
@@ -225,34 +225,9 @@ namespace SOD.Common.BepInEx.Configuration
 
         internal bool ExistsInternal(string identifier, out ConfigEntryBase config)
         {
-            var (section, key) = SplitIdentifier(identifier);
+            var (section, key) = ConfigHelper.SplitIdentifier(identifier);
             return ExistsInternal(section, key, out config);
         }
         #endregion
-
-        private static (string section, string key) SplitIdentifier(string identifier)
-        {
-            var parts = identifier.Split('.');
-            if (parts.Length < 2 || parts.Any(string.IsNullOrWhiteSpace))
-                throw new Exception($"Invalid configuration identifier format \"{identifier}\" provided, must be in format \"section.propertyName\".");
-
-            // Support for identifiers such as "General.Sub.PropertyName"
-            // If we have more than two parts, we concat all parts together except the last to use as the section
-            string section = null;
-            if (parts.Length > 2)
-            {
-                for (int i = 0; i < parts.Length - 1; i++)
-                {
-                    section += parts[i];
-                    if (i < parts.Length - 2)
-                        section += ".";
-                }
-            }
-            else
-            {
-                section = parts[0];
-            }
-            return (section, parts.Last());
-        }
     }
 }
