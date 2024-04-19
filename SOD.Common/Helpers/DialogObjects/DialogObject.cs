@@ -120,6 +120,9 @@ namespace SOD.Common.Helpers.DialogObjects
             }
         }
 
+        /// <summary>
+        /// This method registers the dialog into the game.
+        /// </summary>
         public void Register()
         {
             if (RegisteredInGame) return;
