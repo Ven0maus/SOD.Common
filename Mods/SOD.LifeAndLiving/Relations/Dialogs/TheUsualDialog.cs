@@ -25,7 +25,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         /// </summary>
         internal static void Register()
         {
-            _ = Lib.Dialog.Builder($"{Plugin.PLUGIN_GUID.GetHashCode()}_TheUsualPurchase")
+            _ = Lib.Dialog.Builder()
                 .SetText("The usual please.")
                 .AddCustomResponse("Ahh yes, coming right up!", out _positiveResponse)
                 .AddCustomResponse("You're lucky, they're 50% discounted now!", out _positiveDiscountResponse)
