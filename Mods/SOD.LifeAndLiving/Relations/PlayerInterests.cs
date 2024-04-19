@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common;
+using System;
 using System.Collections.Generic;
 
 namespace SOD.LifeAndLiving.Relations
@@ -20,7 +21,7 @@ namespace SOD.LifeAndLiving.Relations
         /// <summary>
         /// Key: HumanID, Value: (Key: (companyId, itemName).HashCode, Value: amountOfTimesBought)
         /// </summary>
-        public Dictionary<int, Dictionary<int, int>> PurchasedItemsFrom { get; set; } = new Dictionary<int, Dictionary<int, int>>();
+        public Dictionary<int, Dictionary<string, int>> PurchasedItemsFrom { get; set; } = new Dictionary<int, Dictionary<string, int>>();
 
         /// <summary>
         /// Keeps track of what was bought, where and optionally from who.
@@ -41,9 +42,10 @@ namespace SOD.LifeAndLiving.Relations
             if (human != null)
             {
                 if (!PurchasedItemsFrom.TryGetValue(human.humanID, out var fromPurchases))
-                    PurchasedItemsFrom[human.humanID] = fromPurchases = new Dictionary<int, int>();
+                    PurchasedItemsFrom[human.humanID] = fromPurchases = new Dictionary<string, int>();
 
-                var key = HashCode.Combine(companyId, itemName);
+                var key = Lib.SaveGame.GetUniqueString(companyId + "_" + itemName);
+                Plugin.Log.LogInfo($"Buy id {companyId} | key: {itemName} | itemCode: {key}");
                 if (!fromPurchases.ContainsKey(key))
                     fromPurchases.Add(key, 1);
                 else

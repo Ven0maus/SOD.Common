@@ -13,16 +13,22 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         private static Guid _positiveFreeResponse;
 
         private Item _item = null;
-        private readonly Dictionary<int, (int Hash, bool Received)> _discountCache = new();
+        private readonly Dictionary<int, (string Hash, bool Received)> _discountCache = new();
 
         /// <summary>
         /// Add's several dialog options regarding purchasing items often at places.
         /// </summary>
         internal static void Register()
         {
+            // For giggles?
+            var customPositiveText = () => Player.Instance.gender == Human.Gender.male ?
+                $"Good choice sir, coming right up!" : Player.Instance.gender == Human.Gender.female ?
+                $"Good choice ma'am, coming right up!" :
+                $"Good choice, coming right up!";
+
             _ = Lib.Dialog.Builder()
                 .SetText("For me, the usual as always.")
-                .AddCustomResponse("Ahh yes, coming right up!", out _positiveResponse)
+                .AddCustomResponse(customPositiveText, out _positiveResponse)
                 .AddCustomResponse($"You're lucky, this one has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
                 .AddCustomResponse("Coming right up, this one's on the house!", out _positiveFreeResponse)
                 .AddResponse("Looks like you can't afford it today.", isSuccesful: false)
@@ -119,7 +125,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             }
 
             var currentTime = Lib.Time.CurrentDateTime;
-            var hash = HashCode.Combine(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, saysTo.humanID);
+            var hash = Lib.SaveGame.GetUniqueString($"{currentTime.Year}_{currentTime.Month}_{currentTime.Day}_{currentTime.Hour}_{saysTo.humanID}");
 
             // Check if this npc gave a discount before for this hash
             if (!_discountCache.TryGetValue(saysTo.humanID, out var discount))
@@ -136,7 +142,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             {
                 // Use a new random with a custom hash seed based on the in-game time and citizen
                 // So u cannot just spam the dialog until you get lucky, but that its predetermined what you get per in game hour.
-                var rand = new Random(hash).Next(0, 100);
+                var rand = new Random(hash.GetHashCode()).Next(0, 100);
                 if (rand < Plugin.Instance.Config.TheUsualFreeChance)
                 {
                     _item.Price = 0;
@@ -161,7 +167,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             return DialogController.ForceSuccess.none;
         }
 
-        private static Item CollectMostPurchasedItem(Dictionary<int, int> items, Company company)
+        private static Item CollectMostPurchasedItem(Dictionary<string, int> items, Company company)
         {
             var mostPurchasedItemCode = items
                 .Where(a => a.Value >= 5)
@@ -176,7 +182,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 var companyId = data.Key;
                 foreach (var item in data.Value)
                 {
-                    var itemCode = HashCode.Combine(companyId, item.Key);
+                    var itemCode = Lib.SaveGame.GetUniqueString(companyId + "_" + item.Key);
                     if (mostPurchasedItemCode == itemCode)
                     {
                         itemName = item.Key;
