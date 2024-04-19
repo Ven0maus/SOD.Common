@@ -21,8 +21,6 @@ namespace SOD.Common.Patches
                 if (_loaded) return;
                 _loaded = true;
 
-                LoadDDSEntries();
-
                 var sprites = Lib.SyncDisks.RegisteredSyncDisks
                     .SelectMany(a => a.Icons)
                     .ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -53,7 +51,7 @@ namespace SOD.Common.Patches
                 }
 
                 if (Lib.SyncDisks.RegisteredSyncDisks.Count > 0)
-                    Plugin.Log.LogInfo($"Loaded {Lib.SyncDisks.RegisteredSyncDisks} custom sync disks.");
+                    Plugin.Log.LogInfo($"Loaded {Lib.SyncDisks.RegisteredSyncDisks.Count} custom sync disks.");
 
                 // Clear out memory usage for icons as its no longer used
                 Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.Icons = null);
@@ -65,46 +63,6 @@ namespace SOD.Common.Patches
                     Plugin.Log.LogError($"Could not find sprite with name \"{spriteName}\", falling back to default dna sprite.");
                 return sprite ?? gameSprites[SyncDiskBuilder.Effect.DefaultSprite];
             }
-
-            /// <summary>
-            /// Add's any custom dds entries into the game
-            /// </summary>
-            private static void LoadDDSEntries()
-            {
-                // Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
-                const string syncDiskDds = "evidence.syncdisks";
-                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
-                {
-                    // Add dds entry for sync disk name
-                    Lib.DdsStrings[syncDiskDds, syncDisk.Preset.name] = syncDisk.Name;
-
-                    // Add dds entries for effects
-                    for (int i = 0; i < syncDisk.Effects.Length; i++)
-                    {
-                        var name = i == 0 ? syncDisk.Preset.mainEffect1Name : i == 1 ? syncDisk.Preset.mainEffect2Name : syncDisk.Preset.mainEffect3Name;
-                        var description = i == 0 ? syncDisk.Preset.mainEffect1Description : i == 1 ? syncDisk.Preset.mainEffect2Description : syncDisk.Preset.mainEffect3Description;
-
-                        // Add the dds entries
-                        Lib.DdsStrings.AddOrUpdateEntries(syncDiskDds,
-                            (name, name["custom_".Length..]),
-                            (description, description["custom_".Length..]));
-                    }
-
-                    // Add dds entries for upgrades
-                    for (int i = 0; i < syncDisk.UpgradeOptions.Length; i++)
-                    {
-                        var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
-
-                        // Add the dds entries
-                        for (int y = 0; y < nameReferences.Count; y++)
-                            Lib.DdsStrings[syncDiskDds, nameReferences[y]] = nameReferences[y]["custom_".Length..];
-                    }
-
-                    // Add dds entry for side effect
-                    if (syncDisk.SideEffect != null)
-                        Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
-                }
-            }
         }
 
         [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.LoadAll))]
@@ -115,6 +73,9 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
+                // This should happen each time the toolbox is loaded.
+                LoadDDSEntries();
+
                 if (_loaded) return;
                 _loaded = true;
 
@@ -156,6 +117,67 @@ namespace SOD.Common.Patches
 
                 // Remove the memory usage of this, no longer needed
                 Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.MenuPresetLocations = null);
+            }
+
+            /// <summary>
+            /// Add's any custom dds entries into the game
+            /// </summary>
+            private static void LoadDDSEntries()
+            {
+                // Add's every dds entry for the created sync disks into the game, so we don't have to create them custom in files with a ddsloader.
+                const string syncDiskDds = "evidence.syncdisks";
+                foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
+                {
+                    // Add dds entry for sync disk name
+                    Lib.DdsStrings[syncDiskDds, syncDisk.Preset.name] = syncDisk.Name;
+
+                    // Add dds entries for effects
+                    for (int i = 0; i < syncDisk.Effects.Length; i++)
+                    {
+                        var name = i == 0 ? syncDisk.Preset.mainEffect1Name : i == 1 ? syncDisk.Preset.mainEffect2Name : syncDisk.Preset.mainEffect3Name;
+                        var description = i == 0 ? syncDisk.Preset.mainEffect1Description : i == 1 ? syncDisk.Preset.mainEffect2Description : syncDisk.Preset.mainEffect3Description;
+
+                        // Add the dds entries
+                        Lib.DdsStrings.AddOrUpdateEntries(syncDiskDds,
+                            (name, name["custom_".Length..]),
+                            (description, description["custom_".Length..]));
+                    }
+
+                    // Add dds entries for upgrades
+                    for (int i = 0; i < syncDisk.UpgradeOptions.Length; i++)
+                    {
+                        var nameReferences = i == 0 ? syncDisk.Preset.option1UpgradeNameReferences : i == 1 ? syncDisk.Preset.option2UpgradeNameReferences : syncDisk.Preset.option3UpgradeNameReferences;
+
+                        // Add the dds entries
+                        for (int y = 0; y < nameReferences.Count; y++)
+                            Lib.DdsStrings[syncDiskDds, nameReferences[y]] = nameReferences[y]["custom_".Length..];
+                    }
+
+                    // Add dds entry for side effect
+                    if (syncDisk.SideEffect != null)
+                        Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
+                }
+
+                // Add the initial dds records
+                const string dialogDds = "dds.blocks";
+                foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
+                {
+                    Lib.DdsStrings[dialogDds, customDialog.BlockId] = customDialog.Text ?? customDialog.TextGetter.Invoke();
+                    foreach (var response in customDialog.Responses)
+                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
+                }
+
+                // Add dialog blocks
+                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
+                foreach (var block in blocks)
+                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
+
+                // Add dialog messages
+                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
+                foreach (var message in messages)
+                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
+
+                Plugin.Log.LogInfo("Loaded custom dds entries.");
             }
         }
     }

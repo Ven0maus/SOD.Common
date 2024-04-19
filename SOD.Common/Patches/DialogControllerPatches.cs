@@ -17,7 +17,6 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix(DialogController __instance)
             {
-                const string dialogDds = "dds.blocks";
                 foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
                 {
                     Toolbox.Instance.allDialog.Add(customDialog.Preset);
@@ -43,22 +42,7 @@ namespace SOD.Common.Patches
                     __instance.dialogRef.Add(customDialog.Preset, warnNotewriterMI);
 
                     _customDialogInterceptors[customDialog.Preset.name] = customDialog;
-
-                    // Add the initial dds records
-                    Lib.DdsStrings[dialogDds, customDialog.BlockId] = customDialog.Text ?? customDialog.TextGetter.Invoke();
-                    foreach (var response in customDialog.Responses)
-                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
                 }
-
-                // Add dialog blocks
-                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
-                foreach (var block in blocks)
-                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
-
-                // Add dialog messages
-                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
-                foreach (var message in messages)
-                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
 
                 if (Lib.Dialog.RegisteredDialogs.Count > 0)
                     Plugin.Log.LogInfo($"Loaded {Lib.Dialog.RegisteredDialogs.Count} custom dialogs.");
