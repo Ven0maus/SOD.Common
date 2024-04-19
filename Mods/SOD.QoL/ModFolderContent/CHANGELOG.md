@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.3**
+- Fixed some companies still not having unlocked doors sometimes on a new game start when they are suppose to be open.
+
 **1.1.2**
 - Fixed issue regarding consuming food breaking after using heatpacks
 
