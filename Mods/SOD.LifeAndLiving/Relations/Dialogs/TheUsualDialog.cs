@@ -15,20 +15,15 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         private Item _item = null;
         private readonly Dictionary<int, (int Hash, bool Received)> _discountCache = new();
 
-        // TODO: Move to configuration bindings
-        private const int DiscountPercentage = 35;
-        private const int DiscountChance = 25;
-        private const int FreeChance = 10;
-
         /// <summary>
         /// Add's several dialog options regarding purchasing items often at places.
         /// </summary>
         internal static void Register()
         {
             _ = Lib.Dialog.Builder()
-                .SetText("The usual please.")
+                .SetText("For me, the usual as always.")
                 .AddCustomResponse("Ahh yes, coming right up!", out _positiveResponse)
-                .AddCustomResponse("You're lucky, they're 50% discounted now!", out _positiveDiscountResponse)
+                .AddCustomResponse($"You're lucky, this one has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
                 .AddCustomResponse("Coming right up, this one's on the house!", out _positiveFreeResponse)
                 .AddResponse("Looks like you can't afford it today.", isSuccesful: false)
                 .ModifyDialogOptions((a) =>
@@ -142,14 +137,14 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 // Use a new random with a custom hash seed based on the in-game time and citizen
                 // So u cannot just spam the dialog until you get lucky, but that its predetermined what you get per in game hour.
                 var rand = new Random(hash).Next(0, 100);
-                if (rand < FreeChance)
+                if (rand < Plugin.Instance.Config.TheUsualFreeChance)
                 {
                     _item.Price = 0;
                     _discountCache[saysTo.humanID] = (hash, true);
                 }
-                else if (rand < DiscountChance)
+                else if (rand < Plugin.Instance.Config.TheUsualDiscountChance)
                 {
-                    _item.Price -= (int)Math.Round(_item.Price / 100 * (float)DiscountPercentage);
+                    _item.Price -= (int)Math.Round(_item.Price / 100 * (float)Plugin.Instance.Config.TheUsualDiscountValue);
                     _item.Discount = true;
                     _discountCache[saysTo.humanID] = (hash, true);
                 }
