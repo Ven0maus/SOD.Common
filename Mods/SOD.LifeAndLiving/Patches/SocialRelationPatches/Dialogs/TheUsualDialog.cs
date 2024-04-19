@@ -14,10 +14,10 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches.DialogLogic
         /// </summary>
         internal static void Register()
         {
-            _ = Lib.Dialog.Builder("TheUsualPurchase")
+            _ = Lib.Dialog.Builder($"{Plugin.PLUGIN_GUID.GetHashCode()}_TheUsualPurchase")
                 .SetText("The usual please.")
-                .AddResponse("Ahh yes, coming right up sir!", true)
-                .AddResponse("Looks like you can't afford it today.", false)
+                .AddResponse("Ahh yes, coming right up sir!", isSuccesful: true)
+                .AddResponse("Looks like you can't afford it today.", isSuccesful: false)
                 .ModifyDialogOptions((a) =>
                 {
                     a.useSuccessTest = true;
