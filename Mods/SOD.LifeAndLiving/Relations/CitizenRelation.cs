@@ -58,6 +58,20 @@ namespace SOD.LifeAndLiving.Relations
             }
         }
 
+        private int _seenAtHomeBuilding;
+        public int SeenAtHomeBuilding
+        {
+            get => _seenAtHomeBuilding;
+            set
+            {
+                if (_seenAtHomeBuilding != value)
+                {
+                    _seenAtHomeBuilding = value;
+                    Calculate();
+                }
+            }
+        }
+
         /// <summary>
         /// The last time the player has seen this citizen.
         /// </summary>
@@ -85,7 +99,7 @@ namespace SOD.LifeAndLiving.Relations
             if (RelationManager.Instance.IsLoading)
                 return;
 
-
+            // TODO
         }
     }
 

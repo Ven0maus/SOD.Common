@@ -23,6 +23,10 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                 {
                     var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
                     var isInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
+                    var isInTheSameHomeBuilding = __instance.home != null &&
+                        citizen.currentGameLocation != null &&
+                        citizen.currentGameLocation.thisAsAddress != null &&
+                        citizen.currentGameLocation.thisAsAddress == __instance.home;
 
                     var relation = RelationManager.Instance[__instance.humanID];
                     if (relation.LastSeen == null || relation.LastSeen.Value.AddMinutes(1) < DateTime.Now)
@@ -36,6 +40,12 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtHome++;
+                            relation.SeenAtHomeBuilding++;
+                        }
+                        else if (isInTheSameHomeBuilding)
+                        {
+                            relation.LastSeen = DateTime.Now;
+                            relation.SeenAtHomeBuilding++;
                         }
                         else if ((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom)
                         {
