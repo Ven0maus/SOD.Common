@@ -47,7 +47,15 @@ namespace SOD.Common.Helpers.DialogObjects
         internal new AIActionPreset.AISpeechPreset ResponseInfo { get; }
 
         internal DialogObject(DialogPreset dialogPreset, string text, IDialogLogic dialogLogic) 
-            : base(null, text)
+            : base(null, text, null)
+        {
+            Responses = new();
+            DialogLogic = dialogLogic;
+            Preset = dialogPreset;
+        }
+
+        internal DialogObject(DialogPreset dialogPreset, Func<string> textGetter, IDialogLogic dialogLogic)
+            : base(null, null, textGetter)
         {
             Responses = new();
             DialogLogic = dialogLogic;
@@ -123,6 +131,19 @@ namespace SOD.Common.Helpers.DialogObjects
 
             // Now register the dialog into the game
             Lib.Dialog.RegisteredDialogs.Add(this);
+        }
+
+        /// <summary>
+        /// This method updates the dds records with the updated dynamic text from the getter.
+        /// </summary>
+        internal void UpdateDynamicText()
+        {
+            const string dialogDds = "dds.blocks";
+            if (TextGetter != null)
+                Lib.DdsStrings[dialogDds, BlockId] = TextGetter.Invoke();
+            foreach (var response in Responses)
+                if (response.TextGetter != null)
+                    Lib.DdsStrings[dialogDds, response.BlockId] = response.TextGetter.Invoke();
         }
     }
 }

@@ -74,6 +74,11 @@ namespace SOD.Common.Patches
                 if (_customDialogInterceptors.TryGetValue(preset.name, out var interceptor) && interceptor.DialogLogic != null)
                 {
                     __result = interceptor.DialogLogic.IsDialogShown(preset, saysTo, jobRef);
+                    if (__result)
+                    {
+                        // Check if we have dynamic text, if so update it now before it is shown.
+                        interceptor.UpdateDynamicText();
+                    }
                     return false;
                 }
 
