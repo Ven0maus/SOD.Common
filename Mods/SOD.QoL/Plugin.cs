@@ -33,11 +33,16 @@ namespace SOD.QoL
             {
                 if (company.placeOfBusiness.thisAsAddress != null && company.IsOpenAtThisTime(SessionData.Instance.gameTime))
                 {
-                    if (company.placeOfBusiness.streetAccess != null && company.placeOfBusiness.streetAccess.door != null)
-                        company.placeOfBusiness.streetAccess.door.SetLocked(false, null, false);
+                    foreach (var nodeAccess in company.address.entrances)
+                    {
+                        if (nodeAccess.door != null)
+                            nodeAccess.door.SetLocked(false, null, false);
+                    }
 
                     foreach (NewRoom newRoom in company.address.rooms)
                         newRoom.SetMainLights(true, "SOD.QoL: Unlock business door on new game.", null, true, true);
+
+                    company.SetOpen(true, true);
                     count++;
                 }
             }
