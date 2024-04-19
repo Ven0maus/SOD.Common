@@ -104,15 +104,6 @@ namespace SOD.Common.Patches
                     if (syncDisk.SideEffect != null)
                         Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
                 }
-
-                // Add initial dialog dds strings
-                const string dialogDds = "dds.blocks";
-                foreach (var dialog in Lib.Dialog.RegisteredDialogs)
-                {
-                    Lib.DdsStrings[dialogDds, dialog.BlockId] = dialog.Text ?? dialog.TextGetter.Invoke();
-                    foreach (var response in dialog.Responses)
-                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
-                }
             }
         }
 

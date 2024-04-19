@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using Il2CppSystem.Reflection;
+using SOD.Common.Helpers;
 using SOD.Common.Helpers.DialogObjects;
 using System.Collections.Generic;
 
@@ -12,17 +13,15 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(DialogController), nameof(DialogController.Start))]
         internal static class DialogController_Start
         {
-            private static bool _loaded = false;
             [HarmonyPostfix]
             internal static void Postfix(DialogController __instance)
             {
-                if (_loaded) return;
-                _loaded = true;
-
+                const string dialogDds = "dds.blocks";
                 foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
                 {
                     Toolbox.Instance.allDialog.Add(customDialog.Preset);
-                    Toolbox.Instance.defaultDialogOptions.Add(customDialog.Preset);
+                    if (customDialog.Preset.defaultOption)
+                        Toolbox.Instance.defaultDialogOptions.Add(customDialog.Preset);
 
                     MethodInfo warnNotewriterMI = null;
                     foreach (var dialogPreset in Toolbox.Instance.allDialog)
@@ -43,6 +42,11 @@ namespace SOD.Common.Patches
                     __instance.dialogRef.Add(customDialog.Preset, warnNotewriterMI);
 
                     _customDialogInterceptors[customDialog.Preset.name] = customDialog;
+
+                    // Add the initial dds records
+                    Lib.DdsStrings[dialogDds, customDialog.BlockId] = customDialog.Text ?? customDialog.TextGetter.Invoke();
+                    foreach (var response in customDialog.Responses)
+                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
                 }
 
                 if (Lib.Dialog.RegisteredDialogs.Count > 0)

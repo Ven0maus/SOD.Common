@@ -18,7 +18,7 @@ namespace SOD.Common.Helpers
             get
             {
                 if (Strings.Instance == null || Strings.stringTable == null)
-                    return string.Empty;
+                    return null;
 
                 if (!Strings.textFilesLoaded)
                 {
@@ -28,7 +28,7 @@ namespace SOD.Common.Helpers
                 if (Strings.stringTable.TryGetValue(dictionary.ToLower(), out var table) &&
                     table.TryGetValue(key.ToLower(), out var ddsString))
                     return ddsString.displayStr;
-                return string.Empty;
+                return null;
             }
             set
             {
@@ -105,7 +105,18 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string Get(string dictionary, string key)
         {
-            return this[dictionary, key];
+            return this[dictionary, key] ?? string.Empty;
+        }
+
+        /// <summary>
+        /// Checks if a dds entry exists for this combination.
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public bool Exists(string dictionary ,string key)
+        {
+            return this[dictionary, key] != null;
         }
 
         /// <summary>
