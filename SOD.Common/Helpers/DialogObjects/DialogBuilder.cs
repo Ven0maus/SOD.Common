@@ -49,7 +49,7 @@ namespace SOD.Common.Helpers.DialogObjects
         }
 
         /// <summary>
-        /// Add's a new response to the dialog.
+        /// Add's a new custom dialog response to the dialog.
         /// </summary>
         /// <param name="response"></param>
         public DialogBuilder AddResponse(DialogResponse response)
@@ -60,11 +60,21 @@ namespace SOD.Common.Helpers.DialogObjects
         }
 
         /// <summary>
+        /// Add's a new response to the dialog with an optional lambda to modify the response preset info.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="action">The action to modify the response preset info</param>
+        public DialogBuilder AddResponse(string text, Action<AIActionPreset.AISpeechPreset> action = null)
+            => AddResponse(new DialogResponse(text, action));
+
+        /// <summary>
         /// Add's a new response to the dialog.
         /// </summary>
         /// <param name="text"></param>
-        public DialogBuilder AddResponse(string text)
-            => AddResponse(new DialogResponse(text, null));
+        /// <param name="isSuccesful">Is this a succes response?</param>
+        /// <param name="endsDialog">Should the dialog end with this response?</param>
+        public DialogBuilder AddResponse(string text, bool isSuccesful, bool endsDialog = true)
+            => AddResponse(new DialogResponse(text, isSuccesful, endsDialog));
 
         /// <summary>
         /// Allows modificiation of the dialog options.

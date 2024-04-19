@@ -28,7 +28,7 @@ namespace SOD.Common.Helpers.DialogObjects
         /// <summary>
         /// The dialog preset that is used in the game, this will be automatically created.
         /// </summary>
-        public DialogPreset Preset { get; private set; }
+        public DialogPreset Preset { get; }
 
         /// <summary>
         /// Responses to this dialog.
@@ -38,7 +38,7 @@ namespace SOD.Common.Helpers.DialogObjects
         /// <summary>
         /// The logic that is to be executed for this dialog.
         /// </summary>
-        public IDialogLogic DialogLogic { get; set; }
+        public IDialogLogic DialogLogic { get; }
 
         /// <summary>
         /// This one is set to new, so it is now visible to the lib user.
