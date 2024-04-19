@@ -24,9 +24,9 @@ namespace SOD.Common.Helpers
         /// <br>When finished setting up your properties on the builder, call builder.Create();</br>
         /// <br>This will return a Dialog object which you can call .Register() on the register it into the game.</br>
         /// </summary>
-        /// <param name="dialogName">A unique name for your dialog.</param>
+        /// <param name="dialogName">A unique name for your dialog, if null a random guid will be assigned.</param>
         /// <returns></returns>
-        public DialogBuilder Builder(string dialogName)
+        public DialogBuilder Builder(string dialogName = null)
         {
             return new DialogBuilder(dialogName);
         }

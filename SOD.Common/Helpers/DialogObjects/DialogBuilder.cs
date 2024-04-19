@@ -14,12 +14,12 @@ namespace SOD.Common.Helpers.DialogObjects
         private IDialogLogic _dialogLogic;
         private List<DialogResponse> _dialogResponses;
 
-        internal DialogBuilder(string dialogName) 
+        internal DialogBuilder(string dialogName = null) 
         {
             _dialogPreset = ScriptableObject.CreateInstance<DialogPreset>();
 
             // Base preset information
-            _dialogPreset.name = dialogName;
+            _dialogPreset.name = dialogName ?? Guid.NewGuid().ToString();
             _dialogPreset.defaultOption = true;
             _dialogPreset.tiedToKey = Evidence.DataKey.photo;
             _dialogPreset.useSuccessTest = true;
