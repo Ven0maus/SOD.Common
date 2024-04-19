@@ -2,7 +2,6 @@
 using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
-using SOD.LifeAndLiving.Patches.SocialRelationPatches;
 using SOD.LifeAndLiving.Relations;
 using System.Reflection;
 

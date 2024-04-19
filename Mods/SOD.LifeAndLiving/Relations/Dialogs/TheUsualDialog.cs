@@ -1,11 +1,10 @@
 ﻿using SOD.Common;
 using SOD.Common.Helpers.DialogObjects;
-using SOD.LifeAndLiving.Relations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SOD.LifeAndLiving.Patches.SocialRelationPatches.DialogLogic
+namespace SOD.LifeAndLiving.Relations.Dialogs
 {
     internal class TheUsualDialog : IDialogLogic
     {
