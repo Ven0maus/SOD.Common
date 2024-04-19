@@ -8,18 +8,17 @@ namespace SOD.Common.Helpers.DialogObjects
     public class DialogResponse
     {
         /// <summary>
-        /// Unique Guid for DDS structure.
+        /// The ID used for the block.
         /// </summary>
-        public string Id { get; }
+        public string BlockId { get; }
         /// <summary>
         /// The text content of the dialog.
         /// </summary>
         public string Text { get; }
-
         /// <summary>
-        /// Should this response be included in the dialog automatically?
+        /// The ID used for the message.
         /// </summary>
-        internal bool IncludeInDialog { get; } = true;
+        public Guid? MessageId { get; }
 
         /// <summary>
         /// The condition for when this dialog/response should be shown.
@@ -40,31 +39,32 @@ namespace SOD.Common.Helpers.DialogObjects
         /// <summary>
         /// Internal constructor for the DialogObject, cannot be used by library users.
         /// </summary>
-        /// <param name="responseGuid"></param>
+        /// <param name="messageId"></param>
         /// <param name="text"></param>
-        internal DialogResponse(Guid? responseGuid, string text)
+        internal DialogResponse(Guid? messageId, string text)
         {
-            IncludeInDialog = responseGuid == null;
-            Id = responseGuid?.ToString() ?? Guid.NewGuid().ToString();
+            MessageId = messageId;
+            BlockId = Guid.NewGuid().ToString();
             Text = text;
 
             // Create dds block
             Block = new DDSSaveClasses.DDSBlockSave
             {
-                id = Id,
-                name = Id
+                id = BlockId,
+                name = BlockId
             };
         }
 
         /// <summary>
         /// A more advanced constructor, which allows to set a custom guid that you can use to raise the message by code.
         /// <br>This response will NOT be automatically triggered by the dialog.</br>
-        /// <br>An example of raising it in code: "citizen.speechController.Speak(responseGuid.ToString())"</br>
+        /// <br>An example of raising it in code: "citizen.speechController.Speak(messageId.ToString())"</br>
+        /// <br>If you wanna use the "citizen.speechController.Speak(dictionary, entryRef, ..);" overload, you must pass "dds.blocks" as dictionary and the BlockId of this object as entryRef.</br>
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="responseGuid"></param>
-        public DialogResponse(string text, Guid responseGuid)
-            : this(responseGuid, text)
+        /// <param name="messageId"></param>
+        public DialogResponse(string text, Guid messageId)
+            : this(messageId, text)
         { }
 
         /// <summary>
@@ -73,7 +73,7 @@ namespace SOD.Common.Helpers.DialogObjects
         /// </summary>
         /// <param name="text"></param>
         /// <param name="action"></param>
-        public DialogResponse(string text, Action<AIActionPreset.AISpeechPreset> action)
+        public DialogResponse(string text, Action<AIActionPreset.AISpeechPreset> dialogOptions = null, Action<BlockCondition> dialogCondition = null)
             : this(null, text)
         {
             ResponseInfo = new AIActionPreset.AISpeechPreset
@@ -84,7 +84,8 @@ namespace SOD.Common.Helpers.DialogObjects
                 useParsing = true,
                 chance = 1,
             };
-            action?.Invoke(ResponseInfo);
+            dialogOptions?.Invoke(ResponseInfo);
+            dialogCondition?.Invoke(Condition);
         }
 
         /// <summary>

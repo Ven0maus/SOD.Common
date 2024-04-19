@@ -63,9 +63,10 @@ namespace SOD.Common.Helpers.DialogObjects
         /// Add's a new response to the dialog with an optional lambda to modify the response preset info.
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="action">The action to modify the response preset info</param>
-        public DialogBuilder AddResponse(string text, Action<AIActionPreset.AISpeechPreset> action = null)
-            => AddResponse(new DialogResponse(text, action));
+        /// <param name="dialogOptions">A lambda to modify the options for the dialog.</param>
+        /// <param name="dialogCondition">A lambda to modify the condition to show the dialog.</param>
+        public DialogBuilder AddResponse(string text, Action<AIActionPreset.AISpeechPreset> dialogOptions = null, Action<BlockCondition> dialogCondition = null)
+            => AddResponse(new DialogResponse(text, dialogOptions, dialogCondition));
 
         /// <summary>
         /// Add's a new response to the dialog.
@@ -78,22 +79,24 @@ namespace SOD.Common.Helpers.DialogObjects
 
         /// <summary>
         /// Add's a new custom response that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(responseGuid);"</br>
+        /// <br>Example of triggering it: "citizen.speechController.Speak(messageId);"</br>
         /// </summary>
         /// <param name="text"></param>
-        /// <param name="responseGuid">The guid that you generate, so you can trigger it yourself.</param>
-        public DialogBuilder AddCustomResponse(string text, Guid responseGuid)
-            => AddResponse(new DialogResponse(responseGuid, text));
+        /// <param name="messageId">The guid that you generate, so you can trigger it yourself.</param>
+        public DialogBuilder AddCustomResponse(string text, Guid messageId)
+            => AddResponse(new DialogResponse(messageId, text));
 
         /// <summary>
-        /// Add's new custom responses that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(responseGuid);"</br>
+        /// Add's a new custom response that can only be triggered by code.
+        /// <br>Example of triggering it: "citizen.speechController.Speak(dictionary, entryRef, ..);", you must pass "dds.blocks" as dictionary and the blockId as entryRef.</br>
         /// </summary>
-        /// <param name="responses"></param>
-        public DialogBuilder AddCustomResponses(Dictionary<Guid, string> responses)
+        /// <param name="text"></param>
+        /// <param name="blockId">The guid for the specific block of this message.</param>
+        public DialogBuilder AddCustomResponse(string text, out Guid blockId)
         {
-            foreach (var kvp in responses)
-                AddResponse(new DialogResponse(kvp.Key, kvp.Value));
+            var response = new DialogResponse(Guid.NewGuid(), text);
+            blockId = new Guid(response.BlockId);
+            AddResponse(response);
             return this;
         }
 
