@@ -1,5 +1,4 @@
 ﻿using SOD.Common;
-using System;
 using System.Collections.Generic;
 
 namespace SOD.LifeAndLiving.Relations
@@ -45,7 +44,6 @@ namespace SOD.LifeAndLiving.Relations
                     PurchasedItemsFrom[human.humanID] = fromPurchases = new Dictionary<string, int>();
 
                 var key = Lib.SaveGame.GetUniqueString(companyId + "_" + itemName);
-                Plugin.Log.LogInfo($"Buy id {companyId} | key: {itemName} | itemCode: {key}");
                 if (!fromPurchases.ContainsKey(key))
                     fromPurchases.Add(key, 1);
                 else
