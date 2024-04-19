@@ -3,6 +3,7 @@ using Il2CppSystem.Reflection;
 using SOD.Common.Helpers;
 using SOD.Common.Helpers.DialogObjects;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Common.Patches
 {
@@ -48,6 +49,16 @@ namespace SOD.Common.Patches
                     foreach (var response in customDialog.Responses)
                         Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
                 }
+
+                // Add dialog blocks
+                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
+                foreach (var block in blocks)
+                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
+
+                // Add dialog messages
+                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
+                foreach (var message in messages)
+                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
 
                 if (Lib.Dialog.RegisteredDialogs.Count > 0)
                     Plugin.Log.LogInfo($"Loaded {Lib.Dialog.RegisteredDialogs.Count} custom dialogs.");

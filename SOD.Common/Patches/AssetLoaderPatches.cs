@@ -158,28 +158,5 @@ namespace SOD.Common.Patches
                 Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.MenuPresetLocations = null);
             }
         }
-
-        [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.Start))]
-        internal static class Toolbox_Start
-        {
-            private static bool _loaded = false;
-
-            [HarmonyPostfix]
-            internal static void Postfix()
-            {
-                if (_loaded) return;
-                _loaded = true;
-
-                // Add dialog blocks
-                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
-                foreach (var block in blocks)
-                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
-
-                // Add dialog messages
-                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
-                foreach (var message in messages)
-                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
-            }
-        }
     }
 }
