@@ -67,10 +67,10 @@ namespace SOD.Common.Helpers.DialogObjects
         {
             var message = new DDSSaveClasses.DDSMessageSave
             {
-                id = Guid.NewGuid().ToString(),
-                name = info.Id
+                id = info.MessageId?.ToString() ?? Guid.NewGuid().ToString(),
+                name = info.BlockId
             };
-            var block = new DDSSaveClasses.DDSBlockCondition { blockID = info.Id, instanceID = Guid.NewGuid().ToString() };
+            var block = new DDSSaveClasses.DDSBlockCondition { blockID = info.BlockId, instanceID = Guid.NewGuid().ToString() };
             message.blocks.Add(block);
 
             // Copy over the conditions
@@ -83,7 +83,7 @@ namespace SOD.Common.Helpers.DialogObjects
             _messages.Add(message);
 
             // Process children further down
-            if (info.Id != Id) return;
+            if (info.BlockId != BlockId) return;
             foreach (var response in Responses)
                 Build_DDS_Messages(response);
         }
@@ -99,7 +99,9 @@ namespace SOD.Common.Helpers.DialogObjects
             for (int i=0; i < Responses.Count; i++)
             {
                 var response = Responses[i];
-                if (response.IncludeInDialog)
+
+                // If message id is null then it should be automated
+                if (response.MessageId == null)
                 {
                     // Start counting from 1, because 0 is the parent
                     response.ResponseInfo.ddsMessageID = _messages[i + 1].id;

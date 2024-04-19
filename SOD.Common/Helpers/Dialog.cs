@@ -1,4 +1,6 @@
-﻿using SOD.Common.Helpers.DialogObjects;
+﻿using SOD.Common.Extensions;
+using SOD.Common.Helpers.DialogObjects;
+using System;
 using System.Collections.Generic;
 
 namespace SOD.Common.Helpers

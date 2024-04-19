@@ -109,9 +109,9 @@ namespace SOD.Common.Patches
                 const string dialogDds = "dds.blocks";
                 foreach (var dialog in Lib.Dialog.RegisteredDialogs)
                 {
-                    Lib.DdsStrings[dialogDds, dialog.Id] = dialog.Text;
+                    Lib.DdsStrings[dialogDds, dialog.BlockId] = dialog.Text;
                     foreach (var response in dialog.Responses)
-                        Lib.DdsStrings[dialogDds, response.Id] = response.Text;
+                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text;
                 }
             }
         }
