@@ -17,6 +17,11 @@ namespace SOD.Common.Helpers.DialogObjects
         public string Text { get; }
 
         /// <summary>
+        /// Should this response be included in the dialog automatically?
+        /// </summary>
+        internal bool IncludeInDialog { get; } = true;
+
+        /// <summary>
         /// The condition for when this dialog/response should be shown.
         /// </summary>
         public BlockCondition Condition { get; } = new BlockCondition();
@@ -32,9 +37,15 @@ namespace SOD.Common.Helpers.DialogObjects
         /// </summary>
         internal DDSSaveClasses.DDSBlockSave Block { get; }
 
-        internal DialogResponse(string text)
+        /// <summary>
+        /// Internal constructor for the DialogObject, cannot be used by library users.
+        /// </summary>
+        /// <param name="responseGuid"></param>
+        /// <param name="text"></param>
+        internal DialogResponse(Guid? responseGuid, string text)
         {
-            Id = Guid.NewGuid().ToString();
+            IncludeInDialog = responseGuid == null;
+            Id = responseGuid?.ToString() ?? Guid.NewGuid().ToString();
             Text = text;
 
             // Create dds block
@@ -45,8 +56,25 @@ namespace SOD.Common.Helpers.DialogObjects
             };
         }
 
-        public DialogResponse(string text, Action<AIActionPreset.AISpeechPreset> action = null)
-            : this(text)
+        /// <summary>
+        /// A more advanced constructor, which allows to set a custom guid that you can use to raise the message by code.
+        /// <br>This response will NOT be automatically triggered by the dialog.</br>
+        /// <br>An example of raising it in code: "citizen.speechController.Speak(responseGuid.ToString())"</br>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="responseGuid"></param>
+        public DialogResponse(string text, Guid responseGuid)
+            : this(responseGuid, text)
+        { }
+
+        /// <summary>
+        /// Constructor for a response object, which is automatically triggered by the dialog.
+        /// <br>Contains a lambda to modify the dialog option directly from the constructor.</br>
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="action"></param>
+        public DialogResponse(string text, Action<AIActionPreset.AISpeechPreset> action)
+            : this(null, text)
         {
             ResponseInfo = new AIActionPreset.AISpeechPreset
             {
@@ -59,7 +87,13 @@ namespace SOD.Common.Helpers.DialogObjects
             action?.Invoke(ResponseInfo);
         }
 
-        public DialogResponse(string text, bool isSuccesful, bool endsDialog)
+        /// <summary>
+        /// Most basic constructor for a response object, which is automatically triggered by the dialog.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="isSuccesful"></param>
+        /// <param name="endsDialog"></param>
+        public DialogResponse(string text, bool isSuccesful, bool endsDialog = true)
             : this(text, (a) =>
             {
                 a.isSuccessful = isSuccesful;
