@@ -100,6 +100,9 @@ namespace SOD.Common.Patches
                 {
                     Citizen saysToCit = ((dynamic)saysTo.isActor).Cast<Citizen>();
                     forceSuccess = interceptor.DialogLogic.ShouldDialogSucceedOverride(__instance, dialog, saysToCit, where, saidBy);
+
+                    // Check if we have dynamic text, if so update it now before it is shown.
+                    interceptor.UpdateDynamicText();
                 }
             }
         }
