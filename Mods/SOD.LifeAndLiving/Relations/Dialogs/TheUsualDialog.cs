@@ -22,15 +22,15 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         {
             // For giggles?
             var customPositiveText = () => Player.Instance.gender == Human.Gender.male ?
-                $"Good choice sir, one {_item.Name} coming right up!" : Player.Instance.gender == Human.Gender.female ?
-                $"Good choice ma'am, one {_item.Name} coming right up!" :
-                $"Good choice, one {_item.Name} coming right up!";
+                $"Good choice sir, one {_item?.Name ?? ""} coming right up!" : Player.Instance.gender == Human.Gender.female ?
+                $"Good choice ma'am, one {_item?.Name ?? ""} coming right up!" :
+                $"Good choice, one {_item?.Name ?? ""} coming right up!";
 
             _ = Lib.Dialog.Builder()
                 .SetText("For me, the usual as always.")
                 .AddCustomResponse(customPositiveText, out _positiveResponse)
-                .AddCustomResponse(() => $"You're lucky, this {_item.Name} has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
-                .AddCustomResponse(() => $"Coming right up, this {_item.Name} is on the house!", out _positiveFreeResponse)
+                .AddCustomResponse(() => $"You're lucky, this {_item?.Name ?? "item"} has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
+                .AddCustomResponse(() => $"Coming right up, this {_item?.Name ?? "item"} is on the house!", out _positiveFreeResponse)
                 .AddResponse(() => $"Looks like you can't afford {_item?.Name ?? "it"} today.", isSuccesful: false)
                 .ModifyDialogOptions((a) =>
                 {
