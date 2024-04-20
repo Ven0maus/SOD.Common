@@ -12,7 +12,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         private static Guid _positiveDiscountResponse;
         private static Guid _positiveFreeResponse;
 
-        private Item _item = null;
+        private static Item _item = null;
         private readonly Dictionary<int, (string Hash, bool Received)> _discountCache = new();
 
         /// <summary>
@@ -21,17 +21,17 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         internal static void Register()
         {
             // For giggles?
-            var customPositiveText = () => Player.Instance.gender == Human.Gender.male ?
-                $"Good choice sir, coming right up!" : Player.Instance.gender == Human.Gender.female ?
-                $"Good choice ma'am, coming right up!" :
-                $"Good choice, coming right up!";
+            static string customPositiveText() => Player.Instance.gender == Human.Gender.male ?
+                $"Good choice sir, one {_item.Name} coming right up!" : Player.Instance.gender == Human.Gender.female ?
+                $"Good choice ma'am, one {_item.Name} coming right up!" :
+                $"Good choice, one {_item.Name} coming right up!";
 
             _ = Lib.Dialog.Builder()
                 .SetText("For me, the usual as always.")
                 .AddCustomResponse(customPositiveText, out _positiveResponse)
-                .AddCustomResponse($"You're lucky, this one has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
-                .AddCustomResponse("Coming right up, this one's on the house!", out _positiveFreeResponse)
-                .AddResponse("Looks like you can't afford it today.", isSuccesful: false)
+                .AddCustomResponse(() => $"You're lucky, this {_item.Name} has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
+                .AddCustomResponse(() => $"Coming right up, this {_item.Name} is on the house!", out _positiveFreeResponse)
+                .AddResponse(() => $"Looks like you can't afford {_item?.Name ?? "it"} today.", isSuccesful: false)
                 .ModifyDialogOptions((a) =>
                 {
                     a.useSuccessTest = true;
