@@ -21,7 +21,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         internal static void Register()
         {
             // For giggles?
-            static string customPositiveText() => Player.Instance.gender == Human.Gender.male ?
+            var customPositiveText = () => Player.Instance.gender == Human.Gender.male ?
                 $"Good choice sir, one {_item.Name} coming right up!" : Player.Instance.gender == Human.Gender.female ?
                 $"Good choice ma'am, one {_item.Name} coming right up!" :
                 $"Good choice, one {_item.Name} coming right up!";
