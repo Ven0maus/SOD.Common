@@ -43,8 +43,8 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
-            // Check if they have seen the player at work 4 or more times
-            if (!RelationManager.Instance.Exists(saysTo.humanID) || RelationManager.Instance[saysTo.humanID].SeenAtWork < 4) 
+            // Check if they have seen the player at work 5 or more times
+            if (!RelationManager.Instance.Exists(saysTo.humanID) || RelationManager.Instance[saysTo.humanID].SeenAtWork < 5) 
                 return false;
 
             // Check if the citizen is at work and if the player has a free slot available
