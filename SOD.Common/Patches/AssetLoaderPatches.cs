@@ -162,9 +162,13 @@ namespace SOD.Common.Patches
                 const string dialogDds = "dds.blocks";
                 foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
                 {
-                    Lib.DdsStrings[dialogDds, customDialog.BlockId] = customDialog.Text ?? customDialog.TextGetter.Invoke();
+                    // TextGetter are initialized when the conversation is first started dynamically
+                    // Makes no sense to already initialize them now, they could reference things that don't exist yet.
+                    if (customDialog.Text != null)
+                        Lib.DdsStrings[dialogDds, customDialog.BlockId] = customDialog.Text;
                     foreach (var response in customDialog.Responses)
-                        Lib.DdsStrings[dialogDds, response.BlockId] = response.Text ?? response.TextGetter.Invoke();
+                        if (response.Text != null)
+                            Lib.DdsStrings[dialogDds, response.BlockId] = response.Text;
                 }
 
                 // Add dialog blocks
