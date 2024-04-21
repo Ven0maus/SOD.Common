@@ -47,7 +47,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtHomeBuilding++;
                         }
-                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom) && !citizen.isTrespassing)
+                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom || isInTheSameBuilding) && !citizen.isTrespassing)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenOutsideOfWork++;
