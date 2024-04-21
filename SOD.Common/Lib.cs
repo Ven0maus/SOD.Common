@@ -46,5 +46,9 @@ namespace SOD.Common
         /// Contains helper methods regarding player to npc dialog.
         /// </summary>
         public static Dialog Dialog { get; } = new Dialog();
+
+        /// Contains helper methods and indexers regarding in-game DdsStrings.
+        /// </summary>
+        public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
     }
 }
