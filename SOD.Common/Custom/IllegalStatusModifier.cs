@@ -45,7 +45,7 @@ namespace SOD.Common.Custom
             }
 
             TimeRemainingSec = 0f;
-            if (Lib.PlayerStatus.IllegalStatusModifierDictionary == null)
+            if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null)
                 Lib.PlayerStatus.IllegalStatusModifierDictionary.Remove(Key);
             Lib.PlayerStatus.UpdatePlayerIllegalStatus();
             _coroutine = null;
