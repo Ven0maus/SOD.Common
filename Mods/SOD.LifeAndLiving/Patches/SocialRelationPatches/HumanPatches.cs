@@ -31,23 +31,23 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                     var relation = RelationManager.Instance[__instance.humanID];
                     if (relation.LastSeen == null || relation.LastSeen.Value.AddSeconds(45) < DateTime.Now)
                     {
-                        if (__instance.isAtWork && isInTheSameRoom)
+                        if (__instance.isAtWork && isInTheSameRoom && !citizen.isTrespassing)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtWork++;
                         }
-                        else if (__instance.isHome && isInTheSameBuilding)
+                        else if (__instance.isHome && isInTheSameRoom && !citizen.isTrespassing)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtHome++;
                             relation.SeenAtHomeBuilding++;
                         }
-                        else if (isInTheSameHomeBuilding)
+                        else if (isInTheSameHomeBuilding && !citizen.isTrespassing)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenAtHomeBuilding++;
                         }
-                        else if ((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom)
+                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom) && !citizen.isTrespassing)
                         {
                             relation.LastSeen = DateTime.Now;
                             relation.SeenOutsideOfWork++;
