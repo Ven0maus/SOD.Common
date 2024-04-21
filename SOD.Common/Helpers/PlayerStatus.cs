@@ -33,15 +33,31 @@ namespace SOD.Common.Helpers
 
         internal Coroutine UpdateIllegalStatusModifiersCoroutine { get; set; }
 
+        /// <summary>
+        /// Sets an illegal status modifier for the specified duration, or
+        /// indefinitely if the duration is 0.0f or omitted. The modifier will
+        /// cause the Player to have an Illegal Action status while it or any
+        /// other modifier is present. At the end of the duration (if
+        /// provided), the modifier will be automatically removed.
+        /// </summary>
+        /// <param name="key">The key identifying the modifier. Used to overwrite, remove, or toggle the modifier later.</param>
+        /// <param name="force">Whether to overwrite any existing modifier with this key, applying the new duration.</param>
+        /// <param name="duration">The duration that the modifier lasts, in seconds (does not progress while the game is paused).</param>
         public void SetIllegalStatusModifier(string key, bool force = false, float duration = 0.0f)
         {
-            if (force)
+            if (key == "")
             {
-                // Remove entry with the same key, if it exists
-                RemoveIllegalStatusModifier(key);
+                throw new InvalidOperationException("Empty keys are prohibited.");
             }
-            else if (IllegalStatusModifierDictionary.ContainsKey(key))
+            if (force && IllegalStatusModifierDictionary.ContainsKey(key))
             {
+                // Remove entry with the same key, if it exists. Do not stop
+                // the coroutine if it is started.
+                IllegalStatusModifierDictionary.Remove(key);
+            }
+            else if (!force)
+            {
+                // Modifier with this key is already present
                 return;
             }
             IllegalStatusModifierDictionary.Add(key, new IllegalStatusModifier(key, duration, duration == 0.0f ? false : true));
@@ -51,8 +67,17 @@ namespace SOD.Common.Helpers
             }
         }
 
+        /// <summary>
+        /// Removes an illegal status modifier, if present.
+        /// </summary>
+        /// <param name="key">The key identifying the modifier.</param>
         public void RemoveIllegalStatusModifier(string key)
         {
+            if (key == "")
+            {
+                // No need to throw
+                return;
+            }
             if (IllegalStatusModifierDictionary.ContainsKey(key))
             {
                 IllegalStatusModifierDictionary.Remove(key);
@@ -68,6 +93,10 @@ namespace SOD.Common.Helpers
             }
         }
 
+        /// <summary>
+        /// Toggles an illegal status modifier by adding it if the key is not present, or removing it if the key is present. If added, the modifier will not have a duration associated with it (it will be active indefinitely, until toggled or removed).
+        /// </summary>
+        /// <param name="key">The key identifying the modifier.</param>
         public void ToggleIllegalStatusModifier(string key)
         {
             if (IllegalStatusModifierDictionary.ContainsKey(key))
