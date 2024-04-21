@@ -39,8 +39,7 @@ namespace SOD.Common.Helpers
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentException("Key cannot be null or empty.", nameof(key));
 
-            if (IllegalStatusModifierDictionary == null)
-                IllegalStatusModifierDictionary = new();
+            IllegalStatusModifierDictionary ??= new();
 
             if (IllegalStatusModifierDictionary.TryGetValue(key, out var modifier))
             {
