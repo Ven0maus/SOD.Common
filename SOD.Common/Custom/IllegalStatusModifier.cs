@@ -45,9 +45,19 @@ namespace SOD.Common.Custom
             }
 
             TimeRemainingSec = 0f;
-            Lib.PlayerStatus.IllegalStatusModifierDictionary.Remove(Key);
-            Lib.PlayerStatus.Update();
+            if (Lib.PlayerStatus.IllegalStatusModifierDictionary == null)
+                Lib.PlayerStatus.IllegalStatusModifierDictionary.Remove(Key);
+            Lib.PlayerStatus.UpdatePlayerIllegalStatus();
             _coroutine = null;
+        }
+
+        /// <summary>
+        /// Used to store the data into json object
+        /// </summary>
+        public class JsonData
+        {
+            public string Key { get; set; }
+            public float Time { get; set; }
         }
     }
 }

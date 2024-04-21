@@ -1,7 +1,10 @@
 using SOD.Common.Custom;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 
 namespace SOD.Common.Helpers
 {
@@ -60,7 +63,7 @@ namespace SOD.Common.Helpers
             modifier.Start();
 
             // Update status
-            Update();
+            UpdatePlayerIllegalStatus();
         }
 
         /// <summary>
@@ -78,16 +81,91 @@ namespace SOD.Common.Helpers
                 IllegalStatusModifierDictionary.Remove(key);
 
                 // Update status
-                Update();
+                UpdatePlayerIllegalStatus();
             }
         }
 
-        internal void Update()
+        /// <summary>
+        /// Update the player's illegal status based on the information we are tracking.
+        /// </summary>
+        internal void UpdatePlayerIllegalStatus()
         {
-            if (IllegalStatusModifierDictionary.Any())
+            if (IllegalStatusModifierDictionary != null && IllegalStatusModifierDictionary.Any())
                 AdjustIllegalStatus(Player.Instance.illegalStatus, true);
             else
                 AdjustIllegalStatus(Player.Instance.illegalStatus, false);
+        }
+
+        /// <summary>
+        /// Called when a savegame is loaded.
+        /// </summary>
+        /// <param name="path"></param>
+        internal void Load(string path)
+        {
+            var hash = Lib.SaveGame.GetUniqueString(path);
+            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
+
+            if (File.Exists(storePath))
+            {
+                var json = File.ReadAllText(storePath);
+                var jsonData = JsonSerializer.Deserialize<List<IllegalStatusModifier.JsonData>>(json);
+
+                if (jsonData.Count > 0)
+                {
+                    IllegalStatusModifierDictionary = new Dictionary<string, IllegalStatusModifier>();
+                    foreach (var data in jsonData)
+                    {
+                        var modifier = new IllegalStatusModifier(data.Key, data.Time == 0f ? null : TimeSpan.FromSeconds(data.Time));
+                        IllegalStatusModifierDictionary[data.Key] = modifier;
+                        modifier.Start();
+                    }
+
+                    // Update player status
+                    UpdatePlayerIllegalStatus();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Called when a savegame is saved.
+        /// </summary>
+        /// <param name="path"></param>
+        internal void Save(string path)
+        {
+            var hash = Lib.SaveGame.GetUniqueString(path);
+            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
+
+            // Clean-up
+            if (IllegalStatusModifierDictionary == null || IllegalStatusModifierDictionary.Count == 0)
+            {
+                if (File.Exists(storePath))
+                    File.Delete(storePath);
+                return;
+            }
+
+            var data = IllegalStatusModifierDictionary
+                .Select(a => new IllegalStatusModifier.JsonData 
+                { 
+                    Key = a.Key, 
+                    Time = a.Value.TimeRemainingSec 
+                })
+                .ToList();
+            var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = false });
+            File.WriteAllText(storePath, json);
+        }
+
+        /// <summary>
+        /// Method is used to reset the player status data on a new game start.
+        /// </summary>
+        internal void ResetNewGame()
+        {
+            // Clear out the modifiers and the dictionary for a new game
+            if (IllegalStatusModifierDictionary != null)
+            {
+                foreach (var modifier in IllegalStatusModifierDictionary.Values)
+                    modifier.Stop();
+                IllegalStatusModifierDictionary = null;
+            }
         }
 
         private static void AdjustIllegalStatus(bool previousStatus, bool newStatus)

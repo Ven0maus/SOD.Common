@@ -106,7 +106,10 @@ namespace SOD.Common.Helpers
 
             // Handle sync disk data install/upgrade
             if (after)
+            {
                 Lib.SyncDisks.CheckForSyncDiskData(false, path);
+                Lib.PlayerStatus.Save(path);
+            }
         }
 
         internal void OnLoad(string path, bool after)
@@ -118,7 +121,10 @@ namespace SOD.Common.Helpers
 
             // Handle sync disk data install/upgrade
             if (after)
+            {
                 Lib.SyncDisks.CheckForSyncDiskData(true, path);
+                Lib.PlayerStatus.Load(path);
+            }
         }
 
         internal void OnDelete(string path, bool after)
@@ -140,7 +146,10 @@ namespace SOD.Common.Helpers
             if (after)
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
             else
+            {
+                Lib.PlayerStatus.ResetNewGame();
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
+            }
 
             // Clear installed sync disks
             Lib.SyncDisks.InstalledSyncDisks.Clear();
