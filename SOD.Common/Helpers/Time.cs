@@ -49,6 +49,8 @@ namespace SOD.Common.Helpers
         private float? _currentGameTime;
         private TimeData? _currentTimeData, _currentDateData;
 
+        public bool IsGamePaused { get; internal set; }
+
         /// <summary>
         /// Returns the current in game date and time.
         /// </summary>

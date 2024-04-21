@@ -41,5 +41,10 @@ namespace SOD.Common
         /// Contains helper methods and indexers regarding in-game DdsStrings.
         /// </summary>
         public static DdsStrings DdsStrings { get; } = new DdsStrings();
+
+        /// <summary>
+        /// Contains helper methods and indexers regarding in-game DdsStrings.
+        /// </summary>
+        public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
     }
 }
