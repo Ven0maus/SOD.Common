@@ -136,8 +136,24 @@ namespace SOD.LifeAndLiving.Relations
             if (RelationManager.Instance.IsLoading)
                 return;
 
-            // TODO
-            
+            // Calculate a weighted score based on the properties
+            int totalScore = (int)Math.Round(PositiveInteractions * 0.5f) - (int)Math.Round(NegativeInteractions * 0.85f);
+
+            // Adjust the score based on the "seen" properties
+            if (SeenAtWork >= 20 || SeenAtHomeBuilding >= 20)
+                totalScore += 1;
+
+            // Determine the relationship based on the total score
+            if (totalScore >= 15)
+                Relation = Relation.Friend;
+            else if (totalScore >= 5)
+                Relation = Relation.Acquaintance;
+            else if (totalScore >= 0)
+                Relation = Relation.Familiar;
+            else if (totalScore >= -5)
+                Relation = Relation.Neutral;
+            else
+                Relation = Relation.Antagonistic;
         }
     }
 
