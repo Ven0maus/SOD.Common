@@ -125,6 +125,10 @@ namespace SOD.Common.Helpers
                 Lib.SyncDisks.CheckForSyncDiskData(true, path);
                 Lib.PlayerStatus.Load(path);
             }
+            else
+            {
+                Lib.PlayerStatus.ResetStatusTracking();
+            }
         }
 
         internal void OnDelete(string path, bool after)

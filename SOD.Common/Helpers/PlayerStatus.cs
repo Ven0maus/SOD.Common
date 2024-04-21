@@ -102,9 +102,6 @@ namespace SOD.Common.Helpers
         /// <param name="path"></param>
         internal void Load(string path)
         {
-            // First clear previous data if it exists
-            ResetStatusTracking();
-
             var hash = Lib.SaveGame.GetUniqueString(path);
             var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
 
