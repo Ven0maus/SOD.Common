@@ -145,6 +145,10 @@ namespace SOD.Common.Helpers
             var syncDiskDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
             if (File.Exists(syncDiskDataPath))
                 File.Delete(syncDiskDataPath);
+
+            var playerStatusDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+            if (File.Exists(playerStatusDataPath))
+                File.Delete(playerStatusDataPath);
         }
 
         internal void OnNewGame(bool after)
