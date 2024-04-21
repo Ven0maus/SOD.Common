@@ -43,7 +43,7 @@ namespace SOD.LifeAndLiving.Relations
 
         private int _seenAtHome;
         /// <summary>
-        /// How many times the player has seen this citizen at home.
+        /// How many times the player has seen this citizen at the citizen's home.
         /// </summary>
         public int SeenAtHome
         {
@@ -59,6 +59,9 @@ namespace SOD.LifeAndLiving.Relations
         }
 
         private int _seenAtHomeBuilding;
+        /// <summary>
+        /// How many times the player has seen this citizen within the citizen's home building
+        /// </summary>
         public int SeenAtHomeBuilding
         {
             get => _seenAtHomeBuilding;
@@ -67,6 +70,40 @@ namespace SOD.LifeAndLiving.Relations
                 if (_seenAtHomeBuilding != value)
                 {
                     _seenAtHomeBuilding = value;
+                    Calculate();
+                }
+            }
+        }
+
+        private int _positiveInteractions;
+        /// <summary>
+        /// How many times the player has had a positive interaction with this citizen.
+        /// </summary>
+        public int PositiveInteractions
+        {
+            get => _positiveInteractions;
+            set
+            {
+                if (_positiveInteractions != value)
+                {
+                    _positiveInteractions = value;
+                    Calculate();
+                }
+            }
+        }
+
+        private int _negativeInteractions;
+        /// <summary>
+        /// How many times the player has had a negative interaction with this citizen.
+        /// </summary>
+        public int NegativeInteractions
+        {
+            get => _negativeInteractions;
+            set
+            {
+                if (_negativeInteractions != value)
+                {
+                    _negativeInteractions = value;
                     Calculate();
                 }
             }
@@ -100,6 +137,7 @@ namespace SOD.LifeAndLiving.Relations
                 return;
 
             // TODO
+            
         }
     }
 

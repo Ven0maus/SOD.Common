@@ -12,5 +12,8 @@ namespace SOD.LifeAndLiving.Bindings.RelationBindings
 
         [Binding(35, "The percentage value of the usual's discount.", "LifeAndLiving.RelationsDialog.TheUsualDiscountValuePercentage")]
         public int TheUsualDiscountValue { get; set; }
+
+        [Binding(25, "The percentage chance to get a positive interaction when having certain dialog with an npc.", "LifeAndLiving.RelationsDialog.PositiveInteractionChance")]
+        public int PositiveInteractionChance { get; set; }
     }
 }

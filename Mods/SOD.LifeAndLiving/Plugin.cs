@@ -3,6 +3,7 @@ using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
 using SOD.LifeAndLiving.Relations;
+using System;
 using System.Reflection;
 
 namespace SOD.LifeAndLiving
@@ -14,6 +15,8 @@ namespace SOD.LifeAndLiving
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
         public const string PLUGIN_NAME = "LifeAndLiving";
         public const string PLUGIN_VERSION = "2.0.0";
+
+        public readonly Random Random = new Random();
 
         public override void Load()
         {

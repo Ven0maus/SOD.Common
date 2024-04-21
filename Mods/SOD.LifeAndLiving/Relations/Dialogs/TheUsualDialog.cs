@@ -1,5 +1,6 @@
 ﻿using SOD.Common;
 using SOD.Common.Helpers.DialogObjects;
+using SOD.Common.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         private static Guid _positiveFreeResponse;
 
         private static Item _item = null;
-        private readonly Dictionary<int, (string Hash, bool Received)> _discountCache = new();
+        private readonly Dictionary<int, (int Hash, bool Received)> _discountCache = new();
 
         /// <summary>
         /// Add's several dialog options regarding purchasing items often at places.
@@ -76,6 +77,10 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 {
                     HandleInteractableLogic(interactable);
 
+                    // Add a positive interaction with the citizen if chance foresees it
+                    if (Plugin.Instance.Random.Next(0, 100) < Plugin.Instance.Config.PositiveInteractionChance)
+                        RelationManager.Instance[saysTo.humanID].PositiveInteractions++;
+
                     // Pay for the item if its not free, and provide a custom response
                     if (_item.Price > 0)
                     {
@@ -131,8 +136,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 return DialogController.ForceSuccess.fail;
             }
 
-            var currentTime = Lib.Time.CurrentDateTime;
-            var hash = Lib.SaveGame.GetUniqueString($"{currentTime.Year}_{currentTime.Month}_{currentTime.Day}_{currentTime.Hour}_{saysTo.humanID}");
+            var hash = GetDeterministicHashCode(saysTo);
 
             // Check if this npc gave a discount before for this hash
             if (!_discountCache.TryGetValue(saysTo.humanID, out var discount))
@@ -149,7 +153,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             {
                 // Use a new random with a custom hash seed based on the in-game time and citizen
                 // So u cannot just spam the dialog until you get lucky, but that its predetermined what you get per in game hour.
-                var rand = new Random(hash.GetHashCode()).Next(0, 100);
+                var rand = new Random(hash).Next(0, 100);
                 if (rand < Plugin.Instance.Config.TheUsualFreeChance)
                 {
                     _item.Price = 0;
@@ -172,6 +176,12 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 return DialogController.ForceSuccess.fail;
 
             return DialogController.ForceSuccess.none;
+        }
+
+        private int GetDeterministicHashCode(Human citizen)
+        {
+            var currentTime = Lib.Time.CurrentDateTime;
+            return $"{currentTime.Year}_{currentTime.Month}_{currentTime.Day}_{currentTime.Hour}_{citizen.humanID}".GetFnvHashCode();
         }
 
         private static Item CollectMostPurchasedItem(Dictionary<string, int> items, Company company)
