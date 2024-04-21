@@ -195,7 +195,7 @@ namespace SOD.Common.Helpers
                 Lib.PlayerStatus.OnSetIllegalActionStatus(args, false);
 
                 // Adjust illegal status
-                Player.Instance.illegalStatus = newStatus;
+                Player.Instance.illegalActionActive = newStatus;
                 Player.Instance.illegalActionTimer = newStatus ? float.MaxValue : 0f;
                 Player.Instance.UpdateIllegalStatus();
 
