@@ -32,9 +32,9 @@ namespace SOD.Common.Helpers
         /// <br>At the end of the duration (if provided), the modifier will be automatically removed.</br>
         /// </summary>
         /// <param name="key">The key identifying the modifier. Used to overwrite, remove, or toggle the modifier later.</param>
-        /// <param name="overwrite">Whether to overwrite any existing modifier with this key, applying the new duration.</param>
         /// <param name="duration">The duration that the modifier lasts. (does not progress while the game is paused).</param>
-        public void SetIllegalStatusModifier(string key, bool overwrite = false, TimeSpan? duration = null)
+        /// <param name="overwrite">Whether to overwrite any existing modifier with this key, applying the new duration.</param>
+        public void SetIllegalStatusModifier(string key, TimeSpan? duration = null, bool overwrite = false)
         {
             if (string.IsNullOrEmpty(key))
                 throw new ArgumentException("Key cannot be null or empty.", nameof(key));
@@ -83,6 +83,24 @@ namespace SOD.Common.Helpers
                 // Update status
                 UpdatePlayerIllegalStatus();
             }
+        }
+
+        /// <summary>
+        /// Determines if a modifier exists with the given key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="timeLeft"></param>
+        /// <returns></returns>
+        public bool ModifierExists(string key, out TimeSpan? timeLeft)
+        {
+            timeLeft = null;
+            if (IllegalStatusModifierDictionary != null && IllegalStatusModifierDictionary.TryGetValue(key, out var modifier))
+            {
+                if (modifier.TimeRemainingSec > 0f)
+                    timeLeft = TimeSpan.FromSeconds(modifier.TimeRemainingSec);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
