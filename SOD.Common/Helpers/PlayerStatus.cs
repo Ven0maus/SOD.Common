@@ -120,7 +120,7 @@ namespace SOD.Common.Helpers
         internal void Load(string path)
         {
             var hash = Lib.SaveGame.GetUniqueString(path);
-            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
+            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
 
             if (File.Exists(storePath))
             {
@@ -150,7 +150,7 @@ namespace SOD.Common.Helpers
         internal void Save(string path)
         {
             var hash = Lib.SaveGame.GetUniqueString(path);
-            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
+            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
 
             // Clean-up
             if (IllegalStatusModifierDictionary == null || IllegalStatusModifierDictionary.Count == 0)
