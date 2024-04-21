@@ -97,6 +97,7 @@ namespace SOD.Common.Helpers
             return hash.ToString();
         }
 
+        internal bool IsSaving { get; private set; }
         internal void OnSave(string path, bool after)
         {
             if (after)
@@ -107,8 +108,20 @@ namespace SOD.Common.Helpers
             // Handle sync disk data install/upgrade
             if (after)
             {
+                IsSaving = false;
+                // Reset illegal action timer to max value
+                if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
+                    Player.Instance.illegalActionTimer = float.MaxValue;
+
                 Lib.SyncDisks.CheckForSyncDiskData(false, path);
                 Lib.PlayerStatus.Save(path);
+            }
+            else
+            {
+                IsSaving = true;
+                // Set illegal action timer to low number to prevent saves breaking (incase sod.common is ever uninstalled while its at maxvalue)
+                if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
+                    Player.Instance.illegalActionTimer = 1f;
             }
         }
 

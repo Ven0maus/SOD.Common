@@ -37,7 +37,7 @@ namespace SOD.Common.Custom
             {
                 yield return new WaitForEndOfFrame();
 
-                if (!Lib.Time.IsInitialized || Lib.Time.IsGamePaused) 
+                if (!Lib.Time.IsInitialized || Lib.Time.IsGamePaused || Lib.SaveGame.IsSaving) 
                     continue;
 
                 float deltaTime = Time.deltaTime;
