@@ -57,8 +57,7 @@ namespace SOD.Common.Helpers
             IllegalStatusModifierDictionary.Add(key, modifier);
 
             // Start timer
-            if (duration != null)
-                modifier.Start();
+            modifier.Start();
 
             // Update status
             Update();
