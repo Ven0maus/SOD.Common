@@ -147,7 +147,7 @@ namespace SOD.Common.Helpers
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
             else
             {
-                Lib.PlayerStatus.ResetNewGame();
+                Lib.PlayerStatus.ResetStatusTracking();
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
             }
 

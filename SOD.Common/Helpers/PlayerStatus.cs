@@ -102,6 +102,9 @@ namespace SOD.Common.Helpers
         /// <param name="path"></param>
         internal void Load(string path)
         {
+            // First clear previous data if it exists
+            ResetStatusTracking();
+
             var hash = Lib.SaveGame.GetUniqueString(path);
             var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}");
 
@@ -155,9 +158,9 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Method is used to reset the player status data on a new game start.
+        /// Method is used to reset the player status data tracked
         /// </summary>
-        internal void ResetNewGame()
+        internal void ResetStatusTracking()
         {
             // Clear out the modifiers and the dictionary for a new game
             if (IllegalStatusModifierDictionary != null)
