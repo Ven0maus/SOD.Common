@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	<Nullable>disable</Nullable>
     <AssemblyName>SOD.Common</AssemblyName>
     <Description>Common library for SOD modding.</Description>
     <Version>1.1.8</Version>

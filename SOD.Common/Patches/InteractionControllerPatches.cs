@@ -83,5 +83,32 @@ namespace SOD.Common.Patches
                 Lib.Interaction.OnActionStarted(__state, true);
             }
         }
+
+        [HarmonyPatch(typeof(InteractionController), nameof(InteractionController.Instance.SetIllegalActionActive))]
+        internal static class InteractionController_SetIllegalActionActive
+        {
+            [HarmonyPrefix]
+            internal static void Prefix(out PlayerStatus.IllegalActionStatusArgs __state, bool val)
+            {
+                __state = null;
+                if (Player.Instance == null || val == Player.Instance.illegalActionActive)
+                {
+                    return;
+                }
+                __state = new PlayerStatus.IllegalActionStatusArgs(Player.Instance.illegalActionActive, val);
+                Lib.PlayerStatus.OnSetIllegalActionStatus(__state, false);
+            }
+
+            [HarmonyPostfix]
+            internal static void Postfix(PlayerStatus.IllegalActionStatusArgs __state)
+            {
+                if (__state == null)
+                {
+                    return;
+                }
+
+                Lib.PlayerStatus.OnSetIllegalActionStatus(__state, true);
+            }
+        }
     }
 }
