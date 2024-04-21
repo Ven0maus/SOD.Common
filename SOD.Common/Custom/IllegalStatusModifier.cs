@@ -14,13 +14,13 @@ namespace SOD.Common.Custom
         }
 
         public string Key { get; }
-        public float? TimeRemainingSec { get; set; }
+        public float TimeRemainingSec { get; set; }
 
         private Coroutine _coroutine;
 
         public void Start()
         {
-            if (_coroutine != null || TimeRemainingSec == null || TimeRemainingSec <= 0) return;
+            if (_coroutine != null || TimeRemainingSec <= 0) return;
             _coroutine = RuntimeHelper.StartCoroutine(Tick());
         }
 
