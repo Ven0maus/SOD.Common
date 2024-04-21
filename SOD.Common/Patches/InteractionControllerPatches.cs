@@ -95,7 +95,7 @@ namespace SOD.Common.Patches
                 {
                     return;
                 }
-                __state = new PlayerStatus.IllegalActionStatusArgs(val);
+                __state = new PlayerStatus.IllegalActionStatusArgs(Player.Instance.illegalActionActive, val);
                 Lib.PlayerStatus.OnSetIllegalActionStatus(__state, false);
             }
 
