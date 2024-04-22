@@ -48,6 +48,11 @@ namespace SOD.Common
         public static Dialog Dialog { get; } = new Dialog();
 
         /// <summary>
+        /// Contains helpers to detect loaded BepInEx plugins and their config settings.
+        /// </summary>
+        public static PluginDetection PluginDetection { get; } = new PluginDetection();
+
+        /// <summary>
         /// Contains helper methods regarding in-game player statuses such as illegal status.
         /// </summary>
         public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
