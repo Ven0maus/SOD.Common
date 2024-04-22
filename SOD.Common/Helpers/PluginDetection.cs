@@ -57,7 +57,7 @@ namespace SOD.Common.Helpers
         public string GetPluginGuidFromPartialGuid(string partialPluginGuid)
         {
             var guids = IL2CPPChainloader.Instance.Plugins.Keys;
-            var matches = guids.Where(guid => guid.ToLower().Contains(partialPluginGuid.ToLower()));
+            var matches = guids.Where(guid => guid.ToLower().Contains(partialPluginGuid.ToLower())).ToArray();
             int matchCount = matches.Count();
             if (matchCount == 0)
             {
