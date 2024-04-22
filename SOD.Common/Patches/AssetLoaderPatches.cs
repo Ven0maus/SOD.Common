@@ -152,8 +152,8 @@ namespace SOD.Common.Patches
 
                         // Add the dds entries
                         Lib.DdsStrings.AddOrUpdateEntries(syncDiskDds,
-                            (name, name["custom_".Length..]),
-                            (description, description["custom_".Length..]));
+                            (name, SyncDisk.GetName(name)),
+                            (description, SyncDisk.GetName(description)));
                     }
 
                     // Add dds entries for upgrades
@@ -163,12 +163,12 @@ namespace SOD.Common.Patches
 
                         // Add the dds entries
                         for (int y = 0; y < nameReferences.Count; y++)
-                            Lib.DdsStrings[syncDiskDds, nameReferences[y]] = nameReferences[y]["custom_".Length..];
+                            Lib.DdsStrings[syncDiskDds, nameReferences[y]] = SyncDisk.GetName(nameReferences[y]);
                     }
 
                     // Add dds entry for side effect
                     if (syncDisk.SideEffect != null)
-                        Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
+                        Lib.DdsStrings[syncDiskDds, syncDisk.SideEffect.Value.DdsIdentifier] = syncDisk.SideEffect.Value.Name;
                 }
 
                 if (Lib.SyncDisks.RegisteredSyncDisks.Any())

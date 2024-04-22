@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace SOD.Common.Helpers
 {
@@ -208,7 +209,7 @@ namespace SOD.Common.Helpers
                     // Add to dictionary that it is installed
                     if (after)
                     {
-                        if (!installArgs.SyncDisk.Preset.name.StartsWith("custom") || !installArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
+                        if (!installArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !installArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (installArgs.Effect != null)
                         {
                             if (!InstalledSyncDisks.TryGetValue(installArgs.SyncDisk.Preset.name, out var disks1))
@@ -230,7 +231,7 @@ namespace SOD.Common.Helpers
                     if (after)
                     {
                         // Remove from installed sync disks
-                        if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith("custom") || !uninstallArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
+                        if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !uninstallArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(uninstallArgs.SyncDisk.Preset.name, out var disks2))
                         {
                             Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
@@ -259,7 +260,7 @@ namespace SOD.Common.Helpers
 
                     if (after)
                     {
-                        if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith("custom") || !upgradeArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
+                        if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !upgradeArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(upgradeArgs.SyncDisk.Preset.name, out var disks3))
                         {
                             Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
@@ -293,11 +294,13 @@ namespace SOD.Common.Helpers
         {
             public readonly int Id;
             public readonly string Name;
+            internal readonly string DdsIdentifier;
 
             internal Effect(int id, string name)
             {
                 Id = id;
-                Name = name;
+                Name = SyncDisk.GetName(name);
+                DdsIdentifier = name;
             }
 
             public bool Equals(Effect other)
@@ -340,17 +343,17 @@ namespace SOD.Common.Helpers
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {
                     Id1 = (int)options.Option1Effect;
-                    Name1 = stripCustom && options.Option1.StartsWith("custom_") ? options.Option1["custom_".Length..] : options.Option1;
+                    Name1 = stripCustom ? SyncDisk.GetName(options.Option1) : options.Option1;
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option2))
                 {
                     Id2 = (int)options.Option2Effect;
-                    Name2 = stripCustom && options.Option2.StartsWith("custom_") ? options.Option2["custom_".Length..] : options.Option2;
+                    Name2 = stripCustom ? SyncDisk.GetName(options.Option2) : options.Option2;
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option3))
                 {
                     Id3 = (int)options.Option3Effect;
-                    Name3 = stripCustom && options.Option3.StartsWith("custom_") ? options.Option3["custom_".Length..] : options.Option3;
+                    Name3 = stripCustom ? SyncDisk.GetName(options.Option3) : options.Option3;
                 }
             }
 
