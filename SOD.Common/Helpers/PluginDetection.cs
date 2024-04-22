@@ -50,7 +50,7 @@ namespace SOD.Common.Helpers
         {
             var guids = IL2CPPChainloader.Instance.Plugins.Keys;
             var matches = guids.Where(guid => guid.ToLower().Contains(partialPluginGuid.ToLower())).ToArray();
-            int matchCount = matches.Count();
+            int matchCount = matches.Length;
             if (matchCount == 0)
             {
                 return null;
