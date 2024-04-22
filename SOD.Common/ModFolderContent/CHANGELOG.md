@@ -4,8 +4,9 @@
 - Added support for enum values in interface bindings
 - Added method "UpdateConfigFileLayout" to PluginController for IPluginBindings clean up support
 - Added Dialog Helper to create dialogs between player and npcs. (Lib.Dialog)
+- Added PlayerStatus helper, it provides helpers to set status on player such as illegal status. (Lib.PlayerStatus)
 - Fixed DDS entries (names, descriptions, text) not being loaded for custom sync disks when loading/creating a new/existing game.
-- Added PlayerStatus helper, it provides helpers to set status on player such as illegal status.
+- Sync disk DDS records are now unique and cannot be overriden anymore by other mods by accident
 
 **1.1.7**
 - Made sync disk re-raise events optional (extra parameter in builder, default true)

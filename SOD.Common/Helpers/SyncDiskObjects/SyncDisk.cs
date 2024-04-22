@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -53,9 +54,9 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public SyncDiskPreset Preset { get; private set; }
 
         /// <summary>
-        /// A unique hash based on the plugin guid
+        /// A unique hash based on the plugin guid and disk name
         /// </summary>
-        internal string ModHash { get; private set; }
+        internal string Hash { get; private set; }
 
         /// <summary>
         /// Used to re raise events on save load
@@ -98,7 +99,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
         }
         .Where(a => a.Id != 0)
-        .Select(a => new SyncDisks.Effect(a.Id, a.Name.StartsWith("custom_") ? a.Name["custom_".Length..] : a.Name))
+        .Select(a => new SyncDisks.Effect(a.Id, a.DdsIdentifier))
         .ToArray();
 
         private SyncDisks.Effect? _sideEffect;
@@ -110,7 +111,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             get
             {
                 if (_sideEffect == null && Preset.sideEffect != 0)
-                    _sideEffect ??= new SyncDisks.Effect((int)Preset.sideEffect, Preset.sideEffectDescription["custom_".Length..]);
+                    _sideEffect ??= new SyncDisks.Effect((int)Preset.sideEffect, Preset.sideEffectDescription);
                 return _sideEffect;
             }
         }
@@ -146,6 +147,28 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         }
 
         /// <summary>
+        /// A unique code that identifies custom sync disks.
+        /// </summary>
+        internal static int UniqueDiskIdentifier = Plugin.PLUGIN_GUID.GetFnvHashCode();
+
+        /// <summary>
+        /// Converts a dds record to its actual name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        internal static string GetName(string name)
+        {
+            if (name == null) return null;
+            if (name.StartsWith($"{UniqueDiskIdentifier}_"))
+            {
+                var data = name.Split('_');
+                var identifier = $"{data[0]}_{data[1]}_";
+                return name[identifier.Length..];
+            }
+            return name;
+        }
+
+        /// <summary>
         /// Converts a sync disk builder instance into a sync disk object.
         /// </summary>
         /// <param name="builder"></param>
@@ -156,11 +179,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             var syncDisk = new SyncDisk
             {
                 Name = builder.Name,
-                ModHash = Lib.SaveGame.GetUniqueString(builder.PluginGuid),
+                Hash = Lib.SaveGame.GetUniqueString($"{builder.PluginGuid}_{builder.Name}"),
                 ReRaiseEventsOnSaveLoad = builder.ReRaiseEventsOnSaveLoad
             };
 
-            syncDisk.Preset.name = $"custom_{builder.Name}_{syncDisk.ModHash}_{syncDisk.ReRaiseEventsOnSaveLoad}";
+            syncDisk.Preset.name = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{syncDisk.ReRaiseEventsOnSaveLoad}_{builder.Name}";
             syncDisk.Preset.presetName = syncDisk.Preset.name;
             syncDisk.Preset.price = builder.Price;
             syncDisk.Preset.rarity = builder.Rarity;
@@ -178,20 +201,20 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 if (i == 0)
                 {
                     syncDisk.Preset.mainEffect1 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect1Name = $"custom_{effect.Name}";
-                    syncDisk.Preset.mainEffect1Description = $"custom_{effect.Description}";
+                    syncDisk.Preset.mainEffect1Name = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Name}";
+                    syncDisk.Preset.mainEffect1Description = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Description}";
                 }
                 else if (i == 1)
                 {
                     syncDisk.Preset.mainEffect2 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect2Name = $"custom_{effect.Name}";
-                    syncDisk.Preset.mainEffect2Description = $"custom_{effect.Description}";
+                    syncDisk.Preset.mainEffect2Name = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Name}";
+                    syncDisk.Preset.mainEffect2Description = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Description}";
                 }
                 else
                 {
                     syncDisk.Preset.mainEffect3 = effect.EffectValue;
-                    syncDisk.Preset.mainEffect3Name = $"custom_{effect.Name}";
-                    syncDisk.Preset.mainEffect3Description = $"custom_{effect.Description}";
+                    syncDisk.Preset.mainEffect3Name = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Name}";
+                    syncDisk.Preset.mainEffect3Description = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{effect.Description}";
                 }
             }
 
@@ -199,8 +222,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             if (builder.SideEffect != null)
             {
                 syncDisk.Preset.sideEffect = builder.SideEffect.EffectValue;
-                syncDisk.Preset.sideEffectDescription = $"custom_{builder.SideEffect.Description}";
-                syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, builder.SideEffect.Description);
+                syncDisk.Preset.sideEffectDescription = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{builder.SideEffect.Description}";
+                syncDisk._sideEffect = new SyncDisks.Effect((int)builder.SideEffect.EffectValue, syncDisk.Preset.sideEffectDescription);
             }
 
             // Add upgrade options
@@ -213,19 +236,19 @@ namespace SOD.Common.Helpers.SyncDiskObjects
 
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {
-                    nameReferences.Add($"custom_{options.Option1}");
+                    nameReferences.Add($"{UniqueDiskIdentifier}_{syncDisk.Hash}_{options.Option1}");
                     upgradeEffects.Add(options.Option1Effect);
                     upgradeValues.Add(0f);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option2))
                 {
-                    nameReferences.Add($"custom_{options.Option2}");
+                    nameReferences.Add($"{UniqueDiskIdentifier}_{syncDisk.Hash}_{options.Option2}");
                     upgradeEffects.Add(options.Option2Effect);
                     upgradeValues.Add(0f);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option3))
                 {
-                    nameReferences.Add($"custom_{options.Option3}");
+                    nameReferences.Add($"{UniqueDiskIdentifier}_{syncDisk.Hash}_{options.Option3}");
                     upgradeEffects.Add(options.Option3Effect);
                     upgradeValues.Add(0f);
                 }
@@ -241,12 +264,33 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         /// <returns></returns>
         internal static SyncDisk ConvertFrom(SyncDiskPreset preset)
         {
+            if (!preset.name.StartsWith($"{UniqueDiskIdentifier}_"))
+                return new SyncDisk(false) { Name = preset.name, Preset = preset };
+
             var split = preset.name.Split('_');
-            var isCustomSyncDisk = split.Length > 1 && split[0].Equals("custom");
-            var name = isCustomSyncDisk ? split[1] : split[0];
-            var modHash = isCustomSyncDisk ? split[^2] : null;
-            var reRaiseEvents = isCustomSyncDisk && bool.Parse(split[^1]);
-            return new SyncDisk(false) { Name = name, Preset = preset, ModHash = modHash, ReRaiseEventsOnSaveLoad = reRaiseEvents };
+            var hash = split[1];
+            var reRaiseEvents = bool.Parse(split[2]);
+            var identifier = $"{split[0]}_{hash}_{reRaiseEvents}_";
+            var name = preset.name[identifier.Length..];
+
+            return new SyncDisk(false) { Name = name, Preset = preset, Hash = hash, ReRaiseEventsOnSaveLoad = reRaiseEvents };
+        }
+
+        /// <summary>
+        /// Retrieves the name from the preset name of a sync disk.
+        /// </summary>
+        /// <param name="presetName"></param>
+        /// <returns></returns>
+        internal static string GetNameFromPreset(string presetName)
+        {
+            if (presetName == null || !presetName.StartsWith($"{UniqueDiskIdentifier}_"))
+                return presetName;
+
+            var split = presetName.Split('_');
+            var identifier = $"{split[0]}_{split[1]}_{split[2]}_";
+            var name = presetName[identifier.Length..];
+
+            return name;
         }
     }
 }
