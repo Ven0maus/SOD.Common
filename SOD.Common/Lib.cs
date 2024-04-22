@@ -48,7 +48,7 @@ namespace SOD.Common
         public static Dialog Dialog { get; } = new Dialog();
 
         /// <summary>
-        /// Contains helper methods and indexers regarding in-game player statuses such as illegal status.
+        /// Contains helper methods regarding in-game player statuses such as illegal status.
         /// </summary>
         public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
     }
