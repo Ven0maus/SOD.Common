@@ -17,6 +17,7 @@ namespace SOD.Common.Patches
             {
                 if (_wasPaused) return;
                 _wasPaused = true;
+                Lib.Time.IsGamePaused = true;
                 Lib.Time.OnPauseModeChanged(true);
             }
         }
@@ -32,6 +33,7 @@ namespace SOD.Common.Patches
             {
                 if (!_wasPaused) return;
                 _wasPaused = false;
+                Lib.Time.IsGamePaused = false;
                 Lib.Time.OnPauseModeChanged(false);
             }
         }

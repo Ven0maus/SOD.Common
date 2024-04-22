@@ -42,17 +42,30 @@ namespace SOD.Common.Helpers
         /// </summary>
         public event EventHandler OnAfterNewGame;
 
+        // FNV prime and offset basis for 32-bit hash
+        private const uint FnvPrime = 16777619;
+        private const uint FnvOffsetBasis = 2166136261;
+
         /// <summary>
-        /// Returns a unique hashed string related to the savegame. 
-        /// <br>Will always return the same unique code for the same <see cref="StateSaveData"/>.</br>
-        /// <br>Can be used to save custom files related to a particular save, and load them later.</br>
+        /// Creates a unique hash from a string value that is always the same.
+        /// <br>Internally it uses FNV hashing.</br>
+        /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="value"></param>
         /// <returns></returns>
-        public string GetUniqueString(string saveFilePath)
+        public string GetUniqueString(string value)
         {
-            // Hash the code
-            return ComputeHash(saveFilePath);
+            // Hash the value
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            uint hash = FnvOffsetBasis;
+            foreach (char c in value)
+            {
+                hash ^= c;
+                hash *= FnvPrime;
+            }
+            return hash.ToString();
         }
 
         /// <summary>
@@ -73,30 +86,7 @@ namespace SOD.Common.Helpers
             return path;
         }
 
-        // FNV prime and offset basis for 32-bit hash
-        private const uint FnvPrime = 16777619;
-        private const uint FnvOffsetBasis = 2166136261;
-
-        /// <summary>
-        /// Simple FNV-1a hashing algorithm.
-        /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
-        /// <exception cref="ArgumentNullException"></exception>
-        private static string ComputeHash(string input)
-        {
-            if (input == null)
-                throw new ArgumentNullException(nameof(input));
-
-            uint hash = FnvOffsetBasis;
-            foreach (char c in input)
-            {
-                hash ^= c;
-                hash *= FnvPrime;
-            }
-            return hash.ToString();
-        }
-
+        internal bool IsSaving { get; private set; }
         internal void OnSave(string path, bool after)
         {
             if (after)
@@ -106,7 +96,22 @@ namespace SOD.Common.Helpers
 
             // Handle sync disk data install/upgrade
             if (after)
+            {
+                IsSaving = false;
+                // Reset illegal action timer to max value
+                if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
+                    Player.Instance.illegalActionTimer = float.MaxValue;
+
                 Lib.SyncDisks.CheckForSyncDiskData(false, path);
+                Lib.PlayerStatus.Save(path);
+            }
+            else
+            {
+                IsSaving = true;
+                // Set illegal action timer to low number to prevent saves breaking (incase sod.common is ever uninstalled while its at maxvalue)
+                if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
+                    Player.Instance.illegalActionTimer = 1f;
+            }
         }
 
         internal void OnLoad(string path, bool after)
@@ -118,7 +123,14 @@ namespace SOD.Common.Helpers
 
             // Handle sync disk data install/upgrade
             if (after)
+            {
                 Lib.SyncDisks.CheckForSyncDiskData(true, path);
+                Lib.PlayerStatus.Load(path);
+            }
+            else
+            {
+                Lib.PlayerStatus.ResetStatusTracking();
+            }
         }
 
         internal void OnDelete(string path, bool after)
@@ -133,6 +145,10 @@ namespace SOD.Common.Helpers
             var syncDiskDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
             if (File.Exists(syncDiskDataPath))
                 File.Delete(syncDiskDataPath);
+
+            var playerStatusDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+            if (File.Exists(playerStatusDataPath))
+                File.Delete(playerStatusDataPath);
         }
 
         internal void OnNewGame(bool after)
@@ -140,7 +156,10 @@ namespace SOD.Common.Helpers
             if (after)
                 OnAfterNewGame?.Invoke(this, EventArgs.Empty);
             else
+            {
+                Lib.PlayerStatus.ResetStatusTracking();
                 OnBeforeNewGame?.Invoke(this, EventArgs.Empty);
+            }
 
             // Clear installed sync disks
             Lib.SyncDisks.InstalledSyncDisks.Clear();

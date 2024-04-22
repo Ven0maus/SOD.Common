@@ -294,6 +294,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             BlackmarketTrader,
             WeaponsDealer,
             SyncClinic,
+            LoanShark
         }
     }
 }

@@ -9,11 +9,21 @@ namespace SOD.Common.Helpers
 {
     public sealed class PluginDetection
     {
+        /// <summary>
+        /// Raised right after the BepInEx chainloader finishes loading the
+        /// last plugin.
+        /// </summary>
         public event EventHandler OnAllPluginsFinishedLoading;
+
+        /// <summary>
+        /// True if the BepInEx chainloader has finished loading all plugins,
+        /// false otherwise (is set to true after OnAllPluginsFinishedLoading).
+        /// </summary>
         public bool AllPluginsFinishedLoading { get; private set; } = false;
+
         private bool _initialized = false;
 
-        public PluginDetection()
+        internal PluginDetection()
         {
             Initialize();
         }
@@ -26,6 +36,7 @@ namespace SOD.Common.Helpers
             }
             _initialized = true;
 
+            // Hook up the OnAllPluginsFinishedLoading event and related
             var invokeEventAction = () => OnAllPluginsFinishedLoading?.Invoke(this, EventArgs.Empty);
             IL2CPPChainloader.Instance.Finished += invokeEventAction;
             IL2CPPChainloader.Instance.Finished += () => { AllPluginsFinishedLoading = true; };
