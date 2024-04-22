@@ -27,7 +27,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 $"Good choice ma'am, one {_item?.Name ?? ""} coming right up!" :
                 $"Good choice, one {_item?.Name ?? ""} coming right up!";
 
-            _ = Lib.Dialog.Builder()
+            _ = Lib.Dialogs.Builder()
                 .SetText("For me, the usual as always.")
                 .AddCustomResponse(customPositiveText, out _positiveResponse)
                 .AddCustomResponse(() => $"You're lucky, this {_item?.Name ?? "item"} has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
