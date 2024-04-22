@@ -275,5 +275,22 @@ namespace SOD.Common.Helpers.SyncDiskObjects
 
             return new SyncDisk(false) { Name = name, Preset = preset, Hash = hash, ReRaiseEventsOnSaveLoad = reRaiseEvents };
         }
+
+        /// <summary>
+        /// Retrieves the name from the preset name of a sync disk.
+        /// </summary>
+        /// <param name="presetName"></param>
+        /// <returns></returns>
+        internal static string GetNameFromPreset(string presetName)
+        {
+            if (presetName == null || !presetName.StartsWith($"{UniqueDiskIdentifier}_"))
+                return presetName;
+
+            var split = presetName.Split('_');
+            var identifier = $"{split[0]}_{split[1]}_{split[2]}_";
+            var name = presetName[identifier.Length..];
+
+            return name;
+        }
     }
 }
