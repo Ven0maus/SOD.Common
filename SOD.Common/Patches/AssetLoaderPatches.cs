@@ -171,6 +171,9 @@ namespace SOD.Common.Patches
                         Lib.DdsStrings[syncDiskDds, $"custom_{syncDisk.SideEffect.Value.Name}"] = syncDisk.SideEffect.Value.Name;
                 }
 
+                if (Lib.SyncDisks.RegisteredSyncDisks.Any())
+                    Plugin.Log.LogInfo("Loaded custom sync disk dds entries.");
+
                 // Add the initial dds records
                 const string dialogDds = "dds.blocks";
                 foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
@@ -182,19 +185,16 @@ namespace SOD.Common.Patches
                     foreach (var response in customDialog.Responses)
                         if (response.Text != null)
                             Lib.DdsStrings[dialogDds, response.BlockId] = response.Text;
+
+                    foreach (var block in customDialog.Blocks)
+                        Toolbox.Instance.allDDSBlocks.Add(block.id, block);
+
+                    foreach (var message in customDialog.Messages)
+                        Toolbox.Instance.allDDSMessages.Add(message.id, message);
                 }
 
-                // Add dialog blocks
-                var blocks = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Blocks);
-                foreach (var block in blocks)
-                    Toolbox.Instance.allDDSBlocks.Add(block.id, block);
-
-                // Add dialog messages
-                var messages = Lib.Dialog.RegisteredDialogs.SelectMany(a => a.Messages);
-                foreach (var message in messages)
-                    Toolbox.Instance.allDDSMessages.Add(message.id, message);
-
-                Plugin.Log.LogInfo("Loaded custom dds entries.");
+                if (Lib.Dialog.RegisteredDialogs.Any())
+                    Plugin.Log.LogInfo("Loaded custom dialog dds entries.");
             }
         }
     }
