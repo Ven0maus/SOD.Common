@@ -56,8 +56,8 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             if (!RelationManager.Instance.PlayerInterests.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
 
-            // Check if any item was purchased 4 or more times by the player
-            return items.Any(a => a.Value >= 4);
+            // Check if any item was purchased 5 or more times by the player
+            return items.Any(a => a.Value >= 5);
         }
 
         public void OnDialogExecute(DialogController instance, Citizen saysTo, Interactable saysToInteractable, NewNode where, Actor saidBy, bool success, NewRoom roomRef, SideJob jobRef)
@@ -178,7 +178,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             return DialogController.ForceSuccess.none;
         }
 
-        private int GetDeterministicHashCode(Human citizen)
+        private static int GetDeterministicHashCode(Human citizen)
         {
             var currentTime = Lib.Time.CurrentDateTime;
             return $"{currentTime.Year}_{currentTime.Month}_{currentTime.Day}_{currentTime.Hour}_{citizen.humanID}".GetFnvHashCode();
