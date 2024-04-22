@@ -144,7 +144,7 @@ namespace SOD.Common.Helpers
                     var realEffect = syncDisk.Effects.First(a => a.Name.Equals(disk.Effect));
                     var index = Array.IndexOf(syncDisk.Effects, realEffect);
                     OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect));
-                    Plugin.Log.LogInfo($"Loaded savegame, raised install event for custom disk: {disk.SyncDiskName} | {realEffect.Name}");
+                    Plugin.Log.LogInfo($"Loaded savegame, raised install event for custom disk: {SyncDisk.GetName(disk.SyncDiskName)} | {realEffect.Name}");
 
                     if (disk.UpgradeOptions != null)
                     {
@@ -157,7 +157,7 @@ namespace SOD.Common.Helpers
                                 realOptions.Name2 != null && realOptions.Name2.Equals(option) ? realOptions.Id2 : realOptions.Id3;
                             if (realOption == null) continue;
                             OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect, new SyncDiskArgs.Option(realOption.Value, option)));
-                            Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {disk.SyncDiskName} | {realEffect.Name} | {option}");
+                            Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {SyncDisk.GetName(disk.SyncDiskName)} | {realEffect.Name} | {option}");
                         }
                     }
                     
@@ -234,7 +234,7 @@ namespace SOD.Common.Helpers
                         if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !uninstallArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(uninstallArgs.SyncDisk.Preset.name, out var disks2))
                         {
-                            Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
+                            Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{SyncDisk.GetName(uninstallArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -242,7 +242,7 @@ namespace SOD.Common.Helpers
                         var correctEffect = disks2.FirstOrDefault(a => a.Effect.Equals(uninstallArgs.Effect.Value.Name));
                         if (correctEffect == null)
                         {
-                            Plugin.Log.LogWarning($"Could not find uninstall effect data for custom sync disk \"{uninstallArgs.SyncDisk.Preset.name}\".");
+                            Plugin.Log.LogWarning($"Could not find uninstall effect data for custom sync disk \"{SyncDisk.GetName(uninstallArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -263,7 +263,7 @@ namespace SOD.Common.Helpers
                         if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !upgradeArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(upgradeArgs.SyncDisk.Preset.name, out var disks3))
                         {
-                            Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
+                            Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{SyncDisk.GetName(upgradeArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -271,7 +271,7 @@ namespace SOD.Common.Helpers
                         var cEffect = disks3.FirstOrDefault(a => a.Effect.Equals(upgradeArgs.Effect.Value.Name));
                         if (upgradeArgs.UpgradeOption == null || cEffect == null)
                         {
-                            Plugin.Log.LogWarning($"Could not find {(upgradeArgs.UpgradeOption == null ? "upgrade option" : "effect")} data for custom sync disk \"{upgradeArgs.SyncDisk.Preset.name}\".");
+                            Plugin.Log.LogWarning($"Could not find {(upgradeArgs.UpgradeOption == null ? "upgrade option" : "effect")} data for custom sync disk \"{SyncDisk.GetName(upgradeArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
