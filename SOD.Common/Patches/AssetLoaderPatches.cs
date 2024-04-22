@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using SOD.Common.Helpers.SyncDiskObjects;
 using System;
 using System.Collections.Generic;
@@ -87,24 +88,36 @@ namespace SOD.Common.Patches
                 }
                 _createdSyncDiskPresets = null;
 
+                var menus = new Lazy<Il2CppArrayBase<MenuPreset>>(Resources.FindObjectsOfTypeAll<MenuPreset>);
+
+                if (Plugin.Instance.Config.DebugMode)
+                {
+                    // Log any presets not available in the enum, so we can add them in new updates of SOD.Common incase new game updates introduce new ones.
+                    var missingLocationsInEnum = menus.Value
+                        .Select(a => a.GetPresetName())
+                        .Except(Enum.GetValues<SyncDiskBuilder.SyncDiskSaleLocation>()
+                            .Select(a => a.ToString()), StringComparer.OrdinalIgnoreCase);
+                    foreach (var location in missingLocationsInEnum)
+                        Plugin.Log.LogInfo("[UpdateRequired] Missing following new sale locations in enum: " + location);
+                }
+
                 // Load Sync disks into menu presets if applicable
-                AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.MenuPresetLocations.Count > 0));
+                AddToMenuPresets(Lib.SyncDisks.RegisteredSyncDisks.Where(a => a.MenuPresetLocations.Count > 0), menus);
             }
 
             /// <summary>
             /// Potentially adds sync disk presets to menu presets if they need to be there based on the registration options
             /// </summary>
             /// <param name="syncDisk"></param>
-            private static void AddToMenuPresets(IEnumerable<SyncDisk> syncDisk)
+            private static void AddToMenuPresets(IEnumerable<SyncDisk> syncDisk, Lazy<Il2CppArrayBase<MenuPreset>> menus)
             {
                 var groupedPresets = syncDisk
                     .SelectMany(a => a.MenuPresetLocations.Select(saleLocation => new { a.Preset, SaleLocation = saleLocation }))
                     .GroupBy(x => x.SaleLocation)
-                    .ToDictionary(group => group.Key, group => group.Select(item => item.Preset).ToArray());
+                    .ToDictionary(group => group.Key, group => group.Select(item => item.Preset).ToArray(), StringComparer.OrdinalIgnoreCase);
                 if (groupedPresets.Count == 0) return;
 
-                var menus = Resources.FindObjectsOfTypeAll<MenuPreset>();
-                foreach (var menu in menus)
+                foreach (var menu in menus.Value)
                 {
                     var menuPresetName = menu.GetPresetName();
                     if (groupedPresets.TryGetValue(menuPresetName, out var syncDiskPresets))
