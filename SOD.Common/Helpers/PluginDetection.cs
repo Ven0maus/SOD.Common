@@ -21,25 +21,16 @@ namespace SOD.Common.Helpers
         /// </summary>
         public bool AllPluginsFinishedLoading { get; private set; } = false;
 
-        private bool _initialized = false;
-
         internal PluginDetection()
         {
-            Initialize();
+            IL2CPPChainloader.Instance.Finished += OnAllPluginsFinishedLoadingListener;
         }
 
-        internal void Initialize()
+        private void OnAllPluginsFinishedLoadingListener()
         {
-            if (_initialized)
-            {
-                return;
-            }
-            _initialized = true;
-
-            // Hook up the OnAllPluginsFinishedLoading event and related
-            var invokeEventAction = () => OnAllPluginsFinishedLoading?.Invoke(this, EventArgs.Empty);
-            IL2CPPChainloader.Instance.Finished += invokeEventAction;
-            IL2CPPChainloader.Instance.Finished += () => { AllPluginsFinishedLoading = true; };
+            AllPluginsFinishedLoading = true;
+            OnAllPluginsFinishedLoading?.Invoke(this, EventArgs.Empty);
+            IL2CPPChainloader.Instance.Finished -= OnAllPluginsFinishedLoadingListener;
         }
 
         /// <summary>
