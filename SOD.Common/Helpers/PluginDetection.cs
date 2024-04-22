@@ -3,6 +3,7 @@ using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
+using Il2CppSystem.Runtime.InteropServices;
 using UniverseLib;
 
 namespace SOD.Common.Helpers
@@ -17,7 +18,7 @@ namespace SOD.Common.Helpers
 
         /// <summary>
         /// True if the BepInEx chainloader has finished loading all plugins,
-        /// false otherwise (is set to true after OnAllPluginsFinishedLoading).
+        /// false otherwise (is set to true after <c>OnAllPluginsFinishedLoading</c>).
         /// </summary>
         public bool AllPluginsFinishedLoading { get; private set; } = false;
 
@@ -38,7 +39,7 @@ namespace SOD.Common.Helpers
         /// across all loaded plugins.
         /// </summary>
         /// <remarks>
-        /// Should be called in response to Lib.BepInEx.OnAllPluginsFinishedLoading.
+        /// Should be called in response to <c>OnAllPluginsFinishedLoading</c>.
         /// Useful for plugins such as Babbler, which use a prefix on their
         /// GUID to influence load order.
         /// </remarks>
@@ -73,18 +74,39 @@ namespace SOD.Common.Helpers
         /// name, etc.) of a BepInEx plugin given its GUID.
         /// </summary>
         /// <remarks>
-        /// Should be called in response to Lib.BepInEx.OnAllPluginsFinishedLoading.
+        /// Should be called in response to <c>OnAllPluginsFinishedLoading</c>.
+        /// </remarks>
+        /// <param name="pluginGuid">The GUID of the target plugin.</param>
+        /// <param name="info">The BepInEx PluginInfo data object of the target
+        /// plugin.</param>
+        /// <returns></returns>
+        public bool TryGetPluginInfo(string pluginGuid, out PluginInfo info) => IL2CPPChainloader.Instance.Plugins.TryGetValue(pluginGuid, out info);
+
+        /// <summary>
+        /// Gets the plugin info (incompatibilities, version, user-friendly
+        /// name, etc.) of a BepInEx plugin given its GUID.
+        /// </summary>
+        /// <remarks>
+        /// Should be called in response to <c>OnAllPluginsFinishedLoading</c>.
         /// </remarks>
         /// <param name="pluginGuid">The GUID of the target plugin.</param>
         /// <returns>The plugin's info.</returns>
-        public PluginInfo GetPluginInfo(string pluginGuid) => IL2CPPChainloader.Instance.Plugins[pluginGuid];
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException"></exception>
+        public PluginInfo GetPluginInfo(string pluginGuid)
+        {
+            if (!TryGetPluginInfo(pluginGuid, out var info))
+            {
+                throw new System.Collections.Generic.KeyNotFoundException($"Plugin GUID ({pluginGuid}) not found.");
+            }
+            return info;
+        }
 
         /// <summary>
         /// Gets the currently assigned value of a specified config setting for
         /// a BepInEx plugin given its GUID.
         /// </summary>
         /// <remarks>
-        /// Should be called in response to Lib.BepInEx.OnAllPluginsFinishedLoading.
+        /// Should be called in response to <c>OnAllPluginsFinishedLoading</c>.
         /// </remarks>
         /// <typeparam name="T">The config entry value type.</typeparam>
         /// <param name="pluginGuid">The GUID of the target plugin.</param>
@@ -110,7 +132,7 @@ namespace SOD.Common.Helpers
         /// respond to changes in the config settings of other plugins.
         /// </summary>
         /// <remarks>
-        /// Should be called in response to Lib.BepInEx.OnAllPluginsFinishedLoading.
+        /// Should be called in response to <c>OnAllPluginsFinishedLoading</c>.
         /// </remarks>
         /// <param name="pluginGuid">The GUID of the target plugin.</param>
         /// <param name="listener">The action to be called in response to a
