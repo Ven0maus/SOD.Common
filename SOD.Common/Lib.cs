@@ -45,7 +45,7 @@ namespace SOD.Common
         /// <summary>
         /// Contains helper methods regarding player to npc dialog.
         /// </summary>
-        public static Dialog Dialog { get; } = new Dialog();
+        public static Dialog Dialogs { get; } = new Dialog();
 
         /// <summary>
         /// Contains helpers to detect loaded BepInEx plugins and their config settings.

@@ -176,7 +176,7 @@ namespace SOD.Common.Patches
 
                 // Add the initial dds records
                 const string dialogDds = "dds.blocks";
-                foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
+                foreach (var customDialog in Lib.Dialogs.RegisteredDialogs)
                 {
                     // TextGetter are initialized when the conversation is first started dynamically
                     // Makes no sense to already initialize them now, they could reference things that don't exist yet.
@@ -193,7 +193,7 @@ namespace SOD.Common.Patches
                         Toolbox.Instance.allDDSMessages.Add(message.id, message);
                 }
 
-                if (Lib.Dialog.RegisteredDialogs.Any())
+                if (Lib.Dialogs.RegisteredDialogs.Any())
                     Plugin.Log.LogInfo("Loaded custom dialog dds entries.");
             }
         }

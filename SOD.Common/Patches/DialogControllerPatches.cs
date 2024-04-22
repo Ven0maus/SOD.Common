@@ -16,7 +16,7 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix(DialogController __instance)
             {
-                foreach (var customDialog in Lib.Dialog.RegisteredDialogs)
+                foreach (var customDialog in Lib.Dialogs.RegisteredDialogs)
                 {
                     Toolbox.Instance.allDialog.Add(customDialog.Preset);
                     if (customDialog.Preset.defaultOption)
@@ -43,8 +43,8 @@ namespace SOD.Common.Patches
                     _customDialogInterceptors[customDialog.Preset.name] = customDialog;
                 }
 
-                if (Lib.Dialog.RegisteredDialogs.Count > 0)
-                    Plugin.Log.LogInfo($"Loaded {Lib.Dialog.RegisteredDialogs.Count} custom dialogs.");
+                if (Lib.Dialogs.RegisteredDialogs.Count > 0)
+                    Plugin.Log.LogInfo($"Loaded {Lib.Dialogs.RegisteredDialogs.Count} custom dialogs.");
             }
         }
 

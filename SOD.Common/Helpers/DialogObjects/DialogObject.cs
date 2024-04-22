@@ -21,7 +21,7 @@ namespace SOD.Common.Helpers.DialogObjects
         {
             get
             {
-                return Lib.Dialog.RegisteredDialogs.Contains(this);
+                return Lib.Dialogs.RegisteredDialogs.Contains(this);
             }
         }
 
@@ -133,7 +133,7 @@ namespace SOD.Common.Helpers.DialogObjects
             Build_Preset();
 
             // Now register the dialog into the game
-            Lib.Dialog.RegisteredDialogs.Add(this);
+            Lib.Dialogs.RegisteredDialogs.Add(this);
         }
 
         /// <summary>
