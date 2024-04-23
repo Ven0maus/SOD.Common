@@ -16,20 +16,20 @@ namespace SOD.RelationsPlus.Patches
                 // We are only interested when they see the player
                 if (citizen == null || __instance.isMachine || !citizen.isPlayer) return;
 
-                float distance = Vector3.Distance(__instance.lookAtThisTransform.position, citizen.lookAtThisTransform.position);
-                if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
-                    __instance.ActorRaycastCheck(citizen, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
+                var relation = RelationManager.Instance[__instance.humanID];
+                if (relation.Visibility.LastSeen == null || relation.Visibility.LastSeen.Value.AddSeconds(45) < DateTime.Now)
                 {
-                    var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
-                    var isInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
-                    var isInTheSameHomeBuilding = __instance.home != null &&
-                        citizen.currentGameLocation != null &&
-                        citizen.currentGameLocation.thisAsAddress != null &&
-                        citizen.currentGameLocation.thisAsAddress == __instance.home;
-
-                    var relation = RelationManager.Instance[__instance.humanID];
-                    if (relation.Visibility.LastSeen == null || relation.Visibility.LastSeen.Value.AddSeconds(45) < DateTime.Now)
+                    float distance = Vector3.Distance(__instance.lookAtThisTransform.position, citizen.lookAtThisTransform.position);
+                    if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
+                        __instance.ActorRaycastCheck(citizen, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
                     {
+                        var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
+                        var isInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
+                        var isInTheSameHomeBuilding = __instance.home != null &&
+                            citizen.currentGameLocation != null &&
+                            citizen.currentGameLocation.thisAsAddress != null &&
+                            citizen.currentGameLocation.thisAsAddress == __instance.home;
+
                         if (__instance.isAtWork && isInTheSameRoom && !citizen.isTrespassing)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
