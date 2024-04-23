@@ -23,8 +23,14 @@ namespace SOD.RelationsPlus.Patches
                     if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
                         __instance.ActorRaycastCheck(citizen, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
                     {
-                        var isInTheSameRoom = __instance.currentRoom != null && citizen.currentRoom != null && __instance.currentRoom.roomID == citizen.currentRoom.roomID;
-                        var isInTheSameBuilding = __instance.currentBuilding != null && citizen.currentBuilding != null && __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
+                        var isInTheSameRoom = __instance.currentRoom != null && 
+                            citizen.currentRoom != null && 
+                            __instance.currentRoom.roomID == citizen.currentRoom.roomID;
+                        
+                        var isInTheSameBuilding = __instance.currentBuilding != null && 
+                            citizen.currentBuilding != null && 
+                            __instance.currentBuilding.buildingID == citizen.currentBuilding.buildingID;
+
                         var isInTheSameHomeBuilding = __instance.home != null &&
                             citizen.currentGameLocation != null &&
                             citizen.currentGameLocation.thisAsAddress != null &&
@@ -39,14 +45,13 @@ namespace SOD.RelationsPlus.Patches
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenAtHome++;
-                            relation.Visibility.SeenAtHomeBuilding++;
                         }
                         else if (isInTheSameHomeBuilding)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenAtHomeBuilding++;
                         }
-                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom || isInTheSameBuilding))
+                        else if ((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom || isInTheSameBuilding)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenOutsideOfWork++;
