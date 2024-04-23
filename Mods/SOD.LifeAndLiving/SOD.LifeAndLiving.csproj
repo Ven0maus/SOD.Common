@@ -22,7 +22,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
-	  <ProjectReference Include="..\..\SOD.RelationsPlus\SOD.RelationsPlus.csproj" />
+	  <ProjectReference Include="..\SOD.RelationsPlus\SOD.RelationsPlus.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
