@@ -30,23 +30,23 @@ namespace SOD.RelationsPlus.Patches
                             citizen.currentGameLocation.thisAsAddress != null &&
                             citizen.currentGameLocation.thisAsAddress == __instance.home;
 
-                        if (__instance.isAtWork && isInTheSameRoom && !citizen.isTrespassing)
+                        if (__instance.isAtWork && isInTheSameRoom)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenAtWork++;
                         }
-                        else if (__instance.isHome && isInTheSameRoom && !citizen.isTrespassing)
+                        else if (__instance.isHome && isInTheSameRoom)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenAtHome++;
                             relation.Visibility.SeenAtHomeBuilding++;
                         }
-                        else if (isInTheSameHomeBuilding && !citizen.isTrespassing)
+                        else if (isInTheSameHomeBuilding)
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenAtHomeBuilding++;
                         }
-                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom || isInTheSameBuilding) && !citizen.isTrespassing)
+                        else if (((__instance.isOnStreet && citizen.isOnStreet) || isInTheSameRoom || isInTheSameBuilding))
                         {
                             relation.Visibility.LastSeen = DateTime.Now;
                             relation.Visibility.SeenOutsideOfWork++;
