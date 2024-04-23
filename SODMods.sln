@@ -26,7 +26,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.LethalActionReborn", "Mods\SOD.LethalActionReborn\SOD.LethalActionReborn.csproj", "{97ECAA26-E721-407C-8C08-A38DA65B4766}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.RelationsPlus", "SOD.RelationsPlus\SOD.RelationsPlus.csproj", "{CEA1F0B1-F666-4B91-A679-526DDDE967F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.RelationsPlus", "Mods\SOD.RelationsPlus\SOD.RelationsPlus.csproj", "{CEA1F0B1-F666-4B91-A679-526DDDE967F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
