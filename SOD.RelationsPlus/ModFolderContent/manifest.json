@@ -1,0 +1,10 @@
+{
+  "name": "SODRelationsPlus",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.RelationsPlus",
+  "description": "A small library mod that collects relational information between citizens and the player.",
+  "author": "Venomaus",
+  "dependencies": [
+    "Venomaus-SODCommon-1.1.8"
+  ]
+}
