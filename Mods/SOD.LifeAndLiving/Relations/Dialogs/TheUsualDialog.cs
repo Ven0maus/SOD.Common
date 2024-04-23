@@ -4,6 +4,7 @@ using SOD.Common.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SOD.RelationsPlus;
 
 namespace SOD.LifeAndLiving.Relations.Dialogs
 {
@@ -45,7 +46,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
             // Check if they have seen the player at work 5 or more times
-            if (!RelationManager.Instance.Exists(saysTo.humanID) || RelationManager.Instance[saysTo.humanID].SeenAtWork < 5) 
+            if (!RelationManager.Instance.TryGetValue(saysTo.humanID, out var relation) || relation.Visibility.SeenAtWork < 5) 
                 return false;
 
             // Check if the citizen is at work and if the player has a free slot available
@@ -53,7 +54,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
                 return false;
 
             // Check if we have purchased items from this citizen
-            if (!RelationManager.Instance.PlayerInterests.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
+            if (!PlayerInterests.Instance.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
 
             // Check if any item was purchased 5 or more times by the player
@@ -79,7 +80,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 
                     // Add a positive interaction with the citizen if chance foresees it
                     if (Plugin.Instance.Random.Next(0, 100) < Plugin.Instance.Config.PositiveInteractionChance)
-                        RelationManager.Instance[saysTo.humanID].PositiveInteractions++;
+                        RelationManager.Instance[saysTo.humanID].Know += 0.05f;
 
                     // Pay for the item if its not free, and provide a custom response
                     if (_item.Price > 0)
@@ -129,7 +130,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             if (!saysTo)
                 return DialogController.ForceSuccess.none;
 
-            _item = CollectMostPurchasedItem(RelationManager.Instance.PlayerInterests.PurchasedItemsFrom[saysTo.humanID], saysTo.job.employer);
+            _item = CollectMostPurchasedItem(PlayerInterests.Instance.PurchasedItemsFrom[saysTo.humanID], saysTo.job.employer);
             if (_item == null)
             {
                 Plugin.Log.LogInfo("Could not find item, this should not have happened.");
@@ -194,7 +195,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 
             // Find the item name
             string itemName = null;
-            foreach (var data in RelationManager.Instance.PlayerInterests.ItemsPurchased)
+            foreach (var data in PlayerInterests.Instance.ItemsPurchased)
             {
                 var companyId = data.Key;
                 foreach (var item in data.Value)

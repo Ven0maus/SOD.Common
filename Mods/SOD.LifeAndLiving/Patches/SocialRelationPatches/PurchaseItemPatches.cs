@@ -39,7 +39,7 @@ namespace SOD.LifeAndLiving.Patches.SocialRelationPatches
                 if (company != null)
                 {
                     // Record where we bought and what we bought.
-                    RelationManager.Instance.PlayerInterests.RecordPurchasedItem(company.companyID, __instance.preset.presetName, _purchasedFrom);
+                    PlayerInterests.Instance.RecordPurchasedItem(company.companyID, __instance.preset.presetName, _purchasedFrom);
                 }
 
                 if (_purchasedFrom != null)

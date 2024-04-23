@@ -16,7 +16,7 @@ namespace SOD.LifeAndLiving
         public const string PLUGIN_NAME = "LifeAndLiving";
         public const string PLUGIN_VERSION = "2.0.0";
 
-        public readonly Random Random = new Random();
+        public readonly Random Random = new();
 
         public override void Load()
         {
@@ -44,8 +44,8 @@ namespace SOD.LifeAndLiving
             // Apartment price cache
             NewGameLocationPatches.NewGameLocation_GetPrice.Delete(hash);
 
-            // Relations
-            RelationManager.Instance.Delete(hash);
+            // Player interests deletion
+            PlayerInterests.Instance.Delete(hash);
         }
 
         private void SaveGame_OnBeforeSave(object sender, Common.Helpers.SaveGameArgs e)
@@ -55,8 +55,8 @@ namespace SOD.LifeAndLiving
             // Apartment price cache
             NewGameLocationPatches.NewGameLocation_GetPrice.Save(hash);
 
-            // Relations
-            RelationManager.Instance.Save(hash);
+            // Player interests saving
+            PlayerInterests.Instance.Save(hash);
         }
 
         private void SaveGame_OnBeforeLoad(object sender, Common.Helpers.SaveGameArgs e)
@@ -66,8 +66,8 @@ namespace SOD.LifeAndLiving
             // Apartment price cache
             NewGameLocationPatches.NewGameLocation_GetPrice.Load(hash);
 
-            // Relations
-            RelationManager.Instance.Load(hash);
+            // Player interests loading
+            PlayerInterests.Instance.Load(hash);
         }
     }
 }
