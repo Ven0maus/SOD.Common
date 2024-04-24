@@ -70,7 +70,8 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
 
                 // Add a positive interaction with the citizen if chance foresees it
                 if (Plugin.Instance.Random.Next(0, 100) < Plugin.Instance.Config.PositiveInteractionChance)
-                    RelationManager.Instance[saysTo.humanID].Know += 0.05f;
+                    RelationManager.Instance[saysTo.humanID].Like += 0.05f;
+                RelationManager.Instance[saysTo.humanID].Know += 0.05f;
 
                 // Pay for the item if its not free, and provide a custom response
                 if (_item.Price > 0)
