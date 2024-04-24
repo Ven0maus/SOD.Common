@@ -66,63 +66,36 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             // Collect most purchased item
             if (success && _item != null)
             {
-                // Spawn interactable to give to the player
-                Interactable interactable = InteractableCreator.Instance.CreateWorldInteractable(
-                    _item.Preset, 
-                    Player.Instance, 
-                    Player.Instance, 
-                    null, 
-                    Player.Instance.transform.position + new UnityEngine.Vector3(0f, 3.5f, 0f),
-                    Player.Instance.transform.eulerAngles, null, null, "");
-                if (interactable != null)
+                _item.Preset.SpawnIntoInventory();
+
+                // Add a positive interaction with the citizen if chance foresees it
+                if (Plugin.Instance.Random.Next(0, 100) < Plugin.Instance.Config.PositiveInteractionChance)
+                    RelationManager.Instance[saysTo.humanID].Know += 0.05f;
+
+                // Pay for the item if its not free, and provide a custom response
+                if (_item.Price > 0)
                 {
-                    HandleInteractableLogic(interactable);
-
-                    // Add a positive interaction with the citizen if chance foresees it
-                    if (Plugin.Instance.Random.Next(0, 100) < Plugin.Instance.Config.PositiveInteractionChance)
-                        RelationManager.Instance[saysTo.humanID].Know += 0.05f;
-
-                    // Pay for the item if its not free, and provide a custom response
-                    if (_item.Price > 0)
-                    {
-                        GameplayController.Instance.AddMoney(-_item.Price, false, "Purchase");
-                        saysTo.speechController.Speak("dds.blocks", _item.Discount ? 
-                            _positiveDiscountResponse.ToString() : _positiveResponse.ToString(), endsDialog: true);
-                    }
-                    else if (_item.Price == 0)
-                    {
-                        saysTo.speechController.Speak("dds.blocks", _positiveFreeResponse.ToString(), endsDialog: true);
-                    }
+                    GameplayController.Instance.AddMoney(-_item.Price, false, "Purchase");
+                    saysTo.speechController.Speak("dds.blocks", _item.Discount ?
+                        _positiveDiscountResponse.ToString() : _positiveResponse.ToString(), endsDialog: true);
                 }
-                else
+                else if (_item.Price == 0)
                 {
-                    Plugin.Log.LogInfo("Could not create interactable.");
+                    saysTo.speechController.Speak("dds.blocks", _positiveFreeResponse.ToString(), endsDialog: true);
+                }
+
+                // New prevent loitering
+                if (Player.Instance.currentGameLocation != null &&
+                    Player.Instance.currentGameLocation.thisAsAddress != null &&
+                    Player.Instance.currentGameLocation.thisAsAddress.company != null &&
+                    Player.Instance.currentGameLocation.thisAsAddress.company.preset.enableLoiteringBehaviour)
+                {
+                    Player.Instance.currentGameLocation.LoiteringPurchase();
                 }
             }
 
             // Reset to null for next dialogue
             _item = null;
-        }
-
-        private static void HandleInteractableLogic(Interactable interactable)
-        {
-            interactable.SetSpawnPositionRelevent(false);
-            if (Player.Instance.currentGameLocation != null &&
-                Player.Instance.currentGameLocation.thisAsAddress != null &&
-                Player.Instance.currentGameLocation.thisAsAddress.company != null &&
-                Player.Instance.currentGameLocation.thisAsAddress.company.preset.enableLoiteringBehaviour)
-            {
-                Player.Instance.currentGameLocation.LoiteringPurchase();
-            }
-
-            if (!FirstPersonItemController.Instance.PickUpItem(interactable, true, false, true, true, false))
-            {
-                Plugin.Log.LogInfo("Unable to pickup item: " + interactable.name);
-                interactable.Delete();
-                return;
-            }
-            AudioController.Instance.Play2DSound(AudioControls.Instance.purchaseItem, null, 1f);
-            interactable.MarkAsTrash(true, false, 0f);
         }
 
         public DialogController.ForceSuccess ShouldDialogSucceedOverride(DialogController instance, EvidenceWitness.DialogOption dialog, Citizen saysTo, NewNode where, Actor saidBy)
