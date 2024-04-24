@@ -23,10 +23,10 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public Visibility Visibility { get; }
 
-        private float _know;
+        private float _know = 0f;
         /// <summary>
         /// How much the citizen knows the player. (how often seen, interacted)
-        /// <br>Range between 0-1</br>
+        /// <br>Range between 0-1 (0: unknown, 1: well known)</br>
         /// <br>Default value: 0</br>
         /// </summary>
         public float Know
@@ -38,7 +38,7 @@ namespace SOD.RelationsPlus.Objects
         private float _like = 0.5f;
         /// <summary>
         /// How much the citizen actually likes the player. (From actively doing something for the citizen)
-        /// <br>Range between 0-1</br>
+        /// <br>Range between 0-1 (0: dislike, 0.5 neutral, 1: like)</br>
         /// <br>Default value: 0.5</br>
         /// </summary>
         public float Like
