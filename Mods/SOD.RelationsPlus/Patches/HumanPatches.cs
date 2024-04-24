@@ -63,7 +63,7 @@ namespace SOD.RelationsPlus.Patches
                         {
                             if (player.isTrespassing)
                                 relation.Like -= 0.05f;
-                            relation.Know += 0.05f;
+                            relation.Know += 0.035f;
                             relation.Visibility.LastSeen = DateTime.Now;
                         }
                     }
