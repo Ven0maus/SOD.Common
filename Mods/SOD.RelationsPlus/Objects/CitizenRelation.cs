@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.Common.Helpers;
 using System;
+using System.Text.Json.Serialization;
 
 namespace SOD.RelationsPlus.Objects
 {
@@ -85,7 +86,8 @@ namespace SOD.RelationsPlus.Objects
             }
         }
 
-        internal CitizenRelation(int citizenId)
+        [JsonConstructor]
+        public CitizenRelation(int citizenId)
         {
             CitizenId = citizenId;
         }
