@@ -1,6 +1,6 @@
 ﻿using SOD.Common.BepInEx.Configuration;
 
-namespace SOD.Common
+namespace SOD.Common.ConfigBindings
 {
     public interface IPluginBindings
     {
