@@ -72,7 +72,7 @@ namespace SOD.RelationsPlus.Patches
                         if ((int)location != -1)
                         {
                             if (player.isTrespassing)
-                                relation.Like += Plugin.Instance.Config.SeenTresspassingModifier;
+                                relation.Like += Plugin.Instance.Config.SeenTrespassingModifier;
 
                             // Add it to the matrix if it didn't exist yet
                             if (!relationExists)

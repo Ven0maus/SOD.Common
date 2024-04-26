@@ -19,7 +19,7 @@ namespace SOD.RelationsPlus
         [Binding(0.035f, "How much the \"Know\" property changes for the citizen and player when seen inside their home's building/apartement.", "Modifiers.SeenInHomeBuilding")]
         float SeenInHomeBuildingModifier { get; set; }
 
-        [Binding(-0.05f, "How much the \"Like\" property changes for the citizen and player when seen tresspassing.", "Modifiers.SeenTresspassingModifier")]
-        float SeenTresspassingModifier { get; set; }
+        [Binding(-0.05f, "How much the \"Like\" property changes for the citizen and player when seen trespassing.", "Modifiers.SeenTrespassingModifier")]
+        float SeenTrespassingModifier { get; set; }
     }
 }
