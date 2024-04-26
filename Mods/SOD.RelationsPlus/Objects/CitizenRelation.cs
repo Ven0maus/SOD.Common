@@ -96,7 +96,7 @@ namespace SOD.RelationsPlus.Objects
         /// <param name="location"></param>
         /// <param name="knowChange"></param>
         /// <param name="likeChange"></param>
-        internal void Seen(SeenPlayerArgs.SeenLocation location, float knowChange, float likeChange)
+        internal void RaiseSeenEvent(SeenPlayerArgs.SeenLocation location, float knowChange, float likeChange)
         {
             LastSeenRealTime = DateTime.Now;
             LastSeenGameTime = Lib.Time.CurrentDateTime;
