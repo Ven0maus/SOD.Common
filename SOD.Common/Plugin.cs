@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
+using SOD.Common.ConfigBindings;
 using System.Reflection;
 
 namespace SOD.Common
