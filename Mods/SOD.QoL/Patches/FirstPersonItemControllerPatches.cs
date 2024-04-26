@@ -15,46 +15,46 @@ namespace SOD.QoL.Patches
             {
                 public float Alertness { get; }
                 public float Energy { get; }
-                public float Cs { get; }
+                public Interactable Interactable { get; }
 
-                public PlayerState(float alertness, float energy, float cs)
+                public PlayerState(float alertness, float energy, Interactable interactable)
                 {
                     Alertness = alertness;
                     Energy = energy;
-                    Cs = cs;
+                    Interactable = interactable;
                 }
             }
 
             [HarmonyPrefix]
             internal static void Prefix(FirstPersonItemController __instance, ref PlayerState __state)
             {
-                if (!Plugin.Instance.Config.FixTiredness) return;
+                if (!Plugin.Instance.Config.FixTiredness || Player.Instance == null || BioScreenController.Instance == null) return;
                 if (__instance.isConsuming && !__instance.takeOneActive && BioScreenController.Instance.selectedSlot != null &&
                     BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
                     Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
                     if (interactable != null && interactable.cs > 0f)
-                        __state = new PlayerState(Player.Instance.alertness, Player.Instance.energy, interactable.cs);
+                        __state = new PlayerState(Player.Instance.alertness, Player.Instance.energy, interactable);
                 }
                 else
                 {
-                    __state = new PlayerState(Player.Instance.alertness, Player.Instance.energy, 0f);
+                    __state = new PlayerState(Player.Instance.alertness, Player.Instance.energy, null);
                 }
             }
 
             [HarmonyPostfix]
             internal static void Postfix(ref PlayerState __state)
             {
-                if (!Plugin.Instance.Config.FixTiredness) return;
+                if (!Plugin.Instance.Config.FixTiredness || Player.Instance == null) return;
                 // Reset alertness to original values before this frame's modification
                 Player.Instance.alertness = __state.Alertness;
                 Player.Instance.energy = __state.Energy;
 
                 // Re-calculate the alertness value modification
-                if (__state.Cs > 0f)
+                if (__state.Interactable != null && __state.Interactable.cs > 0f)
                 {
-                    Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
-                    if (interactable.preset.retailItem != null)
+                    Interactable interactable = __state.Interactable;
+                    if (interactable?.preset?.retailItem != null)
                     {
                         // Set alertness properly
                         Player.Instance.alertness += interactable.preset.retailItem.alertness / interactable.preset.consumableAmount * Time.deltaTime;
@@ -87,7 +87,7 @@ namespace SOD.QoL.Patches
                 if (BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1)
                 {
                     Interactable interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
-                    if (interactable.preset.takeOneEvent != null)
+                    if (interactable != null && interactable.preset?.takeOneEvent != null)
                     {
                         AudioController.Instance.Play2DSound(interactable.preset.takeOneEvent, null, 1f);
                     }
