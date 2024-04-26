@@ -11,7 +11,7 @@ namespace SOD.QoL
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.QoL";
         public const string PLUGIN_NAME = "QoL";
-        public const string PLUGIN_VERSION = "1.1.2";
+        public const string PLUGIN_VERSION = "1.1.4";
 
         public override void Load()
         {
