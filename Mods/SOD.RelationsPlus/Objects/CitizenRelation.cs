@@ -1,7 +1,6 @@
 ﻿using SOD.Common;
 using SOD.Common.Helpers;
 using System;
-using System.Collections.Generic;
 
 namespace SOD.RelationsPlus.Objects
 {
@@ -56,7 +55,9 @@ namespace SOD.RelationsPlus.Objects
                 if (_know != newValue)
                 {
                     _know = newValue;
-                    OnKnowChanged?.Invoke(this, new RelationChangeArgs(oldValue, newValue));
+                    RelationChangeArgs args = null;
+                    OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
+                    RelationManager.Instance.RaiseEvent(RelationManager.EventName.KnowChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
                 }
             }
         }
@@ -77,69 +78,17 @@ namespace SOD.RelationsPlus.Objects
                 if (_like != newValue)
                 {
                     _like = newValue;
-                    OnLikeChanged?.Invoke(this, new RelationChangeArgs(oldValue, newValue));
+                    RelationChangeArgs args = null;
+                    OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
+                    RelationManager.Instance.RaiseEvent(RelationManager.EventName.LikeChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
                 }
             }
         }
-
-        /// <summary>
-        /// Hosts custom modifiers that can be handled by mods.
-        /// </summary>
-        private Dictionary<string, float> _customModifiers;
 
         internal CitizenRelation(int citizenId)
         {
             CitizenId = citizenId;
         }
-
-        /// <summary>
-        /// Get's the given custom modifier by key, exception if not found.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        /// <exception cref="KeyNotFoundException"></exception>
-        public float GetModifier(string key)
-        {
-            if (_customModifiers.TryGetValue(key, out var modifier))
-                return modifier;
-            throw new KeyNotFoundException($"No custom modifer found with key \"{key}\".");
-        }
-
-        /// <summary>
-        /// Determine's if a custom modifier exists with the given key.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        public bool ModifierExists(string key)
-            => _customModifiers?.ContainsKey(key) ?? false;
-
-        /// <summary>
-        /// Add's or updates a custom modifier by key.
-        /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
-        public void AddOrUpdateModifier(string key, float value)
-        {
-            if (string.IsNullOrWhiteSpace(key))
-                throw new ArgumentException("Key cannot be null or whitespace.", nameof(key));
-
-            _customModifiers ??= new Dictionary<string, float>();
-            _customModifiers[key] = value;
-        }
-
-        /// <summary>
-        /// Removes a custom modifier by key.
-        /// </summary>
-        /// <param name="key"></param>
-        public void RemoveModifier(string key)
-            => _customModifiers?.Remove(key);
-
-        /// <summary>
-        /// Retrieves all the existing custom modifiers.
-        /// </summary>
-        /// <returns></returns>
-        public IReadOnlyDictionary<string, float> GetModifiers()
-            => _customModifiers ?? new Dictionary<string, float>();
 
         /// <summary>
         /// Raises required seen event.
@@ -151,7 +100,11 @@ namespace SOD.RelationsPlus.Objects
         {
             LastSeenRealTime = DateTime.Now;
             LastSeenGameTime = Lib.Time.CurrentDateTime;
-            OnPlayerSeen?.Invoke(this, new SeenPlayerArgs(location, knowChange, likeChange));
+
+            // Raise events
+            SeenPlayerArgs args = null; 
+            OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(location, knowChange, likeChange));
+            RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(location, knowChange, likeChange));
         }
     }
 }

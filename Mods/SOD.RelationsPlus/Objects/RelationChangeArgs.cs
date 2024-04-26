@@ -5,6 +5,10 @@ namespace SOD.RelationsPlus.Objects
     public sealed class RelationChangeArgs : EventArgs
     {
         /// <summary>
+        /// The id of the citizen.
+        /// </summary>
+        public int CitizenId { get; }
+        /// <summary>
         /// The value before the change.
         /// </summary>
         public float OldValue { get; }
@@ -13,8 +17,9 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public float NewValue { get; }
 
-        internal RelationChangeArgs(float oldValue, float newValue)
+        internal RelationChangeArgs(int citizenId, float oldValue, float newValue)
         {
+            CitizenId = citizenId;
             OldValue = oldValue;
             NewValue = newValue;
         }

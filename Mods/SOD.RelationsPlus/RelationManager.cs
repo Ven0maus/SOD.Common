@@ -1,5 +1,6 @@
 ﻿using SOD.Common;
 using SOD.RelationsPlus.Objects;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -33,6 +34,21 @@ namespace SOD.RelationsPlus
         {
             get { return GetOrCreate(citizenId); }
         }
+
+        /// <summary>
+        /// Raised when Know property is changed for a citizen.
+        /// </summary>
+        public event EventHandler<RelationChangeArgs> OnKnowChanged;
+
+        /// <summary>
+        /// Raised when Like property is changed for a citizen.
+        /// </summary>
+        public event EventHandler<RelationChangeArgs> OnLikeChanged;
+
+        /// <summary>
+        /// Raised when a citizen sees the player.
+        /// </summary>
+        public event EventHandler<SeenPlayerArgs> OnPlayerSeen;
 
         private RelationManager()
         { }
@@ -73,6 +89,40 @@ namespace SOD.RelationsPlus
             if (!_relationMatrixes.TryGetValue(citizenId, out var relationMatrix))
                 _relationMatrixes[citizenId] = relationMatrix = new CitizenRelation(citizenId);
             return relationMatrix;
+        }
+
+        /// <summary>
+        /// Add's or replaces the citizen relation for the given citizen.
+        /// </summary>
+        /// <param name="relation"></param>
+        internal void AddOrReplace(CitizenRelation relation)
+        {
+            _relationMatrixes[relation.CitizenId] = relation;
+        }
+
+        internal void RaiseEvent(EventName eventName, EventArgs args)
+        {
+            switch(eventName)
+            {
+                case EventName.KnowChange:
+                    OnKnowChanged?.Invoke(this, args as RelationChangeArgs);
+                    break;
+                case EventName.LikeChange:
+                    OnLikeChanged?.Invoke(this, args as RelationChangeArgs);
+                    break;
+                case EventName.Seen:
+                    OnPlayerSeen?.Invoke(this, args as SeenPlayerArgs);
+                    break;
+                default:
+                    throw new NotSupportedException($"Event ({(int)eventName}) \"{eventName}\" not supported.");
+            }
+        }
+
+        internal enum EventName
+        {
+            KnowChange,
+            LikeChange,
+            Seen
         }
 
         /// <summary>
