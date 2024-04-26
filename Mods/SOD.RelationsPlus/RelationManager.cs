@@ -26,7 +26,8 @@ namespace SOD.RelationsPlus
         private readonly Dictionary<int, CitizenRelation> _relationMatrixes = new();
 
         /// <summary>
-        /// Custom indexer to get citizen relation information.
+        /// Custom indexer to get citizen relation information, if none exists it will create a new relation object.
+        /// <br>This indexer will always return either an existing value or a new value.</br>
         /// </summary>
         /// <param name="citizenId"></param>
         /// <returns></returns>
