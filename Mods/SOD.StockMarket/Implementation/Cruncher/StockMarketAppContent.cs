@@ -95,7 +95,7 @@ namespace SOD.StockMarket.Implementation.Cruncher
         private static string GetCurrentDateTimeReadable()
         {
             // Seems to be possible somehow, better run empty in this case.
-            if (Lib.Time.IsInitialized)
+            if (!Lib.Time.IsInitialized)
                 return string.Empty;
 
             var date = Lib.Time.CurrentDateTime;
