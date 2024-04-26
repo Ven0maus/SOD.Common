@@ -31,8 +31,6 @@ namespace SOD.LifeAndLiving.Relations
         /// </summary>
         public Dictionary<int, Dictionary<string, int>> PurchasedItemsFrom { get; set; } = new Dictionary<int, Dictionary<string, int>>();
 
-        private PlayerInterests() { }
-
         /// <summary>
         /// Keeps track of what was bought, where and optionally from who.
         /// </summary>
