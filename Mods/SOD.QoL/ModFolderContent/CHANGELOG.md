@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.4**
+- Fixed null reference exception after consuming certain items
+
 **1.1.3**
 - Fixed some companies still not having unlocked doors sometimes on a new game start when they are suppose to be open.
 
