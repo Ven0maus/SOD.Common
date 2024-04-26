@@ -26,7 +26,7 @@ namespace SOD.Common.Extensions
         /// <returns></returns>
         public static int GetFnvHashCode(this string value)
         {
-            return int.Parse(Lib.SaveGame.GetUniqueString(value));
+            return (int)uint.Parse(Lib.SaveGame.GetUniqueString(value));
         }
     }
 }
