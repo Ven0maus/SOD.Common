@@ -10,17 +10,17 @@ namespace SOD.RelationsPlus.Objects
     public sealed class CitizenRelation
     {
         /// <summary>
-        /// Raised when Know property is changed.
+        /// Raised when Know property is changed for this specific citizen.
         /// </summary>
         public event EventHandler<RelationChangeArgs> OnKnowChanged;
 
         /// <summary>
-        /// Raised when Like property is changed.
+        /// Raised when Like property is changed for this specific citizen.
         /// </summary>
         public event EventHandler<RelationChangeArgs> OnLikeChanged;
 
         /// <summary>
-        /// Raised when the citizen sees the player.
+        /// Raised when this specific citizen sees the player.
         /// </summary>
         public event EventHandler<SeenPlayerArgs> OnPlayerSeen;
 
