@@ -18,13 +18,18 @@ namespace SOD.RelationsPlus.Patches
                 var player = citizen;
                 if (player == null || __instance.isMachine || !player.isPlayer) return;
 
-                var relation = RelationManager.Instance[__instance.humanID];
-                if (relation.LastSeenRealTime == null || relation.LastSeenRealTime.Value.AddSeconds(45) < DateTime.Now)
+                var relationExists = RelationManager.Instance.TryGetValue(__instance.humanID, out var relation);
+                if (!relationExists || 
+                    relation.LastSeenRealTime == null || 
+                    relation.LastSeenRealTime.Value.AddSeconds(45) < DateTime.Now)
                 {
                     float distance = Vector3.Distance(__instance.lookAtThisTransform.position, player.lookAtThisTransform.position);
                     if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
                         __instance.ActorRaycastCheck(player, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
                     {
+                        // If relation doesn't exist yet at this point, create a new one
+                        relation ??= new CitizenRelation(__instance.humanID);
+
                         var isInTheSameRoom = __instance.currentRoom != null &&
                             player.currentRoom != null && 
                             __instance.currentRoom.roomID == player.currentRoom.roomID;
@@ -68,6 +73,11 @@ namespace SOD.RelationsPlus.Patches
                         {
                             if (player.isTrespassing)
                                 relation.Like -= 0.05f;
+
+                            // Add it to the matrix if it didn't exist yet
+                            if (!relationExists)
+                                RelationManager.Instance.AddOrReplace(relation);
+
                             relation.Seen(location, previousKnow - relation.Know, previousLike - relation.Like);
                         }
                     }

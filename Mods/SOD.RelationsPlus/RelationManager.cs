@@ -91,6 +91,15 @@ namespace SOD.RelationsPlus
             return relationMatrix;
         }
 
+        /// <summary>
+        /// Add's or replaces the citizen relation for the given citizen.
+        /// </summary>
+        /// <param name="relation"></param>
+        internal void AddOrReplace(CitizenRelation relation)
+        {
+            _relationMatrixes[relation.CitizenId] = relation;
+        }
+
         internal void RaiseEvent(EventName eventName, EventArgs args)
         {
             switch(eventName)
