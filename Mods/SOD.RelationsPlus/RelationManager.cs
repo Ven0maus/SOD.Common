@@ -132,7 +132,7 @@ namespace SOD.RelationsPlus
         /// <param name="relationMatrixPath"></param>
         internal void Load(string hash)
         {
-            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (_relationMatrixes.Count > 0)
                 _relationMatrixes.Clear();
@@ -155,7 +155,7 @@ namespace SOD.RelationsPlus
         /// <param name="filePath"></param>
         internal void Save(string hash)
         {
-            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (!_relationMatrixes.Any())
             {
@@ -174,7 +174,7 @@ namespace SOD.RelationsPlus
 
         internal static void Delete(string hash)
         {
-            var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (File.Exists(relationFilePath))
                 File.Delete(relationFilePath);
