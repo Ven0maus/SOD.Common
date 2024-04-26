@@ -7,7 +7,7 @@ namespace SOD.RelationsPlus.Objects
     /// <summary>
     /// Contains information about the relation between the player and the citizen.
     /// </summary>
-    public class CitizenRelation
+    public sealed class CitizenRelation
     {
         /// <summary>
         /// Raised when Know property is changed.
