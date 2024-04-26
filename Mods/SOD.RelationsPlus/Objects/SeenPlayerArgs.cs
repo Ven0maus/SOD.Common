@@ -11,11 +11,11 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public int CitizenId { get; }
         /// <summary>
-        /// The value that "Know" was increased by.
+        /// The value that "Know" was changed by.
         /// </summary>
         public float KnowChange { get; }
         /// <summary>
-        /// The value that "Like" was increased by.
+        /// The value that "Like" was changed by.
         /// <br>It can be changed in the event of tresspassing.</br>
         /// </summary>
         public float LikeChange { get; }
