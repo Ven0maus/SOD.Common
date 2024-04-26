@@ -41,29 +41,34 @@ namespace SOD.RelationsPlus.Patches
                         if (__instance.isAtWork && isInTheSameRoom)
                         {
                             relation.Visibility.SeenAtWork++;
+                            relation.Know += 0.025f;
                             seen = true;
                         }
                         else if (__instance.isHome && isInTheSameRoom)
                         {
                             relation.Visibility.SeenAtHome++;
+                            relation.Know += 0.045f;
                             seen = true;
                         }
                         else if (isInTheSameHomeBuilding)
                         {
                             relation.Visibility.SeenAtHomeBuilding++;
+                            relation.Know += 0.035f;
                             seen = true;
                         }
                         else if ((__instance.isOnStreet && player.isOnStreet) || isInTheSameRoom || isInTheSameBuilding)
                         {
-                            relation.Visibility.SeenOutsideOfWork++;
+                            relation.Know += 0.015f;
                             seen = true;
                         }
 
                         if (seen)
                         {
                             if (player.isTrespassing)
+                            {
                                 relation.Like -= 0.05f;
-                            relation.Know += 0.035f;
+                                relation.Know += 0.25f; // Multiplier
+                            }
                             relation.Visibility.LastSeen = DateTime.Now;
                         }
                     }
