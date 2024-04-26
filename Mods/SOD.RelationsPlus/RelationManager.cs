@@ -26,7 +26,8 @@ namespace SOD.RelationsPlus
         private readonly Dictionary<int, CitizenRelation> _relationMatrixes = new();
 
         /// <summary>
-        /// Custom indexer to get citizen relation information.
+        /// Custom indexer to get citizen relation information, if none exists it will create a new relation object.
+        /// <br>This indexer will always return either an existing value or a new value.</br>
         /// </summary>
         /// <param name="citizenId"></param>
         /// <returns></returns>
@@ -131,7 +132,7 @@ namespace SOD.RelationsPlus
         /// <param name="relationMatrixPath"></param>
         internal void Load(string hash)
         {
-            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (_relationMatrixes.Count > 0)
                 _relationMatrixes.Clear();
@@ -154,7 +155,7 @@ namespace SOD.RelationsPlus
         /// <param name="filePath"></param>
         internal void Save(string hash)
         {
-            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (!_relationMatrixes.Any())
             {
@@ -173,7 +174,7 @@ namespace SOD.RelationsPlus
 
         internal static void Delete(string hash)
         {
-            var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"CitizenRelations_{hash}.json");
+            var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (File.Exists(relationFilePath))
                 File.Delete(relationFilePath);

@@ -7,20 +7,20 @@ namespace SOD.RelationsPlus.Objects
     /// <summary>
     /// Contains information about the relation between the player and the citizen.
     /// </summary>
-    public class CitizenRelation
+    public sealed class CitizenRelation
     {
         /// <summary>
-        /// Raised when Know property is changed.
+        /// Raised when Know property is changed for this specific citizen.
         /// </summary>
         public event EventHandler<RelationChangeArgs> OnKnowChanged;
 
         /// <summary>
-        /// Raised when Like property is changed.
+        /// Raised when Like property is changed for this specific citizen.
         /// </summary>
         public event EventHandler<RelationChangeArgs> OnLikeChanged;
 
         /// <summary>
-        /// Raised when the citizen sees the player.
+        /// Raised when this specific citizen sees the player.
         /// </summary>
         public event EventHandler<SeenPlayerArgs> OnPlayerSeen;
 
@@ -96,15 +96,15 @@ namespace SOD.RelationsPlus.Objects
         /// <param name="location"></param>
         /// <param name="knowChange"></param>
         /// <param name="likeChange"></param>
-        internal void Seen(SeenPlayerArgs.SeenLocation location, float knowChange, float likeChange)
+        internal void RaiseSeenEvent(SeenPlayerArgs.SeenLocation location, float knowChange, float likeChange)
         {
             LastSeenRealTime = DateTime.Now;
             LastSeenGameTime = Lib.Time.CurrentDateTime;
 
             // Raise events
             SeenPlayerArgs args = null; 
-            OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(location, knowChange, likeChange));
-            RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(location, knowChange, likeChange));
+            OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
+            RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
         }
     }
 }

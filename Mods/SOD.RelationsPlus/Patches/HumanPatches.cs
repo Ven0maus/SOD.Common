@@ -49,22 +49,22 @@ namespace SOD.RelationsPlus.Patches
                         SeenPlayerArgs.SeenLocation location = (SeenPlayerArgs.SeenLocation)(-1);
                         if (__instance.isAtWork && isInTheSameRoom)
                         {
-                            relation.Know += 0.025f;
+                            relation.Know += Plugin.Instance.Config.SeenAtWorkplaceModifier;
                             location = SeenPlayerArgs.SeenLocation.Workplace;
                         }
                         else if (__instance.isHome && isInTheSameRoom)
                         {
-                            relation.Know += 0.045f;
+                            relation.Know += Plugin.Instance.Config.SeenInHomeModifier;
                             location = SeenPlayerArgs.SeenLocation.Home;
                         }
                         else if (isInTheSameHomeBuilding)
                         {
-                            relation.Know += 0.035f;
+                            relation.Know += Plugin.Instance.Config.SeenInHomeBuildingModifier;
                             location = SeenPlayerArgs.SeenLocation.HomeBuilding;
                         }
                         else if ((__instance.isOnStreet && player.isOnStreet) || isInTheSameRoom || isInTheSameBuilding)
                         {
-                            relation.Know += 0.015f;
+                            relation.Know += Plugin.Instance.Config.SeenOnStreetModifier;
                             location = SeenPlayerArgs.SeenLocation.Street;
                         }
 
@@ -72,13 +72,14 @@ namespace SOD.RelationsPlus.Patches
                         if ((int)location != -1)
                         {
                             if (player.isTrespassing)
-                                relation.Like -= 0.05f;
+                                relation.Like += Plugin.Instance.Config.SeenTrespassingModifier;
 
                             // Add it to the matrix if it didn't exist yet
                             if (!relationExists)
                                 RelationManager.Instance.AddOrReplace(relation);
 
-                            relation.Seen(location, previousKnow - relation.Know, previousLike - relation.Like);
+                            // Raise event
+                            relation.RaiseSeenEvent(location, previousKnow - relation.Know, previousLike - relation.Like);
                         }
                     }
                 }

@@ -7,11 +7,15 @@ namespace SOD.RelationsPlus.Objects
     public sealed class SeenPlayerArgs : EventArgs
     {
         /// <summary>
-        /// The value that "Know" was increased by.
+        /// The id of the citizen.
+        /// </summary>
+        public int CitizenId { get; }
+        /// <summary>
+        /// The value that "Know" was changed by.
         /// </summary>
         public float KnowChange { get; }
         /// <summary>
-        /// The value that "Like" was increased by.
+        /// The value that "Like" was changed by.
         /// <br>It can be changed in the event of tresspassing.</br>
         /// </summary>
         public float LikeChange { get; }
@@ -28,8 +32,9 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public Time.TimeData SeenGameTime { get; }
 
-        internal SeenPlayerArgs(SeenLocation location, float knowChange, float likeChange)
+        internal SeenPlayerArgs(int citizenId, SeenLocation location, float knowChange, float likeChange)
         {
+            CitizenId = citizenId;
             KnowChange = knowChange;
             LikeChange = likeChange;
             Location = location;
