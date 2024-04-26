@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SOD.RelationsPlus.Objects;
 using System;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace SOD.RelationsPlus.Patches
                 if (player == null || __instance.isMachine || !player.isPlayer) return;
 
                 var relation = RelationManager.Instance[__instance.humanID];
-                if (relation.Visibility.LastSeen == null || relation.Visibility.LastSeen.Value.AddSeconds(45) < DateTime.Now)
+                if (relation.LastSeenRealTime == null || relation.LastSeenRealTime.Value.AddSeconds(45) < DateTime.Now)
                 {
                     float distance = Vector3.Distance(__instance.lookAtThisTransform.position, player.lookAtThisTransform.position);
                     if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
@@ -37,39 +38,37 @@ namespace SOD.RelationsPlus.Patches
                             player.currentGameLocation.thisAsAddress != null &&
                             player.currentGameLocation.thisAsAddress == __instance.home;
 
-                        bool seen = false;
+                        float previousKnow = relation.Know;
+                        float previousLike = relation.Like;
+
+                        SeenPlayerArgs.SeenLocation location = (SeenPlayerArgs.SeenLocation)(-1);
                         if (__instance.isAtWork && isInTheSameRoom)
                         {
-                            relation.Visibility.SeenAtWork++;
                             relation.Know += 0.025f;
-                            seen = true;
+                            location = SeenPlayerArgs.SeenLocation.Workplace;
                         }
                         else if (__instance.isHome && isInTheSameRoom)
                         {
-                            relation.Visibility.SeenAtHome++;
                             relation.Know += 0.045f;
-                            seen = true;
+                            location = SeenPlayerArgs.SeenLocation.Home;
                         }
                         else if (isInTheSameHomeBuilding)
                         {
-                            relation.Visibility.SeenAtHomeBuilding++;
                             relation.Know += 0.035f;
-                            seen = true;
+                            location = SeenPlayerArgs.SeenLocation.HomeBuilding;
                         }
                         else if ((__instance.isOnStreet && player.isOnStreet) || isInTheSameRoom || isInTheSameBuilding)
                         {
                             relation.Know += 0.015f;
-                            seen = true;
+                            location = SeenPlayerArgs.SeenLocation.Street;
                         }
 
-                        if (seen)
+                        // Player was seen by citizen
+                        if ((int)location != -1)
                         {
                             if (player.isTrespassing)
-                            {
                                 relation.Like -= 0.05f;
-                                relation.Know += 0.25f; // Multiplier
-                            }
-                            relation.Visibility.LastSeen = DateTime.Now;
+                            relation.Seen(location, previousKnow - relation.Know, previousLike - relation.Like);
                         }
                     }
                 }
