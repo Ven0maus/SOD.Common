@@ -174,7 +174,7 @@ namespace SOD.StockMarket.Implementation
                 return;
 
             // Init helper
-            MathHelper.Init(CityData.Instance.seed.GetHashCode());
+            MathHelper.Init(CityData.Instance.seed.GetFnvHashCode());
 
             // Also add some default game related stocks and update prices
             foreach (var (data, basePrice) in CustomStocks.Stocks)

@@ -68,6 +68,8 @@ namespace SOD.StockMarket.Implementation.Cruncher
             foreach (var part in parts)
                 part.OnSetup();
 
+            name = "stockmarketpreset";
+
             // Load by default the menu
             AppMenu.Show();
 
@@ -92,6 +94,10 @@ namespace SOD.StockMarket.Implementation.Cruncher
 
         private static string GetCurrentDateTimeReadable()
         {
+            // Seems to be possible somehow, better run empty in this case.
+            if (Lib.Time.IsInitialized)
+                return string.Empty;
+
             var date = Lib.Time.CurrentDateTime;
             var day = date.DayEnum.ToString()[..3];
             var month = date.MonthEnum.ToString()[..3];
