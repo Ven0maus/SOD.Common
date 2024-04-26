@@ -103,8 +103,8 @@ namespace SOD.RelationsPlus.Objects
 
             // Raise events
             SeenPlayerArgs args = null; 
-            OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(location, knowChange, likeChange));
-            RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(location, knowChange, likeChange));
+            OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
+            RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
         }
     }
 }

@@ -7,6 +7,10 @@ namespace SOD.RelationsPlus.Objects
     public sealed class SeenPlayerArgs : EventArgs
     {
         /// <summary>
+        /// The id of the citizen.
+        /// </summary>
+        public int CitizenId { get; }
+        /// <summary>
         /// The value that "Know" was increased by.
         /// </summary>
         public float KnowChange { get; }
@@ -28,8 +32,9 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public Time.TimeData SeenGameTime { get; }
 
-        internal SeenPlayerArgs(SeenLocation location, float knowChange, float likeChange)
+        internal SeenPlayerArgs(int citizenId, SeenLocation location, float knowChange, float likeChange)
         {
+            CitizenId = citizenId;
             KnowChange = knowChange;
             LikeChange = likeChange;
             Location = location;
