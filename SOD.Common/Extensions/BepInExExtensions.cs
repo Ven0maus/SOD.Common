@@ -1,9 +1,7 @@
 ﻿using BepInEx.Configuration;
-using SOD.Common.BepInEx;
 using SOD.Common.BepInEx.Configuration;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace SOD.Common.Extensions
@@ -25,7 +23,7 @@ namespace SOD.Common.Extensions
             var valueType = defaultValue.GetType();
             if (!TomlTypeConverter.CanConvert(valueType))
             {
-                throw new ArgumentException(string.Format("Type {0} is not supported by the config system. Supported types: {1}", valueType, string.Join(", ", 
+                throw new ArgumentException(string.Format("Type {0} is not supported by the config system. Supported types: {1}", valueType, string.Join(", ",
                     (from x in TomlTypeConverter.GetSupportedTypes() select x.Name).ToArray())));
             }
 
