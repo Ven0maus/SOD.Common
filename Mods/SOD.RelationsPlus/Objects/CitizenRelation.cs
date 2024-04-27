@@ -105,7 +105,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\".");
 
                     RelationChangeArgs args = null;
                     OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -134,7 +134,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\".");
 
                     RelationChangeArgs args = null;
                     OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -150,6 +150,18 @@ namespace SOD.RelationsPlus.Objects
         }
 
         /// <summary>
+        /// Retrieves the cached citizen object from the city data instance.
+        /// Could be null if the citizen is missing from the citydata somehow (handled by the game).
+        /// </summary>
+        /// <returns></returns>
+        public Citizen GetCitizen()
+        {
+            if (!CityData.Instance.citizenDictionary.TryGetValue(CitizenId, out var human))
+                return null;
+            return human as Citizen;
+        }
+
+        /// <summary>
         /// Raises required seen event.
         /// </summary>
         /// <param name="location"></param>
@@ -161,7 +173,7 @@ namespace SOD.RelationsPlus.Objects
             LastSeenGameTime = Lib.Time.CurrentDateTime;
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): saw player at \"{location}\" on \"{LastSeenGameTime}\".");
+                Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): saw player at \"{location}\" on \"{LastSeenGameTime}\".");
 
             // Raise events
             SeenPlayerArgs args = null; 
