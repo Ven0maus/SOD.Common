@@ -2,8 +2,17 @@
 
 namespace SOD.RelationsPlus
 {
-    public interface IPluginBindings : ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
+    public interface IPluginBindings : IDecayModifierBindings, ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
     { }
+
+    public interface IDecayModifierBindings
+    {
+        [Binding(60, "After how many in-game minutes is the decay check executed each time?", "Modifiers.Decay.DecayTimeMinutesCheck")]
+        int DecayTimeMinutesCheck { get; set; }
+
+        [Binding(-0.005f, "How much does 'Know' decay automatically? (cannot decay past certain stages of 'Know')", "Modifiers.Decay.DecayKnowAmount")]
+        float DecayKnowAmount { get; set; }
+    }
 
     public interface ISeenModifierBindings
     {

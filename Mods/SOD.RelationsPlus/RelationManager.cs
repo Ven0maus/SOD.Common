@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.RelationsPlus.Objects;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SOD.RelationsPlus
     /// <summary>
     /// Contains methods to create, update and delete relations between citizens and load/save the relation state per savegame.
     /// </summary>
-    public sealed class RelationManager
+    public sealed class RelationManager : IEnumerable<CitizenRelation>
     {
         private static RelationManager _instance;
         /// <summary>
@@ -93,11 +94,30 @@ namespace SOD.RelationsPlus
         }
 
         /// <summary>
+        /// Returns all the known citizen relations recorded to date.
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<CitizenRelation> ListAll()
+        {
+            return _relationMatrixes.Values;
+        }
+
+        /// <summary>
         /// Clears out all known relations of all citizens.
         /// </summary>
         public void Clear()
         {
             _relationMatrixes.Clear();
+        }
+
+        public IEnumerator<CitizenRelation> GetEnumerator()
+        {
+            return _relationMatrixes.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
 
         /// <summary>
