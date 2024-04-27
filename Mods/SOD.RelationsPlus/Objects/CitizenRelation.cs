@@ -60,8 +60,8 @@ namespace SOD.RelationsPlus.Objects
                 if (Know < Plugin.Instance.Config.KnowGateThree)
                     return KnowStage.Familiar;
                 if (Know < Plugin.Instance.Config.KnowGateFour)
-                    return KnowStage.Acquaintance;
-                return KnowStage.Friend;
+                    return KnowStage.Known;
+                return KnowStage.WellKnown;
             }
         }
 
@@ -189,8 +189,8 @@ namespace SOD.RelationsPlus.Objects
             Stranger,
             Aware,
             Familiar,
-            Acquaintance,
-            Friend,
+            Known,
+            WellKnown,
         }
 
         /// <summary>

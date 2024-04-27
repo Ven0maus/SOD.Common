@@ -20,11 +20,11 @@ namespace SOD.RelationsPlus
         [Binding(0.6f, "The third gate, (GateTwoValue -> GateThreeValue): The citizen becomes familiar with the player.", "Relation.Gates.KnowGateThree")]
         float KnowGateThree { get; set; }
 
-        [Binding(0.8f, "The fourth gate, (GateThreeValue -> GateFourValue): The citizen becomes an acquaintance of the player.", "Relation.Gates.KnowGateFour")]
+        [Binding(0.8f, "The fourth gate, (GateThreeValue -> GateFourValue): The citizen knows the player.", "Relation.Gates.KnowGateFour")]
         float KnowGateFour { get; set; }
         
         // Gate five can not be modified, it is the last stage (this is just shown for info)
-        [Binding(1f, "The fifth gate, (GateFourValue -> GateFiveValue): The citizen becomes a friend of the player. (CANNOT BE MODIFIED)", "Relation.Gates.KnowGateFive")]
+        [Binding(1f, "The fifth gate, (GateFourValue -> GateFiveValue): The citizen knows the player very well. (CANNOT BE MODIFIED)", "Relation.Gates.KnowGateFive")]
         float KnowGateFive { get; set; }
 
         // Like gates
@@ -74,16 +74,16 @@ namespace SOD.RelationsPlus
 
     public interface IKnowModifierBindings
     {
-        [Binding(0.015f, "How much the \"Know\" property changes for the citizen and player when seen passing by on the street.", "Modifiers.Know.SeenOnStreetModifier")]
+        [Binding(0.01f, "How much the \"Know\" property changes for the citizen and player when seen passing by on the street.", "Modifiers.Know.SeenOnStreetModifier")]
         float SeenOnStreetModifier { get; set; }
 
-        [Binding(0.025f, "How much the \"Know\" property changes for the citizen and player when seen at their workplace.", "Modifiers.Know.SeenAtWorkplaceModifier")]
+        [Binding(0.02f, "How much the \"Know\" property changes for the citizen and player when seen at their workplace.", "Modifiers.Know.SeenAtWorkplaceModifier")]
         float SeenAtWorkplaceModifier { get; set; }
 
-        [Binding(0.045f, "How much the \"Know\" property changes for the citizen and player when seen inside their home.", "Modifiers.Know.SeenInHome")]
+        [Binding(0.035f, "How much the \"Know\" property changes for the citizen and player when seen inside their home.", "Modifiers.Know.SeenInHome")]
         float SeenInHomeModifier { get; set; }
 
-        [Binding(0.035f, "How much the \"Know\" property changes for the citizen and player when seen inside their home's building/apartement.", "Modifiers.Know.SeenInHomeBuilding")]
+        [Binding(0.025f, "How much the \"Know\" property changes for the citizen and player when seen inside their home's building/apartement.", "Modifiers.Know.SeenInHomeBuilding")]
         float SeenInHomeBuildingModifier { get; set; }
     }
 
