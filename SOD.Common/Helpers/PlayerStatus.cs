@@ -161,10 +161,10 @@ namespace SOD.Common.Helpers
             }
 
             var data = IllegalStatusModifierDictionary
-                .Select(a => new IllegalStatusModifier.JsonData 
-                { 
-                    Key = a.Key, 
-                    Time = a.Value.TimeRemainingSec 
+                .Select(a => new IllegalStatusModifier.JsonData
+                {
+                    Key = a.Key,
+                    Time = a.Value.TimeRemainingSec
                 })
                 .ToList();
             var json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = false });

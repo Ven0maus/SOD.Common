@@ -1,6 +1,5 @@
 ﻿using HarmonyLib;
 using Il2CppSystem.Reflection;
-using SOD.Common.Helpers;
 using SOD.Common.Helpers.DialogObjects;
 using System.Collections.Generic;
 

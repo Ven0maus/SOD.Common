@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using System.Xml.Linq;
 
 namespace SOD.Common.Helpers
 {
@@ -160,8 +159,8 @@ namespace SOD.Common.Helpers
                             Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {SyncDisk.GetNameFromPreset(disk.SyncDiskName)} | {realEffect.Name} | {option}");
                         }
                     }
-                    
-                    if (!InstalledSyncDisks.TryGetValue(disk.SyncDiskName, out List<InstalledSyncDiskData> disks)) 
+
+                    if (!InstalledSyncDisks.TryGetValue(disk.SyncDiskName, out List<InstalledSyncDiskData> disks))
                     {
                         disks = new();
                         InstalledSyncDisks.Add(disk.SyncDiskName, disks);

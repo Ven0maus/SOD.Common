@@ -37,7 +37,7 @@ namespace SOD.Common.Helpers
         /// </summary>
         /// <param name="pluginGuid">The GUID of the target plugin.</param>
         /// <returns>True if the plugin has been loaded, false otherwise.</returns>
-        public bool IsPluginLoaded(string pluginGuid) 
+        public bool IsPluginLoaded(string pluginGuid)
             => IL2CPPChainloader.Instance.Plugins.ContainsKey(pluginGuid);
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace SOD.Common.Helpers
         /// <param name="info">The BepInEx PluginInfo data object of the target
         /// plugin.</param>
         /// <returns></returns>
-        public bool TryGetPluginInfo(string pluginGuid, out PluginInfo info) 
+        public bool TryGetPluginInfo(string pluginGuid, out PluginInfo info)
             => IL2CPPChainloader.Instance.Plugins.TryGetValue(pluginGuid, out info);
 
         /// <summary>

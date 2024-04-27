@@ -14,7 +14,7 @@ namespace SOD.Common.Helpers.DialogObjects
         private IDialogLogic _dialogLogic;
         private List<DialogResponse> _dialogResponses;
 
-        internal DialogBuilder(string dialogName = null) 
+        internal DialogBuilder(string dialogName = null)
         {
             _dialogPreset = ScriptableObject.CreateInstance<DialogPreset>();
 

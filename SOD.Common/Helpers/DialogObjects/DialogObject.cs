@@ -46,7 +46,7 @@ namespace SOD.Common.Helpers.DialogObjects
         /// </summary>
         internal new AIActionPreset.AISpeechPreset ResponseInfo { get; }
 
-        internal DialogObject(DialogPreset dialogPreset, string text, IDialogLogic dialogLogic) 
+        internal DialogObject(DialogPreset dialogPreset, string text, IDialogLogic dialogLogic)
             : base(null, text, null)
         {
             Responses = new();
@@ -104,7 +104,7 @@ namespace SOD.Common.Helpers.DialogObjects
             // First message is the main parent
             Preset.msgID = Messages[0].id;
 
-            for (int i=0; i < Responses.Count; i++)
+            for (int i = 0; i < Responses.Count; i++)
             {
                 var response = Responses[i];
 

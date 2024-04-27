@@ -114,7 +114,7 @@ namespace SOD.Common.Helpers
         /// <param name="dictionary"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public bool Exists(string dictionary ,string key)
+        public bool Exists(string dictionary, string key)
         {
             return this[dictionary, key] != null;
         }

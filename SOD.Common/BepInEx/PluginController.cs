@@ -3,7 +3,6 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
-using Internal.Cryptography;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
 using SOD.Common.Extensions.Internal;
