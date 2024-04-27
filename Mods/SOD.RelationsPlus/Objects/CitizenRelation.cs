@@ -40,6 +40,11 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public Time.TimeData? LastSeenGameTime { get; private set; }
 
+        /// <summary>
+        /// Determines if the player was trespassing the last time he was seen by the citizen.
+        /// </summary>
+        public bool WasTrespassingLastTimeSeen { get; internal set; } = false;
+
         private float _know = 0f;
         /// <summary>
         /// How much the citizen knows the player. (how often seen, interacted)
