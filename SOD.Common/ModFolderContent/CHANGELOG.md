@@ -1,6 +1,7 @@
 # CHANGELOG
 **1.1.9**
 - Added extra operators (<, >, <=, >=) to TimeData struct in Lib.Time
+- Added extra AddHours method to TimeData struct in Lib.Time
 - Fixed parsing issue with GetFnvHashCode extension
 
 **1.1.8**
