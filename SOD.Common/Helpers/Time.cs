@@ -313,10 +313,17 @@ namespace SOD.Common.Helpers
             /// <returns></returns>
             public TimeData AddDays(int days)
             {
-                DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
-                DateTime newDateTime = currentDateTime.AddDays(days);
-                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
-                    Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+                return AddHours(days * 24);
+            }
+
+            /// <summary>
+            /// Add's a certain amount of hours to the TimeData
+            /// </summary>
+            /// <param name="minutes"></param>
+            /// <returns></returns>
+            public TimeData AddHours(int hours)
+            {
+                return AddMinutes(hours * 60);
             }
 
             /// <summary>
