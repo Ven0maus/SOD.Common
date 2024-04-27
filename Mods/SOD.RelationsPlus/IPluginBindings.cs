@@ -3,7 +3,10 @@
 namespace SOD.RelationsPlus
 {
     public interface IPluginBindings : IRelationGateBindings, IDecayModifierBindings, ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
-    { }
+    {
+        [Binding(false, "Debug mode shows extra logging to track relational changes between citizens and the player.")]
+        bool DebugMode { get; set; }
+    }
 
     public interface IRelationGateBindings
     {

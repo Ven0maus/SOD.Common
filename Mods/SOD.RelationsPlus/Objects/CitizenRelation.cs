@@ -61,6 +61,10 @@ namespace SOD.RelationsPlus.Objects
                 if (_know != newValue)
                 {
                     _know = newValue;
+
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\".");
+
                     RelationChangeArgs args = null;
                     OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
                     RelationManager.Instance.RaiseEvent(RelationManager.EventName.KnowChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -84,6 +88,10 @@ namespace SOD.RelationsPlus.Objects
                 if (_like != newValue)
                 {
                     _like = newValue;
+
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\".");
+
                     RelationChangeArgs args = null;
                     OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
                     RelationManager.Instance.RaiseEvent(RelationManager.EventName.LikeChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -107,6 +115,9 @@ namespace SOD.RelationsPlus.Objects
         {
             LastSeenRealTime = DateTime.Now;
             LastSeenGameTime = Lib.Time.CurrentDateTime;
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): saw player at \"{location}\" on \"{LastSeenGameTime}\".");
 
             // Raise events
             SeenPlayerArgs args = null; 
