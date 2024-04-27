@@ -27,6 +27,11 @@ namespace SOD.RelationsPlus
         private readonly Dictionary<int, CitizenRelation> _relationMatrixes = new();
 
         /// <summary>
+        /// Stores the last check time of the timed decay logic.
+        /// </summary>
+        private int _lastDecayCheckMinute;
+
+        /// <summary>
         /// Custom indexer to get citizen relation information, if none exists it will create a new relation object.
         /// <br>This indexer will always return either an existing value or a new value.</br>
         /// </summary>
@@ -210,6 +215,59 @@ namespace SOD.RelationsPlus
                 File.Delete(relationFilePath);
                 Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
             }
+        }
+
+        /// <summary>
+        /// Handles the automatic decay logic.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal void Timed_DecayLogic(object sender, Common.Helpers.TimeChangedArgs e)
+        {
+            if (_lastDecayCheckMinute >= Plugin.Instance.Config.DecayTimeMinutesCheck)
+            {
+                _lastDecayCheckMinute = 0;
+
+                var decayAmount = Plugin.Instance.Config.DecayKnowAmount;
+
+                // Decay each recorded citizen's know value automatically
+                foreach (var citizen in _relationMatrixes.Values)
+                {
+                    // Take decay gates into account to not decay past these values once reached.
+                    var currentDecayGate = GetCurrentDecayGate(citizen);
+
+                    // Apply decay
+                    citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayAmount, currentDecayGate, 1f);
+                }
+            }
+            else
+            {
+                _lastDecayCheckMinute++;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current decay gate of the given relation.
+        /// </summary>
+        /// <param name="citizenRelation"></param>
+        /// <returns></returns>
+        private static float GetCurrentDecayGate(CitizenRelation citizenRelation)
+        {
+            // If we allow decay past gates, we are always at gate 0f
+            if (Plugin.Instance.Config.AllowDecayPastRelationGates)
+                return 0f;
+
+            var know = citizenRelation.Know;
+            if (know >= Plugin.Instance.Config.GateFour)
+                return Plugin.Instance.Config.GateFour;
+            if (know >= Plugin.Instance.Config.GateThree)
+                return Plugin.Instance.Config.GateThree;
+            if (know >= Plugin.Instance.Config.GateTwo)
+                return Plugin.Instance.Config.GateTwo;
+            if (know >= Plugin.Instance.Config.GateOne)
+                return Plugin.Instance.Config.GateOne;
+
+            return 0f;
         }
     }
 }
