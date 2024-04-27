@@ -178,7 +178,7 @@ namespace SOD.Common.BepInEx
                     .Where(a => a.GetCustomAttribute<BindingAttribute>() != null)
                     .Select(a =>
                     {
-                        var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name ?? "");
+                        var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name ?? $"General.{a.Name}");
                         return new { Section = section, Key = key };
                     })
                     .GroupBy(a => a.Section)
