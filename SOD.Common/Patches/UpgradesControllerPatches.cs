@@ -24,7 +24,7 @@ namespace SOD.Common.Patches
         }
 
         [HarmonyPatch(typeof(UpgradesController), nameof(UpgradesController.UpgradeSyncDisk))]
-        public class UpgradeSyncDiskHook
+        internal class UpgradeSyncDiskHook
         {
             [HarmonyPrefix]
             public static void Prefix(UpgradesController.Upgrades upgradeThis)
@@ -42,7 +42,7 @@ namespace SOD.Common.Patches
         }
 
         [HarmonyPatch(typeof(UpgradesController), nameof(UpgradesController.UninstallSyncDisk))]
-        public class UninstallSyncDiskHook
+        internal class UninstallSyncDiskHook
         {
             [HarmonyPrefix]
             public static void Prefix(UpgradesController.Upgrades removal)
