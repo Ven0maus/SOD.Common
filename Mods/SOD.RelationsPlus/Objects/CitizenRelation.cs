@@ -105,7 +105,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\" | KnowRelation: \"{KnowRelation}\".");
 
                     RelationChangeArgs args = null;
                     OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -134,7 +134,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\" | LikeRelation: \"{LikeRelation}\".");
 
                     RelationChangeArgs args = null;
                     OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
