@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using SOD.Common;
 using SOD.Common.BepInEx;
+using SOD.RelationsPlus.Objects;
 using System.Reflection;
 using UnityEngine;
 
@@ -42,22 +43,44 @@ namespace SOD.RelationsPlus
             {
                 _lastDecayCheckMinute = 0;
 
-                // Decay each known citizen's know
+                // Decay each recorded citizen's know value automatically
                 foreach (var citizen in RelationManager.Instance)
                 {
-                    // TODO: Take decay gates into account to not decay past these values once reached.
+                    // Take decay gates into account to not decay past these values once reached.
+                    var currentDecayGate = GetCurrentDecayGate(citizen);
 
-                    // Add decay value
-                    citizen.Know += Config.DecayKnowAmount;
-
-                    // Make sure to clamp the values
-                    citizen.Know = Mathf.Clamp01(citizen.Know);
+                    // Apply decay
+                    citizen.Know = Mathf.Clamp(citizen.Know + Config.DecayKnowAmount, currentDecayGate, 1f);
                 }
             }
             else
             {
                 _lastDecayCheckMinute++;
             }
+        }
+
+        /// <summary>
+        /// Returns the current decay gate of the given relation.
+        /// </summary>
+        /// <param name="citizenRelation"></param>
+        /// <returns></returns>
+        private float GetCurrentDecayGate(CitizenRelation citizenRelation)
+        {
+            // If we allow decay past gates, we are always at gate 0f
+            if (Config.AllowDecayPastRelationGates)
+                return 0f;
+
+            var know = citizenRelation.Know;
+            if (know >= Config.GateFour)
+                return Config.GateFour;
+            if (know >= Config.GateThree)
+                return Config.GateThree;
+            if (know >= Config.GateTwo)
+                return Config.GateTwo;
+            if (know >= Config.GateOne)
+                return Config.GateOne;
+
+            return 0f;
         }
 
         private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)

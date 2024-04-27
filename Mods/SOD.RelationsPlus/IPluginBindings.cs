@@ -2,8 +2,23 @@
 
 namespace SOD.RelationsPlus
 {
-    public interface IPluginBindings : IDecayModifierBindings, ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
+    public interface IPluginBindings : IRelationGateBindings, IDecayModifierBindings, ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
     { }
+
+    public interface IRelationGateBindings
+    {
+        [Binding(0.2f, "The first gate, when reached the citizen becomes aware of the player.", "Relation.Gates.GateOne")]
+        float GateOne { get; set; }
+
+        [Binding(0.4f, "The second gate, when reached the citizen becomes familiar with the player.", "Relation.Gates.GateTwo")]
+        float GateTwo { get; set; }
+
+        [Binding(0.6f, "The third gate, when reached the citizen becomes an acquaintance of the player.", "Relation.Gates.GateThree")]
+        float GateThree { get; set; }
+
+        [Binding(0.8f, "The fourth gate, when reached the citizen becomes a friend of the player.", "Relation.Gates.GateFour")]
+        float GateFour { get; set; }
+    }
 
     public interface IDecayModifierBindings
     {
@@ -12,6 +27,9 @@ namespace SOD.RelationsPlus
 
         [Binding(-0.005f, "How much does 'Know' decay automatically? (cannot decay past certain stages of 'Know')", "Modifiers.Decay.DecayKnowAmount")]
         float DecayKnowAmount { get; set; }
+
+        [Binding(false, "Can the automatic decay of 'Know' go past the relation stages once reached.", "Modifiers.Decay.AllowDecayPastRelationGates")]
+        bool AllowDecayPastRelationGates { get; set; }
     }
 
     public interface ISeenModifierBindings
