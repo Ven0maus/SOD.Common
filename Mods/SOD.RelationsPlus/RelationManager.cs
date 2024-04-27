@@ -224,9 +224,11 @@ namespace SOD.RelationsPlus
                 _lastDecayCheckMinute = 0;
 
                 var decayAmount = Plugin.Instance.Config.DecayKnowAmount;
+                var decaySince = Plugin.Instance.Config.DecayKnowAfterUnseenMinutes;
 
-                // Decay each recorded citizen's know value automatically
-                foreach (var citizen in _relationMatrixes.Values)
+                // Decay each recorded citizen's know value automatically if they haven't seen the player for more than X minutes
+                foreach (var citizen in _relationMatrixes.Values
+                    .Where(a => a.LastSeenGameTime != null && a.LastSeenGameTime.Value.AddMinutes(decaySince) <= Lib.Time.CurrentDateTime))
                 {
                     // Take decay gates into account to not decay past these values once reached.
                     var currentDecayGate = GetCurrentDecayGate(citizen);
