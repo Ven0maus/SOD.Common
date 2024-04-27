@@ -18,33 +18,26 @@ namespace SOD.RelationsPlus
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
 
-            Lib.SaveGame.OnBeforeLoad += SaveGame_OnBeforeLoad;
-            Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
-            Lib.SaveGame.OnBeforeDelete += SaveGame_OnBeforeDelete;
+            // SaveGame Events
+            Lib.SaveGame.OnBeforeNewGame += (sender, e) => RelationManager.Instance.Clear();
+            Lib.SaveGame.OnBeforeLoad += (sender, e) => RelationManager.Instance.Load(Lib.SaveGame.GetUniqueString(e.FilePath));
+            Lib.SaveGame.OnBeforeSave += (sender, e) => RelationManager.Instance.Save(Lib.SaveGame.GetUniqueString(e.FilePath));
+            Lib.SaveGame.OnBeforeDelete += (sender, e) => RelationManager.Delete(Lib.SaveGame.GetUniqueString(e.FilePath));
+
+            // Time Events
+            Lib.Time.OnMinuteChanged += RelationManager.Instance.Timed_DecayLogic;
         }
 
-        private void SaveGame_OnBeforeDelete(object sender, Common.Helpers.SaveGameArgs e)
+        public override void OnConfigureBindings()
         {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+            base.OnConfigureBindings();
 
-            // Relations
-            RelationManager.Delete(hash);
-        }
+            // Make sure to always sync the config file layout if new config is introduced.
+            UpdateConfigFileLayout();
 
-        private void SaveGame_OnBeforeSave(object sender, Common.Helpers.SaveGameArgs e)
-        {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
-
-            // Relations
-            RelationManager.Instance.Save(hash);
-        }
-
-        private void SaveGame_OnBeforeLoad(object sender, Common.Helpers.SaveGameArgs e)
-        {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
-
-            // Relations
-            RelationManager.Instance.Load(hash);
+            // Modify them back to original value if they are changed
+            Config.LikeGateFive = 1f;
+            Config.KnowGateFive = 1f;
         }
     }
 }

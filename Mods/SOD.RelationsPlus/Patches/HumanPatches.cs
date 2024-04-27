@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
+using SOD.Common;
 using SOD.RelationsPlus.Objects;
-using System;
 using UnityEngine;
 
 namespace SOD.RelationsPlus.Patches
@@ -13,15 +13,21 @@ namespace SOD.RelationsPlus.Patches
             [HarmonyPrefix]
             internal static void Prefix(Human __instance, Human citizen)
             {
-                // This method is called on a citizen when he sees another citizen, in this case
-                // We are only interested when they see the player
+                // This method is called on a citizen when he sees another citizen.
+                // in this case we are only interested when they see the player
                 var player = citizen;
                 if (player == null || __instance.isMachine || !player.isPlayer) return;
 
+                // Following scenarios are valid for the citizen to see the player:
+                // - There is no relational information yet between citizen and the player
+                // - The player was not trespassing last time when seen, but he is now
+                // - The last time the player was seen by this citizen was more than "SeenTimeMinutesCheck" minutes ago.
+                // - The distance between player / citizen is respected by the base game (stealth detection range, or raycast check)
+
                 var relationExists = RelationManager.Instance.TryGetValue(__instance.humanID, out var relation);
-                if (!relationExists || 
-                    relation.LastSeenRealTime == null || 
-                    relation.LastSeenRealTime.Value.AddSeconds(45) < DateTime.Now)
+                if (!relationExists || (!relation.WasTrespassingLastTimeSeen && player.isTrespassing) ||
+                    relation.LastSeenGameTime == null || 
+                    relation.LastSeenGameTime.Value.AddMinutes(Plugin.Instance.Config.SeenTimeMinutesCheck) <= Lib.Time.CurrentDateTime)
                 {
                     float distance = Vector3.Distance(__instance.lookAtThisTransform.position, player.lookAtThisTransform.position);
                     if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
@@ -29,6 +35,7 @@ namespace SOD.RelationsPlus.Patches
                     {
                         // If relation doesn't exist yet at this point, create a new one
                         relation ??= new CitizenRelation(__instance.humanID);
+                        relation.WasTrespassingLastTimeSeen = player.isTrespassing;
 
                         var isInTheSameRoom = __instance.currentRoom != null &&
                             player.currentRoom != null && 

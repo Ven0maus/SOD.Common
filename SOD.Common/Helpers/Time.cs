@@ -236,7 +236,6 @@ namespace SOD.Common.Helpers
                 Minute = minute;
             }
 
-
             /// <summary>
             /// Serializes the data in a string format "{Year}|{Month}|{Day}|{Hour}|{Minute}".
             /// </summary>
@@ -314,10 +313,17 @@ namespace SOD.Common.Helpers
             /// <returns></returns>
             public TimeData AddDays(int days)
             {
-                DateTime currentDateTime = new(Year, Month == 0 ? Month + 1 : Month, Day == 0 ? Day + 1 : Day, Hour, Minute, 0);
-                DateTime newDateTime = currentDateTime.AddDays(days);
-                return new TimeData(newDateTime.Year, Month == 0 ? newDateTime.Month - 1 : newDateTime.Month,
-                    Day == 0 ? newDateTime.Day - 1 : newDateTime.Day, newDateTime.Hour, newDateTime.Minute);
+                return AddHours(days * 24);
+            }
+
+            /// <summary>
+            /// Add's a certain amount of hours to the TimeData
+            /// </summary>
+            /// <param name="minutes"></param>
+            /// <returns></returns>
+            public TimeData AddHours(int hours)
+            {
+                return AddMinutes(hours * 60);
             }
 
             /// <summary>
@@ -386,6 +392,48 @@ namespace SOD.Common.Helpers
                 return !(left == right);
             }
 
+            public static bool operator <(TimeData t1, TimeData t2)
+            {
+                if (t1.Year < t2.Year)
+                    return true;
+                else if (t1.Year == t2.Year)
+                {
+                    if (t1.Month < t2.Month)
+                        return true;
+                    else if (t1.Month == t2.Month)
+                    {
+                        if (t1.Day < t2.Day)
+                            return true;
+                        else if (t1.Day == t2.Day)
+                        {
+                            if (t1.Hour < t2.Hour)
+                                return true;
+                            else if (t1.Hour == t2.Hour)
+                            {
+                                if (t1.Minute < t2.Minute)
+                                    return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            public static bool operator >(TimeData t1, TimeData t2)
+            {
+                return t2 < t1;
+            }
+
+            public static bool operator <=(TimeData t1, TimeData t2)
+            {
+                return t1 < t2 || t1 == t2;
+            }
+
+            public static bool operator >=(TimeData t1, TimeData t2)
+            {
+                return t1 > t2 || t1 == t2;
+            }
+
             public static TimeSpan operator -(TimeData left, TimeData right)
             {
                 try
@@ -398,7 +446,7 @@ namespace SOD.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Plugin.Log.LogInfo("Left: " + left + " | Right: " + right);
+                    Plugin.Log.LogError($"[Date information]: Left ({left}) | Right ({right})");
                     throw;
                 }
             }

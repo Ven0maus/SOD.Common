@@ -40,6 +40,51 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public Time.TimeData? LastSeenGameTime { get; private set; }
 
+        /// <summary>
+        /// Determines if the player was trespassing the last time he was seen by the citizen.
+        /// </summary>
+        public bool WasTrespassingLastTimeSeen { get; internal set; } = false;
+
+        /// <summary>
+        /// Get's the current citizens know relation with the player based on the know gates configured.
+        /// </summary>
+        [JsonIgnore]
+        public KnowStage KnowRelation 
+        {
+            get 
+            {
+                if (Know < Plugin.Instance.Config.KnowGateOne)
+                    return KnowStage.Stranger;
+                if (Know < Plugin.Instance.Config.KnowGateTwo)
+                    return KnowStage.Aware;
+                if (Know < Plugin.Instance.Config.KnowGateThree)
+                    return KnowStage.Familiar;
+                if (Know < Plugin.Instance.Config.KnowGateFour)
+                    return KnowStage.Known;
+                return KnowStage.WellKnown;
+            }
+        }
+
+        /// <summary>
+        /// Get's the current citizens like relation with the player based on the like gates configured.
+        /// </summary>
+        [JsonIgnore]
+        public LikeStage LikeRelation
+        {
+            get
+            {
+                if (Like < Plugin.Instance.Config.LikeGateOne)
+                    return LikeStage.Hated;
+                if (Like < Plugin.Instance.Config.LikeGateTwo)
+                    return LikeStage.Disliked;
+                if (Like < Plugin.Instance.Config.LikeGateThree)
+                    return LikeStage.Neutral;
+                if (Like < Plugin.Instance.Config.LikeGateFour)
+                    return LikeStage.Liked;
+                return LikeStage.Loved;
+            }
+        }
+
         private float _know = 0f;
         /// <summary>
         /// How much the citizen knows the player. (how often seen, interacted)
@@ -56,6 +101,12 @@ namespace SOD.RelationsPlus.Objects
                 if (_know != newValue)
                 {
                     _know = newValue;
+
+                    // Skip when loading data from savefile
+                    if (RelationManager.Instance.IsLoading) return;
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\" | KnowRelation: \"{KnowRelation}\".");
+
                     RelationChangeArgs args = null;
                     OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
                     RelationManager.Instance.RaiseEvent(RelationManager.EventName.KnowChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -79,6 +130,12 @@ namespace SOD.RelationsPlus.Objects
                 if (_like != newValue)
                 {
                     _like = newValue;
+
+                    // Skip when loading data from savefile
+                    if (RelationManager.Instance.IsLoading) return;
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\" | LikeRelation: \"{LikeRelation}\".");
+
                     RelationChangeArgs args = null;
                     OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
                     RelationManager.Instance.RaiseEvent(RelationManager.EventName.LikeChange, args ?? new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -93,6 +150,18 @@ namespace SOD.RelationsPlus.Objects
         }
 
         /// <summary>
+        /// Retrieves the cached citizen object from the city data instance.
+        /// Could be null if the citizen is missing from the citydata somehow (handled by the game).
+        /// </summary>
+        /// <returns></returns>
+        public Human GetCitizen()
+        {
+            if (!CityData.Instance.citizenDictionary.TryGetValue(CitizenId, out var human))
+                return null;
+            return human;
+        }
+
+        /// <summary>
         /// Raises required seen event.
         /// </summary>
         /// <param name="location"></param>
@@ -103,10 +172,37 @@ namespace SOD.RelationsPlus.Objects
             LastSeenRealTime = DateTime.Now;
             LastSeenGameTime = Lib.Time.CurrentDateTime;
 
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): saw player at \"{location}\" on \"{LastSeenGameTime}\".");
+
             // Raise events
             SeenPlayerArgs args = null; 
             OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
             RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
+        }
+
+        /// <summary>
+        /// The different know stages between citizens and player.
+        /// </summary>
+        public enum KnowStage
+        {
+            Stranger,
+            Aware,
+            Familiar,
+            Known,
+            WellKnown,
+        }
+
+        /// <summary>
+        /// The different like stages between citizens and player.
+        /// </summary>
+        public enum LikeStage
+        {
+            Neutral,
+            Hated,
+            Disliked,
+            Liked,
+            Loved
         }
     }
 }

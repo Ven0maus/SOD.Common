@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.RelationsPlus.Objects;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace SOD.RelationsPlus
     /// <summary>
     /// Contains methods to create, update and delete relations between citizens and load/save the relation state per savegame.
     /// </summary>
-    public sealed class RelationManager
+    public sealed class RelationManager : IEnumerable<CitizenRelation>
     {
         private static RelationManager _instance;
         /// <summary>
@@ -24,6 +25,11 @@ namespace SOD.RelationsPlus
         /// A relation matrix dictionary for each unique citizen.
         /// </summary>
         private readonly Dictionary<int, CitizenRelation> _relationMatrixes = new();
+
+        /// <summary>
+        /// Stores the last check time of the timed decay logic.
+        /// </summary>
+        private int _lastDecayCheckMinute;
 
         /// <summary>
         /// Custom indexer to get citizen relation information, if none exists it will create a new relation object.
@@ -93,6 +99,25 @@ namespace SOD.RelationsPlus
         }
 
         /// <summary>
+        /// Clears out all known relations of all citizens.
+        /// </summary>
+        public void Clear()
+        {
+            _lastDecayCheckMinute = 0;
+            _relationMatrixes.Clear();
+        }
+
+        public IEnumerator<CitizenRelation> GetEnumerator()
+        {
+            return _relationMatrixes.Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        /// <summary>
         /// Add's or replaces the citizen relation for the given citizen.
         /// </summary>
         /// <param name="relation"></param>
@@ -126,27 +151,34 @@ namespace SOD.RelationsPlus
             Seen
         }
 
+        internal bool IsLoading { get; private set; }
+
         /// <summary>
         /// Loads all citizen relation information from a save file.
         /// </summary>
         /// <param name="relationMatrixPath"></param>
         internal void Load(string hash)
         {
+            IsLoading = true;
             var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
-            if (_relationMatrixes.Count > 0)
-                _relationMatrixes.Clear();
+            // Reset for a new load
+            Clear();
 
             // Relation matrix loading
             if (File.Exists(relationMatrixPath))
             {
                 var relationMatrixJson = File.ReadAllText(relationMatrixPath);
-                var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(relationMatrixJson);
-                foreach (var citizenRelation in citizenRelations)
-                    _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
-            }
+                var citizenSaveData = JsonSerializer.Deserialize<CitizenSaveData>(relationMatrixJson);
 
-            Plugin.Log.LogInfo("Loaded citizen relations and player interests information.");
+                // Set values
+                _lastDecayCheckMinute = citizenSaveData.LastDecayCheckMinute;
+                foreach (var citizenRelation in citizenSaveData.RelationMatrix)
+                    _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+
+                Plugin.Log.LogInfo("Loaded citizen relations.");
+            }
+            IsLoading = false;
         }
 
         /// <summary>
@@ -160,16 +192,25 @@ namespace SOD.RelationsPlus
             if (!_relationMatrixes.Any())
             {
                 if (File.Exists(relationMatrixPath))
+                {
                     File.Delete(relationMatrixPath);
+                    Plugin.Log.LogInfo("Deleted citizen relations.");
+                }
             }
             else
             {
-                // Relation matrixes
-                var relationMatrixJson = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
-                File.WriteAllText(relationMatrixPath, relationMatrixJson);
-            }
+                // Collect data to save
+                var saveObject = new CitizenSaveData
+                {
+                    RelationMatrix = _relationMatrixes,
+                    LastDecayCheckMinute = _lastDecayCheckMinute
+                };
 
-            Plugin.Log.LogInfo("Saved citizen relations and player interests information.");
+                // Serialize to json and save
+                var citizenSaveDataJson = JsonSerializer.Serialize(saveObject, new JsonSerializerOptions { WriteIndented = false });
+                File.WriteAllText(relationMatrixPath, citizenSaveDataJson);
+                Plugin.Log.LogInfo("Saved citizen relations.");
+            }
         }
 
         internal static void Delete(string hash)
@@ -177,9 +218,95 @@ namespace SOD.RelationsPlus
             var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (File.Exists(relationFilePath))
+            {
                 File.Delete(relationFilePath);
+                Plugin.Log.LogInfo("Deleted citizen relations.");
+            }
+        }
 
-            Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+        /// <summary>
+        /// Handles the automatic decay logic.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        internal void Timed_DecayLogic(object sender, Common.Helpers.TimeChangedArgs e)
+        {
+            if (_lastDecayCheckMinute >= Plugin.Instance.Config.DecayTimeMinutesCheck)
+            {
+                _lastDecayCheckMinute = 0;
+
+                var decayKnowAmount = Plugin.Instance.Config.DecayKnowAmount;
+                var decaySince = Plugin.Instance.Config.DecayKnowAfterUnseenMinutes;
+                var canImproveToNeutral = Plugin.Instance.Config.AllowAutoImproveLikeToNeutral;
+                var improveAmount = Plugin.Instance.Config.ImproveLikeAmount;
+                var decayLikeAmount = Plugin.Instance.Config.DecayLikeAmount;
+                var canDecayLike = Plugin.Instance.Config.AllowDecayLikeToNeutral;
+                var debugMode = Plugin.Instance.Config.DebugMode;
+
+                if (debugMode)
+                    Plugin.Log.LogInfo("[Debug]: Start decay process.");
+
+                // Decay each recorded citizen's know value automatically if they haven't seen the player for more than X minutes
+                foreach (var citizen in _relationMatrixes.Values)
+                {
+                    if (citizen.LastSeenGameTime == null) continue;
+
+                    // Decay process
+                    if (citizen.LastSeenGameTime.Value.AddMinutes(decaySince) <= Lib.Time.CurrentDateTime)
+                    {
+                        // Take decay gates into account to not decay past these values once reached.
+                        var currentDecayGate = GetCurrentKnowGate(citizen);
+
+                        // Apply decay for 'Know'
+                        citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayKnowAmount, currentDecayGate, 1f);
+
+                        // Apply decay for 'Like'
+                        if (canDecayLike && citizen.Like > 0.5f)
+                            citizen.Like = UnityEngine.Mathf.Clamp(citizen.Like + decayLikeAmount, 0.5f, 1f);
+                    }
+
+                    // Like improvement process back to neutral, can happen every check
+                    if (canImproveToNeutral && citizen.Like < 0.5f)
+                    {
+                        // Apply improvement
+                        citizen.Like = UnityEngine.Mathf.Clamp(citizen.Like + improveAmount, 0f, 0.5f);
+                    }
+                }
+
+                if (debugMode)
+                    Plugin.Log.LogInfo("[Debug]: Finalized decay process.");
+            }
+            else
+            {
+                _lastDecayCheckMinute++;
+            }
+        }
+
+        /// <summary>
+        /// Returns the current know gate of the given relation.
+        /// </summary>
+        /// <param name="citizenRelation"></param>
+        /// <returns></returns>
+        private static float GetCurrentKnowGate(CitizenRelation citizenRelation)
+        {
+            // If we allow decay past gates, we are always at gate 0f
+            if (Plugin.Instance.Config.AllowDecayPastKnowGates)
+                return 0f;
+
+            var know = citizenRelation.Know;
+            if (know < Plugin.Instance.Config.KnowGateOne)
+                return 0f;
+
+            if (know < Plugin.Instance.Config.KnowGateTwo)
+                return Plugin.Instance.Config.KnowGateOne;
+
+            if (know < Plugin.Instance.Config.KnowGateThree)
+                return Plugin.Instance.Config.KnowGateTwo;
+
+            if (know < Plugin.Instance.Config.KnowGateFour)
+                return Plugin.Instance.Config.KnowGateThree;
+
+            return Plugin.Instance.Config.KnowGateFour;
         }
     }
 }
