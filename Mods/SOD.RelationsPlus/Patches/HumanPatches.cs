@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SOD.Common;
 using SOD.RelationsPlus.Objects;
 using System;
 using UnityEngine;
@@ -20,8 +21,8 @@ namespace SOD.RelationsPlus.Patches
 
                 var relationExists = RelationManager.Instance.TryGetValue(__instance.humanID, out var relation);
                 if (!relationExists || 
-                    relation.LastSeenRealTime == null || 
-                    relation.LastSeenRealTime.Value.AddSeconds(45) < DateTime.Now)
+                    relation.LastSeenGameTime == null || 
+                    relation.LastSeenGameTime.Value.AddMinutes(Plugin.Instance.Config.SeenTimeMinutesCheck) <= Lib.Time.CurrentDateTime)
                 {
                     float distance = Vector3.Distance(__instance.lookAtThisTransform.position, player.lookAtThisTransform.position);
                     if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||

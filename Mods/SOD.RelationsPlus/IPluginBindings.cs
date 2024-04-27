@@ -2,8 +2,14 @@
 
 namespace SOD.RelationsPlus
 {
-    public interface IPluginBindings : IKnowModifierBindings, ILikeModifierBindings
+    public interface IPluginBindings : ISeenModifierBindings, IKnowModifierBindings, ILikeModifierBindings
     { }
+
+    public interface ISeenModifierBindings
+    {
+        [Binding(15, "How often a check is executed per citizen in in-game minutes if they see the player.", "Modifiers.Seen.SeenTimeMinutesCheck")]
+        int SeenTimeMinutesCheck { get; set; }
+    }
 
     public interface IKnowModifierBindings
     {

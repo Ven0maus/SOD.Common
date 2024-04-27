@@ -93,6 +93,14 @@ namespace SOD.RelationsPlus
         }
 
         /// <summary>
+        /// Clears out all known relations of all citizens.
+        /// </summary>
+        public void Clear()
+        {
+            _relationMatrixes.Clear();
+        }
+
+        /// <summary>
         /// Add's or replaces the citizen relation for the given citizen.
         /// </summary>
         /// <param name="relation"></param>
@@ -144,9 +152,8 @@ namespace SOD.RelationsPlus
                 var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(relationMatrixJson);
                 foreach (var citizenRelation in citizenRelations)
                     _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+                Plugin.Log.LogInfo("Loaded citizen relations and player interests information.");
             }
-
-            Plugin.Log.LogInfo("Loaded citizen relations and player interests information.");
         }
 
         /// <summary>
@@ -160,16 +167,18 @@ namespace SOD.RelationsPlus
             if (!_relationMatrixes.Any())
             {
                 if (File.Exists(relationMatrixPath))
+                {
                     File.Delete(relationMatrixPath);
+                    Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+                }
             }
             else
             {
                 // Relation matrixes
                 var relationMatrixJson = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
                 File.WriteAllText(relationMatrixPath, relationMatrixJson);
+                Plugin.Log.LogInfo("Saved citizen relations and player interests information.");
             }
-
-            Plugin.Log.LogInfo("Saved citizen relations and player interests information.");
         }
 
         internal static void Delete(string hash)
@@ -177,9 +186,10 @@ namespace SOD.RelationsPlus
             var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (File.Exists(relationFilePath))
+            {
                 File.Delete(relationFilePath);
-
-            Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+                Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+            }
         }
     }
 }

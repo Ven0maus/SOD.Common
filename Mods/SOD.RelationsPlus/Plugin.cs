@@ -18,9 +18,15 @@ namespace SOD.RelationsPlus
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
 
+            Lib.SaveGame.OnBeforeNewGame += SaveGame_OnBeforeNewGame;
             Lib.SaveGame.OnBeforeLoad += SaveGame_OnBeforeLoad;
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnBeforeDelete += SaveGame_OnBeforeDelete;
+        }
+
+        private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)
+        {
+            RelationManager.Instance.Clear();
         }
 
         private void SaveGame_OnBeforeDelete(object sender, Common.Helpers.SaveGameArgs e)
