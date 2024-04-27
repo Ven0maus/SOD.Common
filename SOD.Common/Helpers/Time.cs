@@ -236,7 +236,6 @@ namespace SOD.Common.Helpers
                 Minute = minute;
             }
 
-
             /// <summary>
             /// Serializes the data in a string format "{Year}|{Month}|{Day}|{Hour}|{Minute}".
             /// </summary>
@@ -440,7 +439,7 @@ namespace SOD.Common.Helpers
                 }
                 catch (Exception)
                 {
-                    Plugin.Log.LogInfo("Left: " + left + " | Right: " + right);
+                    Plugin.Log.LogError($"[Date information]: Left ({left}) | Right ({right})");
                     throw;
                 }
             }
