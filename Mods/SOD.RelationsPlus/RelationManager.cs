@@ -225,17 +225,38 @@ namespace SOD.RelationsPlus
 
                 var decayAmount = Plugin.Instance.Config.DecayKnowAmount;
                 var decaySince = Plugin.Instance.Config.DecayKnowAfterUnseenMinutes;
+                var improveToNeutral = Plugin.Instance.Config.AutoImproveLike;
+                var improveAmount = Plugin.Instance.Config.ImproveLikeAmount;
+                var debugMode = Plugin.Instance.Config.DebugMode;
+
+                if (debugMode)
+                    Plugin.Log.LogInfo("[Debug]: Start decay process.");
 
                 // Decay each recorded citizen's know value automatically if they haven't seen the player for more than X minutes
-                foreach (var citizen in _relationMatrixes.Values
-                    .Where(a => a.LastSeenGameTime != null && a.LastSeenGameTime.Value.AddMinutes(decaySince) <= Lib.Time.CurrentDateTime))
+                foreach (var citizen in _relationMatrixes.Values)
                 {
-                    // Take decay gates into account to not decay past these values once reached.
-                    var currentDecayGate = GetCurrentDecayGate(citizen);
+                    if (citizen.LastSeenGameTime == null) continue;
 
-                    // Apply decay
-                    citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayAmount, currentDecayGate, 1f);
+                    // Decay process
+                    if (citizen.LastSeenGameTime.Value.AddMinutes(decaySince) <= Lib.Time.CurrentDateTime)
+                    {
+                        // Take decay gates into account to not decay past these values once reached.
+                        var currentDecayGate = GetCurrentDecayGate(citizen);
+
+                        // Apply decay
+                        citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayAmount, currentDecayGate, 1f);
+                    }
+
+                    // Like improvement process back to neutral
+                    if (improveToNeutral && citizen.Like < 0.5f)
+                    {
+                        // Apply improvement
+                        citizen.Like = UnityEngine.Mathf.Clamp(citizen.Like + improveAmount, 0f, 0.5f);
+                    }
                 }
+
+                if (debugMode)
+                    Plugin.Log.LogInfo("[Debug]: Finalized decay process.");
             }
             else
             {
