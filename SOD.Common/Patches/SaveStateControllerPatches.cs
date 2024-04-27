@@ -21,14 +21,14 @@ namespace SOD.Common.Patches
                     // Trigger new game event
                     _isStartingNewGame = true;
                     // Overwrite time, so we initialize again
-                    ClockControllerPatches.ClockController_Update.LastTime = null;
+                    SessionDataPatches.SessionData_Update.LastTime = null;
                     Lib.Time.InitializeTime(true);
                     Lib.SaveGame.OnNewGame(false);
                 }
                 else if (RestartSafeController.Instance.loadSaveGame)
                 {
                     // Overwrite time, so we initialize again
-                    ClockControllerPatches.ClockController_Update.LastTime = null;
+                    SessionDataPatches.SessionData_Update.LastTime = null;
                     Lib.Time.InitializeTime(true);
 
                     // Trigger load event with the file path to the save file
