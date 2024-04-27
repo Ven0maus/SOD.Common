@@ -99,15 +99,6 @@ namespace SOD.RelationsPlus
         }
 
         /// <summary>
-        /// Returns all the known citizen relations recorded to date.
-        /// </summary>
-        /// <returns></returns>
-        public IEnumerable<CitizenRelation> ListAll()
-        {
-            return _relationMatrixes.Values;
-        }
-
-        /// <summary>
         /// Clears out all known relations of all citizens.
         /// </summary>
         public void Clear()
