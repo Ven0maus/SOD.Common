@@ -154,11 +154,11 @@ namespace SOD.RelationsPlus.Objects
         /// Could be null if the citizen is missing from the citydata somehow (handled by the game).
         /// </summary>
         /// <returns></returns>
-        public Citizen GetCitizen()
+        public Human GetCitizen()
         {
             if (!CityData.Instance.citizenDictionary.TryGetValue(CitizenId, out var human))
                 return null;
-            return human as Citizen;
+            return human;
         }
 
         /// <summary>
