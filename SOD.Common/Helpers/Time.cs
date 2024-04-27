@@ -386,6 +386,48 @@ namespace SOD.Common.Helpers
                 return !(left == right);
             }
 
+            public static bool operator <(TimeData t1, TimeData t2)
+            {
+                if (t1.Year < t2.Year)
+                    return true;
+                else if (t1.Year == t2.Year)
+                {
+                    if (t1.Month < t2.Month)
+                        return true;
+                    else if (t1.Month == t2.Month)
+                    {
+                        if (t1.Day < t2.Day)
+                            return true;
+                        else if (t1.Day == t2.Day)
+                        {
+                            if (t1.Hour < t2.Hour)
+                                return true;
+                            else if (t1.Hour == t2.Hour)
+                            {
+                                if (t1.Minute < t2.Minute)
+                                    return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
+            public static bool operator >(TimeData t1, TimeData t2)
+            {
+                return t2 < t1;
+            }
+
+            public static bool operator <=(TimeData t1, TimeData t2)
+            {
+                return t1 < t2 || t1 == t2;
+            }
+
+            public static bool operator >=(TimeData t1, TimeData t2)
+            {
+                return t1 > t2 || t1 == t2;
+            }
+
             public static TimeSpan operator -(TimeData left, TimeData right)
             {
                 try
