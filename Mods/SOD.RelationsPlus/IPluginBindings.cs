@@ -50,20 +50,26 @@ namespace SOD.RelationsPlus
         [Binding(60, "After how many in-game minutes is the decay check executed each time?", "Modifiers.Decay.DecayTimeMinutesCheck")]
         int DecayTimeMinutesCheck { get; set; }
 
-        [Binding(120, "After how many in-game minutes that the citizen hasn't seen the player should 'Know' start decaying?", "Modifiers.Decay.DecayKnowAfterUnseenMinutes")]
+        [Binding(120, "After how many in-game minutes that the citizen hasn't seen the player should decay start? (both 'Know' and 'Like' if enabled)", "Modifiers.Decay.DecayKnowAfterUnseenMinutes")]
         int DecayKnowAfterUnseenMinutes { get; set; }
 
         [Binding(-0.005f, "How much does 'Know' decay automatically? (cannot decay past certain stages of 'Know')", "Modifiers.Decay.DecayKnowAmount")]
         float DecayKnowAmount { get; set; }
 
         [Binding(false, "Can the automatic decay of 'Know' go past the relation stages once reached.", "Modifiers.Decay.AllowDecayPastRelationGates")]
-        bool AllowDecayPastRelationGates { get; set; }
+        bool AllowDecayPastKnowGates { get; set; }
+
+        [Binding(false, "Can 'Like' automatically decay back to neutral?", "Modifiers.Decay.AllowDecayLikeToNeutral")]
+        bool AllowDecayLikeToNeutral { get; set; }
+
+        [Binding(-0.0025f, "How much does 'Like' decay automatically? (cannot decay past neutral)", "Modifiers.Decay.DecayLikeAmount")]
+        float DecayLikeAmount { get; set; }
 
         [Binding(0.0035f, "How much does 'Like' improve automatically back to neutral (0.5)?", "Modifiers.Decay.ImproveLikeAmount")]
         float ImproveLikeAmount { get; set; }
 
         [Binding(true, "Can 'Like' automatically improve back to neutral (0.5) when it is under neutral?", "Modifiers.Decay.AutoImproveLike")]
-        bool AutoImproveLike { get; set; }
+        bool AllowAutoImproveLikeToNeutral { get; set; }
     }
 
     public interface ISeenModifierBindings

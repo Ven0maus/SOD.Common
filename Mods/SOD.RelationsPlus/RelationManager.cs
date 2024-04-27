@@ -235,10 +235,12 @@ namespace SOD.RelationsPlus
             {
                 _lastDecayCheckMinute = 0;
 
-                var decayAmount = Plugin.Instance.Config.DecayKnowAmount;
+                var decayKnowAmount = Plugin.Instance.Config.DecayKnowAmount;
                 var decaySince = Plugin.Instance.Config.DecayKnowAfterUnseenMinutes;
-                var improveToNeutral = Plugin.Instance.Config.AutoImproveLike;
+                var canImproveToNeutral = Plugin.Instance.Config.AllowAutoImproveLikeToNeutral;
                 var improveAmount = Plugin.Instance.Config.ImproveLikeAmount;
+                var decayLikeAmount = Plugin.Instance.Config.DecayLikeAmount;
+                var canDecayLike = Plugin.Instance.Config.AllowDecayLikeToNeutral;
                 var debugMode = Plugin.Instance.Config.DebugMode;
 
                 if (debugMode)
@@ -253,14 +255,18 @@ namespace SOD.RelationsPlus
                     if (citizen.LastSeenGameTime.Value.AddMinutes(decaySince) <= Lib.Time.CurrentDateTime)
                     {
                         // Take decay gates into account to not decay past these values once reached.
-                        var currentDecayGate = GetCurrentDecayGate(citizen);
+                        var currentDecayGate = GetCurrentKnowGate(citizen);
 
-                        // Apply decay
-                        citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayAmount, currentDecayGate, 1f);
+                        // Apply decay for 'Know'
+                        citizen.Know = UnityEngine.Mathf.Clamp(citizen.Know + decayKnowAmount, currentDecayGate, 1f);
+
+                        // Apply decay for 'Like'
+                        if (canDecayLike && citizen.Like > 0.5f)
+                            citizen.Like = UnityEngine.Mathf.Clamp(citizen.Like + decayLikeAmount, 0.5f, 1f);
                     }
 
-                    // Like improvement process back to neutral
-                    if (improveToNeutral && citizen.Like < 0.5f)
+                    // Like improvement process back to neutral, can happen every check
+                    if (canImproveToNeutral && citizen.Like < 0.5f)
                     {
                         // Apply improvement
                         citizen.Like = UnityEngine.Mathf.Clamp(citizen.Like + improveAmount, 0f, 0.5f);
@@ -277,14 +283,14 @@ namespace SOD.RelationsPlus
         }
 
         /// <summary>
-        /// Returns the current decay gate of the given relation.
+        /// Returns the current know gate of the given relation.
         /// </summary>
         /// <param name="citizenRelation"></param>
         /// <returns></returns>
-        private static float GetCurrentDecayGate(CitizenRelation citizenRelation)
+        private static float GetCurrentKnowGate(CitizenRelation citizenRelation)
         {
             // If we allow decay past gates, we are always at gate 0f
-            if (Plugin.Instance.Config.AllowDecayPastRelationGates)
+            if (Plugin.Instance.Config.AllowDecayPastKnowGates)
                 return 0f;
 
             var know = citizenRelation.Know;
