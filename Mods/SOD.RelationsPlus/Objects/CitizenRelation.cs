@@ -62,6 +62,8 @@ namespace SOD.RelationsPlus.Objects
                 {
                     _know = newValue;
 
+                    // Skip when loading data from savefile
+                    if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
                         Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\".");
 
@@ -89,6 +91,8 @@ namespace SOD.RelationsPlus.Objects
                 {
                     _like = newValue;
 
+                    // Skip when loading data from savefile
+                    if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
                         Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{CityData.Instance.citizenDictionary[CitizenId].GetCitizenName()}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\".");
 

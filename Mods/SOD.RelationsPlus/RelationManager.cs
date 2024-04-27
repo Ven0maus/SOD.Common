@@ -150,12 +150,15 @@ namespace SOD.RelationsPlus
             Seen
         }
 
+        internal bool IsLoading { get; private set; }
+
         /// <summary>
         /// Loads all citizen relation information from a save file.
         /// </summary>
         /// <param name="relationMatrixPath"></param>
         internal void Load(string hash)
         {
+            IsLoading = true;
             var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
             if (_relationMatrixes.Count > 0)
@@ -170,6 +173,7 @@ namespace SOD.RelationsPlus
                     _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
                 Plugin.Log.LogInfo("Loaded citizen relations.");
             }
+            IsLoading = false;
         }
 
         /// <summary>
