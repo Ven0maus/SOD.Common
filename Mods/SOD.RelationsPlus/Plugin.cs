@@ -34,6 +34,10 @@ namespace SOD.RelationsPlus
 
             // Make sure to always sync the config file layout if new config is introduced.
             UpdateConfigFileLayout();
+
+            // Modify them back to original value if they are changed
+            Config.LikeGateFive = 1f;
+            Config.KnowGateFive = 1f;
         }
     }
 }

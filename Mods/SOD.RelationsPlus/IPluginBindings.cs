@@ -10,17 +10,39 @@ namespace SOD.RelationsPlus
 
     public interface IRelationGateBindings
     {
-        [Binding(0.2f, "The first gate, when reached the citizen becomes aware of the player.", "Relation.Gates.GateOne")]
-        float GateOne { get; set; }
+        // Know gates
+        [Binding(0.2f, "The first gate, (0 -> GateOneValue): The player is a stranger to the citizen.", "Relation.Gates.KnowGateOne")]
+        float KnowGateOne { get; set; }
 
-        [Binding(0.4f, "The second gate, when reached the citizen becomes familiar with the player.", "Relation.Gates.GateTwo")]
-        float GateTwo { get; set; }
+        [Binding(0.4f, "The second gate, (GateOneValue -> GateTwoValue): The citizen becomes aware of the player.", "Relation.Gates.KnowGateTwo")]
+        float KnowGateTwo { get; set; }
 
-        [Binding(0.6f, "The third gate, when reached the citizen becomes an acquaintance of the player.", "Relation.Gates.GateThree")]
-        float GateThree { get; set; }
+        [Binding(0.6f, "The third gate, (GateTwoValue -> GateThreeValue): The citizen becomes familiar with the player.", "Relation.Gates.KnowGateThree")]
+        float KnowGateThree { get; set; }
 
-        [Binding(0.8f, "The fourth gate, when reached the citizen becomes a friend of the player.", "Relation.Gates.GateFour")]
-        float GateFour { get; set; }
+        [Binding(0.8f, "The fourth gate, (GateThreeValue -> GateFourValue): The citizen becomes an acquaintance of the player.", "Relation.Gates.KnowGateFour")]
+        float KnowGateFour { get; set; }
+        
+        // Gate five can not be modified, it is the last stage (this is just shown for info)
+        [Binding(1f, "The fifth gate, (GateFourValue -> GateFiveValue): The citizen becomes a friend of the player. (CANNOT BE MODIFIED)", "Relation.Gates.KnowGateFive")]
+        float KnowGateFive { get; set; }
+
+        // Like gates
+        [Binding(0.2f, "The first gate, (0 -> GateOneValue): The citizen hates the player.", "Relation.Gates.LikeGateOne")]
+        float LikeGateOne { get; set; }
+
+        [Binding(0.4f, "The second gate, (GateOneValue -> GateTwoValue): The citizen dislikes the player", "Relation.Gates.LikeGateTwo")]
+        float LikeGateTwo { get; set; }
+
+        [Binding(0.6f, "The third gate, (GateTwoValue -> GateThreeValue): The citizen is neutral towards the player.", "Relation.Gates.LikeGateThree")]
+        float LikeGateThree { get; set; }
+
+        [Binding(0.8f, "The fourth gate, (GateThreeValue -> GateFourValue): The citizen likes the player.", "Relation.Gates.LikeGateFour")]
+        float LikeGateFour { get; set; }
+
+        // Gate five can not be modified, it is the last stage (this is just shown for info)
+        [Binding(1f, "The fifth gate, (GateFourValue -> GateFiveValue): The citizen loves the player. (CANNOT BE MODIFIED)", "Relation.Gates.LikeGateFive")]
+        float LikeGateFive { get; set; }
     }
 
     public interface IDecayModifierBindings

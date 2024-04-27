@@ -276,16 +276,19 @@ namespace SOD.RelationsPlus
                 return 0f;
 
             var know = citizenRelation.Know;
-            if (know >= Plugin.Instance.Config.GateFour)
-                return Plugin.Instance.Config.GateFour;
-            if (know >= Plugin.Instance.Config.GateThree)
-                return Plugin.Instance.Config.GateThree;
-            if (know >= Plugin.Instance.Config.GateTwo)
-                return Plugin.Instance.Config.GateTwo;
-            if (know >= Plugin.Instance.Config.GateOne)
-                return Plugin.Instance.Config.GateOne;
+            if (know < Plugin.Instance.Config.KnowGateOne)
+                return 0f;
 
-            return 0f;
+            if (know < Plugin.Instance.Config.KnowGateTwo)
+                return Plugin.Instance.Config.KnowGateOne;
+
+            if (know < Plugin.Instance.Config.KnowGateThree)
+                return Plugin.Instance.Config.KnowGateTwo;
+
+            if (know < Plugin.Instance.Config.KnowGateFour)
+                return Plugin.Instance.Config.KnowGateThree;
+
+            return Plugin.Instance.Config.KnowGateFour;
         }
     }
 }

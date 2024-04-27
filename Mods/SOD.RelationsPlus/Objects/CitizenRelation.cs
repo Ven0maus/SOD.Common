@@ -45,6 +45,46 @@ namespace SOD.RelationsPlus.Objects
         /// </summary>
         public bool WasTrespassingLastTimeSeen { get; internal set; } = false;
 
+        /// <summary>
+        /// Get's the current citizens know relation with the player based on the know gates configured.
+        /// </summary>
+        [JsonIgnore]
+        public KnowStage KnowRelation 
+        {
+            get 
+            {
+                if (Know < Plugin.Instance.Config.KnowGateOne)
+                    return KnowStage.Stranger;
+                if (Know < Plugin.Instance.Config.KnowGateTwo)
+                    return KnowStage.Aware;
+                if (Know < Plugin.Instance.Config.KnowGateThree)
+                    return KnowStage.Familiar;
+                if (Know < Plugin.Instance.Config.KnowGateFour)
+                    return KnowStage.Acquaintance;
+                return KnowStage.Friend;
+            }
+        }
+
+        /// <summary>
+        /// Get's the current citizens like relation with the player based on the like gates configured.
+        /// </summary>
+        [JsonIgnore]
+        public LikeStage LikeRelation
+        {
+            get
+            {
+                if (Like < Plugin.Instance.Config.LikeGateOne)
+                    return LikeStage.Hated;
+                if (Like < Plugin.Instance.Config.LikeGateTwo)
+                    return LikeStage.Disliked;
+                if (Like < Plugin.Instance.Config.LikeGateThree)
+                    return LikeStage.Neutral;
+                if (Like < Plugin.Instance.Config.LikeGateFour)
+                    return LikeStage.Liked;
+                return LikeStage.Loved;
+            }
+        }
+
         private float _know = 0f;
         /// <summary>
         /// How much the citizen knows the player. (how often seen, interacted)
@@ -127,6 +167,30 @@ namespace SOD.RelationsPlus.Objects
             SeenPlayerArgs args = null; 
             OnPlayerSeen?.Invoke(this, args ??= new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
             RelationManager.Instance.RaiseEvent(RelationManager.EventName.Seen, args ?? new SeenPlayerArgs(CitizenId, location, knowChange, likeChange));
+        }
+
+        /// <summary>
+        /// The different know stages between citizens and player.
+        /// </summary>
+        public enum KnowStage
+        {
+            Stranger,
+            Aware,
+            Familiar,
+            Acquaintance,
+            Friend,
+        }
+
+        /// <summary>
+        /// The different like stages between citizens and player.
+        /// </summary>
+        public enum LikeStage
+        {
+            Neutral,
+            Hated,
+            Disliked,
+            Liked,
+            Loved
         }
     }
 }
