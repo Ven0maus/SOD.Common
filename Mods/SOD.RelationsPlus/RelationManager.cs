@@ -168,7 +168,7 @@ namespace SOD.RelationsPlus
                 var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(relationMatrixJson);
                 foreach (var citizenRelation in citizenRelations)
                     _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
-                Plugin.Log.LogInfo("Loaded citizen relations and player interests information.");
+                Plugin.Log.LogInfo("Loaded citizen relations.");
             }
         }
 
@@ -185,7 +185,7 @@ namespace SOD.RelationsPlus
                 if (File.Exists(relationMatrixPath))
                 {
                     File.Delete(relationMatrixPath);
-                    Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+                    Plugin.Log.LogInfo("Deleted citizen relations.");
                 }
             }
             else
@@ -193,7 +193,7 @@ namespace SOD.RelationsPlus
                 // Relation matrixes
                 var relationMatrixJson = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
                 File.WriteAllText(relationMatrixPath, relationMatrixJson);
-                Plugin.Log.LogInfo("Saved citizen relations and player interests information.");
+                Plugin.Log.LogInfo("Saved citizen relations.");
             }
         }
 
@@ -204,7 +204,7 @@ namespace SOD.RelationsPlus
             if (File.Exists(relationFilePath))
             {
                 File.Delete(relationFilePath);
-                Plugin.Log.LogInfo("Deleted citizen relations and player interests information.");
+                Plugin.Log.LogInfo("Deleted citizen relations.");
             }
         }
 
