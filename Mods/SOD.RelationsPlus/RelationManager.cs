@@ -103,6 +103,7 @@ namespace SOD.RelationsPlus
         /// </summary>
         public void Clear()
         {
+            _lastDecayCheckMinute = 0;
             _relationMatrixes.Clear();
         }
 
@@ -161,16 +162,20 @@ namespace SOD.RelationsPlus
             IsLoading = true;
             var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
 
-            if (_relationMatrixes.Count > 0)
-                _relationMatrixes.Clear();
+            // Reset for a new load
+            Clear();
 
             // Relation matrix loading
             if (File.Exists(relationMatrixPath))
             {
                 var relationMatrixJson = File.ReadAllText(relationMatrixPath);
-                var citizenRelations = JsonSerializer.Deserialize<Dictionary<int, CitizenRelation>>(relationMatrixJson);
-                foreach (var citizenRelation in citizenRelations)
+                var citizenSaveData = JsonSerializer.Deserialize<CitizenSaveData>(relationMatrixJson);
+
+                // Set values
+                _lastDecayCheckMinute = citizenSaveData.LastDecayCheckMinute;
+                foreach (var citizenRelation in citizenSaveData.RelationMatrix)
                     _relationMatrixes.Add(citizenRelation.Key, citizenRelation.Value);
+
                 Plugin.Log.LogInfo("Loaded citizen relations.");
             }
             IsLoading = false;
@@ -194,9 +199,16 @@ namespace SOD.RelationsPlus
             }
             else
             {
-                // Relation matrixes
-                var relationMatrixJson = JsonSerializer.Serialize(_relationMatrixes, new JsonSerializerOptions { WriteIndented = false });
-                File.WriteAllText(relationMatrixPath, relationMatrixJson);
+                // Collect data to save
+                var saveObject = new CitizenSaveData
+                {
+                    RelationMatrix = _relationMatrixes,
+                    LastDecayCheckMinute = _lastDecayCheckMinute
+                };
+
+                // Serialize to json and save
+                var citizenSaveDataJson = JsonSerializer.Serialize(saveObject, new JsonSerializerOptions { WriteIndented = false });
+                File.WriteAllText(relationMatrixPath, citizenSaveDataJson);
                 Plugin.Log.LogInfo("Saved citizen relations.");
             }
         }
