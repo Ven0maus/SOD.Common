@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using SOD.Common;
 using SOD.RelationsPlus.Objects;
-using System;
 using UnityEngine;
 
 namespace SOD.RelationsPlus.Patches
