@@ -50,7 +50,7 @@ namespace SOD.RelationsPlus
         [Binding(60, "After how many in-game minutes is the decay check executed each time?", "Modifiers.Decay.DecayTimeMinutesCheck")]
         int DecayTimeMinutesCheck { get; set; }
 
-        [Binding(120, "After how many in-game minutes that the citizen hasn't seen the player should 'Know' start decaying?")]
+        [Binding(120, "After how many in-game minutes that the citizen hasn't seen the player should 'Know' start decaying?", "Modifiers.Decay.DecayKnowAfterUnseenMinutes")]
         int DecayKnowAfterUnseenMinutes { get; set; }
 
         [Binding(-0.005f, "How much does 'Know' decay automatically? (cannot decay past certain stages of 'Know')", "Modifiers.Decay.DecayKnowAmount")]
