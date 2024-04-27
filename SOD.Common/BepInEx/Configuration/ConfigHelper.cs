@@ -168,9 +168,12 @@ namespace SOD.Common.BepInEx.Configuration
 
                 foreach (var setting in kvp.Value)
                 {
-                    var descriptions = setting.Description.Split('\n');
-                    foreach (var desc in descriptions)
-                        writer.WriteLine($"## {desc}");
+                    if (!string.IsNullOrEmpty(setting.Description)) 
+                    {
+                        var descriptions = setting.Description.Split('\n');
+                        foreach (var desc in descriptions)
+                            writer.WriteLine($"## {desc}");
+                    }
 
                     writer.WriteLine($"# Setting type: {setting.Type}");
                     writer.WriteLine($"# Default value: {setting.DefaultValue}");

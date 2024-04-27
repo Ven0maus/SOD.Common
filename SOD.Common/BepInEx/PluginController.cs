@@ -3,7 +3,6 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using BepInEx.Unity.IL2CPP;
 using HarmonyLib;
-using Internal.Cryptography;
 using SOD.Common.BepInEx.Configuration;
 using SOD.Common.BepInEx.Proxies;
 using SOD.Common.Extensions.Internal;
@@ -161,13 +160,14 @@ namespace SOD.Common.BepInEx
         {
             try
             {
-                if (_createdNewConfigFile || string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
+                if (_createdNewConfigFile || ConfigFile == null || string.IsNullOrWhiteSpace(ConfigFile.ConfigFilePath) || !File.Exists(ConfigFile.ConfigFilePath)) return;
                 if (!HasConfigurationBindings())
                 {
                     File.Delete(ConfigFile.ConfigFilePath);
                     Plugin.Log.LogInfo($"Deleted outdated configuration file for mod \"{PluginGUID}\".");
                     return;
                 }
+                if (Config == null) return;
 
                 var helper = new ConfigHelper(ConfigFile.ConfigFilePath);
                 var configEntries = helper.GetConfigEntries();
@@ -178,7 +178,7 @@ namespace SOD.Common.BepInEx
                     .Where(a => a.GetCustomAttribute<BindingAttribute>() != null)
                     .Select(a =>
                     {
-                        var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name);
+                        var (section, key) = ConfigHelper.SplitIdentifier(a.GetCustomAttribute<BindingAttribute>().Name ?? $"General.{a.Name}");
                         return new { Section = section, Key = key };
                     })
                     .GroupBy(a => a.Section)
@@ -190,7 +190,7 @@ namespace SOD.Common.BepInEx
                     var section = configEntry.Key;
                     if (properties.TryGetValue(section, out var validValues))
                     {
-                        var invalidValues = configEntry.Value.Except(validValues);
+                        var invalidValues = configEntry.Value.Except(validValues ?? Array.Empty<string>());
                         foreach (var value in invalidValues)
                             helper.RemoveEntry(value, section);
                     }
