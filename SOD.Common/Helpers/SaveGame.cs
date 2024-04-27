@@ -65,7 +65,7 @@ namespace SOD.Common.Helpers
                 hash ^= c;
                 hash *= FnvPrime;
             }
-            return hash.ToString();
+            return ((int)hash).ToString();
         }
 
         /// <summary>
