@@ -7,6 +7,7 @@
 - Removed 'GetPluginGuidFromPartialGuid' method from PluginDetection lib
 - Minor bugfixes and code cleanup/optimization
 - Added traits, occupations, and world spawning to sync disk builder
+- Added JsonUtility as part of RestoredUnityEngine functions helper (thx piepieonline)
 
 **1.1.8**
 - Added non-generic bind extension on BepInEx ConfigFile object
