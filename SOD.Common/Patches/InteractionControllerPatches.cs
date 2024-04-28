@@ -84,7 +84,7 @@ namespace SOD.Common.Patches
             }
         }
 
-        [HarmonyPatch(typeof(InteractionController), nameof(InteractionController.Instance.SetIllegalActionActive))]
+        [HarmonyPatch(typeof(InteractionController), nameof(InteractionController.SetIllegalActionActive))]
         internal static class InteractionController_SetIllegalActionActive
         {
             [HarmonyPrefix]

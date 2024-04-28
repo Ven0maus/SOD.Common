@@ -79,6 +79,11 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public int Price => Preset.price;
 
         /// <summary>
+        /// Determines if the sync disk can spawn in the world generation.
+        /// </summary>
+        public bool EnableWorldSpawn { get; private set; } = true;
+
+        /// <summary>
         /// The sync disk's rarity.
         /// </summary>
         public SyncDiskPreset.Rarity Rarity => Preset.rarity;
@@ -180,7 +185,8 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             {
                 Name = builder.Name,
                 Hash = Lib.SaveGame.GetUniqueString($"{builder.PluginGuid}_{builder.Name}"),
-                ReRaiseEventsOnSaveLoad = builder.ReRaiseEventsOnSaveLoad
+                ReRaiseEventsOnSaveLoad = builder.ReRaiseEventsOnSaveLoad,
+                EnableWorldSpawn = builder.EnableWorldSpawn
             };
 
             syncDisk.Preset.name = $"{UniqueDiskIdentifier}_{syncDisk.Hash}_{syncDisk.ReRaiseEventsOnSaveLoad}_{builder.Name}";
@@ -189,6 +195,18 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             syncDisk.Preset.rarity = builder.Rarity;
             syncDisk.Preset.manufacturer = builder.Manufacturer;
             syncDisk.Preset.canBeSideJobReward = builder.CanBeSideJobReward;
+            if (builder.OccupationPresets != null && builder.OccupationPresets.Length > 0)
+            {
+                syncDisk.Preset.occupation = new Il2CppSystem.Collections.Generic.List<OccupationPreset>();
+                builder.OccupationPresets.ForEach(syncDisk.Preset.occupation.Add);
+                syncDisk.Preset.occupationWeight = builder.OccupationWeight;
+            }
+            if (builder.Traits != null && builder.Traits.Length > 0)
+            {
+                syncDisk.Preset.traits = new Il2CppSystem.Collections.Generic.List<SyncDiskPreset.TraitPick>();
+                builder.Traits.ForEach(syncDisk.Preset.traits.Add);
+                syncDisk.Preset.traitWeight = builder.TraitWeight;
+            }
             syncDisk.MenuPresetLocations = builder.MenuPresetLocations;
 
             // Add effects
