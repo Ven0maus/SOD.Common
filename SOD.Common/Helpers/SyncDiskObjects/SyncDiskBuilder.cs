@@ -16,7 +16,12 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         internal Effect SideEffect { get; private set; }
         internal List<Options> UpgradeOptions { get; private set; }
         internal HashSet<string> MenuPresetLocations { get; private set; }
+        internal OccupationPreset[] OccupationPresets { get; private set; }
+        internal SyncDiskPreset.TraitPick[] Traits { get; private set; }
+        internal int OccupationWeight { get; private set; }
+        internal int TraitWeight { get; private set; }
         internal bool CanBeSideJobReward { get; private set; }
+        internal bool EnableWorldSpawn { get; private set; } = true;
 
         internal SyncDiskBuilder(string syncDiskName, string pluginGuid, bool reRaiseEventsOnSaveLoad = true)
         {
@@ -38,6 +43,44 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         public SyncDiskBuilder SetPrice(int price)
         {
             Price = price;
+            return this;
+        }
+
+        /// <summary>
+        /// Determines if the sync disk can be spawned within the world automatically by world generation.
+        /// <br>If disable, it will only be spawned by setting the Sale location, or manually by your own code logic.</br>
+        /// <br>If enabled, you will have to assign occupation or traits to the preset for it to spawn in the world.</br>
+        /// </summary>
+        /// <param name="enabled"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder SetWorldSpawnOption(bool enabled)
+        {
+            EnableWorldSpawn = enabled;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets spawn chance in the world for certain occupations (will spawn in their buildings.)
+        /// <br>Weight should be atleast one, but it affects the chance of selection</br>
+        /// </summary>
+        /// <param name="presets"></param>
+        /// <returns></returns>
+        public SyncDiskBuilder SetOccupations(int weight, params OccupationPreset[] presets)
+        {
+            OccupationPresets = presets;
+            OccupationWeight = weight;
+            return this;
+        }
+
+        /// <summary>
+        /// Sets spawn chance in the world for certain traits (will spawn in their houses)
+        /// <br>Weight should be atleast one, but it affects the chance of selection</br>
+        /// </summary>
+        /// <returns></returns>
+        public SyncDiskBuilder SetTraits(int weight, params SyncDiskPreset.TraitPick[] traits)
+        {
+            Traits = traits;
+            TraitWeight = weight;
             return this;
         }
 
