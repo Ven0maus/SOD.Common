@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.5**
+- Made dependency reference the latest version to 2.0.0 of sod.common
+
 **2.0.4**
 - Some minor fixes in dds records
 - Some minor fixes in date printing
