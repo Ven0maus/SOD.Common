@@ -5,8 +5,8 @@
   "description": "Add's a lot more immersion to the lifestyle of a detective in a city.'",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.1.8",
-    "Venomaus-SODQoL-1.1.3",
+    "Venomaus-SODCommon-2.0.0",
+    "Venomaus-SODQoL-1.1.4",
     "Venomaus-SODRelationsPlus-1.0.0"
   ]
 }
