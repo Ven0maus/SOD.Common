@@ -5,6 +5,6 @@
   "description": "A standalone common library that provides functionality to retrieve and edit relational information between citizens and the player.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.1.8"
+    "Venomaus-SODCommon-2.0.0"
   ]
 }
