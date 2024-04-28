@@ -52,9 +52,25 @@ namespace SOD.Common.Helpers
         /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
         /// </summary>
         /// <param name="value"></param>
-        /// <param name="convertToHexadecimalString">if true it will convert to a string that you can parse back to uint32</param>
         /// <returns></returns>
-        public string GetUniqueString(string value, bool convertToHexadecimalString = false)
+        public string GetUniqueString(string value)
+        {
+            return GetFnvHash(value).ToString();
+        }
+
+        /// <summary>
+        /// Creates a unique hash from a string value that is always the same.
+        /// <br>Internally it uses FNV hashing.</br>
+        /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal string GetUniqueStringHexaDecimal(string value)
+        {
+            return GetFnvHash(value).ToString("X");
+        }
+
+        private static uint GetFnvHash(string value)
         {
             // Hash the value
             if (value == null)
@@ -66,7 +82,7 @@ namespace SOD.Common.Helpers
                 hash ^= c;
                 hash *= FnvPrime;
             }
-            return convertToHexadecimalString ? hash.ToString("X") : hash.ToString();
+            return hash;
         }
 
         /// <summary>

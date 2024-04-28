@@ -1,4 +1,12 @@
 # CHANGELOG
+**2.0.5**
+- Made dependency reference the latest version to 2.0.0 of sod.common
+
+**2.0.4**
+- Some minor fixes in dds records
+- Some minor fixes in date printing
+- Adjusted some hashcode usage to fnv hashcode from sod.common
+
 **2.0.3**
 - Remove ddsloader dependency, use SOD.Common DdsStrings functionality instead
 - Fixed issue with Run Simulation parameter freezing game when loading a save

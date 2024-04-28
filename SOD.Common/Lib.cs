@@ -56,5 +56,10 @@ namespace SOD.Common
         /// Contains helper methods regarding in-game player statuses such as illegal status.
         /// </summary>
         public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
+
+        /// <summary>
+        /// Contains helpers to access engine functionality that is stripped from the game
+        /// </summary>
+        public static RestoredUnityEngine RestoredEngineFunctions { get; } = new RestoredUnityEngine();
     }
 }
