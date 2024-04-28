@@ -6,6 +6,7 @@
 - Fixed Lib.Time not initializing properly in some specific scenarios
 - Removed 'GetPluginGuidFromPartialGuid' method from PluginDetection lib
 - Minor bugfixes and code cleanup/optimization
+- Added traits, occupations, and world spawning to sync disk builder
 
 **1.1.8**
 - Added non-generic bind extension on BepInEx ConfigFile object
