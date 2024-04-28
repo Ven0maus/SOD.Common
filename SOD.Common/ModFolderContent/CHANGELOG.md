@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.1**
+- Adjusted GetSavestoreDirectoryPath method overrides. (No more missing method exception when not providing filename parameter)
+
 **2.0.0**
 - Fix missing method exceptions.
 
