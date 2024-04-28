@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.0**
+- Fix missing method exceptions.
+
 **1.1.9**
 - Added extra operators (<, >, <=, >=) to TimeData struct in Lib.Time
 - Added extra AddHours method to TimeData struct in Lib.Time
