@@ -55,6 +55,23 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string GetUniqueString(string value)
         {
+            return GetFnvHash(value).ToString();
+        }
+
+        /// <summary>
+        /// Creates a unique hash from a string value that is always the same.
+        /// <br>Internally it uses FNV hashing.</br>
+        /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        internal string GetUniqueStringHexaDecimal(string value)
+        {
+            return GetFnvHash(value).ToString("X");
+        }
+
+        private static uint GetFnvHash(string value)
+        {
             // Hash the value
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
@@ -65,7 +82,7 @@ namespace SOD.Common.Helpers
                 hash ^= c;
                 hash *= FnvPrime;
             }
-            return ((int)hash).ToString();
+            return hash;
         }
 
         /// <summary>
