@@ -4,8 +4,10 @@ using Il2CppInterop.Runtime.InteropTypes;
 
 namespace SOD.Common
 {
-    public class RestoredUnityEngine
+    public sealed class RestoredUnityEngine
     {
+        internal RestoredUnityEngine() { }
+
         public static class JsonUtility
         {
             private delegate System.IntPtr Delegate_FromJsonInternal(System.IntPtr json, System.IntPtr scriptableObject, System.IntPtr type);
