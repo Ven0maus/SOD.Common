@@ -12,6 +12,16 @@ namespace SOD.Common.Extensions
                 action(value);
         }
 
+        public static IEnumerable<TResult> AsEnumerable<TResult>(this Il2CppSystem.Collections.Generic.List<TResult> list)
+        {
+            return list.Select(a => a);
+        }
+
+        public static IEnumerable<TResult> AsEnumerable<TResult>(this Il2CppSystem.Collections.Generic.IList<TResult> list)
+        {
+            return list.Select(a => a);
+        }
+
         public static IEnumerable<TResult> Select<TSource, TResult>(
             this Il2CppSystem.Collections.Generic.List<TSource> source, Func<TSource, TResult> selector)
         {
