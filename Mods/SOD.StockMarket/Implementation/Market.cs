@@ -47,6 +47,7 @@ namespace SOD.StockMarket.Implementation
             Lib.SaveGame.OnBeforeLoad += OnFileLoad;
             Lib.SaveGame.OnBeforeSave += OnFileSave;
             Lib.SaveGame.OnBeforeDelete += OnFileDelete;
+            Lib.Time.OnTimeInitialized += InitDdsRecords;
             Lib.Time.OnMinuteChanged += OnMinuteChanged;
             Lib.Time.OnHourChanged += OnHourChanged;
 
@@ -62,6 +63,13 @@ namespace SOD.StockMarket.Implementation
                         Simulate(Plugin.Instance.Config.SimulationDays);
                 };
             }
+        }
+
+        private void InitDdsRecords(object sender, TimeChangedArgs e)
+        {
+            // Set the dds entry for the app's name
+            Lib.DdsStrings["computer", "stockmarketpreset"] = "Stock Market";
+            Lib.Time.OnTimeInitialized -= InitDdsRecords;
         }
 
         private void OnTimeInit(object sender, TimeChangedArgs args)
@@ -203,9 +211,6 @@ namespace SOD.StockMarket.Implementation
             // Market is finished initializing stocks
             if (Plugin.Instance.Config.IsDebugEnabled)
                 Plugin.Log.LogInfo("Stocks created: " + _stocks.Count);
-
-            // Set the dds entry for the app's name
-            Lib.DdsStrings["computer", "stockmarketpreset"] = "Stock Market";
 
             Plugin.Log.LogInfo("Stock market initialized.");
             Initialized = true;
