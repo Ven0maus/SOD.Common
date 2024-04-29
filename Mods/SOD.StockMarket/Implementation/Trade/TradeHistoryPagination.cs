@@ -36,7 +36,7 @@ namespace SOD.StockMarket.Implementation.Trade
         internal TradeHistory[] Next()
         {
             var histories = new TradeHistory[_maxTradeHistoryPerPage];
-            var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
+            var maxPages = (int)Math.Ceiling((double)_tradeController.TradeHistory.Count / _maxTradeHistoryPerPage);
             if (CurrentPage < maxPages - 1)
             {
                 CurrentPage++;
@@ -64,8 +64,8 @@ namespace SOD.StockMarket.Implementation.Trade
             }
             else if (CurrentPage == 0)
             {
-                var maxPages = (int)Math.Ceiling((double)_tradeController.TradeOrders.Count / _maxTradeHistoryPerPage);
-                CurrentPage = maxPages - 1;
+                var maxPages = (int)Math.Ceiling((double)_tradeController.TradeHistory.Count / _maxTradeHistoryPerPage);
+                CurrentPage = Math.Max(0, maxPages - 1);
                 SetHistories(histories);
             }
             return histories;
@@ -112,15 +112,7 @@ namespace SOD.StockMarket.Implementation.Trade
 
             var startIndex = CurrentPage * _maxTradeHistoryPerPage;
             for (int i = 0; i < _maxTradeHistoryPerPage; i++)
-            {
-                var history = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
-                if (history == null)
-                {
-                    slots[i] = null;
-                    continue;
-                }
-                slots[i] = history;
-            }
+                slots[i] = sortedCollection.Count > (startIndex + i) ? sortedCollection[startIndex + i] : null;
         }
     }
 }
