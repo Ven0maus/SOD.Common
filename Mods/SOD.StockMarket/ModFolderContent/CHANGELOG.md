@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.0.6**
+- Fixed app name not displaying properly in some cases
+- Fixed previous / next button for trade history
+
 **2.0.5**
 - Made dependency reference the latest version to 2.0.0 of sod.common
 
