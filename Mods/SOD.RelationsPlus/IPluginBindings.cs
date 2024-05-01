@@ -91,11 +91,23 @@ namespace SOD.RelationsPlus
 
         [Binding(0.025f, "How much the \"Know\" property changes for the citizen and player when seen inside their home's building/apartement.", "Modifiers.Know.SeenInHomeBuilding")]
         float SeenInHomeBuildingModifier { get; set; }
+
+        [Binding(0.035f, "How much the \"Know\" property changes for the citizen when the player accepts a job for them.", "Modifiers.Know.AcceptedJobModifier")]
+        float AcceptedJobModifier { get; set; }
+
+        [Binding(0.015f, "How much the \"Know\" property changes for the citizen and player when they talk to eachother.", "Modifiers.Know.SpeakingToCitizenModifier")]
+        float SpeakingToCitizenModifier { get; set; }
     }
 
     public interface ILikeModifierBindings
     {
         [Binding(-0.05f, "How much the \"Like\" property changes for the citizen and player when seen trespassing.", "Modifiers.Like.SeenTrespassingModifier")]
         float SeenTrespassingModifier { get; set; }
+
+        [Binding(0.125f, "How much the \"Like\" property changes for the citizen when the player solves a job from them.", "Modifiers.Know.SolvedJobModifier")]
+        float SolvedJobModifier { get; set; }
+
+        [Binding(-0.065f, "How much the \"Like\" property changes for the citizen when the player fails a job from them.", "Modifiers.Know.FailedJobModifier")]
+        float FailedJobModifier { get; set; }
     }
 }
