@@ -104,8 +104,8 @@ namespace SOD.RelationsPlus
         [Binding(-0.05f, "How much the \"Like\" property changes for the citizen and player when seen trespassing.", "Modifiers.Like.SeenTrespassingModifier")]
         float SeenTrespassingModifier { get; set; }
 
-        [Binding(-0.05f, "How much the \"Like\" property changes for the citizen when they see the player stealing something from them.", "Modifiers.Like.SeenStealingModifier")]
-        float SeenStealingModifier { get; set; }
+        [Binding(-0.05f, "How much the \"Like\" property changes for the citizen when they see the player doing something illegal.", "Modifiers.Like.SeenDoingIllegalModifier")]
+        float SeenDoingIllegalModifier { get; set; }
 
         [Binding(0.125f, "How much the \"Like\" property changes for the citizen when the player solves a job from them.", "Modifiers.Know.SolvedJobModifier")]
         float SolvedJobModifier { get; set; }

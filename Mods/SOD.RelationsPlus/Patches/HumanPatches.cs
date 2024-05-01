@@ -30,8 +30,9 @@ namespace SOD.RelationsPlus.Patches
                     relation.LastSeenGameTime.Value.AddMinutes(Plugin.Instance.Config.SeenTimeMinutesCheck) <= Lib.Time.CurrentDateTime)
                 {
                     float distance = Vector3.Distance(__instance.lookAtThisTransform.position, player.lookAtThisTransform.position);
-                    if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
-                        __instance.ActorRaycastCheck(player, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
+                    float maxDistance = Mathf.Min(GameplayControls.Instance.citizenSightRange, __instance.stealthDistance);
+                    if (distance <= maxDistance && (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
+                        __instance.ActorRaycastCheck(player, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f)))
                     {
                         // If relation doesn't exist yet at this point, create a new one
                         relation ??= new CitizenRelation(__instance.humanID);

@@ -1,27 +1,37 @@
 ﻿using HarmonyLib;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SOD.RelationsPlus.Patches
 {
     internal class InteractionControllerPatches
     {
-        [HarmonyPatch(typeof(InteractionController), nameof(InteractionController.GetValidPlayerActionIllegal))]
-        internal static class InteractionController_GetValidPlayerActionIllegal
+        [HarmonyPatch(typeof(InteractionController), nameof(InteractionController.SetIllegalActionActive))]
+        internal static class InteractionController_SetIllegalActionActive
         {
             [HarmonyPostfix]
-            internal static void Postfix(Interactable inter, ref bool __result)
+            internal static void Prefix(bool val)
             {
-                if (inter == null || inter.belongsTo == null || inter.belongsTo.humanID == Player.Instance.humanID) return;
-                if (__result)
+                if (!val) return;
+
+                // Needs to run everytime, even if the value didn't change
+                foreach (var actor in CityData.Instance.visibleActors)
                 {
-                    // Are we seen by the person who the interactable belongs to?
-                    var belongsTo = inter.belongsTo;
-                    float distance = Vector3.Distance(belongsTo.lookAtThisTransform.position, Player.Instance.lookAtThisTransform.position);
-                    if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
-                        belongsTo.ActorRaycastCheck(Player.Instance, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
+                    var human = actor as Human;
+                    if (human == null || actor.isPlayer ||
+                        !actor.isSeenByOthers || actor.isDead || actor.isStunned || actor.isAsleep)
+                        continue;
+
+                    float distance = Vector3.Distance(human.lookAtThisTransform.position, Player.Instance.lookAtThisTransform.position);
+                    float maxDistance = Mathf.Min(GameplayControls.Instance.citizenSightRange, human.stealthDistance);
+                    if (distance <= maxDistance)
                     {
-                        RelationManager.Instance[belongsTo.humanID].Like += Plugin.Instance.Config.SeenStealingModifier;
+                        if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
+                            human.ActorRaycastCheck(Player.Instance, distance + 3f, out _, false, Color.green, Color.red, Color.white, 1f))
+                        {
+                            if (Plugin.Instance.Config.DebugMode)
+                                Plugin.Log.LogInfo($"Illegal activity seen by {human.GetCitizenName()}!");
+                            RelationManager.Instance[human.humanID].Like += Plugin.Instance.Config.SeenDoingIllegalModifier;
+                        }
                     }
                 }
             }
