@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SOD.RelationsPlus;
+using SOD.RelationsPlus.Objects;
 
 namespace SOD.LifeAndLiving.Relations.Dialogs
 {
@@ -46,10 +47,8 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
             // Player must be known to the citizen
-            if (!RelationManager.Instance.TryGetValue(saysTo.humanID, out var relation) || relation.Know < 0.4f) 
+            if (!RelationManager.Instance.TryGetValue(saysTo.humanID, out var relation) || (int)relation.KnowRelation < (int)CitizenRelation.KnowStage.Familiar) 
                 return false;
-
-            // TODO: Player must have been seen at the citizen's workplace enough times.
 
             // Check if the citizen is at work and if the player has a free slot available
             if (saysTo == null || !saysTo.isAtWork || saysTo.job?.employer == null || !FirstPersonItemController.Instance.IsSlotAvailable())
@@ -59,8 +58,8 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
             if (!PlayerInterests.Instance.PurchasedItemsFrom.TryGetValue(saysTo.humanID, out var items))
                 return false;
 
-            // Check if any item was purchased 5 or more times by the player
-            return items.Any(a => a.Value >= 5);
+            // Check if any item was purchased 4 or more times by the player
+            return items.Any(a => a.Value >= 4);
         }
 
         public void OnDialogExecute(DialogController instance, Citizen saysTo, Interactable saysToInteractable, NewNode where, Actor saidBy, bool success, NewRoom roomRef, SideJob jobRef)
