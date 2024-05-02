@@ -1,7 +1,6 @@
 ﻿using HarmonyLib;
 using System;
-using System.Linq;
-using UnityEngine;
+using SOD.Common.Extensions;
 
 namespace SOD.RelationsPlus.Patches
 {
@@ -18,28 +17,23 @@ namespace SOD.RelationsPlus.Patches
                 // Needs to run everytime, even if the value didn't change
                 foreach (var actor in CityData.Instance.visibleActors)
                 {
+                    if (actor.isMachine || actor.isPlayer) continue;
+                    if (!actor.Sees(Player.Instance)) continue;
+
+                    Human human = null;
                     try
                     {
-                        var human = ((dynamic)actor).Cast<Human>();
-                        if (human == null || actor.isPlayer ||
-                            !actor.isSeenByOthers || actor.isDead || actor.isStunned || actor.isAsleep)
-                            continue;
-
-                        float distance = Vector3.Distance(human.lookAtThisTransform.position, Player.Instance.lookAtThisTransform.position);
-                        float maxDistance = Mathf.Min(GameplayControls.Instance.citizenSightRange, human.stealthDistance);
-                        if (distance <= maxDistance)
-                        {
-                            if (distance < GameplayControls.Instance.minimumStealthDetectionRange ||
-                                human.ActorRaycastCheck(Player.Instance, distance + 3f, out RaycastHit _, false, Color.green, Color.red, Color.white, 1f))
-                            {
-                                if (Plugin.Instance.Config.DebugMode)
-                                    Plugin.Log.LogInfo($"Illegal activity seen by {human.GetCitizenName()}!");
-                                RelationManager.Instance[human.humanID].Like += Plugin.Instance.Config.SeenDoingIllegalModifier;
-                            }
-                        }
+                        human = ((dynamic)actor).Cast<Human>();
                     }
                     catch(InvalidCastException)
                     { }
+
+                    if (human == null) continue;
+
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"[Debug]: Illegal activity seen by {human.GetCitizenName()}!");
+
+                    RelationManager.Instance[human.humanID].Like += Plugin.Instance.Config.SeenDoingIllegalModifier;
                 }
             }
         }

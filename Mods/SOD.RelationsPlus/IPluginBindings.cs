@@ -107,10 +107,13 @@ namespace SOD.RelationsPlus
         [Binding(-0.05f, "How much the \"Like\" property changes for the citizen when they see the player doing something illegal.", "Modifiers.Like.SeenDoingIllegalModifier")]
         float SeenDoingIllegalModifier { get; set; }
 
-        [Binding(0.125f, "How much the \"Like\" property changes for the citizen when the player solves a job from them.", "Modifiers.Know.SolvedJobModifier")]
+        [Binding(0.125f, "How much the \"Like\" property changes for the citizen when the player solves a job from them.", "Modifiers.Like.SolvedJobModifier")]
         float SolvedJobModifier { get; set; }
 
-        [Binding(-0.065f, "How much the \"Like\" property changes for the citizen when the player fails a job from them.", "Modifiers.Know.FailedJobModifier")]
+        [Binding(-0.065f, "How much the \"Like\" property changes for the citizen when the player fails a job from them.", "Modifiers.Like.FailedJobModifier")]
         float FailedJobModifier { get; set; }
+
+        [Binding(-0.1f, "How much the \"Like\" property changes for the citizen when the player fails a job from them.", "Modifiers.Like.OnAttackCitizenModifier")]
+        float OnAttackCitizenModifier { get; set; }
     }
 }
