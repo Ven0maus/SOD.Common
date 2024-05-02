@@ -20,7 +20,10 @@ namespace SOD.RelationsPlus.Patches
                 if (!__state && __instance.accepted)
                 {
                     if (__instance.poster != null && __instance.posterID > 0)
-                        RelationManager.Instance[__instance.posterID].Know += Plugin.Instance.Config.AcceptedJobModifier;
+                    {
+                        RelationManager.Instance[__instance.posterID].Know += Plugin.Instance.Config.AcceptedJobKnowModifier;
+                        RelationManager.Instance[__instance.posterID].Like += Plugin.Instance.Config.AcceptedJobLikeModifier;
+                    }
                 }
             }
         }
