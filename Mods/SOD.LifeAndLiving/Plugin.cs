@@ -76,29 +76,19 @@ namespace SOD.LifeAndLiving
         {
             // Update company prices that haven't been calculated properly yet from pre-mod savegames
             var random = new Random(CityData.Instance.seed.GetHashCode());
-            int total = 0;
             foreach (var company in CityData.Instance.companyDirectory)
             {
                 var arr = new List<KeyValuePair<InteractablePreset, int>>(company.prices.Keys.Count);
                 foreach (var kvp in company.prices)
                     arr.Add(new KeyValuePair<InteractablePreset, int>(kvp.Key, kvp.Value));
 
-                int count = 0;
                 foreach (var preset in arr)
                 {
                     var realValue = preset.Key.value;
                     if (preset.Value < realValue.x || preset.Value > realValue.y)
-                    {
                         company.prices[preset.Key] = random.Next((int)realValue.x, (int)realValue.y + 1);
-                        count++;
-                    }
                 }
-                if (count > 0)
-                    total++;
             }
-
-            if (total > 0)
-                Log.LogInfo($"Found pre-mod savegame, recalculated all item prices for {total} companies.");
         }
     }
 }
