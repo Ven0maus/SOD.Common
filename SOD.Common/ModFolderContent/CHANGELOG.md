@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.2**
+- Bugfix option ids were not passed through properly for Upgrade Option on sync disk builder
+
 **2.0.1**
 - Adjusted GetSavestoreDirectoryPath method overrides. (No more missing method exception when not providing filename parameter)
 - Added extension class "GameExtensions" in SOD.Common.Extensions
