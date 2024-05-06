@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using UnityEngine.Playables;
 using UniverseLib;
 
 namespace SOD.Common.Extensions
@@ -26,7 +27,7 @@ namespace SOD.Common.Extensions
         /// <returns></returns>
         public static int GetFnvHashCode(this string value)
         {
-            return (int)uint.Parse(Lib.SaveGame.GetUniqueStringHexaDecimal(value), System.Globalization.NumberStyles.HexNumber);
+            return (int)Lib.SaveGame.GetUniqueNumber(value);
         }
     }
 }
