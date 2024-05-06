@@ -104,7 +104,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
         }
         .Where(a => a.Id != 0)
-        .Select(a => new SyncDisks.Effect(a.Id, a.DdsIdentifier))
         .ToArray();
 
         private SyncDisks.Effect? _sideEffect;
@@ -132,7 +131,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.UpgradeOption(new SyncDiskBuilder.Options(Preset, 3))
         }
         .Where(a => a.HasOptions)
-        .Select(a => new SyncDisks.UpgradeOption(a.Options, true))
         .ToArray();
 
         internal HashSet<string> MenuPresetLocations { get; set; }

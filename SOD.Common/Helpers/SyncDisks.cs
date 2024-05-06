@@ -336,23 +336,23 @@ namespace SOD.Common.Helpers
             internal readonly bool HasOptions => !string.IsNullOrWhiteSpace(Name1) || !string.IsNullOrWhiteSpace(Name2) || !string.IsNullOrWhiteSpace(Name3);
             internal readonly SyncDiskBuilder.Options Options;
 
-            internal UpgradeOption(SyncDiskBuilder.Options options, bool stripCustom = false)
+            internal UpgradeOption(SyncDiskBuilder.Options options)
             {
                 Options = options;
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {
                     Id1 = (int)options.Option1Effect;
-                    Name1 = stripCustom ? SyncDisk.GetName(options.Option1) : options.Option1;
+                    Name1 = SyncDisk.GetName(options.Option1);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option2))
                 {
                     Id2 = (int)options.Option2Effect;
-                    Name2 = stripCustom ? SyncDisk.GetName(options.Option2) : options.Option2;
+                    Name2 = SyncDisk.GetName(options.Option2);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option3))
                 {
                     Id3 = (int)options.Option3Effect;
-                    Name3 = stripCustom ? SyncDisk.GetName(options.Option3) : options.Option3;
+                    Name3 = SyncDisk.GetName(options.Option3);
                 }
             }
 
