@@ -104,7 +104,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.Effect((int)Preset.mainEffect3, Preset.mainEffect3Name)
         }
         .Where(a => a.Id != 0)
-        .Select(a => new SyncDisks.Effect(a.Id, a.DdsIdentifier))
         .ToArray();
 
         private SyncDisks.Effect? _sideEffect;
@@ -132,7 +131,6 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             new SyncDisks.UpgradeOption(new SyncDiskBuilder.Options(Preset, 3))
         }
         .Where(a => a.HasOptions)
-        .Select(a => new SyncDisks.UpgradeOption(a.Options, true))
         .ToArray();
 
         internal HashSet<string> MenuPresetLocations { get; set; }
@@ -294,12 +292,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
             return new SyncDisk(false) { Name = name, Preset = preset, Hash = hash, ReRaiseEventsOnSaveLoad = reRaiseEvents };
         }
 
-        /// <summary>
-        /// Retrieves the name from the preset name of a sync disk.
-        /// </summary>
-        /// <param name="presetName"></param>
-        /// <returns></returns>
-        internal static string GetNameFromPreset(string presetName)
+        internal static string GetSyncDiskNameFromPreset(string presetName)
         {
             if (presetName == null || !presetName.StartsWith($"{UniqueDiskIdentifier}_"))
                 return presetName;
