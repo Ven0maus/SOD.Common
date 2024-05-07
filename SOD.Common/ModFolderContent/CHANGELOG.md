@@ -4,8 +4,6 @@
 
 **2.0.1**
 - Adjusted GetSavestoreDirectoryPath method overrides. (No more missing method exception when not providing filename parameter)
-- Added extension class "GameExtensions" in SOD.Common.Extensions
-- Added CanSee extension in "GameExtensions" for Actor object
 
 **2.0.0**
 - Fix missing method exceptions.

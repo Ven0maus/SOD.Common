@@ -53,16 +53,6 @@
         "bin\\Release\\net6.0\\SOD.LethalActionReborn.dll"
       ],
       "Package": true
-    },
-    {
-      "ProjectParentPath": "Mods",
-      "ProjectName": "SOD.RelationsPlus",
-      "ModFolderName": "ModFolderContent",
-      "DestinationFolderName": "Builds",
-      "ExtraFiles": [
-        "bin\\Release\\net6.0\\SOD.RelationsPlus.dll"
-      ],
-      "Package": true
     }
   ]
 }

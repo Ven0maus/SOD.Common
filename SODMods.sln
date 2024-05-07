@@ -26,8 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.LethalActionReborn", "Mods\SOD.LethalActionReborn\SOD.LethalActionReborn.csproj", "{97ECAA26-E721-407C-8C08-A38DA65B4766}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.RelationsPlus", "Mods\SOD.RelationsPlus\SOD.RelationsPlus.csproj", "{CEA1F0B1-F666-4B91-A679-526DDDE967F4}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,10 +56,6 @@ Global
 		{97ECAA26-E721-407C-8C08-A38DA65B4766}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{97ECAA26-E721-407C-8C08-A38DA65B4766}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97ECAA26-E721-407C-8C08-A38DA65B4766}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -73,7 +67,6 @@ Global
 		{80423AFE-CCF4-40A4-8177-1F40EA92AF3B} = {41E97C5C-35C5-42C6-9417-8CE5C9281FE7}
 		{093E8556-E4D7-44C9-B428-E80BCAE8BCBC} = {D6470792-AB41-40B1-B029-4E67A5D91F1C}
 		{97ECAA26-E721-407C-8C08-A38DA65B4766} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
-		{CEA1F0B1-F666-4B91-A679-526DDDE967F4} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92CC1827-8FE6-4E8C-8518-DE8D0EAEE515}

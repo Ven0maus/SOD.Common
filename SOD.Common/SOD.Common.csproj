@@ -63,9 +63,6 @@
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>..\libs\il2cpp\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
     <Reference Include="UnityEngine.TextMeshPro">
       <HintPath>..\libs\il2cpp\Unity.TextMeshPro.dll</HintPath>
     </Reference>
