@@ -114,6 +114,19 @@ namespace SOD.Common.Helpers
             return path;
         }
 
+        /// <summary>
+        /// Returns a path to your plugin folder.
+        /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <returns></returns>
+        public string GetPluginDirectoryPath(Assembly executingAssembly)
+        {
+            var path = Path.GetDirectoryName(executingAssembly.Location);
+            if (!Directory.Exists(path))
+                throw new Exception("There is no plugin directory for this assembly location: " + path);
+            return path;
+        }
+
         internal bool IsSaving { get; private set; }
         internal void OnSave(string path, bool after)
         {

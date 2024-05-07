@@ -12,7 +12,7 @@ namespace SOD.Common.Extensions
         /// <returns></returns>
         public static bool Sees(this Actor actor, Actor target)
         {
-            if (actor == null || target == null || actor.GetHashCode() == target.GetHashCode() || 
+            if (actor == null || target == null || actor.GetHashCode() == target.GetHashCode() ||
                 actor.isDead || actor.isStunned || actor.isAsleep || !target.isSeenByOthers)
                 return false;
 
