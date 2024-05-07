@@ -178,7 +178,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
                 throw new Exception("This sync disk already contains 3 upgrade options.");
 
             // Get a new unique effect id that can be used by mods
-            uniqueOptionIds = new OptionIds(options);
+            uniqueOptionIds = new OptionIds(ref options);
 
             // Create and store the effect
             UpgradeOptions.Add(options);
@@ -289,7 +289,7 @@ namespace SOD.Common.Helpers.SyncDiskObjects
         {
             public readonly int Option1Id, Option2Id, Option3Id;
 
-            internal OptionIds(Options options)
+            internal OptionIds(ref Options options)
             {
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {

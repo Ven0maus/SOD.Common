@@ -139,13 +139,26 @@ namespace SOD.Common.Helpers
                 {
                     // Raise correct events for each sync disk
                     var syncDisk = RegisteredSyncDisks.FirstOrDefault(a => a.Preset.name.Equals(disk.SyncDiskName));
+                    if (syncDisk == null)
+                    {
+                        Plugin.Log.LogInfo($"[Skipped]: Could not find registered sync disk with preset name \"{SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)}\".");
+                        continue;
+                    }
+
                     // Get correct effect with right ID
+                    if (!syncDisk.Effects.Any(a => a.Name.Equals(disk.Effect)))
+                    {
+                        Plugin.Log.LogInfo($"[Skipped]: Could not find effect \"{disk.Effect}\" within sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)}\".");
+                        continue;
+                    }
+
                     var realEffect = syncDisk.Effects.First(a => a.Name.Equals(disk.Effect));
                     var index = Array.IndexOf(syncDisk.Effects, realEffect);
                     OnAfterSyncDiskInstalled?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect));
-                    Plugin.Log.LogInfo($"Loaded savegame, raised install event for custom disk: {SyncDisk.GetNameFromPreset(disk.SyncDiskName)} | {realEffect.Name}");
 
-                    if (disk.UpgradeOptions != null)
+                    Plugin.Log.LogInfo($"Loaded savegame, raised install event for custom disk: {SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)} | {realEffect.Name}");
+
+                    if (disk.UpgradeOptions != null && syncDisk.UpgradeOptions.Length > index)
                     {
                         // Options for the given effect index
                         var realOptions = syncDisk.UpgradeOptions[index];
@@ -154,17 +167,19 @@ namespace SOD.Common.Helpers
                             // Get real option id
                             var realOption = realOptions.Name1 != null && realOptions.Name1.Equals(option) ? realOptions.Id1 :
                                 realOptions.Name2 != null && realOptions.Name2.Equals(option) ? realOptions.Id2 : realOptions.Id3;
-                            if (realOption == null) continue;
+                            if (realOption == null) 
+                            {
+                                Plugin.Log.LogInfo($"[Skipped]: Could not find upgrade option \"{option}\" within sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)}\".");
+                                continue;
+                            }
+
                             OnAfterSyncDiskUpgraded?.Invoke(this, new SyncDiskArgs(syncDisk, realEffect, new SyncDiskArgs.Option(realOption.Value, option)));
-                            Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {SyncDisk.GetNameFromPreset(disk.SyncDiskName)} | {realEffect.Name} | {option}");
+                            Plugin.Log.LogInfo($"Loaded savegame, raised upgrade event for disk: {SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)} | {realEffect.Name} | {option}");
                         }
                     }
 
                     if (!InstalledSyncDisks.TryGetValue(disk.SyncDiskName, out List<InstalledSyncDiskData> disks))
-                    {
-                        disks = new();
-                        InstalledSyncDisks.Add(disk.SyncDiskName, disks);
-                    }
+                        InstalledSyncDisks.Add(disk.SyncDiskName, disks = new());
 
                     disks.Add(disk);
                 }
@@ -181,7 +196,13 @@ namespace SOD.Common.Helpers
                 }
 
                 // On save, serialize all sync disk data
-                var toBeSaved = new SyncDiskJsonData() { SyncDiskData = InstalledSyncDisks.Values.SelectMany(a => a).OrderBy(a => a.SyncDiskName).ToList() };
+                var toBeSaved = new SyncDiskJsonData() 
+                { 
+                    SyncDiskData = InstalledSyncDisks.Values
+                        .SelectMany(a => a)
+                        .OrderBy(a => a.SyncDiskName)
+                        .ToList() 
+                };
                 var json = JsonSerializer.Serialize(toBeSaved, new JsonSerializerOptions { WriteIndented = false });
                 File.WriteAllText(path, json);
 
@@ -233,7 +254,7 @@ namespace SOD.Common.Helpers
                         if (uninstallArgs.Effect == null || !uninstallArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !uninstallArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(uninstallArgs.SyncDisk.Preset.name, out var disks2))
                         {
-                            Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{SyncDisk.GetNameFromPreset(uninstallArgs.SyncDisk.Preset.name)}\".");
+                            Plugin.Log.LogWarning($"Could not find uninstall data for custom sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(uninstallArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -241,7 +262,7 @@ namespace SOD.Common.Helpers
                         var correctEffect = disks2.FirstOrDefault(a => a.Effect.Equals(uninstallArgs.Effect.Value.Name));
                         if (correctEffect == null)
                         {
-                            Plugin.Log.LogWarning($"Could not find uninstall effect data for custom sync disk \"{SyncDisk.GetNameFromPreset(uninstallArgs.SyncDisk.Preset.name)}\".");
+                            Plugin.Log.LogWarning($"Could not find uninstall effect data for custom sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(uninstallArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -262,7 +283,7 @@ namespace SOD.Common.Helpers
                         if (!upgradeArgs.Effect.HasValue || !upgradeArgs.SyncDisk.Preset.name.StartsWith($"{SyncDisk.UniqueDiskIdentifier}_") || !upgradeArgs.SyncDisk.ReRaiseEventsOnSaveLoad) break;
                         if (!InstalledSyncDisks.TryGetValue(upgradeArgs.SyncDisk.Preset.name, out var disks3))
                         {
-                            Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{SyncDisk.GetNameFromPreset(upgradeArgs.SyncDisk.Preset.name)}\".");
+                            Plugin.Log.LogWarning($"Could not find upgrade data for custom sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(upgradeArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -270,7 +291,7 @@ namespace SOD.Common.Helpers
                         var cEffect = disks3.FirstOrDefault(a => a.Effect.Equals(upgradeArgs.Effect.Value.Name));
                         if (upgradeArgs.UpgradeOption == null || cEffect == null)
                         {
-                            Plugin.Log.LogWarning($"Could not find {(upgradeArgs.UpgradeOption == null ? "upgrade option" : "effect")} data for custom sync disk \"{SyncDisk.GetNameFromPreset(upgradeArgs.SyncDisk.Preset.name)}\".");
+                            Plugin.Log.LogWarning($"Could not find {(upgradeArgs.UpgradeOption == null ? "upgrade option" : "effect")} data for custom sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(upgradeArgs.SyncDisk.Preset.name)}\".");
                             break;
                         }
 
@@ -336,23 +357,23 @@ namespace SOD.Common.Helpers
             internal readonly bool HasOptions => !string.IsNullOrWhiteSpace(Name1) || !string.IsNullOrWhiteSpace(Name2) || !string.IsNullOrWhiteSpace(Name3);
             internal readonly SyncDiskBuilder.Options Options;
 
-            internal UpgradeOption(SyncDiskBuilder.Options options, bool stripCustom = false)
+            internal UpgradeOption(SyncDiskBuilder.Options options)
             {
                 Options = options;
                 if (!string.IsNullOrWhiteSpace(options.Option1))
                 {
                     Id1 = (int)options.Option1Effect;
-                    Name1 = stripCustom ? SyncDisk.GetName(options.Option1) : options.Option1;
+                    Name1 = SyncDisk.GetName(options.Option1);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option2))
                 {
                     Id2 = (int)options.Option2Effect;
-                    Name2 = stripCustom ? SyncDisk.GetName(options.Option2) : options.Option2;
+                    Name2 = SyncDisk.GetName(options.Option2);
                 }
                 if (!string.IsNullOrWhiteSpace(options.Option3))
                 {
                     Id3 = (int)options.Option3Effect;
-                    Name3 = stripCustom ? SyncDisk.GetName(options.Option3) : options.Option3;
+                    Name3 = SyncDisk.GetName(options.Option3);
                 }
             }
 

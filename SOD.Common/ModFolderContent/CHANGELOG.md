@@ -1,4 +1,11 @@
 # CHANGELOG
+**2.0.2**
+- Bugfix option ids were not passed through properly for Upgrade Options on sync disk builder
+- Code cleanup, logging and performance improvements to sync disk helper
+- Added GameExtensions class, which will contain helper extensions for the game, such as "Actor.Sees(actor);"
+- Added GetUniqueNumber variant to SaveGame helper (similar to GetUniqueString but uint version)
+- Added GetPluginDirectoryPath to SaveGame helper
+
 **2.0.1**
 - Adjusted GetSavestoreDirectoryPath method overrides. (No more missing method exception when not providing filename parameter)
 - Added extension class "GameExtensions" in SOD.Common.Extensions

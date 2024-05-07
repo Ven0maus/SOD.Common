@@ -59,15 +59,13 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Creates a unique hash from a string value that is always the same.
-        /// <br>Internally it uses FNV hashing.</br>
-        /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
+        /// Same functionality as <see cref="GetUniqueString(string)"/> but in uint format.
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        internal string GetUniqueStringHexaDecimal(string value)
+        public uint GetUniqueNumber(string value)
         {
-            return GetFnvHash(value).ToString("X");
+            return GetFnvHash(value);
         }
 
         private static uint GetFnvHash(string value)
@@ -113,6 +111,19 @@ namespace SOD.Common.Helpers
             var path = Path.Combine(Path.GetDirectoryName(executingAssembly.Location), "Savestore");
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+            return path;
+        }
+
+        /// <summary>
+        /// Returns a path to your plugin folder.
+        /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <returns></returns>
+        public string GetPluginDirectoryPath(Assembly executingAssembly)
+        {
+            var path = Path.GetDirectoryName(executingAssembly.Location);
+            if (!Directory.Exists(path))
+                throw new Exception("There is no plugin directory for this assembly location: " + path);
             return path;
         }
 
