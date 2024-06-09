@@ -3,7 +3,7 @@ using SOD.Common.Extensions;
 using System;
 using System.Linq;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class ToolboxPatches
     {
@@ -87,9 +87,6 @@ namespace SOD.LifeAndLiving.Patches
 
             private static void AdjustItemPrices(Toolbox __instance)
             {
-                var percentageValueIncrease = Plugin.Instance.Config.PercentageValueIncrease;
-                var percentage = (percentageValueIncrease / 100f) + 1;
-                var minItemValue = Plugin.Instance.Config.MinItemValue;
                 // Static seed because the LoadAll is ran at startup of the game exe
                 // The city gen will randomize it properly
                 var random = new Random(1000);
@@ -102,6 +99,25 @@ namespace SOD.LifeAndLiving.Patches
                         // Both these cases are hardcoded to certain values
                         if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
                             continue;
+
+                        var percentageValueIncrease = Plugin.Instance.Config.PercentageValueIncreaseGeneral;
+                        var minItemValue = Plugin.Instance.Config.MinGeneralItemValue;
+
+                        // If its food, look at different config values
+                        if (preset.retailItem != null)
+                        {
+                            if (preset.retailItem.isConsumable &&
+                                (preset.retailItem.menuCategory == RetailItemPreset.MenuCategory.drinks ||
+                                preset.retailItem.menuCategory == RetailItemPreset.MenuCategory.food ||
+                                preset.retailItem.menuCategory == RetailItemPreset.MenuCategory.snacks) &&
+                                (preset.retailItem.nourishment > 0 || preset.retailItem.hydration > 0))
+                            {
+                                percentageValueIncrease = Plugin.Instance.Config.PercentageValueIncreaseFood;
+                                minItemValue = Plugin.Instance.Config.MinFoodItemValue;
+                            }
+                        }
+
+                        var percentage = percentageValueIncrease / 100f + 1;
 
                         // Calculate initial min and max values
                         var initialMinValue = Math.Max(minItemValue, (int)preset.value.x);
@@ -153,7 +169,7 @@ namespace SOD.LifeAndLiving.Patches
                         foreach (var resolveQuestion in sideJob.resolveQuestions)
                             resolveQuestion.rewardRange = new UnityEngine.Vector2(totalPerQuestion, totalPerQuestion);
                     }
-                    
+
                     jobCount++;
                 }
                 Plugin.Log.LogInfo($"Reduced \"{jobCount}\" job payouts.");
@@ -197,7 +213,7 @@ namespace SOD.LifeAndLiving.Patches
                 }
 
                 // Set value
-                syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue, 
+                syncDiskModulePreset.value = new UnityEngine.Vector2(Plugin.Instance.Config.MinSyncDiskUpgradeModuleValue,
                     Plugin.Instance.Config.MaxSyncDiskUpgradeModuleValue);
 
                 if (Plugin.Instance.Config.LimitSpawnrateSyncDisks)

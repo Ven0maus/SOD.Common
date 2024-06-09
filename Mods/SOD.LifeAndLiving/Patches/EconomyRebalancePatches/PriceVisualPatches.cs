@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using UnityEngine;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class PriceVisualPatches
     {
@@ -32,9 +32,6 @@ namespace SOD.LifeAndLiving.Patches
                 __instance.reward = 0;
                 foreach (var resolveQuestion in __instance.resolveQuestions)
                 {
-                    if (__instance.rewardSyncDisk != null && __instance.rewardSyncDisk.Length > 0) 
-                        continue;
-
                     float num = 1f;
                     if (resolveQuestion.inputType == Case.InputType.revengeObjective)
                     {

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class CityControlsPatches
     {
