@@ -1,7 +1,7 @@
 ﻿using HarmonyLib;
 using System;
 
-namespace SOD.LifeAndLiving.Patches
+namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
 {
     internal class BuyInterfacePatches
     {
@@ -27,7 +27,7 @@ namespace SOD.LifeAndLiving.Patches
                     if (component.sellInteractable != null && component.sellMode && !component.sellInteractable.preset.presetName.Equals("Diamond"))
                     {
                         var prev = component.price;
-                        
+
                         component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
                         if (prev != component.price)
                         {

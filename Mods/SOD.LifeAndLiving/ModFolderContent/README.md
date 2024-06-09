@@ -4,28 +4,27 @@ SOD.LifeAndLiving is a mod designed to provide a more immersive lifestyle experi
 The mod focuses on enhancing the day-to-day aspects of city living.
 Improving things such as economy balance, social experience, daily needs and more.
 
-Features:
-- Reduce payout of side jobs
-- Reduce payout of murder cases
-- Reduce lockpick amount received from buying a lockpick kit
-- Reduce spawn rate of lockpicks
-- Reduce the spawn rate of diamonds
-- Reduce the value of loose change
-- Reduce the spawn rate of loose change
-- Reduce the spawn rate of sync disks upgrade modules
-- Reduce the spawn rate of sync disks
-- Increase cost of apartment
-- Increase cost of hotel suites
-- Set adjustable max sell price for items to general/blackmarket (diamonds excluded)
-- Adjust item value and store prices
-- Adjust cost price of furniture
-- Adjust cost price of dialog (guest pass, codes, etc..)
+Current features available (read changelog for full details):
+- Economy rebalance
+- Social Relations
+- Immersive Requirements
 
-Features to come (not implemented yet):
-- More social engagement with other civilians
-(Different dialog options based on standing with citizens) 
-(eg. bartender could recognize you and ask, same as usual?)
+Planned releases:
+[v1.0.0] [RELEASED]
+- Economy rebalance (prices, rewards)
 
+[v2.0.0] [RELEASED]
+- Social Relations (track relations between civs and player)
+- Immersive Requirements (immersive requirements to execute certain actions)
+
+[v3.0.0] [ONGOING]
+- Sync disk that provides a second life when KO'd
+- Sync disk that highlights chatter or civ name if you have face or voice identified of cases/jobs
+
+[v4.0.0] [PLANNED]
+- Ability to retrieve blood type from blood pools (and occasionally also killer's blood type if they fought)
+- Drugs and addictions (new moodlets, actions)
+
+[v5.0.0] [PLANNED]
+- Automatic civ repopulation in the city
 - A more immersive and impactful hunger / thirst system
-- Certain new actions and requirements to introduce some more realism
-(eg. screwdriver required to open vents)

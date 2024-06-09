@@ -22,11 +22,15 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
+	  <ProjectReference Include="..\SOD.RelationsPlus\SOD.RelationsPlus.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\libs\il2cpp\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="FMODUnity">
+		  <HintPath>..\..\libs\il2cpp\FMODUnity.dll</HintPath>
 		</Reference>
 		<Reference Include="Il2Cppmscorlib">
 			<HintPath>..\..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
@@ -39,6 +43,9 @@
 		</Reference>
 		<Reference Include="UnityEngine.InputLegacyModule">
 			<HintPath>..\..\libs\il2cpp\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+		  <HintPath>..\..\libs\il2cpp\UnityEngine.PhysicsModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.UI">
 			<HintPath>..\..\libs\il2cpp\UnityEngine.UI.dll</HintPath>
