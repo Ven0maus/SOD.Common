@@ -1,4 +1,8 @@
 # CHANGELOG
+**V2.0.1**
+- Bugfix: Fixed the dialog and furniture cost price calculation
+- Bugfix: You will now actually (for real) require a screwdriver to open vents
+
 **V2.0.0**
 [Social Relations]
 - Added social relations between civs and players

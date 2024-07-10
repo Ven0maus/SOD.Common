@@ -43,7 +43,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                 {
                     if (dialogPreset.cost > 0)
                     {
-                        dialogPreset.cost += dialogPreset.cost / 100 * percentage;
+                        dialogPreset.cost += (int)(dialogPreset.cost / 100f * percentage);
                         count++;
                     }
                 }
@@ -58,7 +58,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                 {
                     if (furniturePreset.cost > 0)
                     {
-                        furniturePreset.cost += furniturePreset.cost / 100 * percentage;
+                        furniturePreset.cost += (int)(furniturePreset.cost / 100f * percentage);
                         count++;
                     }
                 }
