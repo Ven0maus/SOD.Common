@@ -384,7 +384,7 @@ namespace SOD.StockMarket.Implementation
         {
             _stocks.ForEach(a =>
             {
-                a.OpeningPrice = a.ClosingPrice.Value;
+                a.OpeningPrice = a.ClosingPrice ?? a.Price;
                 a.ClosingPrice = null;
             });
             if (!_simulation)

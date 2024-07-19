@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.7**
+- Fixed an error on stocks that don't have a closing price when the stock market opens.
+
 **2.0.6**
 - Fixed app name not displaying properly in some cases
 - Fixed previous / next button for trade history
