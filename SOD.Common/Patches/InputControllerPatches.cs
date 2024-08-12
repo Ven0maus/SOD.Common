@@ -54,13 +54,14 @@ namespace SOD.Common.Patches
                 }
                 foreach (var actionName in _actionNames)
                 {
-                    if (__instance.player.GetButtonDown(actionName) || __instance.player.GetButtonUp(actionName))
+                    bool isBtnDown = __instance.player.GetButtonDown(actionName);
+                    if (isBtnDown || __instance.player.GetButtonUp(actionName))
                     {
                         var key = _gameMappedKeyDictionary.ContainsKey(actionName)
                             ? _gameMappedKeyDictionary[actionName]
                             : InteractablePreset.InteractionKey.none;
         
-                        Lib.InputDetection.ReportButtonStateChange(actionName, key, __instance.player.GetButtonDown(actionName));
+                        Lib.InputDetection.ReportButtonStateChange(actionName, key, isBtnDown);
                     }
                 }
             }
