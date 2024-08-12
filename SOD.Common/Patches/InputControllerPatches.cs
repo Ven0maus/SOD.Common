@@ -48,16 +48,20 @@ namespace SOD.Common.Patches
                         _gameMappedKeyDictionary.Add(capitalizedKey, Enum.Parse<InteractablePreset.InteractionKey>(key, true));
                     }
                 }
+                if (!__instance.player.GetAnyButtonDown() && !__instance.player.GetAnyButtonUp())
+                {
+                    return;
+                }
                 foreach (var actionName in _actionNames)
                 {
-                    var key = _gameMappedKeyDictionary.ContainsKey(actionName) ? _gameMappedKeyDictionary[actionName] : InteractablePreset.InteractionKey.none;
-                    if (__instance.player.GetButtonDown(actionName))
+                    bool isBtnDown = __instance.player.GetButtonDown(actionName);
+                    if (isBtnDown || __instance.player.GetButtonUp(actionName))
                     {
-                        Lib.InputDetection.ReportButtonStateChange(actionName, key, true);
-                    }
-                    else if (__instance.player.GetButtonUp(actionName))
-                    {
-                        Lib.InputDetection.ReportButtonStateChange(actionName, key, false);
+                        var key = _gameMappedKeyDictionary.ContainsKey(actionName)
+                            ? _gameMappedKeyDictionary[actionName]
+                            : InteractablePreset.InteractionKey.none;
+        
+                        Lib.InputDetection.ReportButtonStateChange(actionName, key, isBtnDown);
                     }
                 }
             }

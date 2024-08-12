@@ -5,6 +5,7 @@
 - Added GameExtensions class, which will contain helper extensions for the game, such as "Actor.Sees(actor);"
 - Added GetUniqueNumber variant to SaveGame helper (similar to GetUniqueString but uint version)
 - Added GetPluginDirectoryPath to SaveGame helper
+- Optimized InputController_Update patch input detection handling
 
 **2.0.1**
 - Adjusted GetSavestoreDirectoryPath method overrides. (No more missing method exception when not providing filename parameter)
