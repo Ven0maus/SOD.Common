@@ -1,4 +1,7 @@
 # CHANGELOG
+**V2.0.2**
+- Added screwdriver spawn + objective to storyline for vent objective to work properly when immersive requirement is enabled
+
 **V2.0.1**
 - Bugfix: Fixed the dialog and furniture cost price calculation
 - Bugfix: You will now actually (for real) require a screwdriver to open vents
