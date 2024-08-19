@@ -53,7 +53,7 @@ namespace SOD.StockMarket.Patches
             stock.SetTrend(stockTrend);
 
             if (Plugin.Instance.Config.IsDebugEnabled)
-                Plugin.Log.LogInfo($"Created trend: {stockTrend.Percentage}% | Source Price: € {stockTrend.StartPrice} | Target Price: € {stockTrend.EndPrice} | Steps: {stockTrend.Steps}.");
+                Plugin.Log.LogInfo($"Created trend: {stockTrend.Percentage}% | Source Price: {stockTrend.StartPrice} | Target Price: {stockTrend.EndPrice} | Steps: {stockTrend.Steps}.");
 
             if (!Plugin.Instance.Market.Simulation)
                 NewsGenerator.GenerateArticle(stock, stockTrend, murder: true);
