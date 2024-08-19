@@ -2,7 +2,7 @@
 
 namespace SOD.StockMarket
 {
-    public interface IPluginBindings : IDebugBindings, IMarketBindings, IEconomyBindings
+    public interface IPluginBindings : IDebugBindings, IMarketBindings, IEconomyBindings, IntegrationBindings
     { }
 
     public interface IDebugBindings
@@ -18,6 +18,12 @@ namespace SOD.StockMarket
 
         [Binding(Constants.SimulationDays, "The total amount of days to simulate for (only if RunSimulation is enabled).", "Debugging.SimulationDays")]
         int SimulationDays { get; set; }
+    }
+
+    public interface IntegrationBindings
+    {
+        [Binding(true, "Should murder's impact the stock market?", "Integrations.EnableMurderIntegration")]
+        bool EnableMurderIntegration { get; set; }
     }
 
     public interface IMarketBindings

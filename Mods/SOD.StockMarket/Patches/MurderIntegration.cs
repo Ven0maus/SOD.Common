@@ -10,6 +10,7 @@ namespace SOD.StockMarket.Patches
     {
         internal static void Initialize()
         {
+            if (!Plugin.Instance.Config.EnableMurderIntegration) return;
             Lib.Detective.OnVictimReported += Detective_OnVictimReported;
         }
 
