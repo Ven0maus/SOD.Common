@@ -1,5 +1,6 @@
 # CHANGELOG
 **2.0.8**
+- Rebalanced configuration defaults
 - Added an extra (configurable) integration that enables murders to impact the stock market.
 (If the murdered victim belongs to a company with a stock, it will be negatively impacted.)
 
