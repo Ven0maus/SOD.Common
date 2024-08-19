@@ -17,7 +17,7 @@
         internal const bool RunSimulation = false;
         internal const int SimulationDays = 365;
         internal const int MinimumStocksInMarket = 50;
-        internal const int MinimumMurderTrendPercentage = -20;
-        internal const int MaximumMurderTrendPercentage = -35;
+        internal const int MinimumMurderTrendPercentage = -5;
+        internal const int MaximumMurderTrendPercentage = -15;
     }
 }
