@@ -299,11 +299,11 @@ namespace SOD.StockMarket.Implementation
         /// </summary>
         private void OnMinuteChanged(object sender, TimeChangedArgs args)
         {
-            // Don't execute calculations when the stock market is closed
-            if (!IsOpen()) return;
-
             // Make sure unreleased articles can be released at random times
             NewsGenerator.TickToBeReleased();
+
+            // Don't execute calculations when the stock market is closed
+            if (!IsOpen()) return;
 
             // Trigger price update every in game minute
             // Hour change price updates are handled seperately

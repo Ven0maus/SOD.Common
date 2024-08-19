@@ -34,7 +34,7 @@ namespace SOD.StockMarket.Patches
             if (stock == null)
             {
                 if (Plugin.Instance.Config.IsDebugEnabled)
-                    Plugin.Log.LogInfo($"Victim was part of company \"{company.name}\", but no stock was found. It is possible this company is illegal/self-employed or not public facing.");
+                    Plugin.Log.LogInfo($"Victim was part of company \"{company.name}\", but no stock was found. Self employed or illegal companies don't have stocks.");
                 return;
             }
 

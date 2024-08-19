@@ -17,7 +17,7 @@ namespace SOD.StockMarket.Patches
 
                 // Don't create stocks for these types of companies
                 if (__instance.preset != null && __instance.preset.isSelfEmployed ||
-                    __instance.preset.isIllegal || !__instance.preset.publicFacing)
+                    __instance.preset.isIllegal)
                     return;
 
                 if (!ShownInitializingMessage)
