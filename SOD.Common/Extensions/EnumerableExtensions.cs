@@ -6,6 +6,22 @@ namespace SOD.Common.Extensions
 {
     public static class EnumerableExtensions
     {
+        public static bool Any<T>(this Il2CppSystem.Collections.Generic.List<T> list, Func<T, bool> criteria)
+        {
+            return list.AsEnumerable().Any(criteria);
+        }
+
+        public static bool All<T>(this Il2CppSystem.Collections.Generic.List<T> list, Func<T, bool> criteria)
+        {
+            return list.AsEnumerable().All(criteria);
+        }
+
+        public static void ForEach<T>(this Il2CppSystem.Collections.Generic.List<T> list, Action<T> action)
+        {
+            foreach (var value in list.AsEnumerable())
+                action(value);
+        }
+
         public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
         {
             foreach (var value in enumerable)
