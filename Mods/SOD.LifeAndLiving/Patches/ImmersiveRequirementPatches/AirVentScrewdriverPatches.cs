@@ -57,5 +57,70 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 return true;
             }
         }
+
+        private static Interactable ScrewDriverForVent = null;
+
+        [HarmonyPatch(typeof(ChapterIntro), nameof(ChapterIntro.InvestigateWriterAddress))]
+        internal class ChapterIntro_InvestigateWriterAddress
+        {
+            private static void Prefix(ChapterIntro __instance)
+            {
+                if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
+
+                // Check if there is atleast a vent
+                var airVent = __instance.kidnapper.home.rooms
+                    .AsEnumerable()
+                    .SelectMany(a => a.airVents.AsEnumerable())
+                    .FirstOrDefault();
+                if (airVent == null)
+                {
+                    Plugin.Log.LogInfo("No airvents found, no need to spawn a screwdriver.");
+                    return;
+                }
+
+                if (!Toolbox.Instance.objectPresetDictionary.TryGetValue("Screwdriver", out var screwDriverPreset))
+                {
+                    Plugin.Log.LogInfo("Unable to find screwdriver preset, cannot spawn screwdriver.");
+                    return;
+                }
+
+                ScrewDriverForVent = __instance.kidnapper.home.nodes
+                    .AsEnumerable()
+                    .SelectMany(a => a.interactables.Where(b => b.preset.name.Equals(screwDriverPreset.name)))
+                    .FirstOrDefault();
+                if (ScrewDriverForVent == null)
+                {
+                    Plugin.Log.LogInfo("No screwdrivers found, spawning atleast one.");
+
+                    FurnitureLocation furnitureLocation;
+                    ScrewDriverForVent = __instance.kidnapper.home.PlaceObject(screwDriverPreset, null, null, null, out furnitureLocation, false, Interactable.PassedVarType.jobID, -1, true, 0, InteractablePreset.OwnedPlacementRule.nonOwnedOnly, 0, null, false, null, null, null, "", true);
+
+                    Plugin.Log.LogInfo("Screwdriver was spawned in: " + ScrewDriverForVent.node.room.name);
+                }
+                else
+                {
+                    Plugin.Log.LogInfo("A screwdriver is already present, no need to spawn an extra one.");
+                }
+            }
+        }
+
+        [HarmonyPatch(typeof(Objective), nameof(Objective.Complete))]
+        internal class Objective_Complete
+        {
+            [HarmonyPostfix]
+            private static void Postfix(Objective __instance)
+            {
+                if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
+                if (ScrewDriverForVent != null && __instance.queueElement.entryRef.StartsWith("Look around for vents for a potential quick exit"))
+                {
+                    // Add custom objective
+                    Lib.DdsStrings["chapter.introduction", "PickupScrewdriverForVent"] = "Pick up screwdriver to open the vent";
+                    Objective.ObjectiveTrigger trigger2 = new Objective.ObjectiveTrigger(Objective.ObjectiveTriggerType.interactableRemoved, "", false, 0f, null, ScrewDriverForVent, null, null, null, null, null, "", false, default);
+                    __instance.thisCase.AddObjective("PickupScrewdriverForVent", trigger2, true, ScrewDriverForVent.GetWorldPosition(true), InterfaceControls.Icon.hand, Objective.OnCompleteAction.nothing, 0f, false, "", false, false);
+
+                    ScrewDriverForVent = null;
+                }
+            }
+        }
     }
 }

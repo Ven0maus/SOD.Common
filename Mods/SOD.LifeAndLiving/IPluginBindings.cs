@@ -1,5 +1,4 @@
-﻿using SOD.LifeAndLiving.Bindings;
-using SOD.LifeAndLiving.Bindings.EconomicBindings;
+﻿using SOD.LifeAndLiving.Bindings.EconomicBindings;
 using SOD.LifeAndLiving.Bindings.ImRequirementBindings;
 
 namespace SOD.LifeAndLiving
