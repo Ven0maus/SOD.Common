@@ -16,15 +16,28 @@ namespace SOD.StockMarket.Implementation.Cruncher.News
         /// Generates an article for a specific stock.
         /// </summary>
         /// <param name="stock"></param>
-        internal static void GenerateArticle(Stock stock, StockTrend? trend = null)
+        internal static void GenerateArticle(Stock stock, StockTrend? trend = null, bool murder = false)
         {
             var currentTime = Lib.Time.CurrentDateTime;
 
-            // 40% seems like a good balance as max duration to release articles when a trend happens
-            var timeUntilRelease = trend != null ? MathHelper.Random.Next(0, trend.Value.Steps / 100 * 40) : 0;
-            var starter = NewsElements.VagueHeadlineStarts[MathHelper.Random.Next(NewsElements.VagueHeadlineStarts.Length-1)];
-            var headline = NewsElements.Headlines[MathHelper.Random.Next(NewsElements.Headlines.Length-1)];
-            var article = new Article(currentTime, $"{starter}: {stock.Name} ({stock.Symbol}) {headline}.", timeUntilRelease);
+            // For murders the articles cannot release instantly
+            // So we have a base of 10 steps, the total length can be up to 30 steps for murder or 40 steps for regular stock article
+            var timeUntilRelease = trend != null ? MathHelper.Random.Next(murder ? 10 : 0, trend.Value.Steps / 100 * (murder ? 30 : 40)) : 0;
+
+            Article article;
+            // Decide which starter and headline
+            if (murder)
+            {
+                var headline = NewsElements.MurderHeadlines[MathHelper.Random.Next(NewsElements.Headlines.Length - 1)];
+                article = new Article(currentTime, string.Format(headline, $"{stock.Name} ({stock.Symbol})"), timeUntilRelease);
+            }
+            else
+            {
+                var starter = NewsElements.VagueHeadlineStarts[MathHelper.Random.Next(NewsElements.VagueHeadlineStarts.Length - 1)];
+                var headline = NewsElements.Headlines[MathHelper.Random.Next(NewsElements.Headlines.Length - 1)];
+                article = new Article(currentTime, $"{starter}: {stock.Name} ({stock.Symbol}) {headline}.", timeUntilRelease);
+            }
+
             _articles.Add(article);
 
             if (Plugin.Instance.Config.IsDebugEnabled)

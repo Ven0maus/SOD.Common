@@ -34,7 +34,7 @@ namespace SOD.StockMarket.Implementation
         private static int ClosingHour => Plugin.Instance.Config.ClosingHour;
 
         internal TradeController TradeController { get; private set; }
-        private readonly bool _simulation = false;
+        internal readonly bool Simulation = false;
         internal Time.TimeData? SimulationTime;
 
         internal Market()
@@ -50,6 +50,9 @@ namespace SOD.StockMarket.Implementation
             Lib.Time.OnTimeInitialized += InitDdsRecords;
             Lib.Time.OnMinuteChanged += OnMinuteChanged;
             Lib.Time.OnHourChanged += OnHourChanged;
+
+            // Init the murder integration
+            MurderIntegration.Initialize();
 
             // Trigger simulation if enabled
             if (Plugin.Instance.Config.RunSimulation)
@@ -90,7 +93,7 @@ namespace SOD.StockMarket.Implementation
             foreach (var stock in market.Stocks)
                 _stocks.Add(new Stock(stock));
             TradeController = new TradeController(this);
-            _simulation = true;
+            Simulation = true;
             SimulationTime = new Time.TimeData(1979, 1, 1, Plugin.Instance.Config.OpeningHour, 0);
             Initialized = true;
         }
@@ -232,7 +235,7 @@ namespace SOD.StockMarket.Implementation
             Lib.Time.OnTimeInitialized -= InitializeMarket;
 
             // Create first portfolio historical data entry
-            if (!_simulation)
+            if (!Simulation)
                 TradeController.CreatePortfolioHistoricalDataEntry();
 
             // Create the initial historical data
@@ -334,7 +337,7 @@ namespace SOD.StockMarket.Implementation
             // Do a check to remove any outdated articles
             NewsGenerator.RemoveOutdatedArticles();
 
-            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
+            if (Plugin.Instance.Config.IsDebugEnabled && !Simulation)
             {
                 Plugin.Log.LogInfo($"- New stock updates -");
                 foreach (var stock in _stocks.OrderBy(a => a.Id))
@@ -345,7 +348,7 @@ namespace SOD.StockMarket.Implementation
 
         internal bool IsOpen()
         {
-            if (!_simulation && !Lib.Time.IsInitialized) return false;
+            if (!Simulation && !Lib.Time.IsInitialized) return false;
 
             // Check the time
             var currentTime = SimulationTime ?? Lib.Time.CurrentDateTime;
@@ -374,9 +377,9 @@ namespace SOD.StockMarket.Implementation
                 a.CreateHistoricalData(date: SimulationTime);
                 historicalDataDeleted += a.CleanUpHistoricalData(SimulationTime);
             });
-            if (historicalDataDeleted > 0 && Plugin.Instance.Config.IsDebugEnabled && !_simulation)
+            if (historicalDataDeleted > 0 && Plugin.Instance.Config.IsDebugEnabled && !Simulation)
                 Plugin.Log.LogInfo($"Deleted {historicalDataDeleted} old historical data.");
-            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
+            if (Plugin.Instance.Config.IsDebugEnabled && !Simulation)
                 Plugin.Log.LogInfo("Stock market is closing.");
         }
 
@@ -387,9 +390,9 @@ namespace SOD.StockMarket.Implementation
                 a.OpeningPrice = a.ClosingPrice ?? a.Price;
                 a.ClosingPrice = null;
             });
-            if (!_simulation)
+            if (!Simulation)
                 TradeController.CreatePortfolioHistoricalDataEntry();
-            if (Plugin.Instance.Config.IsDebugEnabled && !_simulation)
+            if (Plugin.Instance.Config.IsDebugEnabled && !Simulation)
                 Plugin.Log.LogInfo("Stock market is opening.");
         }
 
@@ -411,8 +414,6 @@ namespace SOD.StockMarket.Implementation
             var trendsGenerated = 0;
 
             // Validations for configuration
-            var maxTrendSteps = Plugin.Instance.Config.MaxHoursTrendsCanPersist;
-            var minTrendSteps = Plugin.Instance.Config.MinHoursTrendsMustPersist;
             var trendChancePerStock = Plugin.Instance.Config.StockTrendChancePercentage;
             var maxTrends = Plugin.Instance.Config.MaxTrends;
             var debugModeEnabled = Plugin.Instance.Config.IsDebugEnabled;
@@ -430,67 +431,88 @@ namespace SOD.StockMarket.Implementation
                 var chance = (MathHelper.Random.NextDouble() * 100) < trendChancePerStock;
                 if (chance)
                 {
-                    // Generate mean and standard deviation based on historical data
-                    double stockMean;
-                    double stockStdDev;
-                    if (stock.HistoricalData.Count >= 2)
-                    {
-                        // Calculate historical percentage changes for the current stock
-                        for (int i = 1; i < stock.HistoricalData.Count; i++)
-                        {
-                            decimal previousClose = stock.HistoricalData[i - 1].Close.Value;
-                            decimal currentClose = stock.HistoricalData[i].Close.Value;
+                    if (!CalculateStockTrend(historicalPercentageChanges, stock, out StockTrend? strend)) 
+                        continue;
 
-                            double percentageChange = (double)((currentClose - previousClose) / previousClose * 100);
-                            historicalPercentageChanges.Add(percentageChange);
-                        }
-
-                        // Calculate mean and standard deviation for the current stock
-                        stockMean = historicalPercentageChanges.Average();
-                        stockStdDev = MathHelper.CalculateStandardDeviation(historicalPercentageChanges);
-                        historicalPercentageChanges.Clear();
-                    }
-                    else
-                    {
-                        // Use a uniform mean and deviation if there is no historical data yet
-                        stockMean = 0.0d;
-                        stockStdDev = 0.3d;
-                    }
-
-                    // Generate a realistic percentage change using a normal distribution
-                    double percentage = Math.Round(MathHelper.NextGaussian(stockMean, stockStdDev));
-
-                    // Skip 0 percentage differences
-                    var intPercent = (int)percentage;
-                    if (intPercent == 0) continue;
-
-                    // Not too small percentages
-                    if (Math.Abs(intPercent) < 2)
-                        percentage = percentage < 0 ? percentage - 3 : percentage + 3;
-
-                    // Small 7% chance to have a really high percentage spike
-                    if ((MathHelper.Random.NextDouble() * 100) < 7)
-                        percentage *= MathHelper.Random.Next(2, 5);
-
-                    // Total steps to full-fill trend (1 step = 1 in game minute)
-                    int steps = MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
-
-                    // Generate the stock trend entry
-                    var stockTrend = new StockTrend(percentage, stock.Price, steps);
+                    // Set the trend that was calculated
+                    var stockTrend = strend.Value;
                     stock.SetTrend(stockTrend);
-                    trendsGenerated++;
 
                     // Generate news entry
-                    if (!_simulation)
+                    if (!Simulation)
                         NewsGenerator.GenerateArticle(stock, stockTrend);
 
-                    if (debugModeEnabled && !_simulation)
+                    if (debugModeEnabled && !Simulation)
                         Plugin.Log.LogInfo($"[NEW TREND]: \"({stock.Symbol}) {stock.Name}\" | Price: {stockTrend.StartPrice} | Target {stockTrend.EndPrice} | Percentage: {Math.Round(stockTrend.Percentage, 2)} | MinutesLeft: {stockTrend.Steps}");
+                    
+                    trendsGenerated++;
                 }
             }
 
-            if (trendsGenerated > 0 && debugModeEnabled && !_simulation && Lib.Time.IsInitialized)
+            if (trendsGenerated > 0 && debugModeEnabled && !Simulation && Lib.Time.IsInitialized)
                 Plugin.Log.LogInfo($"[GameTime({Lib.Time.CurrentDateTime})] Created {trendsGenerated} new trends.");
+        }
+
+        private static bool CalculateStockTrend(List<double> historicalPercentageChanges, Stock stock, out StockTrend? stockTrend)
+        {
+            stockTrend = null;
+
+            // Generate mean and standard deviation based on historical data
+            double stockMean;
+            double stockStdDev;
+            if (stock.HistoricalData.Count >= 2)
+            {
+                // Calculate historical percentage changes for the current stock
+                for (int i = 1; i < stock.HistoricalData.Count; i++)
+                {
+                    decimal previousClose = stock.HistoricalData[i - 1].Close.Value;
+                    decimal currentClose = stock.HistoricalData[i].Close.Value;
+
+                    double percentageChange = (double)((currentClose - previousClose) / previousClose * 100);
+                    historicalPercentageChanges.Add(percentageChange);
+                }
+
+                // Calculate mean and standard deviation for the current stock
+                stockMean = historicalPercentageChanges.Average();
+                stockStdDev = MathHelper.CalculateStandardDeviation(historicalPercentageChanges);
+                historicalPercentageChanges.Clear();
+            }
+            else
+            {
+                // Use a uniform mean and deviation if there is no historical data yet
+                stockMean = 0.0d;
+                stockStdDev = 0.3d;
+            }
+
+            // Generate a realistic percentage change using a normal distribution
+            double percentage = Math.Round(MathHelper.NextGaussian(stockMean, stockStdDev));
+
+            // Skip 0 percentage differences
+            var intPercent = (int)percentage;
+            if (intPercent == 0) return false;
+
+            // Not too small percentages
+            if (Math.Abs(intPercent) < 2)
+                percentage = percentage < 0 ? percentage - 3 : percentage + 3;
+
+            // Small 7% chance to have a really high percentage spike
+            if ((MathHelper.Random.NextDouble() * 100) < 7)
+                percentage *= MathHelper.Random.Next(2, 5);
+
+            // Generate the stock trend entry
+            stockTrend = new StockTrend(percentage, stock.Price, CalculateRandomSteps());
+            return true;
+        }
+
+        /// <summary>
+        /// Generates a random amount of total steps to full-fill a trend (1 step = 1 in game minute)
+        /// </summary>
+        /// <returns></returns>
+        internal static int CalculateRandomSteps()
+        {
+            var maxTrendSteps = Plugin.Instance.Config.MaxHoursTrendsCanPersist;
+            var minTrendSteps = Plugin.Instance.Config.MinHoursTrendsMustPersist;
+            return MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
         }
 
         private void OnFileSave(object sender, SaveGameArgs e)

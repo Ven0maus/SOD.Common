@@ -57,5 +57,11 @@ namespace SOD.StockMarket
 
         [Binding(Constants.MinimumStocksInMarket, "The minimum amount of stocks that should be in the market on generation.", "StockMarket.Economy.MinimumStocksInMarket")]
         int MinimumStocksInMarket { get; set; }
+
+        [Binding(Constants.MinimumMurderTrendPercentage, "The minimum percentage effect on the stock on a company employee murder.", "StockMarket.Economy.MinimumMurderTrendPercentage")]
+        int MinimumMurderTrendPercentage { get; set; }
+
+        [Binding(Constants.MaximumMurderTrendPercentage, "The maximum percentage effect on the stock on a company employee murder.", "StockMarket.Economy.MaximumMurderTrendPercentage")]
+        int MaximumMurderTrendPercentage { get; set; }
     }
 }
