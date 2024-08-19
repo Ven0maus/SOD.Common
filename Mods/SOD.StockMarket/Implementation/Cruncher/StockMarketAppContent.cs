@@ -22,10 +22,10 @@ namespace SOD.StockMarket.Implementation.Cruncher
         internal AppBuyLimitInterface AppBuyLimitInterface { get; private set; }
         internal AppSellLimitInterface AppSellLimitInterface { get; private set; }
         internal AppLimitOrdersOverview AppLimitOrdersOverview { get; private set; }
-        internal IAppContent CurrentContent { get; private set; }
+        internal AppContent CurrentContent { get; private set; }
 
-        private readonly List<IAppContent> _previousContents = new();
-        internal IReadOnlyList<IAppContent> PreviousContents => _previousContents;
+        private readonly List<AppContent> _previousContents = new();
+        internal IReadOnlyList<AppContent> PreviousContents => _previousContents;
 
         private bool _isSetup = false;
 
@@ -58,7 +58,7 @@ namespace SOD.StockMarket.Implementation.Cruncher
             AppLimitOrdersOverview = new AppLimitOrdersOverview(this);
 
             // Invoke setup on each content
-            var parts = new IAppContent[]
+            var parts = new AppContent[]
             {
                 AppMenu, AppStocks, AppPortfolio, AppStock,
                 AppFundsInterface, AppInstantBuyInterface, AppInstantSellInterface,
@@ -113,17 +113,17 @@ namespace SOD.StockMarket.Implementation.Cruncher
             AppSellLimitInterface.Update();
         }
 
-        internal void AddPreviousContent(IAppContent content)
+        internal void AddPreviousContent(AppContent content)
         {
             _previousContents.Add(content);
         }
 
-        internal void RemovePreviousContent(IAppContent content)
+        internal void RemovePreviousContent(AppContent content)
         {
             _previousContents.Remove(content);
         }
 
-        internal void SetCurrentContent(IAppContent content)
+        internal void SetCurrentContent(AppContent content)
         {
             CurrentContent = content;
         }

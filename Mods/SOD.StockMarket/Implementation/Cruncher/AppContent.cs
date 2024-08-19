@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace SOD.StockMarket.Implementation.Cruncher
 {
-    internal abstract class AppContent : IAppContent
+    internal abstract class AppContent
     {
         protected bool ContentActive { get { return Content != null && Content.CurrentContent != null && Content.CurrentContent.Equals(this); } }
         protected readonly StockMarketAppContent Content;

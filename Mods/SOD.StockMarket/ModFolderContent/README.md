@@ -14,3 +14,6 @@ These trends will raise or lower the stock's value by much larger margins than t
 - Stock prices calculate each in game minute (you can see the time on your game watch)
 - Occassional trends may arise and push big percentage changes in a stock
 - Supports saving and loading stockmarket data through savegames.
+
+**Available integrations**
+- Employee murders negatively impacting the company stock.
