@@ -65,6 +65,6 @@ namespace SOD.Common
         /// <summary>
         /// Provides several helpful events and tools relative to the dective work.
         /// </summary>
-        public static Detective Detective { get; } = new Detective();
+        public static Gameplay Gameplay { get; } = new Gameplay();
     }
 }
