@@ -56,13 +56,13 @@ namespace SOD.Common.Patches
         }
 
         [HarmonyPatch(typeof(FirstPersonItemController), nameof(FirstPersonItemController.PickUpItem))]
-        internal class InteractableController_MovablePickUpThis
+        internal class FirstPersonItemController_PickUpItem
         {
             [HarmonyPrefix]
-            internal static void Postfix(InteractableController __instance, bool __result)
+            internal static void Postfix(Interactable pickUpThis, ref bool __result)
             {
                 if (__result)
-                    Lib.Gameplay.InteractablePickedUp(__instance.interactable);
+                    Lib.Gameplay.InteractablePickedUp(pickUpThis);
             }
         }
 
