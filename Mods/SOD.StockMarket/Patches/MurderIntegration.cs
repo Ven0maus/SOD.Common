@@ -11,7 +11,7 @@ namespace SOD.StockMarket.Patches
         internal static void Initialize()
         {
             if (!Plugin.Instance.Config.EnableMurderIntegration) return;
-            Lib.Detective.OnVictimReported += Detective_OnVictimReported;
+            Lib.Gameplay.OnVictimReported += Detective_OnVictimReported;
         }
 
         private static void Detective_OnVictimReported(object sender, Common.Helpers.DetectiveObjects.VictimArgs e)
