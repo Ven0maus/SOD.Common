@@ -23,7 +23,7 @@ namespace SOD.Common.Helpers.ObjectiveObjects
 
         internal ObjectiveBuilder(Case @case) 
         {
-            if (_case == null)
+            if (@case == null)
                 throw new ArgumentException("Case cannot be null.", nameof(@case));
             _case = @case;
         }
@@ -87,7 +87,6 @@ namespace SOD.Common.Helpers.ObjectiveObjects
         public ObjectiveBuilder SetCompletionTrigger(PredefinedTrigger predefinedTrigger)
         {
             _trigger = predefinedTrigger.ObjectiveTrigger;
-            _pointerPosition = predefinedTrigger.PointerPosition;
             return this;
         }
 

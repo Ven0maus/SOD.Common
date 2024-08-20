@@ -101,8 +101,7 @@ namespace SOD.Common.Patches
             customObjective = FindCustomObjective(objective);
             if (customObjective != null)
             {
-                // Remove the occupied dds record, as the objective is completed
-                // TODO: Might have to remove it with a delay, as the objective fades UI out overtime.
+                // Remove the occupied dds record as its no longer needed
                 Lib.DdsStrings[customObjective.DictionaryRef, customObjective.EntryRef] = null;
 
                 // Remove custom objective
