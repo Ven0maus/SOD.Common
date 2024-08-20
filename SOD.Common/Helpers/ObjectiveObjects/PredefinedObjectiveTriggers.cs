@@ -8,12 +8,10 @@ namespace SOD.Common.Helpers.ObjectiveObjects
     public sealed class PredefinedTrigger
     {
         internal readonly Objective.ObjectiveTrigger ObjectiveTrigger;
-        internal readonly Vector3? PointerPosition;
 
-        internal PredefinedTrigger(Objective.ObjectiveTrigger objectiveTrigger, Vector3? pointerPosition)
+        internal PredefinedTrigger(Objective.ObjectiveTrigger objectiveTrigger)
         {
             ObjectiveTrigger = objectiveTrigger;
-            PointerPosition = pointerPosition;
         }
 
         public static PredefinedTrigger GoToNode(NewNode node)
@@ -23,27 +21,32 @@ namespace SOD.Common.Helpers.ObjectiveObjects
 
         public static PredefinedTrigger GoToRoom(NewRoom room)
         {
-            return Create(Objective.ObjectiveTriggerType.goToNode, room: room);
+            return Create(Objective.ObjectiveTriggerType.goToRoom, room: room);
         }
 
-        public static PredefinedTrigger PickupInteractable(Interactable interactable, bool showPointer = true)
+        public static PredefinedTrigger GoToAddress(NewGameLocation address)
         {
-            return Create(Objective.ObjectiveTriggerType.interactableRemoved, interactable: interactable, showPointer: showPointer);
+            return Create(Objective.ObjectiveTriggerType.goToAddress, address: address);
         }
 
-        public static PredefinedTrigger LookAtInteractable(Interactable interactable, bool showPointer = true)
+        public static PredefinedTrigger PickupInteractable(Interactable interactable)
         {
-            return Create(Objective.ObjectiveTriggerType.viewInteractable, interactable: interactable, showPointer: showPointer);
+            return Create(Objective.ObjectiveTriggerType.interactableRemoved, interactable: interactable);
         }
 
-        public static PredefinedTrigger InspectInteractable(Interactable interactable, bool showPointer = true)
+        public static PredefinedTrigger LookAtInteractable(Interactable interactable)
         {
-            return Create(Objective.ObjectiveTriggerType.inspectInteractable, interactable: interactable, showPointer: showPointer);
+            return Create(Objective.ObjectiveTriggerType.viewInteractable, interactable: interactable);
         }
 
-        private static PredefinedTrigger Create(Objective.ObjectiveTriggerType type, Interactable interactable = null, NewRoom room = null, NewNode node = null, bool showPointer = false)
+        public static PredefinedTrigger InspectInteractable(Interactable interactable)
         {
-            return new PredefinedTrigger(new Objective.ObjectiveTrigger(type, "", false, 0f, room, interactable, null, node, null, null, null, "", false, default), showPointer ? interactable.GetWorldPosition() : null);
+            return Create(Objective.ObjectiveTriggerType.inspectInteractable, interactable: interactable);
+        }
+
+        private static PredefinedTrigger Create(Objective.ObjectiveTriggerType type, Interactable interactable = null, NewRoom room = null, NewNode node = null, NewGameLocation address = null)
+        {
+            return new PredefinedTrigger(new Objective.ObjectiveTrigger(type, "", false, 0f, room, interactable, null, node, null, address, null, "", false, default));
         }
     }
 }
