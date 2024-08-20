@@ -3,9 +3,9 @@ using System;
 
 namespace SOD.Common.Helpers
 {
-    public sealed class Detective
+    public sealed class Gameplay
     {
-        internal Detective() { }
+        internal Gameplay() { }
 
         /// <summary>
         /// Raises when a victim is reported by a civilian, and provides some arguments related to this.
