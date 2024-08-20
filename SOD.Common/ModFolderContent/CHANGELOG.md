@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.0.3**
+- Added Detective Lib helper which provides functionality related to the detective gameplay
+- Added extra extensions for il2cpp to enumerable support
+
 **2.0.2**
 - Bugfix option ids were not passed through properly for Upgrade Options on sync disk builder
 - Code cleanup, logging and performance improvements to sync disk helper

@@ -28,7 +28,7 @@ namespace SOD.Common.Patches
                     // Raise method for victim discovery
                     var victim = __instance.GetVictim();
                     if (victim != null)
-                        Lib.Detective.ReportVictim(victim, newFoundBy, newReportType);
+                        Lib.Gameplay.ReportVictim(victim, newFoundBy, newReportType);
                 }
             }
         }
