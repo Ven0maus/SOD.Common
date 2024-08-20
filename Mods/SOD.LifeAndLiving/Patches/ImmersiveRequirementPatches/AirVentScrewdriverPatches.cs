@@ -67,6 +67,22 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
             {
                 if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
 
+                // Check if we already have a screwdriver in our inventory
+                var hasScrewdriver = FirstPersonItemController.Instance.slots.ToList()
+                    .Select(a =>
+                    {
+                        if (a.interactableID == -1) return null;
+                        var inter = a.GetInteractable();
+                        if (inter == null || inter.preset == null || inter.preset.presetName == null) return null;
+                        return inter.preset.presetName;
+                    })
+                    .Any(a => a != null && a.Equals("Screwdriver"));
+                if (hasScrewdriver)
+                {
+                    Plugin.Log.LogInfo("Already have a screwdriver in the inventory, no need to add objective or spawn a new one.");
+                    return;
+                }
+
                 // Check if there is atleast a vent
                 var airVent = __instance.kidnapper.home.rooms
                     .AsEnumerable()
