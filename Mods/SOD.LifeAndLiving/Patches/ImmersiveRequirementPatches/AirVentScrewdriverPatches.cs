@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SOD.Common;
 using SOD.Common.Extensions;
+using SOD.Common.Helpers.ObjectiveObjects;
 using System.Linq;
 
 namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
@@ -117,24 +118,24 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 {
                     Plugin.Log.LogInfo("A screwdriver is already present, no need to spawn an extra one.");
                 }
-            }
-        }
 
-        [HarmonyPatch(typeof(Objective), nameof(Objective.Complete))]
-        internal class Objective_Complete
-        {
-            [HarmonyPostfix]
-            private static void Postfix(Objective __instance)
+                Lib.CaseObjectives.OnObjectiveCompleted += CaseObjectives_OnObjectiveCompleted;
+            }
+
+            private static void CaseObjectives_OnObjectiveCompleted(object sender, ObjectiveArgs e)
             {
-                if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
-                if (ScrewDriverForVent != null && __instance.queueElement.entryRef.StartsWith("Look around for vents for a potential quick exit"))
+                if (ScrewDriverForVent != null && e.EntryRef.StartsWith("Look around for vents for a potential quick exit"))
                 {
-                    // Add screwdriver objective
-                    Lib.DdsStrings["chapter.introduction", "FindScrewdriverForVent"] = "Look around for a screwdriver to open the air vent";
-                    Objective.ObjectiveTrigger trigger2 = new Objective.ObjectiveTrigger(Objective.ObjectiveTriggerType.goToNode, "", false, 0f, null, null, null, ScrewDriverForVent.node, null, null, null, "", false, default);
-                    __instance.thisCase.AddObjective("FindScrewdriverForVent", trigger2, true, ScrewDriverForVent.GetWorldPosition(true), InterfaceControls.Icon.hand, Objective.OnCompleteAction.nothing, 0f, false, "", false, false);
+                    // Create a new objective
+                    Lib.CaseObjectives.Builder(e.Case)
+                        .SetText("Look around for a screwdriver to open the air vent")
+                        .SetIcon(InterfaceControls.Icon.lookingGlass)
+                        .SetPointer(ScrewDriverForVent.GetWorldPosition())
+                        .SetCompletionTrigger(PredefinedTrigger.GoToNode(ScrewDriverForVent.node))
+                        .Register();
 
                     ScrewDriverForVent = null;
+                    Lib.CaseObjectives.OnObjectiveCompleted -= CaseObjectives_OnObjectiveCompleted;
                 }
             }
         }
