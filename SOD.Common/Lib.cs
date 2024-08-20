@@ -58,8 +58,18 @@ namespace SOD.Common
         public static PlayerStatus PlayerStatus { get; } = new PlayerStatus();
 
         /// <summary>
-        /// Contains helpers to access engine functionality that is stripped from the game
+        /// Contains helpers to access engine functionality that is stripped from the game.
         /// </summary>
         public static RestoredUnityEngine RestoredEngineFunctions { get; } = new RestoredUnityEngine();
+
+        /// <summary>
+        /// Provides several helpful events and tools relative to the dective gameplay.
+        /// </summary>
+        public static Gameplay Gameplay { get; } = new Gameplay();
+
+        /// <summary>
+        /// Contains helpers to create and hook new objectives for cases.
+        /// </summary>
+        public static CaseObjectives CaseObjectives { get; } = new CaseObjectives();
     }
 }
