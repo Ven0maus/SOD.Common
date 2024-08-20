@@ -1,6 +1,7 @@
 # CHANGELOG
 **2.0.3**
-- Added Detective Lib helper which provides functionality related to the detective gameplay
+- Added Gameplay Lib helper which provides functionality related to the detective gameplay
+- Added CaseObjectives Lib helper which provides functionality to create and hook new objectives to cases
 - Added extra extensions for il2cpp to enumerable support
 
 **2.0.2**

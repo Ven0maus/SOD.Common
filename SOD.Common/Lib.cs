@@ -63,7 +63,7 @@ namespace SOD.Common
         public static RestoredUnityEngine RestoredEngineFunctions { get; } = new RestoredUnityEngine();
 
         /// <summary>
-        /// Provides several helpful events and tools relative to the dective work.
+        /// Provides several helpful events and tools relative to the dective gameplay.
         /// </summary>
         public static Gameplay Gameplay { get; } = new Gameplay();
 
