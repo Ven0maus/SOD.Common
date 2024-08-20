@@ -14,7 +14,7 @@ namespace SOD.StockMarket.Patches
             Lib.Gameplay.OnVictimReported += Detective_OnVictimReported;
         }
 
-        private static void Detective_OnVictimReported(object sender, Common.Helpers.DetectiveObjects.VictimArgs e)
+        private static void Detective_OnVictimReported(object sender, Common.Helpers.GameplayObjects.VictimReportedArgs e)
         {
             var victim = e.Victim;
             var reporter = e.Reporter;
