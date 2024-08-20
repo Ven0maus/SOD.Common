@@ -58,14 +58,10 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
             {
                 if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
 
-                if (!Toolbox.Instance.objectPresetDictionary.TryGetValue("Screwdriver", out var screwDriverPreset))
-                {
-                    Plugin.Log.LogInfo("Unable to find screwdriver preset, cannot spawn screwdriver.");
-                    return;
-                }
+                const string screwDriverPresetName = "Screwdriver";
 
                 // Check if we already have a screwdriver in our inventory
-                if (Lib.Gameplay.HasInteractableInInventory(screwDriverPreset.name, out _))
+                if (Lib.Gameplay.HasInteractableInInventory(screwDriverPresetName, out _))
                 {
                     Plugin.Log.LogInfo("Already have a screwdriver in the inventory, no need to add objective or spawn a new one.");
                     return;
@@ -78,12 +74,12 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                     return;
                 }
                 
-                if (!Lib.Gameplay.InteractableExistsInHouse(screwDriverPreset.name, __instance.kidnapper.home, out var screwDrivers))
+                if (!Lib.Gameplay.InteractableExistsInHouse(screwDriverPresetName, __instance.kidnapper.home, out var screwDrivers))
                 {
                     Plugin.Log.LogInfo("No screwdrivers found, spawning atleast one.");
 
-                    FurnitureLocation furnitureLocation;
-                    ScrewDriverForVent = __instance.kidnapper.home.PlaceObject(screwDriverPreset, null, null, null, out furnitureLocation, false, Interactable.PassedVarType.jobID, -1, true, 0, InteractablePreset.OwnedPlacementRule.nonOwnedOnly, 0, null, false, null, null, null, "", true);
+                    // Add screwdriver to house
+                    Lib.Gameplay.AddInteractableToHouse(screwDriverPresetName, __instance.kidnapper.home, out _, out ScrewDriverForVent);
 
                     Plugin.Log.LogInfo("Screwdriver was spawned in: " + ScrewDriverForVent.node.room.name);
                 }
