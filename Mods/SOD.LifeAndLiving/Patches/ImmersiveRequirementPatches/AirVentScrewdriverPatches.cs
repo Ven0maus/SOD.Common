@@ -113,10 +113,10 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
                 if (ScrewDriverForVent != null && __instance.queueElement.entryRef.StartsWith("Look around for vents for a potential quick exit"))
                 {
-                    // Add custom objective
-                    Lib.DdsStrings["chapter.introduction", "PickupScrewdriverForVent"] = "Pick up screwdriver to open the vent";
-                    Objective.ObjectiveTrigger trigger2 = new Objective.ObjectiveTrigger(Objective.ObjectiveTriggerType.interactableRemoved, "", false, 0f, null, ScrewDriverForVent, null, null, null, null, null, "", false, default);
-                    __instance.thisCase.AddObjective("PickupScrewdriverForVent", trigger2, true, ScrewDriverForVent.GetWorldPosition(true), InterfaceControls.Icon.hand, Objective.OnCompleteAction.nothing, 0f, false, "", false, false);
+                    // Add screwdriver objective
+                    Lib.DdsStrings["chapter.introduction", "FindScrewdriverForVent"] = "Look around for a screwdriver to open the air vent";
+                    Objective.ObjectiveTrigger trigger2 = new Objective.ObjectiveTrigger(Objective.ObjectiveTriggerType.goToNode, "", false, 0f, null, null, null, ScrewDriverForVent.node, null, null, null, "", false, default);
+                    __instance.thisCase.AddObjective("FindScrewdriverForVent", trigger2, true, ScrewDriverForVent.GetWorldPosition(true), InterfaceControls.Icon.hand, Objective.OnCompleteAction.nothing, 0f, false, "", false, false);
 
                     ScrewDriverForVent = null;
                 }
