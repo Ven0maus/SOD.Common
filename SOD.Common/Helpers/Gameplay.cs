@@ -27,6 +27,20 @@ namespace SOD.Common.Helpers
         public event EventHandler<InteractableArgs> OnInteractableDropped;
 
         /// <summary>
+        /// Checks if an airvent exist in a house, returns true/false and outs the airvents found.
+        /// </summary>
+        /// <param name="address"></param>
+        /// <returns></returns>
+        public bool AirVentExistsInHouse(NewAddress address, out AirDuctGroup.AirVent[] airVents)
+        {
+            airVents = address.rooms
+                .AsEnumerable()
+                .SelectMany(a => a.airVents.AsEnumerable())
+                .ToArray();
+            return airVents.Length > 0;
+        }
+
+        /// <summary>
         /// Checks if a certain interactable exists in a house, returns true/false and outs the interactables found.
         /// </summary>
         /// <param name="interactablePresetName"></param>
