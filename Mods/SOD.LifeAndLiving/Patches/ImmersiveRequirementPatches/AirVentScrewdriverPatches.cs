@@ -39,17 +39,7 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 _attemptOpenOrCloseAirVent = false;
 
                 // Check if we have a screwdriver in our inventory
-                var hasScrewdriver = FirstPersonItemController.Instance.slots.ToList()
-                    .Select(a =>
-                    {
-                        if (a.interactableID == -1) return null;
-                        var inter = a.GetInteractable();
-                        if (inter == null || inter.preset == null || inter.preset.presetName == null) return null;
-                        return inter.preset.presetName;
-                    })
-                    .Any(a => a != null && a.Equals("Screwdriver"));
-
-                if (!hasScrewdriver)
+                if (!Lib.Gameplay.HasInteractableInInventory("Screwdriver", out _))
                 {
                     Lib.GameMessage.ShowPlayerSpeech("I could open this with a screwdriver, maybe I should look for one.", 5);
                     return false;
@@ -68,44 +58,27 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
             {
                 if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
 
-                // Check if we already have a screwdriver in our inventory
-                var hasScrewdriver = FirstPersonItemController.Instance.slots.ToList()
-                    .Select(a =>
-                    {
-                        if (a.interactableID == -1) return null;
-                        var inter = a.GetInteractable();
-                        if (inter == null || inter.preset == null || inter.preset.presetName == null) return null;
-                        return inter.preset.presetName;
-                    })
-                    .Any(a => a != null && a.Equals("Screwdriver"));
-                if (hasScrewdriver)
-                {
-                    Plugin.Log.LogInfo("Already have a screwdriver in the inventory, no need to add objective or spawn a new one.");
-                    return;
-                }
-
-                // Check if there is atleast a vent
-                var airVent = __instance.kidnapper.home.rooms
-                    .AsEnumerable()
-                    .SelectMany(a => a.airVents.AsEnumerable())
-                    .FirstOrDefault();
-                if (airVent == null)
-                {
-                    Plugin.Log.LogInfo("No airvents found, no need to spawn a screwdriver.");
-                    return;
-                }
-
                 if (!Toolbox.Instance.objectPresetDictionary.TryGetValue("Screwdriver", out var screwDriverPreset))
                 {
                     Plugin.Log.LogInfo("Unable to find screwdriver preset, cannot spawn screwdriver.");
                     return;
                 }
 
-                ScrewDriverForVent = __instance.kidnapper.home.nodes
-                    .AsEnumerable()
-                    .SelectMany(a => a.interactables.Where(b => b.preset.name.Equals(screwDriverPreset.name)))
-                    .FirstOrDefault();
-                if (ScrewDriverForVent == null)
+                // Check if we already have a screwdriver in our inventory
+                if (Lib.Gameplay.HasInteractableInInventory(screwDriverPreset.name, out _))
+                {
+                    Plugin.Log.LogInfo("Already have a screwdriver in the inventory, no need to add objective or spawn a new one.");
+                    return;
+                }
+
+                // Check if there is atleast a vent
+                if (!Lib.Gameplay.AirVentExistsInHouse(__instance.kidnapper.home, out var airvents))
+                {
+                    Plugin.Log.LogInfo("No airvents found, no need to spawn a screwdriver.");
+                    return;
+                }
+                
+                if (!Lib.Gameplay.InteractableExistsInHouse(screwDriverPreset.name, __instance.kidnapper.home, out var screwDrivers))
                 {
                     Plugin.Log.LogInfo("No screwdrivers found, spawning atleast one.");
 
@@ -117,6 +90,9 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 else
                 {
                     Plugin.Log.LogInfo("A screwdriver is already present, no need to spawn an extra one.");
+
+                    // Get the closest screwdriver to the player within the house
+                    ScrewDriverForVent = screwDrivers.First();
                 }
 
                 Lib.CaseObjectives.OnObjectiveCompleted += CaseObjectives_OnObjectiveCompleted;
