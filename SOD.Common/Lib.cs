@@ -66,5 +66,9 @@ namespace SOD.Common
         /// Provides several helpful events and tools relative to the dective work.
         /// </summary>
         public static Gameplay Gameplay { get; } = new Gameplay();
+
+        /// Contains helpers to create and hook new objectives for cases.
+        /// </summary>
+        public static CaseObjectives CaseObjectives { get; } = new CaseObjectives();
     }
 }
