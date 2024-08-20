@@ -39,17 +39,7 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 _attemptOpenOrCloseAirVent = false;
 
                 // Check if we have a screwdriver in our inventory
-                var hasScrewdriver = FirstPersonItemController.Instance.slots.ToList()
-                    .Select(a =>
-                    {
-                        if (a.interactableID == -1) return null;
-                        var inter = a.GetInteractable();
-                        if (inter == null || inter.preset == null || inter.preset.presetName == null) return null;
-                        return inter.preset.presetName;
-                    })
-                    .Any(a => a != null && a.Equals("Screwdriver"));
-
-                if (!hasScrewdriver)
+                if (!Lib.Gameplay.HasInteractableInInventory("Screwdriver", out _))
                 {
                     Lib.GameMessage.ShowPlayerSpeech("I could open this with a screwdriver, maybe I should look for one.", 5);
                     return false;
