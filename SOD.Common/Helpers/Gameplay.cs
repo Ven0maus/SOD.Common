@@ -118,9 +118,9 @@ namespace SOD.Common.Helpers
             OnInteractablePickup?.Invoke(this, new InteractableArgs(interactable));
         }
 
-        internal void InteractableDropped(Interactable interactable)
+        internal void InteractableDropped(Interactable interactable, bool wasThrown)
         {
-            OnInteractableDropped?.Invoke(this, new InteractableArgs(interactable));
+            OnInteractableDropped?.Invoke(this, new InteractableArgs(interactable, wasThrown));
         }
     }
 }

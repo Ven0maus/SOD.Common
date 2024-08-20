@@ -58,7 +58,7 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(FirstPersonItemController), nameof(FirstPersonItemController.PickUpItem))]
         internal class FirstPersonItemController_PickUpItem
         {
-            [HarmonyPrefix]
+            [HarmonyPostfix]
             internal static void Postfix(Interactable pickUpThis, ref bool __result)
             {
                 if (__result)
@@ -69,10 +69,10 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(InteractableController), nameof(InteractableController.DropThis))]
         internal class InteractableController_DropThis
         {
-            [HarmonyPrefix]
-            internal static void Postfix(InteractableController __instance)
+            [HarmonyPostfix]
+            internal static void Postfix(InteractableController __instance, bool throwThis)
             {
-                Lib.Gameplay.InteractableDropped(__instance.interactable);
+                Lib.Gameplay.InteractableDropped(__instance.interactable, throwThis && __instance.rb != null);
             }
         }
     }
