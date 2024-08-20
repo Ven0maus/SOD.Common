@@ -67,6 +67,7 @@ namespace SOD.Common
         /// </summary>
         public static Gameplay Gameplay { get; } = new Gameplay();
 
+        /// <summary>
         /// Contains helpers to create and hook new objectives for cases.
         /// </summary>
         public static CaseObjectives CaseObjectives { get; } = new CaseObjectives();
