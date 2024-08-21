@@ -5,7 +5,7 @@
 	<Nullable>disable</Nullable>
     <AssemblyName>SOD.Common</AssemblyName>
     <Description>Common library for SOD modding.</Description>
-    <Version>2.0.2</Version>
+    <Version>2.0.3</Version>
 	<Authors>Venomaus, Spyraxi</Authors>
 	<PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
@@ -56,6 +56,9 @@
     </Reference>
     <Reference Include="Il2Cppmscorlib">
       <HintPath>..\libs\il2cpp\Il2Cppmscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="Il2CppSystem.Core">
+      <HintPath>..\libs\il2cpp\Il2CppSystem.Core.dll</HintPath>
     </Reference>
     <Reference Include="Rewired_Core">
       <HintPath>..\libs\il2cpp\Rewired_Core.dll</HintPath>

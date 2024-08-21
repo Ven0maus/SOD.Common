@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SOD.Common;
 using SOD.Common.Extensions;
+using SOD.Common.Helpers.ObjectiveObjects;
 using System.Linq;
 
 namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
@@ -38,23 +39,76 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 _attemptOpenOrCloseAirVent = false;
 
                 // Check if we have a screwdriver in our inventory
-                var hasScrewdriver = FirstPersonItemController.Instance.slots.ToList()
-                    .Select(a =>
-                    {
-                        if (a.interactableID == -1) return null;
-                        var inter = a.GetInteractable();
-                        if (inter == null || inter.preset == null || inter.preset.presetName == null) return null;
-                        return inter.preset.presetName;
-                    })
-                    .Any(a => a != null && a.Equals("Screwdriver"));
-
-                if (!hasScrewdriver)
+                if (!Lib.Gameplay.HasInteractableInInventory("Screwdriver", out _))
                 {
                     Lib.GameMessage.ShowPlayerSpeech("I could open this with a screwdriver, maybe I should look for one.", 5);
                     return false;
                 }
 
                 return true;
+            }
+        }
+
+        private static Interactable ScrewDriverForVent = null;
+
+        [HarmonyPatch(typeof(ChapterIntro), nameof(ChapterIntro.InvestigateWriterAddress))]
+        internal class ChapterIntro_InvestigateWriterAddress
+        {
+            private static void Prefix(ChapterIntro __instance)
+            {
+                if (!Plugin.Instance.Config.RequireScrewdriverForVents) return;
+
+                const string screwDriverPresetName = "Screwdriver";
+
+                // Check if we already have a screwdriver in our inventory
+                if (Lib.Gameplay.HasInteractableInInventory(screwDriverPresetName, out _))
+                {
+                    Plugin.Log.LogInfo("Already have a screwdriver in the inventory, no need to add objective or spawn a new one.");
+                    return;
+                }
+
+                // Check if there is atleast a vent
+                if (!Lib.Gameplay.AirVentExistsInHouse(__instance.kidnapper.home, out var airvents))
+                {
+                    Plugin.Log.LogInfo("No airvents found, no need to spawn a screwdriver.");
+                    return;
+                }
+                
+                if (!Lib.Gameplay.InteractableExistsInHouse(screwDriverPresetName, __instance.kidnapper.home, out var screwDrivers))
+                {
+                    Plugin.Log.LogInfo("No screwdrivers found, spawning atleast one.");
+
+                    // Add screwdriver to house
+                    Lib.Gameplay.AddInteractableToHouse(screwDriverPresetName, __instance.kidnapper.home, out _, out ScrewDriverForVent);
+
+                    Plugin.Log.LogInfo("Screwdriver was spawned in: " + ScrewDriverForVent.node.room.name);
+                }
+                else
+                {
+                    Plugin.Log.LogInfo("A screwdriver is already present, no need to spawn an extra one.");
+
+                    // Get the closest screwdriver to the player within the house
+                    ScrewDriverForVent = screwDrivers.First();
+                }
+
+                Lib.CaseObjectives.OnObjectiveCompleted += CaseObjectives_OnObjectiveCompleted;
+            }
+
+            private static void CaseObjectives_OnObjectiveCompleted(object sender, ObjectiveArgs e)
+            {
+                if (ScrewDriverForVent != null && e.EntryRef.StartsWith("Look around for vents for a potential quick exit"))
+                {
+                    // Create a new objective
+                    Lib.CaseObjectives.Builder(e.Case)
+                        .SetText("Look around for a screwdriver to open the air vent")
+                        .SetIcon(InterfaceControls.Icon.lookingGlass)
+                        .SetPointer(ScrewDriverForVent.GetWorldPosition())
+                        .SetCompletionTrigger(PredefinedTrigger.GoToNode(ScrewDriverForVent.node))
+                        .Register();
+
+                    ScrewDriverForVent = null;
+                    Lib.CaseObjectives.OnObjectiveCompleted -= CaseObjectives_OnObjectiveCompleted;
+                }
             }
         }
     }

@@ -2,7 +2,7 @@
 
 namespace SOD.StockMarket
 {
-    public interface IPluginBindings : IDebugBindings, IMarketBindings, IEconomyBindings
+    public interface IPluginBindings : IDebugBindings, IMarketBindings, IEconomyBindings, IntegrationBindings
     { }
 
     public interface IDebugBindings
@@ -18,6 +18,12 @@ namespace SOD.StockMarket
 
         [Binding(Constants.SimulationDays, "The total amount of days to simulate for (only if RunSimulation is enabled).", "Debugging.SimulationDays")]
         int SimulationDays { get; set; }
+    }
+
+    public interface IntegrationBindings
+    {
+        [Binding(true, "Should murder's impact the stock market?", "Integrations.EnableMurderIntegration")]
+        bool EnableMurderIntegration { get; set; }
     }
 
     public interface IMarketBindings
@@ -52,10 +58,16 @@ namespace SOD.StockMarket
         [Binding(Constants.DaysToKeepStockHistoricalData, "The amount of days the historical data should be kept per stock.", "StockMarket.Economy.DaysToKeepStockHistoricalData")]
         int DaysToKeepStockHistoricalData { get; set; }
 
-        [Binding(Constants.PastHistoricalDataVolatility, "The base percentage of volatility the market has been for the past [DaysToKeepStockHistoricalData] on market initialization. (MIN 1.0)", "Stockmarket.Economy.PastHistoricalDataVolatility")]
+        [Binding(Constants.PastHistoricalDataVolatility, "The base percentage of volatility the market has been for the past [DaysToKeepStockHistoricalData] on market initialization. (MIN 1.0)", "StockMarket.Economy.PastHistoricalDataVolatility")]
         double PastHistoricalDataVolatility { get; set; }
 
         [Binding(Constants.MinimumStocksInMarket, "The minimum amount of stocks that should be in the market on generation.", "StockMarket.Economy.MinimumStocksInMarket")]
         int MinimumStocksInMarket { get; set; }
+
+        [Binding(Constants.MinimumMurderTrendPercentage, "The minimum percentage effect on the stock on a company employee murder.", "StockMarket.Economy.MinimumMurderTrendPercentage")]
+        int MinimumMurderTrendPercentage { get; set; }
+
+        [Binding(Constants.MaximumMurderTrendPercentage, "The maximum percentage effect on the stock on a company employee murder.", "StockMarket.Economy.MaximumMurderTrendPercentage")]
+        int MaximumMurderTrendPercentage { get; set; }
     }
 }

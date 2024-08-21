@@ -62,13 +62,17 @@ namespace SOD.StockMarket.Implementation.Stocks
         private readonly decimal? _basePrice;
         private readonly bool _imported;
 
+        internal int CompanyId { get; }
+
         internal Stock(Company company) : this()
         {
+            CompanyId = company.companyID;
             _companyData = new CompanyStockData(company);
         }
 
         internal Stock(CompanyStockData companyData, decimal? basePrice = null) : this(basePrice: basePrice)
         {
+            CompanyId = -1;
             _companyData = companyData;
         }
 
