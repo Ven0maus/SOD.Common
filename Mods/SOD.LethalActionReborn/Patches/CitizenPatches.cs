@@ -29,13 +29,21 @@ namespace SOD.LethalActionReborn.Patches
                     CityData.Instance.deadCitizensDirectory.Add(__instance);
                     KilledCitizens.Add(__instance.humanID);
 
-                    if (MurderController.Instance.currentMurderer != null && MurderController.Instance.currentMurderer.humanID == __instance.humanID)
+                    int check = 0;
+                    while (MurderController.Instance.currentMurderer != null && MurderController.Instance.currentMurderer.humanID == __instance.humanID)
                     {
+                        if (check >= 500) break;
+                        check++;
+                        MurderController.Instance.currentMurderer = null;
                         MurderController.Instance.PickNewMurderer();
-                        MurderController.Instance.PickNewVictim();
                     }
-                    if (MurderController.Instance.currentVictim != null && MurderController.Instance.currentVictim.humanID == __instance.humanID)
+
+                    check = 0;
+                    while (MurderController.Instance.currentVictim != null && MurderController.Instance.currentVictim.humanID == __instance.humanID)
                     {
+                        if (check >= 500) break;
+                        check++;
+                        MurderController.Instance.currentVictim = null;
                         MurderController.Instance.PickNewVictim();
                     }
                 }

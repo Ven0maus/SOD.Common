@@ -15,7 +15,7 @@ namespace SOD.LethalActionReborn
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LethalActionReborn";
         public const string PLUGIN_NAME = "LethalActionReborn";
-        public const string PLUGIN_VERSION = "1.0.3";
+        public const string PLUGIN_VERSION = "1.0.4";
 
         public override void Load()
         {
@@ -75,14 +75,21 @@ namespace SOD.LethalActionReborn
                         deadCitizens.Add(citizenId);
                     }
 
-                    // Pick new murderer/victim
-                    if (MurderController.Instance.currentMurderer != null && MurderController.Instance.currentMurderer.humanID == citizenId)
+                    int check = 0;
+                    while (MurderController.Instance.currentMurderer != null && MurderController.Instance.currentMurderer.humanID == citizenId)
                     {
+                        if (check >= 500) break;
+                        check++;
+                        MurderController.Instance.currentMurderer = null;
                         MurderController.Instance.PickNewMurderer();
-                        MurderController.Instance.PickNewVictim();
                     }
-                    if (MurderController.Instance.currentVictim != null && MurderController.Instance.currentVictim.humanID == citizenId)
+
+                    check = 0;
+                    while (MurderController.Instance.currentVictim != null && MurderController.Instance.currentVictim.humanID == citizenId)
                     {
+                        if (check >= 500) break;
+                        check++;
+                        MurderController.Instance.currentVictim = null;
                         MurderController.Instance.PickNewVictim();
                     }
                 }
