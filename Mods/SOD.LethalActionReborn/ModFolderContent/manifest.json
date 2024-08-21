@@ -5,6 +5,6 @@
   "description": "Remaster of IgnizHerz's LethalAction mod",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-1.1.7"
+    "Venomaus-SODCommon-2.0.3"
   ]
 }
