@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.LethalActionReborn.Patches
 {
@@ -11,11 +12,35 @@ namespace SOD.LethalActionReborn.Patches
             internal static readonly HashSet<int> KilledCitizens = new();
             private static bool _hasKilled = false;
 
+            internal static HashSet<MurderWeaponPreset.WeaponType> ExcludedWeaponTypes = null;
+            internal static Dictionary<int, int> CitizenHitsTakenOnKo = new();
+
             [HarmonyPrefix]
-            internal static void Prefix(Citizen __instance, float amount, Actor fromWho)
+            internal static void Prefix(Citizen __instance, Actor fromWho)
             {
                 if (fromWho == Player.Instance && __instance.ai.ko)
-                    _hasKilled = true;
+                {
+                    if (ExcludedWeaponTypes != null && ExcludedWeaponTypes.Any() && BioScreenController.Instance.selectedSlot != null)
+                    {
+                        var weapon = BioScreenController.Instance.selectedSlot.GetInteractable();
+                        if (weapon != null && weapon.preset.weapon != null)
+                        {
+                            var wPreset = weapon.preset.weapon;
+                            if (ExcludedWeaponTypes.Contains(wPreset.type))
+                            {
+                                _hasKilled = false;
+                                return;
+                            }
+                        }
+                    }
+
+                    CitizenHitsTakenOnKo.TryGetValue(__instance.humanID, out int hitsTaken);
+                    hitsTaken += 1;
+                    CitizenHitsTakenOnKo[__instance.humanID] = hitsTaken;
+
+                    if (hitsTaken >= Plugin.Instance.Config.HitsRequiredForKillAfterKo)
+                        _hasKilled = true;
+                }
             }
 
             [HarmonyPostfix]
@@ -47,6 +72,17 @@ namespace SOD.LethalActionReborn.Patches
                         MurderController.Instance.PickNewVictim();
                     }
                 }
+            }
+        }
+
+        [HarmonyPatch(typeof(NewAIController), nameof(NewAIController.SetKO))]
+        internal static class NewAIController_SetKO
+        {
+            [HarmonyPostfix]
+            internal static void Postfix(NewAIController __instance, bool val)
+            {
+                if (!val)
+                    Citizen_RecieveDamage.CitizenHitsTakenOnKo.Remove(__instance.human.humanID);
             }
         }
     }

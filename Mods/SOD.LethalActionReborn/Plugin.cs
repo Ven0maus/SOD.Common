@@ -3,6 +3,7 @@ using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.Common.Extensions;
 using SOD.LethalActionReborn.Patches;
+using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -11,7 +12,7 @@ namespace SOD.LethalActionReborn
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
-    public class Plugin : PluginController<Plugin>
+    public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LethalActionReborn";
         public const string PLUGIN_NAME = "LethalActionReborn";
@@ -25,6 +26,24 @@ namespace SOD.LethalActionReborn
 
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
+        }
+
+        public override void OnConfigureBindings()
+        {
+            base.OnConfigureBindings();
+
+            // Define the excluded weapon types
+            CitizenPatches.Citizen_RecieveDamage.ExcludedWeaponTypes = Config.WeaponTypesExcludedFromKilling
+                .Split(',')
+                .Select(a =>
+                {
+                    if (Enum.TryParse(typeof(MurderWeaponPreset.WeaponType), a, true, out var result))
+                        return (MurderWeaponPreset.WeaponType?)result;
+                    return null;
+                })
+                .Where(a => a != null)
+                .Select(a => a.Value)
+                .ToHashSet();
         }
 
         private void SaveGame_OnAfterDelete(object sender, Common.Helpers.SaveGameArgs e)
@@ -44,6 +63,8 @@ namespace SOD.LethalActionReborn
 
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)
         {
+            CitizenPatches.Citizen_RecieveDamage.CitizenHitsTakenOnKo.Clear();
+
             var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"lethalActioned_{hash}.txt");
             if (!File.Exists(path)) return;
