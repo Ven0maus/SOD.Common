@@ -72,6 +72,19 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
+        /// Returns the actual plugin class.
+        /// </summary>
+        /// <param name="pluginInfo"></param>
+        /// <returns></returns>
+        public BasePlugin GetPlugin(PluginInfo pluginInfo, bool throwExceptionOnNull = true)
+        {
+            var plugin = (BasePlugin)pluginInfo.Instance.TryCast(typeof(BasePlugin));
+            if (throwExceptionOnNull && plugin == null)
+                throw new Exception("Unable to retrieve plugin object based on pluginInfo.");
+            return plugin;
+        }
+
+        /// <summary>
         /// Gets the currently assigned value of a specified config setting for
         /// a BepInEx plugin given its GUID.
         /// </summary>
@@ -88,10 +101,28 @@ namespace SOD.Common.Helpers
         public T GetPluginConfigEntryValue<T>(string pluginGuid, string section, string key)
         {
             var info = GetPluginInfo(pluginGuid);
-            var plugin = (BasePlugin)info.Instance.TryCast(typeof(BasePlugin));
+            var plugin = GetPlugin(info, true);
             if (!plugin.Config.TryGetEntry<T>(section: section, key: key, entry: out var entry))
                 throw new InvalidOperationException($"No configuration entry found for ({section}, {key}).");
             return entry.Value;
+        }
+
+        /// <summary>
+        /// Sets a new value into the currently assigned value of specified config setting for a BepInEx plugin given its GUID.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="pluginGuid"></param>
+        /// <param name="section"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <exception cref="InvalidOperationException"></exception>
+        public void SetPluginConfigEntryValue<T>(string pluginGuid, string section, string key, T value)
+        {
+            var info = GetPluginInfo(pluginGuid);
+            var plugin = GetPlugin(info, true);
+            if (!plugin.Config.TryGetEntry<T>(section: section, key: key, entry: out var entry))
+                throw new InvalidOperationException($"No configuration entry found for ({section}, {key}).");
+            entry.Value = value;
         }
 
         /// <summary>
@@ -108,7 +139,7 @@ namespace SOD.Common.Helpers
         public void AddPluginConfigEntryChangedListener(string pluginGuid, Action<SettingChangedEventArgs> listener)
         {
             var info = GetPluginInfo(pluginGuid);
-            var plugin = (BasePlugin)info.Instance.TryCast(typeof(BasePlugin));
+            var plugin = GetPlugin(info, true);
             plugin.Config.SettingChanged += (_, args) => listener(args);
         }
     }

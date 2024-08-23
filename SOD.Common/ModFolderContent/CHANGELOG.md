@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.0.4**
+- Added extra helpers to the plugin detection lib
+- Added extra extension to TryCast for il2cpp types.
+
 **2.0.3**
 - Added Gameplay Lib helper which provides functionality related to the detective gameplay
 - Added CaseObjectives Lib helper which provides functionality to create and hook new objectives to cases

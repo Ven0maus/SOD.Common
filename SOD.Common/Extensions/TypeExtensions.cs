@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BepInEx.Unity.IL2CPP;
+using BepInEx;
+using System;
 using System.Linq;
 using UniverseLib;
 
@@ -27,6 +29,17 @@ namespace SOD.Common.Extensions
         public static int GetFnvHashCode(this string value)
         {
             return (int)Lib.SaveGame.GetUniqueNumber(value);
+        }
+
+        /// <summary>
+        /// Attempts to try cast an object to something for il2cpp.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public static T TryCast<T>(this object obj)
+        {
+            return (T)obj.TryCast(typeof(T));
         }
     }
 }
