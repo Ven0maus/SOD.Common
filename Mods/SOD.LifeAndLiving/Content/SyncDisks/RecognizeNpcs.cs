@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using SOD.Common;
+using SOD.Common.Extensions;
 using SOD.Common.Helpers.SyncDiskObjects;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,11 +14,6 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
     internal class RecognizeNpcs
     {
         private readonly int _effectId;
-
-        /// <summary>
-        /// Determines if the effect to recognize npcs is enabled.
-        /// </summary>
-        internal bool Enabled { get; private set; }
 
         public RecognizeNpcs() 
         {
@@ -37,13 +33,19 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
         private void OnSyncDiskUninstall(object sender, SyncDiskArgs e)
         {
             if (e.Effect != null && e.Effect.Value.Id == _effectId)
-                Enabled = false;
+            {
+                SpeechController_Update.EffectEnabled = false;
+                SpeechController_Update.IsDirty = true;
+            }
         }
 
         private void OnSyncDiskInstall(object sender, SyncDiskArgs e)
         {
             if (e.Effect != null && e.Effect.Value.Id == _effectId)
-                Enabled = true;
+            {
+                SpeechController_Update.EffectEnabled = true;
+                SpeechController_Update.IsDirty = true;
+            }
         }
     }
 
@@ -56,62 +58,93 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
     internal static class SpeechController_Update
     {
         private static readonly HashSet<int> _actorsOnCurrentCaseboard = new();
-        private static bool _speechActive = false, _isDirty = false;
+        private static bool _speechActive = false;
         private static Color _originalColor;
+
+        internal static bool IsDirty = false, EffectEnabled = false;
 
         [HarmonyPostfix]
         internal static void Postfix(SpeechController __instance)
         {
             // Speech active check so we don't keep overdoing the logic each frame
             var speechActive = __instance.activeSpeechBubble != null;
-            if (_speechActive != speechActive || _isDirty)
+            if (_speechActive != speechActive || IsDirty)
             {
-                // If we didn't come from a dirty check, and there are no actors we don't need to do anything
-                if (!_isDirty && _actorsOnCurrentCaseboard.Count == 0) 
+                // If we didn't come from a dirty check, and there are no actors or effect not enabled we don't need to do anything
+                if (!IsDirty && (!EffectEnabled || _actorsOnCurrentCaseboard.Count == 0)) 
                     return;
 
                 // Update the latest speech state
                 _speechActive = speechActive;
 
                 // Grab the original color when it becomes active
-                if (speechActive && !_isDirty)
+                if (speechActive && !IsDirty)
                     _originalColor = __instance.activeSpeechBubble.text.color;
 
                 // Set the color of the speech bubble if we know the actor from the current case board
                 __instance.activeSpeechBubble.text.color = GetColorForActor(__instance.actor);
-                _isDirty = false;
+                IsDirty = false;
             }
         }
 
         private static Color GetColorForActor(Actor actor)
         {
             // Get cached value based on if actor is on caseboard or not
-            return _actorsOnCurrentCaseboard.Contains(actor.ai.human.humanID) ? 
+            return EffectEnabled && _actorsOnCurrentCaseboard.Contains(actor.ai.human.humanID) ? 
                 Color.cyan : _originalColor;
         }
 
         /// <summary>
         /// Call this method when an evidence not is added or removed that is an actor profile.
         /// </summary>
-        /// <param name="actors"></param>
-        internal static void AdjustActors(IEnumerable<Actor> actors)
+        /// <param name="actorIds"></param>
+        internal static void AdjustActors(IEnumerable<int> actorIds)
         {
             // Clone the hashset for dirty check
             var prev = _actorsOnCurrentCaseboard.ToHashSet();
 
             // Attempt to modify the hashset
             _actorsOnCurrentCaseboard.Clear();
-            foreach (var actor in actors)
+            foreach (var actorId in actorIds)
+                _actorsOnCurrentCaseboard.Add(actorId);
+
+            // Set dirty if the set was modified
+            IsDirty = prev.Count != _actorsOnCurrentCaseboard.Count || !prev.All(a => _actorsOnCurrentCaseboard.Contains(a));
+        }
+
+        /// <summary>
+        /// Collects all the valid actors on the current active case board with voice identified.
+        /// </summary>
+        /// <returns></returns>
+        internal static HashSet<int> CollectActorsOnCurrentCaseWithVoiceUnlocked()
+        {
+            var data = new HashSet<int>();
+            if (CasePanelController.Instance.activeCase == null)
+                return data;
+
+            // Add tied keys to find voice, figure out which keys we actually need to check for
+            var tiedKeys = new Il2CppSystem.Collections.Generic.List<Evidence.DataKey>();
+            tiedKeys.Add(Evidence.DataKey.photo);
+            tiedKeys.Add(Evidence.DataKey.name);
+
+            foreach (var caseElement in CasePanelController.Instance.activeCase.caseElements)
             {
-                if (actor.ai != null && actor.ai.human != null)
+                if (Toolbox.Instance.TryGetEvidence(caseElement.id, out var evidence))
                 {
-                    // TODO: Additionally also verify that the actor has voice print identified
-                    _actorsOnCurrentCaseboard.Add(actor.ai.human.humanID);
+                    var evidenceCitizen = evidence.TryCast<EvidenceCitizen>();
+                    if (evidenceCitizen == null) continue;
+
+                    // Check if voice is enabled
+                    // TODO: Fix this check
+                    if (evidence.GetTiedKeys(tiedKeys).Contains(Evidence.DataKey.voice))
+                    {
+                        Plugin.Log.LogInfo("Found citizen evidence for citizen: " + evidenceCitizen.witnessController.humanID);
+                        data.Add(evidenceCitizen.witnessController.humanID);
+                    }
                 }
             }
 
-            // Set dirty if the set was modified
-            _isDirty = prev.Count != _actorsOnCurrentCaseboard.Count || !prev.All(a => _actorsOnCurrentCaseboard.Contains(a));
+            return data;
         }
     }
 }
