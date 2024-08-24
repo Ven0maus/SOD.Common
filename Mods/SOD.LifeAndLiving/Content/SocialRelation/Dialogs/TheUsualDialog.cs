@@ -7,7 +7,7 @@ using System.Linq;
 using SOD.RelationsPlus;
 using SOD.RelationsPlus.Objects;
 
-namespace SOD.LifeAndLiving.Relations.Dialogs
+namespace SOD.LifeAndLiving.Content.SocialRelation.Dialogs
 {
     internal class TheUsualDialog : IDialogLogic
     {
@@ -47,7 +47,7 @@ namespace SOD.LifeAndLiving.Relations.Dialogs
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)
         {
             // Player must be known to the citizen
-            if (!RelationManager.Instance.TryGetValue(saysTo.humanID, out var relation) || (int)relation.KnowRelation < (int)CitizenRelation.KnowStage.Familiar) 
+            if (!RelationManager.Instance.TryGetValue(saysTo.humanID, out var relation) || (int)relation.KnowRelation < (int)CitizenRelation.KnowStage.Familiar)
                 return false;
 
             // Check if the citizen is at work and if the player has a free slot available

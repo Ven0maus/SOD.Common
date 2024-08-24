@@ -1,6 +1,6 @@
-﻿using SOD.LifeAndLiving.Relations.Dialogs;
+﻿using SOD.LifeAndLiving.Content.SocialRelation.Dialogs;
 
-namespace SOD.LifeAndLiving.Relations
+namespace SOD.LifeAndLiving.Content.SocialRelation
 {
     internal static class CivilianDialogAdditions
     {

@@ -1,8 +1,8 @@
 ﻿using BepInEx;
 using SOD.Common;
 using SOD.Common.BepInEx;
+using SOD.LifeAndLiving.Content.SocialRelation;
 using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
-using SOD.LifeAndLiving.Relations;
 using System;
 using System.Collections.Generic;
 using System.Reflection;

@@ -1,6 +1,6 @@
 ﻿using HarmonyLib;
 using SOD.Common.Extensions;
-using SOD.LifeAndLiving.Relations;
+using SOD.LifeAndLiving.Content.SocialRelation;
 using System;
 using System.Linq;
 
