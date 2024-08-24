@@ -15,7 +15,7 @@ namespace SOD.LifeAndLiving
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
         public const string PLUGIN_NAME = "LifeAndLiving";
-        public const string PLUGIN_VERSION = "2.0.2";
+        public const string PLUGIN_VERSION = "3.0.0";
 
         public readonly Random Random = new();
 

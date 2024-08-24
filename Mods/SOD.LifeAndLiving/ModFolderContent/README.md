@@ -18,8 +18,7 @@ Planned releases:
 - Immersive Requirements (immersive requirements to execute certain actions)
 
 [v3.0.0] [ONGOING]
-- Sync disk that provides a second life when KO'd
-- Sync disk that highlights chatter or civ name if you have face or voice identified of cases/jobs
+- Adds a sync disk that highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.
 
 [v4.0.0] [PLANNED]
 - Ability to retrieve blood type from blood pools (and occasionally also killer's blood type if they fought)

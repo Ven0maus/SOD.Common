@@ -1,4 +1,7 @@
 # CHANGELOG
+**V3.0.0**
+- Adds a sync disk that highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.
+
 **V2.0.2**
 - Added screwdriver spawn + objective to storyline for vent objective to work properly when immersive requirement is enabled
 - Fixed coins and stacks of money not being reduced as expected
