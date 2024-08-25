@@ -27,7 +27,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
                 var color = ColorTranslator.FromHtml(Plugin.Instance.Config.NpcChatterTextColor);
                 Color = new Color(color.R, color.G, color.B, color.A);
             }
-            catch(System.Exception e)
+            catch
             {
                 Plugin.Log.LogError("Unable to read config value for \"NpcChatterTextColor\", using fallback cyan color.");
                 Color = Color.cyan;
