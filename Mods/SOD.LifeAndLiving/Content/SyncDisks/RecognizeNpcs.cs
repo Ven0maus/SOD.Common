@@ -38,11 +38,11 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
 
             // Create and register the sync disk
             _ = Lib.SyncDisks.Builder("Echolocation", Plugin.PLUGIN_GUID)
-                .SetPrice(50)
+                .SetPrice(Plugin.Instance.Config.NpcChatterDiskPrice)
                 .SetManufacturer(SyncDiskPreset.Manufacturer.BlackMarket)
                 .SetRarity(SyncDiskPreset.Rarity.veryRare)
                 .AddEffect("Echolocation", "Highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.", out _effectId)
-                .AddSaleLocation(new[] { SyncDiskBuilder.SyncDiskSaleLocation.BlackmarketTrader, SyncDiskBuilder.SyncDiskSaleLocation.PoliceAutomat })
+                .AddSaleLocation(new[] { SyncDiskBuilder.SyncDiskSaleLocation.BlackmarketTrader })
                 .CreateAndRegister();
         }
 
