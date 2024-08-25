@@ -96,6 +96,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
                 (_currentCase != null && __instance.activeCase == null) ||
                 (_currentCase.id != __instance.activeCase.id))
             {
+                SpeechController_Update.ClearActors();
                 SpeechController_Update.SetActorsOfCurrentCase();
             }
         }
