@@ -180,7 +180,6 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
                     // Check if voice is enabled
                     if (tiedKeys.Contains(Evidence.DataKey.voice))
                     {
-                        Plugin.Log.LogInfo("Found citizen evidence for citizen: " + evidenceCitizen.witnessController.humanID);
                         data ??= new HashSet<int>();
                         data.Add(evidenceCitizen.witnessController.humanID);
                     }
