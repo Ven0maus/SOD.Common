@@ -92,6 +92,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
         [HarmonyPostfix]
         internal static void Postfix(CasePanelController __instance)
         {
+            if (_currentCase == null && __instance.activeCase == null) return;
             if ((_currentCase == null && __instance.activeCase != null) ||
                 (_currentCase != null && __instance.activeCase == null) ||
                 (_currentCase.id != __instance.activeCase.id))
