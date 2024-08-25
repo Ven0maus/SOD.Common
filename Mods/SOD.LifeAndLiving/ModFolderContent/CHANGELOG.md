@@ -1,5 +1,6 @@
 # CHANGELOG
 **V3.0.0**
+[Sync disks]
 - Adds a sync disk that highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.
 
 **V2.0.2**

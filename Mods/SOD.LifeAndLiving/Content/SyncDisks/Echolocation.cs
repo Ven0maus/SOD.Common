@@ -12,19 +12,19 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
     /// <summary>
     /// Add's a sync disk that can recognize the chatter of npcs which are selected on your current selected case board as evidence.
     /// </summary>
-    internal static class RecognizeNpcs
+    internal static class Echolocation
     {
         private static int _effectId;
         internal static Color Color { get; private set; }
 
         internal static void Initialize() 
         {
-            if (!Plugin.Instance.Config.IncludeNpcChatterSyncDisk) return;
+            if (!Plugin.Instance.Config.IncludeEcholocationSyncDisk) return;
 
             // Read color from config
             try
             {
-                var color = ColorTranslator.FromHtml(Plugin.Instance.Config.NpcChatterTextColor);
+                var color = ColorTranslator.FromHtml(Plugin.Instance.Config.EcholocationTextColor);
                 Color = new Color(color.R, color.G, color.B, color.A);
             }
             catch
@@ -38,7 +38,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
 
             // Create and register the sync disk
             _ = Lib.SyncDisks.Builder("Echolocation", Plugin.PLUGIN_GUID)
-                .SetPrice(Plugin.Instance.Config.NpcChatterDiskPrice)
+                .SetPrice(Plugin.Instance.Config.EcholocationDiskPrice)
                 .SetManufacturer(SyncDiskPreset.Manufacturer.BlackMarket)
                 .SetRarity(SyncDiskPreset.Rarity.veryRare)
                 .AddEffect("Echolocation", "Highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.", out _effectId)
@@ -193,7 +193,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
         {
             // Get cached value based on if actor is on caseboard or not
             return EffectEnabled && actor.ai != null && actor.ai.human != null && _actorsOnCurrentCaseboard.Contains(actor.ai.human.humanID) ?
-                RecognizeNpcs.Color : _originalColor;
+                Echolocation.Color : _originalColor;
         }
 
         private static void AdjustActors(HashSet<int> actorIds)

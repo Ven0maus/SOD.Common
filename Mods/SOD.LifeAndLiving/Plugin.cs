@@ -29,7 +29,7 @@ namespace SOD.LifeAndLiving
 
             // Initialize submodules
             CivilianDialogAdditions.Initialize();
-            RecognizeNpcs.Initialize();
+            Echolocation.Initialize();
 
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
