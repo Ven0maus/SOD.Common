@@ -2,6 +2,7 @@
 using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.LifeAndLiving.Content.SocialRelation;
+using SOD.LifeAndLiving.Content.SyncDisks;
 using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
 using System;
 using System.Collections.Generic;
@@ -26,8 +27,9 @@ namespace SOD.LifeAndLiving
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnBeforeDelete += SaveGame_OnBeforeDelete;
 
-            // Add new dialog between player and civilians
+            // Initialize submodules
             CivilianDialogAdditions.Initialize();
+            RecognizeNpcs.Initialize();
 
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
