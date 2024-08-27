@@ -12,6 +12,7 @@ namespace SOD.LifeAndLiving
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
+    [BepInDependency(RelationsPlus.Plugin.PLUGIN_GUID)]
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
