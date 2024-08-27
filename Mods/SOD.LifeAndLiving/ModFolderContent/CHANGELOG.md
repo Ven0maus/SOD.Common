@@ -1,5 +1,7 @@
 # CHANGELOG
 **V3.0.0**
+- Fixed method not found for "TheUsualDialog"
+
 [Sync disks]
 - Added "Echolocation" sync disk.
 
