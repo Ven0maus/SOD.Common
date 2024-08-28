@@ -4,11 +4,14 @@ namespace SOD.LifeAndLiving.Bindings.EconomicBindings
 {
     public interface ISideJobBindings
     {
-        [Binding(50, "The minimum amount a side job should reward.", "LifeAndLiving.SideJobs.MinSideJobReward")]
+        [Binding(150, "The minimum amount a side job should reward.", "LifeAndLiving.SideJobs.MinSideJobReward")]
         public int MinSideJobReward { get; set; }
 
-        [Binding(85, "The percentage reduction of job resolve payouts.", "LifeAndLiving.SideJobs.PayoutReductionJobs")]
+        [Binding(75, "The percentage reduction of job resolve payouts.", "LifeAndLiving.SideJobs.PayoutReductionJobs")]
         public int PayoutReductionJobs { get; set; }
+
+        [Binding(-150, "The percentage reduction of lost items payouts.", "LifeAndLiving.SideJobs.PayoutReductionLostItems")]
+        public int PayoutReductionLostItems { get; set; }
     }
 
     public interface IMurderCaseBindings
