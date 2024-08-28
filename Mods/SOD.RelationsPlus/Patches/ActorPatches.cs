@@ -19,12 +19,12 @@ namespace SOD.RelationsPlus.Patches
                 if (amount == 0f || __instance.currentHealth <= 0f || __instance.isStunned || __instance.currentHealth == __state) return;
 
                 if (__instance.isPlayer) return;
-                if (!fromWho.isPlayer) return;
+                if (fromWho == null || !fromWho.isPlayer) return;
 
                 Human human = null;
                 try
                 {
-                    human = ((dynamic)__instance).Cast<Human>();
+                    human = __instance.TryCast<Human>();
                 }
                 catch (InvalidCastException)
                 { }
