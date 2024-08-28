@@ -1,6 +1,8 @@
 # CHANGELOG
 **V3.0.0**
 - Fixed method not found for "TheUsualDialog"
+- Increased the reward amounts for lost and found items by 150% (configurable)
+- Increased the default values for side job payouts to be less punishing.
 
 [Sync disks]
 - Added "Echolocation" sync disk.
