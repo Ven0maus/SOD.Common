@@ -1,6 +1,8 @@
 # CHANGELOG
 **V3.0.0**
 - Fixed method not found for "TheUsualDialog"
+- Updated RelationsPlus dependency to the latest version
+- General code improvements (memory, performance)
 - Increased the reward amounts for lost and found items by 150% (configurable)
 - Increased the default values for side job payouts to be less punishing.
 
