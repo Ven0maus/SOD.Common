@@ -48,41 +48,33 @@ namespace SOD.RelationsPlus.Objects
         /// <summary>
         /// Get's the current citizens know relation with the player based on the know gates configured.
         /// </summary>
-        [JsonIgnore]
-        public KnowStage KnowRelation 
+        public KnowStage GetKnowRelation()
         {
-            get 
-            {
-                if (Know < Plugin.Instance.Config.KnowGateOne)
-                    return KnowStage.Stranger;
-                if (Know < Plugin.Instance.Config.KnowGateTwo)
-                    return KnowStage.Aware;
-                if (Know < Plugin.Instance.Config.KnowGateThree)
-                    return KnowStage.Familiar;
-                if (Know < Plugin.Instance.Config.KnowGateFour)
-                    return KnowStage.Known;
-                return KnowStage.WellKnown;
-            }
+            if (Know < Plugin.Instance.Config.KnowGateOne)
+                return KnowStage.Stranger;
+            if (Know < Plugin.Instance.Config.KnowGateTwo)
+                return KnowStage.Aware;
+            if (Know < Plugin.Instance.Config.KnowGateThree)
+                return KnowStage.Familiar;
+            if (Know < Plugin.Instance.Config.KnowGateFour)
+                return KnowStage.Known;
+            return KnowStage.WellKnown;
         }
 
         /// <summary>
         /// Get's the current citizens like relation with the player based on the like gates configured.
         /// </summary>
-        [JsonIgnore]
-        public LikeStage LikeRelation
+        public LikeStage GetLikeRelation()
         {
-            get
-            {
-                if (Like < Plugin.Instance.Config.LikeGateOne)
-                    return LikeStage.Hated;
-                if (Like < Plugin.Instance.Config.LikeGateTwo)
-                    return LikeStage.Disliked;
-                if (Like < Plugin.Instance.Config.LikeGateThree)
-                    return LikeStage.Neutral;
-                if (Like < Plugin.Instance.Config.LikeGateFour)
-                    return LikeStage.Liked;
-                return LikeStage.Loved;
-            }
+            if (Like < Plugin.Instance.Config.LikeGateOne)
+                return LikeStage.Hated;
+            if (Like < Plugin.Instance.Config.LikeGateTwo)
+                return LikeStage.Disliked;
+            if (Like < Plugin.Instance.Config.LikeGateThree)
+                return LikeStage.Neutral;
+            if (Like < Plugin.Instance.Config.LikeGateFour)
+                return LikeStage.Liked;
+            return LikeStage.Loved;
         }
 
         private float _know = 0f;
@@ -105,7 +97,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\" | KnowRelation: \"{KnowRelation}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Know' value from \"{oldValue}\" to \"{newValue}\" | KnowRelation: \"{GetKnowRelation()}\".");
 
                     RelationChangeArgs args = null;
                     OnKnowChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));
@@ -134,7 +126,7 @@ namespace SOD.RelationsPlus.Objects
                     // Skip when loading data from savefile
                     if (RelationManager.Instance.IsLoading) return;
                     if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\" | LikeRelation: \"{LikeRelation}\".");
+                        Plugin.Log.LogInfo($"[Debug]: Citizen({CitizenId}|{GetCitizen()?.GetCitizenName() ?? "Unknown"}): Changed 'Like' value from \"{oldValue}\" to \"{newValue}\" | LikeRelation: \"{GetLikeRelation()}\".");
 
                     RelationChangeArgs args = null;
                     OnLikeChanged?.Invoke(this, args ??= new RelationChangeArgs(CitizenId, oldValue, newValue));

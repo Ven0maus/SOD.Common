@@ -1,8 +1,9 @@
 ﻿using BepInEx;
 using SOD.Common;
 using SOD.Common.BepInEx;
+using SOD.LifeAndLiving.Content.SocialRelation;
+using SOD.LifeAndLiving.Content.SyncDisks;
 using SOD.LifeAndLiving.Patches.EconomyRebalancePatches;
-using SOD.LifeAndLiving.Relations;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -11,11 +12,12 @@ namespace SOD.LifeAndLiving
 {
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
+    [BepInDependency(RelationsPlus.Plugin.PLUGIN_GUID)]
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
         public const string PLUGIN_NAME = "LifeAndLiving";
-        public const string PLUGIN_VERSION = "2.0.2";
+        public const string PLUGIN_VERSION = "3.0.0";
 
         public readonly Random Random = new();
 
@@ -26,8 +28,9 @@ namespace SOD.LifeAndLiving
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnBeforeDelete += SaveGame_OnBeforeDelete;
 
-            // Add new dialog between player and civilians
+            // Initialize submodules
             CivilianDialogAdditions.Initialize();
+            Echolocation.Initialize();
 
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
@@ -75,19 +78,24 @@ namespace SOD.LifeAndLiving
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)
         {
             // Update company prices that haven't been calculated properly yet from pre-mod savegames
-            var random = new Random(CityData.Instance.seed.GetHashCode());
+            Random random = null;
+            var list = new List<KeyValuePair<InteractablePreset, int>>();
             foreach (var company in CityData.Instance.companyDirectory)
             {
-                var arr = new List<KeyValuePair<InteractablePreset, int>>(company.prices.Keys.Count);
                 foreach (var kvp in company.prices)
-                    arr.Add(new KeyValuePair<InteractablePreset, int>(kvp.Key, kvp.Value));
+                    list.Add(new KeyValuePair<InteractablePreset, int>(kvp.Key, kvp.Value));
 
-                foreach (var preset in arr)
+                foreach (var preset in list)
                 {
                     var realValue = preset.Key.value;
                     if (preset.Value < realValue.x || preset.Value > realValue.y)
+                    {
+                        random ??= new Random((int)Lib.SaveGame.GetUniqueNumber(CityData.Instance.seed));
                         company.prices[preset.Key] = random.Next((int)realValue.x, (int)realValue.y + 1);
+                    }
                 }
+
+                list.Clear();
             }
         }
     }

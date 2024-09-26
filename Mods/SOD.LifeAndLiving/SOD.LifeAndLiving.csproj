@@ -41,6 +41,9 @@
 		<Reference Include="Rewired_Core">
 			<HintPath>..\..\libs\il2cpp\Rewired_Core.dll</HintPath>
 		</Reference>
+		<Reference Include="Unity.TextMeshPro">
+		  <HintPath>..\..\libs\il2cpp\Unity.TextMeshPro.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.CoreModule">
 			<HintPath>..\..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
 		</Reference>

@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.5**
+- Added null ref checks to some methods in the dialog controller patches
+
 **2.0.4**
 - Added extra helpers to the plugin detection lib
 - Added extra extension to TryCast for il2cpp types.
