@@ -27,5 +27,4 @@ Overview of sync disks:
 - Drugs and addictions (new moodlets, actions)
 
 [v5.0.0] [PLANNED]
-- Automatic civ repopulation in the city
 - A more immersive and impactful hunger / thirst system
