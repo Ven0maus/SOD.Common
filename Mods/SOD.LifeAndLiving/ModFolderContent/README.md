@@ -20,7 +20,7 @@ Planned releases:
 [v3.0.0] [RELEASED]
 - Sync disks (A bunch of sync disks to enhance to detective life)
 Overview of sync disks:
-- "Echolocation": Highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.
+- "Echolocation": Highlights civilian chatter for your selected case if their voice is identified and their profile is on your selected case board.
 
 [v4.0.0] [PLANNED]
 - Ability to retrieve blood type from blood pools (and occasionally also killer's blood type if they fought)
