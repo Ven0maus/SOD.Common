@@ -4,7 +4,7 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 
-namespace SOD.LifeAndLiving.Relations
+namespace SOD.LifeAndLiving.Content.SocialRelation
 {
     /// <summary>
     /// Object that keeps track of all the interests of the player.
@@ -43,7 +43,7 @@ namespace SOD.LifeAndLiving.Relations
 
             if (!items.ContainsKey(itemName))
                 items.Add(itemName, 1);
-            else 
+            else
                 items[itemName] += 1;
 
             var human = from as Human;

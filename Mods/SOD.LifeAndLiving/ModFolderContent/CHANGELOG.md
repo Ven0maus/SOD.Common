@@ -1,4 +1,14 @@
 # CHANGELOG
+**V3.0.0**
+- Fixed method not found for "TheUsualDialog"
+- Updated RelationsPlus dependency to the latest version
+- General code improvements (memory, performance)
+- Increased the reward amounts for lost and found items by 150% (configurable)
+- Increased the default values for side job payouts to be less punishing.
+
+[Sync disks]
+- Added "Echolocation" sync disk.
+
 **V2.0.2**
 - Added screwdriver spawn + objective to storyline for vent objective to work properly when immersive requirement is enabled
 - Fixed coins and stacks of money not being reduced as expected

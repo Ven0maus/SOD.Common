@@ -8,6 +8,7 @@ Current features available (read changelog for full details):
 - Economy rebalance
 - Social Relations
 - Immersive Requirements
+- Immersive Sync Disks
 
 Planned releases:
 [v1.0.0] [RELEASED]
@@ -16,15 +17,17 @@ Planned releases:
 [v2.0.0] [RELEASED]
 - Social Relations (track relations between civs and player)
 - Immersive Requirements (immersive requirements to execute certain actions)
+Overview of actions:
+- Require screwdriver to open vents
 
-[v3.0.0] [ONGOING]
-- Sync disk that provides a second life when KO'd
-- Sync disk that highlights chatter or civ name if you have face or voice identified of cases/jobs
+[v3.0.0] [RELEASED]
+- Sync disks (A bunch of sync disks to enhance to detective life)
+Overview of sync disks:
+- "Echolocation": Highlights civilian chatter for your selected case if their voice is identified and their profile is on your selected case board.
 
 [v4.0.0] [PLANNED]
 - Ability to retrieve blood type from blood pools (and occasionally also killer's blood type if they fought)
 - Drugs and addictions (new moodlets, actions)
 
 [v5.0.0] [PLANNED]
-- Automatic civ repopulation in the city
 - A more immersive and impactful hunger / thirst system

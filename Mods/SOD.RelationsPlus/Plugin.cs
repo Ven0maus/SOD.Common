@@ -11,7 +11,7 @@ namespace SOD.RelationsPlus
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.RelationsPlus";
         public const string PLUGIN_NAME = "RelationsPlus";
-        public const string PLUGIN_VERSION = "1.0.0";
+        public const string PLUGIN_VERSION = "1.0.1";
 
         public override void Load()
         {
