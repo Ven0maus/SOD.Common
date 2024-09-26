@@ -41,7 +41,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
                 .SetPrice(Plugin.Instance.Config.EcholocationDiskPrice)
                 .SetManufacturer(SyncDiskPreset.Manufacturer.BlackMarket)
                 .SetRarity(SyncDiskPreset.Rarity.veryRare)
-                .AddEffect("Echolocation", "Highlights civilian chatter for your selected case if their voice is identified and their profile is on your case board.", out _effectId)
+                .AddEffect("Echolocation", "Highlights civilian chatter for your selected case if their voice is identified and their profile is on your selected case board.", out _effectId)
                 .AddSaleLocation(new[] { SyncDiskBuilder.SyncDiskSaleLocation.BlackmarketTrader })
                 .CreateAndRegister();
         }
