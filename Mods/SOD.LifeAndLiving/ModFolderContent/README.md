@@ -8,6 +8,7 @@ Current features available (read changelog for full details):
 - Economy rebalance
 - Social Relations
 - Immersive Requirements
+- Immersive Sync Disks
 
 Planned releases:
 [v1.0.0] [RELEASED]
@@ -16,6 +17,8 @@ Planned releases:
 [v2.0.0] [RELEASED]
 - Social Relations (track relations between civs and player)
 - Immersive Requirements (immersive requirements to execute certain actions)
+Overview of actions:
+- Require screwdriver to open vents
 
 [v3.0.0] [RELEASED]
 - Sync disks (A bunch of sync disks to enhance to detective life)
