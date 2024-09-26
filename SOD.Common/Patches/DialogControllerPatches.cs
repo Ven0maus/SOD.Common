@@ -55,6 +55,7 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static bool Prefix(DialogController __instance, Citizen saysTo, Interactable saysToInteractable, NewNode where, Actor saidBy, bool success, NewRoom roomRef, SideJob jobRef)
             {
+                if (__instance.preset == null || string.IsNullOrEmpty(__instance.preset.name)) return true;
                 if (_customDialogInterceptors.TryGetValue(__instance.preset.name, out var interceptor) && interceptor.DialogLogic != null)
                 {
                     interceptor.DialogLogic.OnDialogExecute(__instance, saysTo, saysToInteractable, where, saidBy, success, roomRef, jobRef);
@@ -72,6 +73,7 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static bool Prefix(ref bool __result, DialogPreset preset, Citizen saysTo, SideJob jobRef)
             {
+                if (preset == null || string.IsNullOrEmpty(preset.name)) return true;
                 if (_customDialogInterceptors.TryGetValue(preset.name, out var interceptor) && interceptor.DialogLogic != null)
                 {
                     __result = interceptor.DialogLogic.IsDialogShown(preset, saysTo, jobRef);
@@ -94,6 +96,7 @@ namespace SOD.Common.Patches
             [HarmonyPrefix]
             internal static void Prefix(DialogController __instance, EvidenceWitness.DialogOption dialog, Interactable saysTo, NewNode where, Actor saidBy, ref DialogController.ForceSuccess forceSuccess)
             {
+                if (dialog == null || dialog.preset == null || string.IsNullOrEmpty(dialog.preset.name)) return;
                 if (forceSuccess == DialogController.ForceSuccess.none && _customDialogInterceptors.TryGetValue(dialog.preset.name, out var interceptor) && interceptor.DialogLogic != null)
                 {
                     Citizen saysToCit = ((dynamic)saysTo.isActor).Cast<Citizen>();
