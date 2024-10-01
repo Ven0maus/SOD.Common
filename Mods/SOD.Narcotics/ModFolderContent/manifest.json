@@ -1,0 +1,10 @@
+{
+  "name": "SODNarcotics",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.Narcotics",
+  "description": "Add's new moodlets, addictions, sync disks, evidence and cases all related to narcotics.",
+  "author": "Venomaus",
+  "dependencies": [
+    "Venomaus-SODCommon-2.0.5"
+  ]
+}
