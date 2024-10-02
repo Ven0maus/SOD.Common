@@ -1,35 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using SOD.Narcotics.AddictionCore.Addictions;
+using System;
 
-namespace SOD.Narcotics.Addictions
+namespace SOD.Narcotics.AddictionCore
 {
-    public class Addiction
+    public abstract class Addiction : IAddiction
     {
         public bool IsActive { get; set; }
         public string AddictionName => $"{AddictionType} Addiction";
         public AddictionType AddictionType { get; private set; }
         public AddictionStage Stage { get; set; }
-        public Dictionary<AddictionStage, Action<bool>> StageActions { get; private set; }
         public float StageProgress { get; set; }
         public TimeSpan RelapseTime { get; set; }
         public bool Recovering { get; set; }
 
-        public Addiction(AddictionType addictionType)
+        public Addiction(AddictionType addictionType, TimeSpan? relapseTime = null)
         {
             AddictionType = addictionType;
-            StageActions = StageActionFactory.GetActions(addictionType);
+            RelapseTime = relapseTime ?? TimeSpan.FromSeconds(5);
         }
 
         private void ApplyStageEffects()
         {
-            if (StageActions.TryGetValue(Stage, out Action<bool> action))
-                action?.Invoke(true);
+            GetStageAction()?.Invoke(true);
         }
 
         private void RemoveStageEffects()
         {
-            if (StageActions.TryGetValue(Stage, out Action<bool> action))
-                action?.Invoke(false);
+            GetStageAction()?.Invoke(false);
+        }
+
+        private Action<bool> GetStageAction()
+        {
+            switch (Stage)
+            {
+                case AddictionStage.Mild:
+                    return MildStageAction();
+                case AddictionStage.Severe:
+                    return SevereStageAction();
+                case AddictionStage.Extreme:
+                    return ExtremeStageAction();
+            }
+
+            throw new NotSupportedException($"Stage \"{Stage}\" is not supported.");
         }
 
         public void Cure()
@@ -55,6 +67,10 @@ namespace SOD.Narcotics.Addictions
             ApplyStageEffects();
             Plugin.Log.LogInfo($"[{AddictionName}] [Status]: {Stage}");
         }
+
+        public abstract Action<bool> MildStageAction();
+        public abstract Action<bool> SevereStageAction();
+        public abstract Action<bool> ExtremeStageAction();
     }
 
     public enum AddictionType

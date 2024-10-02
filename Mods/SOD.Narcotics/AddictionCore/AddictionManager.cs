@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace SOD.Narcotics.Addictions
+namespace SOD.Narcotics.AddictionCore
 {
     public class AddictionManager
     {
@@ -17,7 +17,11 @@ namespace SOD.Narcotics.Addictions
         {
             if (!_addictions.TryGetValue(addictionType, out _))
             {
-                Addiction addiction = new(addictionType) { IsActive = true };
+                // Get a new addiction class
+                Addiction addiction = AddictionFactory.Get(addictionType);
+                addiction.IsActive = true;
+
+                // Add to collection
                 _addictions.Add(addictionType, addiction);
 
                 // Update for each stage
