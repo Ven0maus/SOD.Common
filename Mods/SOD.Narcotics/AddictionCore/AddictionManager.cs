@@ -69,6 +69,7 @@ namespace SOD.Narcotics.AddictionCore
                     continue;
                 }
 
+                // TODO: Check how this progression works in game by hooking it up to an update method
                 // Define if progression is going forward or backwards based on recovering or not
                 var progress = deltaTime / (float)addiction.RelapseTime.TotalSeconds;
                 if (addiction.Recovering)

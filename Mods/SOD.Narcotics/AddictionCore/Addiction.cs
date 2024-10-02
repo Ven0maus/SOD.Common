@@ -22,11 +22,13 @@ namespace SOD.Narcotics.AddictionCore
         private void ApplyStageEffects()
         {
             GetStageAction()?.Invoke(true);
+            Plugin.Log.LogInfo($"[{AddictionName}] Applied effects of stage \"{Stage}\".");
         }
 
         private void RemoveStageEffects()
         {
             GetStageAction()?.Invoke(false);
+            Plugin.Log.LogInfo($"[{AddictionName}] Removed effects of stage \"{Stage}\".");
         }
 
         private Action<bool> GetStageAction()
