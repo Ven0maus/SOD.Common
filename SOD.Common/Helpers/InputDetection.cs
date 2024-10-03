@@ -13,6 +13,11 @@ namespace SOD.Common.Helpers
     {
         internal InputDetection() { }
 
+        /// <summary>
+        /// Get the action name associated with an InteractionKey in a format that is useable with Rewired GetButton methods.
+        /// </summary>
+        /// <param name="interactionKey"></param>
+        /// <returns></returns>
         public string GetRewiredActionName(InteractablePreset.InteractionKey interactionKey)
         {
             var gameMappedKey = Enum.GetName(typeof(InteractablePreset.InteractionKey), interactionKey);
@@ -20,11 +25,21 @@ namespace SOD.Common.Helpers
             return capitalizedKey;
         }
 
+        /// <summary>
+        /// Get the Rewired InputAction associated with an InteractionKey.
+        /// </summary>
+        /// <param name="interactionKey"></param>
+        /// <returns></returns>
         public InputAction GetRewiredAction(InteractablePreset.InteractionKey interactionKey)
         {
             return ReInput.MappingHelper.Instance.GetAction(Lib.InputDetection.GetRewiredActionName(interactionKey));
         }
 
+        /// <summary>
+        /// Get the Unity KeyCode currently bound to an InteractionKey's Rewired InputAction.
+        /// </summary>
+        /// <param name="interactionKey"></param>
+        /// <returns></returns>
         public UnityEngine.KeyCode GetBoundKeyCode(InteractablePreset.InteractionKey interactionKey)
         {
             return ReInput.MappingHelper.Instance.GetActionElementMap(GetRewiredAction(interactionKey).id).keyCode;
