@@ -12,7 +12,7 @@ namespace SOD.Common.Patches
         private static readonly List<string> _actionNames = new();
         private static readonly Dictionary<string, InteractablePreset.InteractionKey> _gameMappedKeyDictionary = new();
 
-        internal static void InitializeActionsIfNecessary()
+        private static void InitializeActionsIfNecessary()
         {
             if (_actionNames.Count == 0)
             {
