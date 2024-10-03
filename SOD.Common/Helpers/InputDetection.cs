@@ -4,14 +4,24 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using BepInEx;
+using Il2CppSystem.Linq;
+using Il2CppSystem.Runtime.Remoting.Messaging;
 using Rewired;
+using Rewired.Demos;
 using SOD.Common.Custom;
+using SOD.Common.Extensions;
 
 namespace SOD.Common.Helpers
 {
     public sealed class InputDetection
     {
+        private const int KEYBOARD_AND_MOUSE_CONTROLLER_ID = 0;
+        private readonly List<string> CONTROLLER_MAP_CATEGORIES = ["Interaction", "Movement", "Menu", "CityEdit"];
+
         internal InputDetection() { }
+
+        public Rewired.Player RewiredPlayer => InputController.Instance.player;
 
         /// <summary>
         /// Get the action name associated with an InteractionKey in a format that is useable with Rewired GetButton methods.
@@ -32,7 +42,7 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public InputAction GetRewiredAction(InteractablePreset.InteractionKey interactionKey)
         {
-            return ReInput.MappingHelper.Instance.GetAction(Lib.InputDetection.GetRewiredActionName(interactionKey));
+            return ReInput.MappingHelper.Instance.GetAction(GetRewiredActionName(interactionKey));
         }
 
         /// <summary>
@@ -42,7 +52,15 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public UnityEngine.KeyCode GetBoundKeyCode(InteractablePreset.InteractionKey interactionKey)
         {
-            return ReInput.MappingHelper.Instance.GetActionElementMap(GetRewiredAction(interactionKey).id).keyCode;
+            List<ActionElementMap> controllerMappings = KeyboardAndMouseMappings;
+            try
+            {
+                return controllerMappings.First(x => x.actionId == GetRewiredAction(interactionKey).id).keyCode;
+            }
+            catch (InvalidOperationException e)
+            {
+                return UnityEngine.KeyCode.None;
+            }
         }
 
         /// <summary>
@@ -52,7 +70,7 @@ namespace SOD.Common.Helpers
         /// <param name="callback"></param>
         public void AddInputEventListener(InteractablePreset.InteractionKey interactionKey, Action<Rewired.InputActionEventData> callback)
         {
-            ReInput.PlayerHelper.Instance.GetPlayer(0).AddInputEventDelegate(callback, UpdateLoopType.Update, GetRewiredAction(interactionKey).id);
+            RewiredPlayer.AddInputEventDelegate(callback, UpdateLoopType.Update, GetRewiredAction(interactionKey).id);
         }
 
         /// <summary>
@@ -75,8 +93,35 @@ namespace SOD.Common.Helpers
             OnButtonStateChanged?.Invoke(this, new InputDetectionEventArgs(actionName, key, isDown, isSuppressed));
         }
 
-        // Dictionaries used to track which inputs are being suppressed such that vanilla game responses to suppressed events are bypassed.
-        internal Dictionary<string, InputSuppressionEntry> InputSuppressionDictionary { get; private set; }
+        private List<ActionElementMap> keyboardAndMouseMappings;
+        public List<ActionElementMap> KeyboardAndMouseMappings
+        {
+            get
+            {
+                if (keyboardAndMouseMappings != null)
+                {
+                    return keyboardAndMouseMappings;
+                }
+                keyboardAndMouseMappings = new List<ActionElementMap>();
+                var controllers = new List<Rewired.Controller>();
+                Rewired.Controller keyboardController = RewiredPlayer.controllers.GetController(ControllerType.Keyboard, KEYBOARD_AND_MOUSE_CONTROLLER_ID);
+                controllers.Add(keyboardController);
+                Rewired.Controller mouseController = RewiredPlayer.controllers.GetController(ControllerType.Mouse, KEYBOARD_AND_MOUSE_CONTROLLER_ID);
+                controllers.Add(mouseController);
+                foreach (var controller in controllers)
+                {
+                    foreach (string category in CONTROLLER_MAP_CATEGORIES)
+                    {
+                        ControllerMap map = RewiredPlayer.controllers.maps.GetMap(controller.type, controller.id, category, "Default");
+                        KeyboardAndMouseMappings.AddRange(map.AllMaps.ToList());
+                    }
+                }
+                return keyboardAndMouseMappings;
+            }
+        }
+
+        // Used to track which inputs are being suppressed such that vanilla game responses to suppressed events are bypassed.
+        internal Dictionary<string, InputSuppressionEntry> InputSuppressionDictionary { get; set; }
 
         /// <summary>
         /// Suppress vanilla game responses to an input, with an optional duration. Adds an input suppression entry.

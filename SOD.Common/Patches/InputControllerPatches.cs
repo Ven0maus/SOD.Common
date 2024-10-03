@@ -38,23 +38,23 @@ namespace SOD.Common.Patches
 
         private static void ReportIfSuppressed(string actionName, ref bool __result, bool isDown)
         {
-            var interactionKey = _gameMappedKeyDictionary[actionName];
-
-            var action = ReInput.MappingHelper.Instance.GetAction(actionName);
-            if (ReInput.MappingHelper.Instance.GetActionElementMap(action._id)._elementType != ControllerElementType.Button)
+            if (!_gameMappedKeyDictionary.TryGetValue(actionName, out var interactionKey))
             {
                 return;
             }
-            var boundKeyCode = ReInput.MappingHelper.Instance.GetActionElementMap(action._id).keyCode;
+            var boundKeyCode = Lib.InputDetection.GetBoundKeyCode(interactionKey);
+
+            Lib.InputDetection.InputSuppressionDictionary ??= new();
 
             foreach (var (key, value) in Lib.InputDetection.InputSuppressionDictionary)
             {
-                if (Lib.InputDetection.InputSuppressionDictionary.Values.Any(v => v.InteractionKey == interactionKey || v.KeyCode == boundKeyCode))
+                if (!Lib.InputDetection.InputSuppressionDictionary.Values.Any(v => v.InteractionKey == interactionKey || v.KeyCode == boundKeyCode))
                 {
-                    // Report the state change and that it was suppressed
-                    Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, isDown: isDown, isSuppressed: true);
-                    __result = false;
+                    continue;
                 }
+                // Report the state change and that it was suppressed
+                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, isDown: isDown, isSuppressed: true);
+                __result = false;
             }
         }
 
