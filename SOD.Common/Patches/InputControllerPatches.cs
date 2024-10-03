@@ -1,7 +1,6 @@
 using HarmonyLib;
 using Rewired;
 using SOD.Common.Extensions;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -24,7 +23,7 @@ namespace SOD.Common.Patches
             }
             if (_gameMappedKeyDictionary.Count == 0)
             {
-                var gameMappedKeys = Enum.GetNames(typeof(InteractablePreset.InteractionKey));
+                var gameMappedKeys = System.Enum.GetNames(typeof(InteractablePreset.InteractionKey));
                 foreach (var key in gameMappedKeys)
                 {
                     var capitalizedKey = $"{key.Substring(0, 1).ToUpper()}{key.Substring(1)}";
@@ -32,7 +31,7 @@ namespace SOD.Common.Patches
                     {
                         continue;
                     }
-                    _gameMappedKeyDictionary.Add(capitalizedKey, Enum.Parse<InteractablePreset.InteractionKey>(key, true));
+                    _gameMappedKeyDictionary.Add(capitalizedKey, System.Enum.Parse<InteractablePreset.InteractionKey>(key, true));
                 }
             }
         }
@@ -59,7 +58,7 @@ namespace SOD.Common.Patches
             }
         }
 
-        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonDown))]
+        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonDown), argumentTypes: [typeof(string)])]
         internal class Rewired_Player_GetButtonDown
         {
             [HarmonyPostfix]
@@ -75,7 +74,7 @@ namespace SOD.Common.Patches
 
         }
 
-        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonUp))]
+        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonUp), argumentTypes: [typeof(string)])]
         internal class Rewired_Player_GetButtonUp
         {
             [HarmonyPostfix]
