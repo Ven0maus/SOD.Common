@@ -64,26 +64,6 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Add a Rewired input event listener. Useful for advanced input events supported by Rewired, like double pressing, long presses, timed presses, etc. The listener will be invoked even when vanilla responses to input are being suppressed using SetInputSuppressed.
-        /// </summary>
-        /// <param name="interactionKey"></param>
-        /// <param name="callback"></param>
-        public void AddInputEventListener(InteractablePreset.InteractionKey interactionKey, Action<Rewired.InputActionEventData> callback)
-        {
-            RewiredPlayer.AddInputEventDelegate(callback, UpdateLoopType.Update, GetRewiredAction(interactionKey).id);
-        }
-
-        /// <summary>
-        /// Remove a Rewired input event listener.
-        /// </summary>
-        /// <param name="interactionKey"></param>
-        /// <param name="callback"></param>
-        public void RemoveInputEventListener(InteractablePreset.InteractionKey interactionKey, Action<Rewired.InputActionEventData> callback)
-        {
-            ReInput.PlayerHelper.Instance.GetPlayer(0).RemoveInputEventDelegate(callback, UpdateLoopType.Update, GetRewiredAction(interactionKey).id);
-        }
-
-        /// <summary>
         /// Raised when a button's state changes from up/released to down/pressed and vice versa.
         /// </summary>
         public event EventHandler<InputDetectionEventArgs> OnButtonStateChanged;
