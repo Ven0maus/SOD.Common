@@ -30,16 +30,5 @@ namespace SOD.Common.Extensions
         {
             return (int)Lib.SaveGame.GetUniqueNumber(value);
         }
-
-        /// <summary>
-        /// Attempts to try cast an object to something for il2cpp.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="obj"></param>
-        /// <returns></returns>
-        public static T TryCast<T>(this object obj)
-        {
-            return (T)obj.TryCast(typeof(T));
-        }
     }
 }
