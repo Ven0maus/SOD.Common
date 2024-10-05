@@ -44,10 +44,8 @@ namespace SOD.Common.Custom
 
         public void Start()
         {
-            Plugin.Log.LogInfo($"Attempting to start {CallerGuid} {InteractionKey} {KeyCode} entry");
             if (_coroutine != null || TimeRemainingSec <= 0f)
                 return;
-            Plugin.Log.LogInfo($"Yes, we started it.");
             _coroutine = RuntimeHelper.StartCoroutine(Tick());
         }
 
