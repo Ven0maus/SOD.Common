@@ -69,32 +69,22 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Raised when a button's state changes from up/released to
-        /// down/pressed and vice versa. Is <b>not</b> raised for suppressed inputs,
-        /// which are inputs that the vanilla game is currently being forced to
-        /// ignore.
+        /// Raised when a button's state changes from up/released to down/pressed and vice versa. Is <b>not</b> raised for suppressed inputs, which are inputs that the vanilla game is currently being forced to ignore.
         /// </summary>
         public event EventHandler<InputDetectionEventArgs> OnButtonStateChanged;
 
         /// <summary>
-        /// Raised when a button's state changes from up/released to
-        /// down/pressed and vice versa. Is <b>only</b> raised for suppressed inputs,
-        /// which are inputs that the vanilla game is currently being forced to
-        /// ignore.
+        /// Raised when a button's state changes from up/released to down/pressed and vice versa. Is <b>only</b> raised for suppressed inputs, which are inputs that the vanilla game is currently being forced to ignore.
         /// </summary>
         public event EventHandler<SuppressedInputDetectionEventArgs> OnSuppressedButtonStateChanged;
 
         /// <summary>
-        /// Raised when an axis's state changes in value. Is <b>not</b> raised
-        /// for suppressed inputs, which are inputs that the vanilla game is
-        /// currently being forced to ignore.
+        /// Raised when an axis's state changes in value. Is <b>not</b> raised for suppressed inputs, which are inputs that the vanilla game is currently being forced to ignore.
         /// </summary>
         public event EventHandler<AxisInputDetectionEventArgs> OnAxisStateChanged;
 
         /// <summary>
-        /// Raised when an axis's state changes in value. Is <b>only</b> raised
-        /// for suppressed inputs, which are inputs that the vanilla game is
-        /// currently being forced to ignore.
+        /// Raised when an axis's state changes in value. Is <b>only</b> raised for suppressed inputs, which are inputs that the vanilla game is currently being forced to ignore.
         /// </summary>
         public event EventHandler<SuppressedAxisInputDetectionEventArgs> OnSuppressedAxisStateChanged;
 
@@ -158,10 +148,10 @@ namespace SOD.Common.Helpers
         /// <br>The input suppression entry will suppress vanilla game responses to the input while it or any entry tied to that input is present.</br>
         /// <br>At the end of the duration (if provided), the input suppression entry will be automatically removed.</br>
         /// </summary>
-        /// <param name="callerGuid">The id associated with this entry.</param>
+        /// <param name="callerGuid">The guid associated with the plugin calling this method.</param>
         /// <param name="keyCode">The KeyCode to be suppressed.</param>
-        /// <param name="duration">The duration that the input suppression lasts. (does not progress while the game is paused).</param>
-        /// <param name="overwrite">Whether to overwrite any existing entry with this id, applying the new duration.</param>
+        /// <param name="duration">The duration that the input suppression lasts (does not progress while the game is paused).</param>
+        /// <param name="overwrite">Whether to overwrite any existing entry with this plugin guid and keycode combination, applying the new duration.</param>
         public void SetInputSuppressed(string callerGuid, KeyCode keyCode, TimeSpan? duration = null, bool overwrite = false)
         {
             if (keyCode == KeyCode.None)
@@ -195,10 +185,10 @@ namespace SOD.Common.Helpers
         /// <br>The input suppression entry will suppress vanilla game responses to the input while it or any entry tied to that input is present.</br>
         /// <br>At the end of the duration (if provided), the input suppression entry will be automatically removed.</br>
         /// </summary>
-        /// <param name="callerMetadata">The id associated with this entry.</param>
+        /// <param name="callerGuid">The guid associated with the plugin calling this method.</param>
         /// <param name="interactionKey">The interaction (virtual action name) to be suppressed.</param>
-        /// <param name="duration">The duration that the input suppression lasts. (does not progress while the game is paused).</param>
-        /// <param name="overwrite">Whether to overwrite any existing entry with this id, applying the new duration.</param>
+        /// <param name="duration">The duration that the input suppression lasts (does not progress while the game is paused).</param>
+        /// <param name="overwrite">Whether to overwrite any existing entry with this plugin guid and keycode combination, applying the new duration.</param>
         public void SetInputSuppressed(string callerGuid, InteractablePreset.InteractionKey interactionKey, TimeSpan? duration = null, bool overwrite = false)
         {
             if (interactionKey == InteractablePreset.InteractionKey.none)
@@ -246,9 +236,9 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Stops and removes an input suppression entry, if present.
+        /// Stops and removes any input suppression entries matching the provided predicate.
         /// </summary>
-        /// <param name="caller">The id associated with the entry.</param>
+        /// <param name="matcherPredicate"></param>
         public void RemoveInputSuppression(Func<InputSuppressionEntry, bool> matcherPredicate)
         {
             var entriesToRemove = FindInputSuppressionEntries(matcherPredicate);
@@ -308,12 +298,21 @@ namespace SOD.Common.Helpers
                     return KeyCode.Mouse1;
                 case "Mouse Button 3":
                     return KeyCode.Mouse2;
+                case "Mouse Button 4":
+                    return KeyCode.Mouse3;
+                case "Mouse Button 5":
+                    return KeyCode.Mouse4;
+                // Below are guesses
+                case "Mouse Button 6":
+                    return KeyCode.Mouse5;
+                case "Mouse Button 7":
+                    return KeyCode.Mouse6;
             }
             return KeyCode.None;
         }
 
         /// <summary>
-        /// Determines if an input is being suppressed.
+        /// Determines if an input is being suppressed by any plugin.
         /// </summary>
         /// <param name="keyCode">The KeyCode of the input.</param>
         /// <param name="suppressedBy">The guids of all plugins involved in suppressing the KeyCode.</param>
@@ -370,7 +369,7 @@ namespace SOD.Common.Helpers
 
 
         /// <summary>
-        /// Determines if an input is being suppressed.
+        /// Determines if an input is being suppressed by any plugin.
         /// </summary>
         /// <param name="interactionKey">The interaction (virtual action name) associated with the input.</param>
         /// <param name="checkOverlappingEntries">Whether to account for indirect suppression of the key code bound to the interaction, in addition to targeted/specific suppression of the interaction.</param>
