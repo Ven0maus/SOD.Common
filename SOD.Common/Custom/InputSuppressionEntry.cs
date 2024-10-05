@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using Rewired;
 using UnityEngine;
 using UniverseLib;
 
@@ -12,6 +13,8 @@ namespace SOD.Common.Custom
             Id = id;
             KeyCode = keyCode;
             InteractionKey = InteractablePreset.InteractionKey.none;
+            ElementIdentifierName = string.Empty;
+            ElementIdentifierId = -1;
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
         }
 
@@ -19,11 +22,16 @@ namespace SOD.Common.Custom
         {
             Id = id;
             InteractionKey = interactionKey;
-            KeyCode = Lib.InputDetection.GetBoundKeyCode(interactionKey);
+            var binding = Lib.InputDetection.GetBinding(interactionKey);
+            ElementIdentifierName = binding.elementIdentifierName;
+            ElementIdentifierId = binding.elementIdentifierId;
+            KeyCode = Lib.InputDetection.GetApproximateKeyCode(binding);
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
         }
 
         public KeyCode KeyCode { get; }
+        public string ElementIdentifierName { get; }
+        public int ElementIdentifierId { get; }
         public string Id { get; }
         public InteractablePreset.InteractionKey InteractionKey { get; }
         public float TimeRemainingSec { get; set; }
@@ -68,6 +76,8 @@ namespace SOD.Common.Custom
         public class JsonData
         {
             public string Id { get; set; }
+            public string ElementIdentifierName { get; set; }
+            public int ElementIdentifierId { get; set; }
             public KeyCode KeyCode { get; set; }
             public InteractablePreset.InteractionKey InteractionKey { get; set; }
             public float Time { get; set; }

@@ -4,13 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using BepInEx;
-using Il2CppSystem.Linq;
-using Il2CppSystem.Runtime.Remoting.Messaging;
 using Rewired;
-using Rewired.Demos;
 using SOD.Common.Custom;
 using SOD.Common.Extensions;
+using UnityEngine;
 
 namespace SOD.Common.Helpers
 {
@@ -46,34 +43,80 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Get the Unity KeyCode currently bound to an InteractionKey's Rewired InputAction.
+        /// Get the Rewired controller binding currently bound to an InteractionKey's Rewired InputAction.
         /// </summary>
         /// <param name="interactionKey"></param>
         /// <returns></returns>
-        public UnityEngine.KeyCode GetBoundKeyCode(InteractablePreset.InteractionKey interactionKey)
+        public ActionElementMap GetBinding(InteractablePreset.InteractionKey interactionKey)
         {
             List<ActionElementMap> controllerMappings = KeyboardAndMouseMappings;
             try
             {
-                return controllerMappings.First(x => x.actionId == GetRewiredAction(interactionKey).id).keyCode;
+                return controllerMappings.First(x => x.actionId == GetRewiredAction(interactionKey).id);
             }
-            catch (InvalidOperationException e)
+            catch (InvalidOperationException)
             {
-                return UnityEngine.KeyCode.None;
+                Plugin.Log.LogDebug($"Could not find action controller binding for interactionKey: {interactionKey}");
+                return null;
+            }
+            catch (NullReferenceException)
+            {
+                Plugin.Log.LogDebug($"Null reference exception for interactionKey: {interactionKey}");
+                return null;
             }
         }
 
         /// <summary>
-        /// Raised when a button's state changes from up/released to down/pressed and vice versa.
+        /// Raised when a button's state changes from up/released to
+        /// down/pressed and vice versa. Is <b>not</b> raised for suppressed inputs,
+        /// which are inputs that the vanilla game is currently being forced to
+        /// ignore.
         /// </summary>
         public event EventHandler<InputDetectionEventArgs> OnButtonStateChanged;
 
-        internal void ReportButtonStateChange(string actionName, InteractablePreset.InteractionKey key, bool isDown, bool isSuppressed)
+        /// <summary>
+        /// Raised when a button's state changes from up/released to
+        /// down/pressed and vice versa. Is <b>only</b> raised for suppressed inputs,
+        /// which are inputs that the vanilla game is currently being forced to
+        /// ignore.
+        /// </summary>
+        public event EventHandler<SuppressedInputDetectionEventArgs> OnSuppressedButtonStateChanged;
+
+        /// <summary>
+        /// Raised when an axis's state changes in value. Is <b>not</b> raised
+        /// for suppressed inputs, which are inputs that the vanilla game is
+        /// currently being forced to ignore.
+        /// </summary>
+        public event EventHandler<AxisInputDetectionEventArgs> OnAxisStateChanged;
+
+        /// <summary>
+        /// Raised when an axis's state changes in value. Is <b>only</b> raised
+        /// for suppressed inputs, which are inputs that the vanilla game is
+        /// currently being forced to ignore.
+        /// </summary>
+        public event EventHandler<SuppressedAxisInputDetectionEventArgs> OnSuppressedAxisStateChanged;
+
+        internal void ReportButtonStateChange(string actionName, InteractablePreset.InteractionKey interactionKey, bool isDown, List<string> suppressionEntryIds)
         {
-            OnButtonStateChanged?.Invoke(this, new InputDetectionEventArgs(actionName, key, isDown, isSuppressed));
+            if (suppressionEntryIds.Count == 0)
+                OnButtonStateChanged?.Invoke(this, new InputDetectionEventArgs(actionName, interactionKey, isDown));
+            else
+                OnSuppressedButtonStateChanged?.Invoke(this, new SuppressedInputDetectionEventArgs(actionName, interactionKey, isDown, suppressionEntryIds));
+        }
+
+        internal void ReportAxisStateChange(string actionName, InteractablePreset.InteractionKey interactionKey, float axisValue, List<string> suppressionEntryIds)
+        {
+            if (suppressionEntryIds.Count == 0)
+                OnAxisStateChanged?.Invoke(this, new AxisInputDetectionEventArgs(actionName, interactionKey, axisValue));
+            else
+                OnSuppressedAxisStateChanged?.Invoke(this, new SuppressedAxisInputDetectionEventArgs(actionName, interactionKey, axisValue, suppressionEntryIds));
         }
 
         private List<ActionElementMap> keyboardAndMouseMappings;
+
+        /// <summary>
+        /// Contains all keyboard and mouse Rewired ActionElementMap mappings.
+        /// </summary>
         public List<ActionElementMap> KeyboardAndMouseMappings
         {
             get
@@ -93,15 +136,14 @@ namespace SOD.Common.Helpers
                     foreach (string category in CONTROLLER_MAP_CATEGORIES)
                     {
                         ControllerMap map = RewiredPlayer.controllers.maps.GetMap(controller.type, controller.id, category, "Default");
-                        KeyboardAndMouseMappings.AddRange(map.AllMaps.ToList());
+                        keyboardAndMouseMappings.AddRange(map.AllMaps.ToList());
                     }
                 }
                 return keyboardAndMouseMappings;
             }
         }
 
-        // Used to track which inputs are being suppressed such that vanilla game responses to suppressed events are bypassed.
-        internal Dictionary<string, InputSuppressionEntry> InputSuppressionDictionary { get; set; }
+        internal Dictionary<string, InputSuppressionEntry> InputSuppressionDictionary { get; set; } = new();
 
         /// <summary>
         /// Suppress vanilla game responses to an input, with an optional duration. Adds an input suppression entry.
@@ -112,15 +154,13 @@ namespace SOD.Common.Helpers
         /// <param name="keyCode">The KeyCode to be suppressed.</param>
         /// <param name="duration">The duration that the input suppression lasts. (does not progress while the game is paused).</param>
         /// <param name="overwrite">Whether to overwrite any existing entry with this id, applying the new duration.</param>
-        public void SetInputSuppressed(string id, UnityEngine.KeyCode keyCode, TimeSpan? duration = null, bool overwrite = false)
+        public void SetInputSuppressed(string id, KeyCode keyCode, TimeSpan? duration = null, bool overwrite = false)
         {
             if (id == String.Empty)
                 throw new ArgumentException("Id cannot be empty.", nameof(id));
 
             if (keyCode == UnityEngine.KeyCode.None)
                 throw new ArgumentException("KeyCode cannot be none.", nameof(keyCode));
-
-            InputSuppressionDictionary ??= new();
 
             if (InputSuppressionDictionary.TryGetValue(id, out var entry))
             {
@@ -149,7 +189,7 @@ namespace SOD.Common.Helpers
         /// <br>At the end of the duration (if provided), the input suppression entry will be automatically removed.</br>
         /// </summary>
         /// <param name="id">The id associated with this entry.</param>
-        /// <param name="interactionKey">The interaction to be suppressed.</param>
+        /// <param name="interactionKey">The interaction (virtual action name) to be suppressed.</param>
         /// <param name="duration">The duration that the input suppression lasts. (does not progress while the game is paused).</param>
         /// <param name="overwrite">Whether to overwrite any existing entry with this id, applying the new duration.</param>
         public void SetInputSuppressed(string id, InteractablePreset.InteractionKey interactionKey, TimeSpan? duration = null, bool overwrite = false)
@@ -159,8 +199,6 @@ namespace SOD.Common.Helpers
 
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
-
-            InputSuppressionDictionary ??= new();
 
             if (InputSuppressionDictionary.TryGetValue(id, out var entry))
             {
@@ -184,7 +222,7 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Removes an input suppression entry, if present.
+        /// Stops and removes an input suppression entry, if present.
         /// </summary>
         /// <param name="id">The id associated with the entry.</param>
         public void RemoveInputSuppression(string id)
@@ -192,7 +230,7 @@ namespace SOD.Common.Helpers
             if (id == String.Empty)
                 throw new ArgumentException("Key cannot be empty.", nameof(id));
 
-            if (InputSuppressionDictionary != null && InputSuppressionDictionary.TryGetValue(id, out var entry))
+            if (InputSuppressionDictionary.TryGetValue(id, out var entry))
             {
                 entry.Stop();
                 InputSuppressionDictionary.Remove(id);
@@ -200,18 +238,13 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Removes matching input suppression entries, if present.
+        /// Stops and removes matching input suppression entries, if present.
         /// </summary>
         /// <param name="keyCode">The KeyCode to search for.</param>
-        public void RemoveInputSuppression(UnityEngine.KeyCode keyCode)
+        public void RemoveInputSuppression(KeyCode keyCode)
         {
             if (keyCode == UnityEngine.KeyCode.None)
                 throw new ArgumentException("KeyCode cannot be none.", nameof(keyCode));
-
-            if (InputSuppressionDictionary == null)
-            {
-                return;
-            }
 
             List<string> keysToRemove = new();
             foreach (var (key, value) in InputSuppressionDictionary)
@@ -230,25 +263,28 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Removes matching input suppression entries, if present.
+        /// Stops and removes matching input suppression entries, if present.
         /// </summary>
         /// <param name="interactionKey">The interaction to search for.</param>
-        /// <param name="includeBoundKeyCodeEntries">Whether to remove entries which indirectly suppress the key code bound to the interaction, in addition to those which specifically target the interaction.</param>
-        public void RemoveInputSuppression(InteractablePreset.InteractionKey interactionKey, bool includeBoundKeyCodeEntries)
+        /// <param name="removeOverlappingEntries">Whether to remove entries which indirectly suppress the key code bound to the interaction, in addition to those which specifically target the interaction.</param>
+        public void RemoveInputSuppression(InteractablePreset.InteractionKey interactionKey, bool removeOverlappingEntries)
         {
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
-
-            if (InputSuppressionDictionary == null)
+            if (!IsInputSuppressed(interactionKey, removeOverlappingEntries, out _, out _))
             {
                 return;
             }
 
             List<string> keysToRemove = new();
-            var boundKeyCode = GetBoundKeyCode(interactionKey);
+            var binding = GetBinding(interactionKey);
+            var boundKeyCode = GetApproximateKeyCode(binding);
+            var elementIdentifierName = binding.elementIdentifierName;
+            var elementIdentifierId = binding.elementIdentifierId;
             foreach (var (key, value) in InputSuppressionDictionary)
             {
-                if (value.InteractionKey != interactionKey && (!includeBoundKeyCodeEntries || value.KeyCode != boundKeyCode))
+                bool isOverlappingEntry = value.KeyCode == boundKeyCode || value.ElementIdentifierName == elementIdentifierName || value.ElementIdentifierId == elementIdentifierId;
+                if (value.Id != key && (!removeOverlappingEntries || !isOverlappingEntry))
                 {
                     continue;
                 }
@@ -259,63 +295,99 @@ namespace SOD.Common.Helpers
             {
                 InputSuppressionDictionary.Remove(i);
             }
+        }
+
+        /// <summary>
+        /// Gets the KeyCode associated with a Rewired ActionElementMap binding. Required for certain Button-type bindings such as mouse buttons.
+        /// </summary>
+        /// <param name="binding"></param>
+        /// <returns></returns>
+        public KeyCode GetApproximateKeyCode(ActionElementMap binding)
+        {
+            if (binding.keyCode != KeyCode.None)
+            {
+                return binding.keyCode;
+            }
+            switch (binding.elementIdentifierName)
+            {
+                case "Left Mouse Button":
+                    return KeyCode.Mouse0;
+                case "Right Mouse Button":
+                    return KeyCode.Mouse1;
+                case "Mouse Button 3":
+                    return KeyCode.Mouse2;
+            }
+            return KeyCode.None;
         }
 
         /// <summary>
         /// Determines if an input is being suppressed.
         /// </summary>
         /// <param name="keyCode">The KeyCode of the input.</param>
-        /// <param name="timeLeft"></param>
+        /// <param name="suppressionEntryIds">All ids (dictionary entry keys) involved in suppressing the KeyCode.</param>
+        /// <param name="maxTimeLeft">The maximum time that the input will be suppressed for, across all suppression entries.</param>
         /// <returns></returns>
-        public bool IsInputSuppressed(UnityEngine.KeyCode keyCode, out TimeSpan? timeLeft)
+        public bool IsInputSuppressed(KeyCode keyCode, out List<string> suppressionEntryIds, out TimeSpan? maxTimeLeft)
         {
-            timeLeft = null;
-            if (InputSuppressionDictionary == null)
-            {
-                return false;
-            }
+            if (keyCode == KeyCode.None)
+                throw new ArgumentException("IsInputSuppressed was passed a keycode value of KeyCode.None");
 
+            suppressionEntryIds = new();
+            maxTimeLeft = null;
+
+            var isSuppressed = false;
             foreach (var (key, value) in InputSuppressionDictionary)
             {
                 if (value.KeyCode != keyCode)
-                // if (value.KeyCode != keyCode && (!includeBoundKeyCodeEntries || value.KeyCode != boundKeyCode))
                 {
                     continue;
                 }
-                if (value.TimeRemainingSec > 0f)
-                    timeLeft = TimeSpan.FromSeconds(value.TimeRemainingSec);
-                return true;
+                isSuppressed = true;
+                suppressionEntryIds.Add(value.Id);
+                maxTimeLeft ??= TimeSpan.MinValue;
+                if (value.TimeRemainingSec > 0f && value.TimeRemainingSec > maxTimeLeft.Value.TotalSeconds)
+                    maxTimeLeft = TimeSpan.FromSeconds(value.TimeRemainingSec);
             }
-            return false;
+            return isSuppressed;
         }
 
         /// <summary>
         /// Determines if an input is being suppressed.
         /// </summary>
-        /// <param name="interactionKey">The interaction associated with the input.</param>
-        /// <param name="includeBoundKeyCodeEntries">Whether to account for indirect suppression of the key code bound to the interaction, in addition to targeted/specific suppression of the interaction.</param>
-        /// <param name="timeLeft"></param>
+        /// <param name="interactionKey">The interaction (virtual action name) associated with the input.</param>
+        /// <param name="checkOverlappingEntries">Whether to account for indirect suppression of the key code bound to the interaction, in addition to targeted/specific suppression of the interaction.</param>
+        /// <param name="suppressionEntryIds">All ids (dictionary entry keys) involved in suppressing the KeyCode.</param>
+        /// <param name="maxTimeLeft">The maximum time that the input will be suppressed for, across all suppression entries.</param>
         /// <returns></returns>
-        public bool IsInputSuppressed(InteractablePreset.InteractionKey interactionKey, bool includeBoundKeyCodeEntries, out TimeSpan? timeLeft)
+        public bool IsInputSuppressed(InteractablePreset.InteractionKey interactionKey, bool checkOverlappingEntries, out List<string> suppressionEntryIds, out TimeSpan? maxTimeLeft)
         {
-            timeLeft = null;
-            if (InputSuppressionDictionary == null)
+            suppressionEntryIds = new();
+            maxTimeLeft = null;
+
+            var binding = GetBinding(interactionKey);
+            if (binding == null)
             {
                 return false;
             }
 
-            var boundKeyCode = GetBoundKeyCode(interactionKey);
+            var boundKeyCode = GetApproximateKeyCode(binding);
+            var elementIdentifierName = binding.elementIdentifierName;
+            var elementIdentifierId = binding.elementIdentifierId;
+            var isSuppressed = false;
             foreach (var (key, value) in InputSuppressionDictionary)
             {
-                if (value.InteractionKey != interactionKey && (!includeBoundKeyCodeEntries || value.KeyCode != boundKeyCode))
+                bool isOverlappingEntry = (boundKeyCode != KeyCode.None && value.KeyCode == boundKeyCode) || (value.ElementIdentifierName != string.Empty && value.ElementIdentifierName == elementIdentifierName && value.ElementIdentifierId == elementIdentifierId);
+                if (value.InteractionKey != interactionKey && (!checkOverlappingEntries || !isOverlappingEntry))
                 {
                     continue;
                 }
-                if (value.TimeRemainingSec > 0f)
-                    timeLeft = TimeSpan.FromSeconds(value.TimeRemainingSec);
-                return true;
+                isSuppressed = true;
+                suppressionEntryIds.Add(key);
+                maxTimeLeft ??= TimeSpan.MinValue;
+                if (value.TimeRemainingSec > 0f && value.TimeRemainingSec > maxTimeLeft.Value.TotalSeconds)
+                    maxTimeLeft = TimeSpan.FromSeconds(value.TimeRemainingSec);
             }
-            return false;
+            return isSuppressed;
         }
 
         /// <summary>
@@ -337,7 +409,15 @@ namespace SOD.Common.Helpers
                     InputSuppressionDictionary = new();
                     foreach (var data in jsonData)
                     {
-                        var entry = new InputSuppressionEntry(data.Id, data.KeyCode, data.Time == 0f ? null : TimeSpan.FromSeconds(data.Time));
+                        InputSuppressionEntry entry;
+                        if (data.ElementIdentifierName != string.Empty)
+                        {
+                            entry = new InputSuppressionEntry(data.Id, data.InteractionKey, data.Time == 0f ? null : TimeSpan.FromSeconds(data.Time));
+                        }
+                        else
+                        {
+                            entry = new InputSuppressionEntry(data.Id, data.KeyCode, data.Time == 0f ? null : TimeSpan.FromSeconds(data.Time));
+                        }
                         InputSuppressionDictionary[data.Id] = entry;
                         entry.Start();
                     }
@@ -355,7 +435,7 @@ namespace SOD.Common.Helpers
             var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"inputsuppression_{hash}.json");
 
             // Clean-up
-            if (InputSuppressionDictionary == null || InputSuppressionDictionary.Count == 0)
+            if (InputSuppressionDictionary.Count == 0)
             {
                 if (File.Exists(storePath))
                     File.Delete(storePath);
@@ -366,6 +446,8 @@ namespace SOD.Common.Helpers
                 .Select(a => new InputSuppressionEntry.JsonData
                 {
                     Id = a.Key,
+                    ElementIdentifierName = a.Value.ElementIdentifierName,
+                    ElementIdentifierId = a.Value.ElementIdentifierId,
                     KeyCode = a.Value.KeyCode,
                     InteractionKey = a.Value.InteractionKey,
                     Time = a.Value.TimeRemainingSec
@@ -381,12 +463,9 @@ namespace SOD.Common.Helpers
         internal void ResetSuppressionTracking()
         {
             // Clear out the modifiers and the dictionary for a new game
-            if (InputSuppressionDictionary != null)
-            {
-                foreach (var entry in InputSuppressionDictionary.Values)
-                    entry.Stop();
-                InputSuppressionDictionary = null;
-            }
+            foreach (var entry in InputSuppressionDictionary.Values)
+                entry.Stop();
+            InputSuppressionDictionary = new();
         }
     }
 
@@ -395,14 +474,58 @@ namespace SOD.Common.Helpers
         public string ActionName { get; }
         public InteractablePreset.InteractionKey Key { get; }
         public bool IsDown { get; }
-        public bool IsSuppressed { get; }
 
-        internal InputDetectionEventArgs(string actionName, InteractablePreset.InteractionKey key, bool isDown, bool isSuppressed)
+        internal InputDetectionEventArgs(string actionName, InteractablePreset.InteractionKey key, bool isDown)
         {
             ActionName = actionName;
             Key = key;
             IsDown = isDown;
-            IsSuppressed = isSuppressed;
+        }
+    }
+
+    public sealed class AxisInputDetectionEventArgs : EventArgs
+    {
+        public string ActionName { get; }
+        public InteractablePreset.InteractionKey Key { get; }
+        public float AxisValue { get; }
+
+        internal AxisInputDetectionEventArgs(string actionName, InteractablePreset.InteractionKey key, float axisValue)
+        {
+            ActionName = actionName;
+            Key = key;
+            AxisValue = axisValue;
+        }
+    }
+
+    public sealed class SuppressedInputDetectionEventArgs : EventArgs
+    {
+        public string ActionName { get; }
+        public InteractablePreset.InteractionKey Key { get; }
+        public bool IsDown { get; }
+        public List<string> SuppressionEntryIds { get; }
+
+        internal SuppressedInputDetectionEventArgs(string actionName, InteractablePreset.InteractionKey key, bool isDown, List<string> suppressionEntryIds)
+        {
+            ActionName = actionName;
+            Key = key;
+            IsDown = isDown;
+            SuppressionEntryIds = suppressionEntryIds;
+        }
+    }
+
+    public sealed class SuppressedAxisInputDetectionEventArgs : EventArgs
+    {
+        public string ActionName { get; }
+        public InteractablePreset.InteractionKey Key { get; }
+        public float AxisValue { get; }
+        public List<string> SuppressionEntryIds { get; }
+
+        internal SuppressedAxisInputDetectionEventArgs(string actionName, InteractablePreset.InteractionKey key, float axisValue, List<string> suppressionEntryIds)
+        {
+            ActionName = actionName;
+            Key = key;
+            AxisValue = axisValue;
+            SuppressionEntryIds = suppressionEntryIds;
         }
     }
 }

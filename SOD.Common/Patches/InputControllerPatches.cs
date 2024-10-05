@@ -2,6 +2,7 @@ using HarmonyLib;
 using Rewired;
 using SOD.Common.Extensions;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SOD.Common.Patches
@@ -23,44 +24,60 @@ namespace SOD.Common.Patches
             }
             if (_gameMappedKeyDictionary.Count == 0)
             {
-                var gameMappedKeys = System.Enum.GetNames(typeof(InteractablePreset.InteractionKey));
+                var gameMappedKeys = System.Enum.GetValues<InteractablePreset.InteractionKey>();
                 foreach (var key in gameMappedKeys)
                 {
-                    var capitalizedKey = $"{key.Substring(0, 1).ToUpper()}{key.Substring(1)}";
-                    if (!_actionNames.Contains(capitalizedKey))
+                    var actionName = Lib.InputDetection.GetRewiredActionName(key);
+                    if (!_actionNames.Contains(actionName))
                     {
                         continue;
                     }
-                    _gameMappedKeyDictionary.Add(capitalizedKey, System.Enum.Parse<InteractablePreset.InteractionKey>(key, true));
+                    _gameMappedKeyDictionary.Add(actionName, key);
                 }
             }
         }
 
-        private static void ReportIfSuppressed(string actionName, ref bool __result, bool isDown)
+        private static InteractablePreset.InteractionKey GetInteractionKey(string actionName)
         {
             if (!_gameMappedKeyDictionary.TryGetValue(actionName, out var interactionKey))
             {
-                return;
+                return InteractablePreset.InteractionKey.none;
             }
-            var boundKeyCode = Lib.InputDetection.GetBoundKeyCode(interactionKey);
+            return interactionKey;
+        }
 
-            Lib.InputDetection.InputSuppressionDictionary ??= new();
-
-            foreach (var (key, value) in Lib.InputDetection.InputSuppressionDictionary)
+        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetAxis), argumentTypes: [typeof(string)])]
+        internal class Rewired_Player_GetAxis
+        {
+            [HarmonyPostfix]
+            internal static void Postfix(Rewired.Player __instance, string actionName, ref float __result)
             {
-                if (!Lib.InputDetection.InputSuppressionDictionary.Values.Any(v => v.InteractionKey == interactionKey || v.KeyCode == boundKeyCode))
+                if (!ReInput.isReady)
                 {
-                    continue;
+                    return;
                 }
-                // Report the state change and that it was suppressed
-                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, isDown: isDown, isSuppressed: true);
-                __result = false;
+                InitializeActionsIfNecessary();
+                var interactionKey = GetInteractionKey(actionName);
+                if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out var entryIds, out _))
+                {
+                    Lib.InputDetection.ReportAxisStateChange(actionName, interactionKey, __result, entryIds);
+                    return;
+                }
+                Lib.InputDetection.ReportAxisStateChange(actionName, interactionKey, __result, entryIds);
+                __result = 0.0f;
             }
         }
 
-        [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonDown), argumentTypes: [typeof(string)])]
-        internal class Rewired_Player_GetButtonDown
+        [HarmonyPatch]
+        internal class Rewired_Player_GetButtonAndGetButtonDown
         {
+            [HarmonyTargetMethods]
+            internal static IEnumerable<System.Reflection.MethodBase> TargetMethods()
+            {
+                var targets = typeof(Rewired.Player).GetMethods().Where(mi => (mi.Name == "GetButton" || mi.Name == "GetButtonDown") && mi.GetParameters().First().ParameterType == typeof(string)).ToList();
+                return targets;
+            }
+
             [HarmonyPostfix]
             internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
             {
@@ -69,10 +86,60 @@ namespace SOD.Common.Patches
                     return;
                 }
                 InitializeActionsIfNecessary();
-                ReportIfSuppressed(actionName, ref __result, isDown: true);
+                var interactionKey = GetInteractionKey(actionName);
+                if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out var entryIds, out _))
+                {
+                    Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
+                    return;
+                }
+                __result = false;
+                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
             }
-
         }
+
+        // [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonDown), argumentTypes: [typeof(string)])]
+        // internal class Rewired_Player_GetButtonDown
+        // {
+        //     [HarmonyPostfix]
+        //     internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
+        //     {
+        //         if (!ReInput.isReady)
+        //         {
+        //             return;
+        //         }
+        //         InitializeActionsIfNecessary();
+        //         var interactionKey = GetInteractionKey(actionName);
+        //         if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out var entryIds, out _))
+        //         {
+        //             Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, false);
+        //             return;
+        //         }
+        //         __result = false;
+        //         Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, true);
+        //     }
+        // }
+
+        // [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButton), argumentTypes: [typeof(string)])]
+        // internal class Rewired_Player_GetButton
+        // {
+        //     [HarmonyPostfix]
+        //     internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
+        //     {
+        //         if (!ReInput.isReady)
+        //         {
+        //             return;
+        //         }
+        //         InitializeActionsIfNecessary();
+        //         var interactionKey = GetInteractionKey(actionName);
+        //         if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out _))
+        //         {
+        //             Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, false);
+        //             return;
+        //         }
+        //         __result = false;
+        //         Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, true);
+        //     }
+        // }
 
         [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonUp), argumentTypes: [typeof(string)])]
         internal class Rewired_Player_GetButtonUp
@@ -80,47 +147,19 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
             {
-                if (!ReInput.isReady || !__result || __instance == null)
+                if (!ReInput.isReady)
                 {
                     return;
                 }
                 InitializeActionsIfNecessary();
-                ReportIfSuppressed(actionName, ref __result, isDown: false);
-            }
-        }
-
-        /// <summary>
-        /// Patch for game input actions which use one of GetButton,
-        /// GetButtonDown, GetButtonUp instead of GetButtonDown and
-        /// GetButtonUp.
-        /// </summary>
-        [HarmonyPatch(typeof(InputController), nameof(InputController.Update))]
-        internal class InputController_Update
-        {
-            [HarmonyPrefix]
-            internal static void Prefix(InputController __instance)
-            {
-                if (!__instance.enabled || !ReInput.isReady || __instance.player == null)
+                var interactionKey = GetInteractionKey(actionName);
+                if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out var entryIds, out _))
                 {
+                    Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
                     return;
                 }
-                InitializeActionsIfNecessary();
-                if (!__instance.player.GetAnyButtonDown() && !__instance.player.GetAnyButtonUp())
-                {
-                    return;
-                }
-                foreach (var actionName in _actionNames)
-                {
-                    bool isBtnDown = __instance.player.GetButtonDown(actionName);
-                    if (isBtnDown || __instance.player.GetButtonUp(actionName))
-                    {
-                        var interactionKey = _gameMappedKeyDictionary.ContainsKey(actionName)
-                            ? _gameMappedKeyDictionary[actionName]
-                            : InteractablePreset.InteractionKey.none;
-
-                        Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, isBtnDown, false);
-                    }
-                }
+                __result = false;
+                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
             }
         }
     }
