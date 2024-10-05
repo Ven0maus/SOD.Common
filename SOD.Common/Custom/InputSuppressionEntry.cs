@@ -1,46 +1,53 @@
 using System;
 using System.Collections;
+using BepInEx;
 using Rewired;
 using UnityEngine;
 using UniverseLib;
 
 namespace SOD.Common.Custom
 {
-    internal sealed class InputSuppressionEntry
+    public sealed class InputSuppressionEntry
     {
-        public InputSuppressionEntry(string id, KeyCode keyCode, TimeSpan? time = null)
+        public InputSuppressionEntry(string callerGuid, KeyCode keyCode, TimeSpan? time = null)
         {
-            Id = id;
+            CallerGuid = callerGuid;
             KeyCode = keyCode;
             InteractionKey = InteractablePreset.InteractionKey.none;
             ElementIdentifierName = string.Empty;
             ElementIdentifierId = -1;
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
+            IsSetOnInteractionKey = false;
         }
 
-        public InputSuppressionEntry(string id, InteractablePreset.InteractionKey interactionKey, TimeSpan? time = null)
+        public InputSuppressionEntry(string callerGuid, InteractablePreset.InteractionKey interactionKey, TimeSpan? time = null)
         {
-            Id = id;
+            CallerGuid = callerGuid;
             InteractionKey = interactionKey;
             var binding = Lib.InputDetection.GetBinding(interactionKey);
             ElementIdentifierName = binding.elementIdentifierName;
             ElementIdentifierId = binding.elementIdentifierId;
             KeyCode = Lib.InputDetection.GetApproximateKeyCode(binding);
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
+            IsSetOnInteractionKey = true;
         }
 
         public KeyCode KeyCode { get; }
         public string ElementIdentifierName { get; }
         public int ElementIdentifierId { get; }
-        public string Id { get; }
+        public string CallerGuid { get; }
         public InteractablePreset.InteractionKey InteractionKey { get; }
+        public bool IsSetOnInteractionKey { get; }
         public float TimeRemainingSec { get; set; }
 
         private Coroutine _coroutine;
 
         public void Start()
         {
-            if (_coroutine != null || TimeRemainingSec <= 0) return;
+            Plugin.Log.LogInfo($"Attempting to start {CallerGuid} {InteractionKey} {KeyCode} entry");
+            if (_coroutine != null || TimeRemainingSec <= 0f)
+                return;
+            Plugin.Log.LogInfo($"Yes, we started it.");
             _coroutine = RuntimeHelper.StartCoroutine(Tick());
         }
 
@@ -49,6 +56,11 @@ namespace SOD.Common.Custom
             if (_coroutine == null) return;
             RuntimeHelper.StopCoroutine(_coroutine);
             _coroutine = null;
+        }
+
+        internal string ConvertToDictionaryKey()
+        {
+            return Lib.InputDetection.ConvertToDictionaryKey(CallerGuid, InteractionKey, KeyCode);
         }
 
         private IEnumerator Tick()
@@ -65,22 +77,20 @@ namespace SOD.Common.Custom
             }
 
             TimeRemainingSec = 0f;
-            if (Lib.InputDetection.InputSuppressionDictionary != null)
-                Lib.InputDetection.InputSuppressionDictionary.Remove(Id);
+            Lib.InputDetection.InputSuppressionDictionary.Remove(ConvertToDictionaryKey());
             _coroutine = null;
         }
 
         /// <summary>
         /// Used to store the data into json object
         /// </summary>
-        public class JsonData
+        internal class JsonData
         {
-            public string Id { get; set; }
-            public string ElementIdentifierName { get; set; }
-            public int ElementIdentifierId { get; set; }
+            public string CallerGuid { get; set; }
             public KeyCode KeyCode { get; set; }
             public InteractablePreset.InteractionKey InteractionKey { get; set; }
             public float Time { get; set; }
+            public bool IsSetOnInteractionKey { get; set; }
         }
     }
 }
