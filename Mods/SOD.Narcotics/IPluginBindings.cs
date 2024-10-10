@@ -54,5 +54,8 @@ namespace SOD.Narcotics
 
         [Binding(1.25f, "The maximum susceptible a person can be (random chosen between min/max).", "Addiction.Calculations.MaximumSusceptibility")]
         float MaximumSusceptibility { get; set; }
+
+        [Binding(4, "The amount of hours the person must have not taken anymore narcotics to start recovering from their addiction.", "Addiction.Calculations.RecoveryStartTime")]
+        int RecoveryStartTime { get; set; }
     }
 }

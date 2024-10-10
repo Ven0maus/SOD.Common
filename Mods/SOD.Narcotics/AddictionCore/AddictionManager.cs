@@ -120,19 +120,15 @@ namespace SOD.Narcotics.AddictionCore
         /// <summary>
         /// Call this periodically (e.g., once per hour) to allow natural recovery.
         /// </summary>
-        public static void NaturalRecovery(AddictionType addictionType, float recoveryAmount)
+        public static void NaturalRecovery()
         {
-            if (!_enabledAddictions.ContainsKey(addictionType)) return;
             // Make sure the clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
             var addictions = _addictions.Values
                 .SelectMany(a => a)
-                .Where(a => a.AddictionType == addictionType)
+                .Where(a => a.Recovering)
                 .ToArray();
             foreach (var addiction in addictions)
-            {
-                if (addiction.Recovering)
-                    addiction.AdjustProgress(-recoveryAmount);
-            }
+                addiction.AdjustProgress(-0.03f);
         }
 
         /// <summary>
