@@ -82,7 +82,7 @@ namespace SOD.Narcotics.AddictionCore
                 .ToArray();
             foreach (var addiction in addictions)
             {
-                if (addiction.IsActive && addiction.Recovering)
+                if (addiction.Recovering)
                     addiction.AdjustProgress(-recoveryAmount);
             }
         }

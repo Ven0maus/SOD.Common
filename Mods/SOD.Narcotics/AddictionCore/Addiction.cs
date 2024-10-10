@@ -8,8 +8,7 @@ namespace SOD.Narcotics.AddictionCore
 {
     public abstract class Addiction : IAddiction
     {
-        public bool IsActive { get; set; }
-        public string AddictionName => $"{AddictionType} Addiction";
+        public string AddictionName => $"{AddictionType} addiction";
         public AddictionType AddictionType { get; private set; }
         public float StageProgress { get; set; }
         public bool Recovering
@@ -29,8 +28,11 @@ namespace SOD.Narcotics.AddictionCore
         {
             HumanId = humanId;
             AddictionType = addictionType;
-            IsActive = true;
             _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human: {HumanId}] has become addicted to \"{AddictionType}\".");
+
             ApplyStageEffects();
         }
 
@@ -40,8 +42,6 @@ namespace SOD.Narcotics.AddictionCore
         /// <param name="progressAmount"></param>
         public void AdjustProgress(float progressAmount)
         {
-            if (!IsActive) return;
-
             if (progressAmount > 0)
                 _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
 
@@ -58,12 +58,12 @@ namespace SOD.Narcotics.AddictionCore
                 MoveToPreviousStage();
             }
 
-            Plugin.Log.LogInfo($"[{AddictionName}] [Progress]: {StageProgress * 100}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Progress]: {StageProgress * 100}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
         }
 
         public void Cure()
         {
-            IsActive = false;
             StageProgress = 0f;
 
             // Remove all effects
@@ -73,7 +73,8 @@ namespace SOD.Narcotics.AddictionCore
                 RemoveStageEffects();
             }
 
-            Plugin.Log.LogInfo($"[{AddictionName}] [Status]: Cured");
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] has now been cured of his \"{AddictionName}\".");
         }
 
         public abstract Action<bool> MildStageAction();
@@ -85,7 +86,9 @@ namespace SOD.Narcotics.AddictionCore
             if (_appliedStageEffects.Contains(Stage)) return;
             GetStageAction()?.Invoke(true);
             _appliedStageEffects.Add(Stage);
-            Plugin.Log.LogInfo($"[{AddictionName}] Applied effects of stage \"{Stage}\".");
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] Applied effects of stage \"{Stage}\".");
         }
 
         private void RemoveStageEffects()
@@ -93,7 +96,9 @@ namespace SOD.Narcotics.AddictionCore
             if (!_appliedStageEffects.Contains(Stage)) return;
             GetStageAction()?.Invoke(false);
             _appliedStageEffects.Remove(Stage);
-            Plugin.Log.LogInfo($"[{AddictionName}] Removed effects of stage \"{Stage}\".");
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] Removed effects of stage \"{Stage}\".");
         }
 
         private Action<bool> GetStageAction()
@@ -115,7 +120,9 @@ namespace SOD.Narcotics.AddictionCore
         {
             Stage++;
             ApplyStageEffects();
-            Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Worsened to {Stage}.");
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Stage]: Worsened to {Stage}.");
         }
 
         private void MoveToPreviousStage()
@@ -130,7 +137,9 @@ namespace SOD.Narcotics.AddictionCore
             }
 
             Stage--;
-            Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Improved to {Stage}.");
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Stage]: Improved to {Stage}.");
         }
     }
 }
