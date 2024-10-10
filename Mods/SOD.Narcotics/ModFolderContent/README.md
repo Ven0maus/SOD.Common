@@ -7,6 +7,7 @@ Full feature list:
 - Adds 5 different addictions: Nicotine, Alcohol, Opioids, Sugar, Caffeine
 - The player will start to develop addictions with too much use of certain narcotics
 - Ability to make certain narcotics with general household items
+- New dialogue options for npcs related to narcotics and addictions
 - The player can now smoke cigarettes and cigars
 - Ability to collect DNA from certain objects and npcs
 - Ability to sequence dna resulting in an evidence item with a unique dna code
@@ -17,6 +18,3 @@ Full feature list:
 - New sync disks:
   - Soberware: Less effect of addictions 25% - 50% - 100%
   - Overdose: Narcotics have a discount 20% - 40% - 60%
-
-// TODO: Explain this better
-- New dialogue options for npcs related to narcotics and addictions
