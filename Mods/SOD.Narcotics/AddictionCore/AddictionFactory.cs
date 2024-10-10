@@ -10,7 +10,9 @@ namespace SOD.Narcotics.AddictionCore
         {
             { AddictionType.Alcohol, typeof(AlcoholAddiction) },
             { AddictionType.Nicotine, typeof(NicotineAddiction) },
-            { AddictionType.Opioid, typeof(OpioidAddiction) }
+            { AddictionType.Opioid, typeof(OpioidAddiction) },
+            { AddictionType.Sugar, typeof(SugarAddiction) },
+            { AddictionType.Caffeine, typeof(CaffeineAddiction) }
         };
 
         public static Addiction Get(int humanId, AddictionType addictionType)
