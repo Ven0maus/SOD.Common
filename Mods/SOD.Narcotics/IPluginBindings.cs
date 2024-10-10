@@ -49,10 +49,10 @@ namespace SOD.Narcotics
         [Binding(10, "The base threshold used in calculating when a person becomes addicted.", "Addiction.Calculations.BaseAddictionThreshold")]
         int BaseAddictionThreshold { get; set; }
 
-        [Binding(0.5f, "The minimum susceptible a human can be (random chosen between min/max).", "Addiction.Calculations.MinimumSusceptibility")]
+        [Binding(0.75f, "The minimum susceptible a person can be (random chosen between min/max).", "Addiction.Calculations.MinimumSusceptibility")]
         float MinimumSusceptibility { get; set; }
 
-        [Binding(1.5f, "The maximum susceptible a human can be (random chosen between min/max).", "Addiction.Calculations.MaximumSusceptibility")]
+        [Binding(1.25f, "The maximum susceptible a person can be (random chosen between min/max).", "Addiction.Calculations.MaximumSusceptibility")]
         float MaximumSusceptibility { get; set; }
     }
 }
