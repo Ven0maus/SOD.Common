@@ -16,7 +16,7 @@ namespace SOD.Narcotics.AddictionCore
         {
             get
             {
-                return _timeSinceLastWorsening.AddHours(6) < Lib.Time.CurrentDateTime;
+                return _timeSinceLastWorsening.AddHours(6) <= Lib.Time.CurrentDateTime;
             }
         }
         public AddictionStage Stage { get; private set; }
