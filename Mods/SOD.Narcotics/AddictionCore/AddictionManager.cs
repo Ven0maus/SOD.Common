@@ -8,6 +8,7 @@ namespace SOD.Narcotics.AddictionCore
     {
         private readonly static Dictionary<int, List<Addiction>> _addictions = new();
         private readonly static Dictionary<int, Dictionary<AddictionType, int>> _consumptionCounters = new();
+        private readonly static Dictionary<int, float> _susceptibilityModifiers = new();
         private readonly static int baseAddictionThreshold = 10; // Default threshold before addiction
 
         /// <summary>
@@ -73,9 +74,12 @@ namespace SOD.Narcotics.AddictionCore
                 _consumptionCounters[humanId][addictionType] = 0;
             }
 
+            // Define the susceptibility of the human
+            if (!_susceptibilityModifiers.TryGetValue(humanId, out var susceptibility))
+                susceptibility = _susceptibilityModifiers[humanId] = UnityEngine.Random.Range(0.5f, 1.5f);
+
             // Increment consumption count for this substance
             _consumptionCounters[humanId][addictionType]++;
-            var susceptibility = 1.0f; // TODO: Define per human a unique random susceptibility value
             int currentConsumption = _consumptionCounters[humanId][addictionType];
             int addictionThreshold = (int)(baseAddictionThreshold * susceptibility / itemPotency);
 
