@@ -25,7 +25,7 @@ namespace SOD.Narcotics.AddictionCore
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
             if (!_addictions.TryGetValue(humanId, out var addictions))
-                _addictions[humanId] = new List<Addiction>();
+                addictions = _addictions[humanId] = new List<Addiction>();
 
             if (!addictions.Any(a => a.AddictionType == addictionType))
             {
