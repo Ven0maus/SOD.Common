@@ -14,6 +14,7 @@ namespace SOD.Narcotics.AddictionCore
         private readonly static Dictionary<int, List<Addiction>> _addictions = new();
         private readonly static Dictionary<int, Dictionary<AddictionType, int>> _consumptionCounters = new();
         private readonly static Dictionary<int, float> _susceptibilityModifiers = new();
+        private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
 
         /// <summary>
@@ -25,9 +26,7 @@ namespace SOD.Narcotics.AddictionCore
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
             if (!_addictions.TryGetValue(humanId, out var addictions))
-            {
                 _addictions[humanId] = new List<Addiction>();
-            }
 
             if (!addictions.Any(a => a.AddictionType == addictionType))
             {
@@ -69,9 +68,7 @@ namespace SOD.Narcotics.AddictionCore
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
             // Ensure the consumption counter is initialized for the human
             if (!_consumptionCounters.ContainsKey(humanId))
-            {
                 _consumptionCounters[humanId] = new Dictionary<AddictionType, int>();
-            }
 
             // Check if the human already has this addiction
             var addiction = GetAddiction(humanId, addictionType);
@@ -84,9 +81,7 @@ namespace SOD.Narcotics.AddictionCore
 
             // If not addicted, track the consumption count
             if (!_consumptionCounters[humanId].ContainsKey(addictionType))
-            {
                 _consumptionCounters[humanId][addictionType] = 0;
-            }
 
             // Define the susceptibility of the human
             if (!_susceptibilityModifiers.TryGetValue(humanId, out var susceptibility))
@@ -99,16 +94,14 @@ namespace SOD.Narcotics.AddictionCore
             // Increment consumption count for this substance
             _consumptionCounters[humanId][addictionType]++;
             int currentConsumption = _consumptionCounters[humanId][addictionType];
-            int addictionThreshold = (int)(Plugin.Instance.Config.BaseAddictionThreshold * susceptibility / itemPotency);
+            int addictionThreshold = (int)(Plugin.Instance.Config.BaseAddictionThreshold * susceptibility / (itemPotency * _addictionPotentials[addictionType]));
 
             if (Plugin.Instance.Config.DebugMode)
                 Plugin.Log.LogInfo($"[Human: {humanId}] consumed {addictionType.ToString().ToLower()}: {currentConsumption}/{addictionThreshold}");
 
             // Check if consumption exceeds the threshold, triggering addiction
             if (currentConsumption >= addictionThreshold)
-            {
                 Assign(humanId, addictionType);
-            }
         }
 
         /// <summary>
@@ -148,12 +141,21 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void InitConfigValues()
         {
-            if (_enabledAddictions.Count != 0) return;
+            if (_enabledAddictions.Count != 0 || _addictionPotentials.Count != 0) return;
+
+            // Enabled or not
             _enabledAddictions.Add(AddictionType.Alcohol, Plugin.Instance.Config.EnableAlcoholAddiction);
             _enabledAddictions.Add(AddictionType.Nicotine, Plugin.Instance.Config.EnableNicotineAddiction);
             _enabledAddictions.Add(AddictionType.Opioid, Plugin.Instance.Config.EnableOpioidAddiction);
             _enabledAddictions.Add(AddictionType.Sugar, Plugin.Instance.Config.EnableSugarAddiction);
             _enabledAddictions.Add(AddictionType.Caffeine, Plugin.Instance.Config.EnableCaffeineAddiction);
+
+            // Potential for addiction
+            _addictionPotentials.Add(AddictionType.Alcohol, Plugin.Instance.Config.AlcoholAddictionPotential);
+            _addictionPotentials.Add(AddictionType.Nicotine, Plugin.Instance.Config.NicotineAddictionPotential);
+            _addictionPotentials.Add(AddictionType.Opioid, Plugin.Instance.Config.OpioidAddictionPotential);
+            _addictionPotentials.Add(AddictionType.Sugar, Plugin.Instance.Config.SugarAddictionPotential);
+            _addictionPotentials.Add(AddictionType.Caffeine, Plugin.Instance.Config.CaffeineAddictionPotential);
         }
 
         /// <summary>
