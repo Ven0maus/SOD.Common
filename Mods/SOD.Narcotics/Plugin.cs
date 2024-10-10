@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
+using SOD.Narcotics.AddictionCore;
 using System.Reflection;
 
 namespace SOD.Narcotics
@@ -16,6 +17,12 @@ namespace SOD.Narcotics
         {
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
+        }
+
+        public override void OnConfigureBindings()
+        {
+            base.OnConfigureBindings();
+            AddictionManager.InitConfigValues();
         }
     }
 }

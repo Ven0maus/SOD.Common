@@ -13,7 +13,7 @@ namespace SOD.Narcotics.AddictionCore
             { AddictionType.Opioid, typeof(OpioidAddiction) }
         };
 
-        public static Addiction Get(AddictionType addictionType, int humanId)
+        public static Addiction Get(int humanId, AddictionType addictionType)
         {
             if (!_addictionTypes.TryGetValue(addictionType, out var type))
                 throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
