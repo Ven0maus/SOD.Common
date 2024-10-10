@@ -13,7 +13,9 @@ namespace SOD.Narcotics.AddictionCore.Addictions
     {
         Alcohol,
         Nicotine,
-        Opioid
+        Opioid,
+        Sugar,
+        Caffeine
     }
 
     public enum AddictionStage

@@ -7,6 +7,8 @@ namespace SOD.Narcotics.AddictionCore
     public static class AddictionManager
     {
         private readonly static Dictionary<int, List<Addiction>> _addictions = new();
+        private readonly static Dictionary<int, Dictionary<AddictionType, int>> _consumptionCounters = new();
+        private readonly static int baseAddictionThreshold = 10; // Default threshold before addiction
 
         /// <summary>
         /// Assigns a new addiction.
@@ -48,12 +50,42 @@ namespace SOD.Narcotics.AddictionCore
         /// This method is called when an item related to an addiction is consumed.
         /// It worsens the addiction by progressing its stage.
         /// </summary>
-        public static void OnItemConsumed(int humanId, AddictionType addictionType, float progressAmount)
+        public static void OnItemConsumed(int humanId, AddictionType addictionType, float itemPotency = 1.0f)
         {
+            // Ensure the consumption counter is initialized for the human
+            if (!_consumptionCounters.ContainsKey(humanId))
+            {
+                _consumptionCounters[humanId] = new Dictionary<AddictionType, int>();
+            }
+
+            // Check if the human already has this addiction
             var addiction = GetAddiction(humanId, addictionType);
             if (addiction != null)
             {
-                addiction.AdjustProgress(progressAmount);
+                // If already addicted, add stage progression for continued use
+                addiction.AdjustProgress(0.15f);
+                return;
+            }
+
+            // If not addicted, track the consumption count
+            if (!_consumptionCounters[humanId].ContainsKey(addictionType))
+            {
+                _consumptionCounters[humanId][addictionType] = 0;
+            }
+
+            // Increment consumption count for this substance
+            _consumptionCounters[humanId][addictionType]++;
+            var susceptibility = 1.0f; // TODO: Define per human a unique random susceptibility value
+            int currentConsumption = _consumptionCounters[humanId][addictionType];
+            int addictionThreshold = (int)(baseAddictionThreshold * susceptibility / itemPotency);
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"[Human: {humanId}] consumed {addictionType.ToString().ToLower()}: {currentConsumption}/{addictionThreshold}");
+
+            // Check if consumption exceeds the threshold, triggering addiction
+            if (currentConsumption >= addictionThreshold)
+            {
+                Assign(humanId, addictionType);
             }
         }
 

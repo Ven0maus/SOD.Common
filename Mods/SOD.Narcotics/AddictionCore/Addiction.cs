@@ -28,10 +28,12 @@ namespace SOD.Narcotics.AddictionCore
         {
             HumanId = humanId;
             AddictionType = addictionType;
+            Stage = AddictionStage.Mild;
+            StageProgress = 0.1f; // Default starting progression, so we don't immediately decay down
             _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human: {HumanId}] has become addicted to \"{AddictionType}\".");
+                Plugin.Log.LogInfo($"[Human: {HumanId}] has become addicted to \"{AddictionType.ToString().ToLower()}\".");
 
             ApplyStageEffects();
         }
