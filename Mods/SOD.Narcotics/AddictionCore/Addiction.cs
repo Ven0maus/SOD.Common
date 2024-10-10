@@ -29,7 +29,6 @@ namespace SOD.Narcotics.AddictionCore
             HumanId = humanId;
             AddictionType = addictionType;
             Stage = AddictionStage.Mild;
-            StageProgress = 0.1f; // Default starting progression, so we don't immediately decay down
             _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
 
             if (Plugin.Instance.Config.DebugMode)
