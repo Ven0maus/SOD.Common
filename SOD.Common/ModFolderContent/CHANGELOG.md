@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.0.6**
+- Removed TryCast extension as it was interfering with universelib
+- [Compatibility fix] Sync disk helper now works again on main branch
+
 **2.0.5**
 - Added null ref checks to some methods in the dialog controller patches
 
