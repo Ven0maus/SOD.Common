@@ -4,7 +4,7 @@ SOD.Narcotics brings more functionality to the available narcotics and alcohol i
 It adds addictions, smoking, new collectable evidence and new cases related to narcotics.
 
 Full feature list:
-- Adds 3 different addictions: Nicotine, Alcohol, Opioids
+- Adds 5 different addictions: Nicotine, Alcohol, Opioids, Sugar, Caffeine
 - Ability to make certain narcotics with general household items
 - The player will start to develop addictions with too much use of certain narcotics
 - The player can now smoke cigarettes and cigars
