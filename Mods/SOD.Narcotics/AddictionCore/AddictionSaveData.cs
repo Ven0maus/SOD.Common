@@ -1,5 +1,4 @@
-﻿using SOD.Narcotics.AddictionCore.Addictions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace SOD.Narcotics.AddictionCore

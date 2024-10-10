@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SOD.Narcotics.AddictionCore.Addictions
+namespace SOD.Narcotics.AddictionCore
 {
     internal interface IAddiction
     {
