@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SOD.Narcotics.AddictionCore.Addictions
 {
@@ -11,5 +7,19 @@ namespace SOD.Narcotics.AddictionCore.Addictions
         Action<bool> MildStageAction();
         Action<bool> SevereStageAction();
         Action<bool> ExtremeStageAction();
+    }
+
+    public enum AddictionType
+    {
+        Alcohol,
+        Nicotine,
+        Opioid
+    }
+
+    public enum AddictionStage
+    {
+        Mild,
+        Severe,
+        Extreme
     }
 }

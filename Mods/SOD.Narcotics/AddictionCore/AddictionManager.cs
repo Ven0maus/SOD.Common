@@ -1,35 +1,32 @@
-﻿using System;
+﻿using SOD.Narcotics.AddictionCore.Addictions;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SOD.Narcotics.AddictionCore
 {
-    public class AddictionManager
+    public static class AddictionManager
     {
-        private readonly Dictionary<AddictionType, Addiction> _addictions = new();
-        private readonly List<AddictionType> _toBeCured = new();
+        private readonly static Dictionary<int, List<Addiction>> _addictions = new();
 
         /// <summary>
         /// Assigns a new addiction.
         /// </summary>
         /// <param name="addictionType"></param>
         /// <param name="stage"></param>
-        public void Assign(AddictionType addictionType, AddictionStage stage = AddictionStage.Mild)
+        public static void Assign(int humanId, AddictionType addictionType)
         {
-            if (!_addictions.TryGetValue(addictionType, out _))
+            if (!_addictions.TryGetValue(humanId, out var addictions))
+            {
+                _addictions[humanId] = new List<Addiction>();
+            }
+
+            if (!addictions.Any(a => a.AddictionType == addictionType))
             {
                 // Get a new addiction class
-                Addiction addiction = AddictionFactory.Get(addictionType);
-                addiction.IsActive = true;
+                Addiction addiction = AddictionFactory.Get(addictionType, humanId);
 
                 // Add to collection
-                _addictions.Add(addictionType, addiction);
-
-                // Update for each stage
-                for (int i = 0; i <= (int)stage; i++)
-                {
-                    addiction.Stage = (AddictionStage)i;
-                    addiction.Update();
-                }
+                addictions.Add(addiction);
             }
         }
 
@@ -37,80 +34,70 @@ namespace SOD.Narcotics.AddictionCore
         /// Cures the given addiction.
         /// </summary>
         /// <param name="addictionType"></param>
-        public void Cure(AddictionType addictionType)
+        public static void Cure(int humanId, AddictionType addictionType)
         {
-            if (_addictions.TryGetValue(addictionType, out var addiction))
+            var addiction = GetAddiction(humanId, addictionType);
+            if (addiction != null)
             {
-                _addictions.Remove(addictionType);
-
-                // Remove effects and disable addiction
+                _addictions[humanId].Remove(addiction);
                 addiction.Cure();
             }
         }
 
         /// <summary>
-        /// Set's the current state of the addiction. (recovering or not)
+        /// This method is called when an item related to an addiction is consumed.
+        /// It worsens the addiction by progressing its stage.
         /// </summary>
-        /// <param name="addictionType"></param>
-        /// <param name="recovering"></param>
-        public void SetAddictionState(AddictionType addictionType, bool recovering)
+        public static void OnItemConsumed(int humanId, AddictionType addictionType, float progressAmount)
         {
-            if (_addictions.TryGetValue(addictionType, out var addiction))
-                addiction.Recovering = recovering;
+            var addiction = GetAddiction(humanId, addictionType);
+            if (addiction != null)
+            {
+                addiction.AdjustProgress(progressAmount);
+            }
         }
 
-        public void Update(float deltaTime)
+        /// <summary>
+        /// This method is called when an action that helps recovery is performed.
+        /// It improves the addiction by reducing its stage.
+        /// </summary>
+        public static void OnRecoveryAction(int humanId, AddictionType addictionType, float recoveryAmount)
         {
-            foreach (var addiction in _addictions.Values)
+            var addiction = GetAddiction(humanId, addictionType);
+            if (addiction != null)
             {
-                if (!addiction.IsActive)
-                {
-                    _toBeCured.Add(addiction.AddictionType);
-                    continue;
-                }
-
-                // TODO: Check how this progression works in game by hooking it up to an update method
-                // Define if progression is going forward or backwards based on recovering or not
-                var progress = deltaTime / (float)addiction.RelapseTime.TotalSeconds;
-                if (addiction.Recovering)
-                    addiction.StageProgress -= progress;
-                else
-                    addiction.StageProgress += progress;
-               
-                // Once progression reaches 0 or 100 we adjust the stage
-                if (addiction.StageProgress <= 0f || addiction.StageProgress >= 100f)
-                {
-                    if (addiction.StageProgress <= 0f)
-                    {
-                        // Cure when we are at stage 0 and trying to reduce further.
-                        if (addiction.Stage == 0)
-                        {
-                            _toBeCured.Add(addiction.AddictionType);
-                            continue;
-                        }
-                        addiction.Stage -= 1;
-                    }
-                    else if (addiction.StageProgress >= 100f)
-                    {
-                        addiction.Stage += 1;
-                    }
-
-                    // Adjust stage properly with clamped value and reset progress
-                    var previousStage = addiction.Stage;
-                    addiction.Stage = (AddictionStage)Math.Clamp((int)addiction.Stage, 0, 2);
-                    addiction.StageProgress = 0f;
-
-                    // Update the addiction if the stage changed
-                    if (previousStage != addiction.Stage)
-                        addiction.Update();
-                }
+                addiction.AdjustProgress(-recoveryAmount);
             }
+        }
 
-            // Cure addictions if needed
-            foreach (var addiction in _toBeCured)
-                Cure(addiction);
-            if (_toBeCured.Count > 0)
-                _toBeCured.Clear();
+        /// <summary>
+        /// Call this periodically (e.g., once per hour) to allow natural recovery.
+        /// </summary>
+        public static void NaturalRecovery(AddictionType addictionType, float recoveryAmount)
+        {
+            // Make sure the clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
+            var addictions = _addictions.Values
+                .SelectMany(a => a)
+                .Where(a => a.AddictionType == addictionType)
+                .ToArray();
+            foreach (var addiction in addictions)
+            {
+                if (addiction.IsActive && addiction.Recovering)
+                    addiction.AdjustProgress(-recoveryAmount);
+            }
+        }
+
+        /// <summary>
+        /// Returns the full addiction item
+        /// </summary>
+        /// <param name="humanId"></param>
+        /// <param name="addictionType"></param>
+        /// <returns></returns>
+        private static Addiction GetAddiction(int humanId, AddictionType addictionType)
+        {
+            if (_addictions.TryGetValue(humanId, out var addictions))
+                return addictions.FirstOrDefault(a => a.AddictionType == addictionType);
+            return null;
         }
     }
 }

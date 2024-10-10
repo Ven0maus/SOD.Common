@@ -1,23 +1,24 @@
 ﻿using SOD.Narcotics.AddictionCore.Addictions;
 using System;
+using System.Collections.Generic;
 
 namespace SOD.Narcotics.AddictionCore
 {
     public static class AddictionFactory
     {
-        public static Addiction Get(AddictionType addictionType)
+        private static readonly Dictionary<AddictionType, Type> _addictionTypes = new()
         {
-            switch (addictionType)
-            {
-                case AddictionType.Alcohol:
-                    return new AlcoholAddiction();
-                case AddictionType.Nicotine:
-                    return new NicotineAddiction();
-                case AddictionType.Opioid:
-                    return new OpioidAddiction();
-            }
+            { AddictionType.Alcohol, typeof(AlcoholAddiction) },
+            { AddictionType.Nicotine, typeof(NicotineAddiction) },
+            { AddictionType.Opioid, typeof(OpioidAddiction) }
+        };
 
-            throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
+        public static Addiction Get(AddictionType addictionType, int humanId)
+        {
+            if (!_addictionTypes.TryGetValue(addictionType, out var type))
+                throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
+
+            return (Addiction)Activator.CreateInstance(type, new[] {humanId});
         }
     }
 }

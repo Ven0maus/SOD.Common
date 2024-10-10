@@ -1,5 +1,8 @@
-﻿using SOD.Narcotics.AddictionCore.Addictions;
+﻿using SOD.Common;
+using SOD.Common.Helpers;
+using SOD.Narcotics.AddictionCore.Addictions;
 using System;
+using System.Collections.Generic;
 
 namespace SOD.Narcotics.AddictionCore
 {
@@ -8,26 +11,88 @@ namespace SOD.Narcotics.AddictionCore
         public bool IsActive { get; set; }
         public string AddictionName => $"{AddictionType} Addiction";
         public AddictionType AddictionType { get; private set; }
-        public AddictionStage Stage { get; set; }
         public float StageProgress { get; set; }
-        public TimeSpan RelapseTime { get; set; }
-        public bool Recovering { get; set; }
-
-        public Addiction(AddictionType addictionType, TimeSpan? relapseTime = null)
+        public bool Recovering
         {
-            AddictionType = addictionType;
-            RelapseTime = relapseTime ?? TimeSpan.FromSeconds(5);
+            get
+            {
+                return _timeSinceLastWorsening.AddHours(6) < Lib.Time.CurrentDateTime;
+            }
         }
+        public AddictionStage Stage { get; private set; }
+        public int HumanId { get; }
+
+        private Time.TimeData _timeSinceLastWorsening;
+        private readonly HashSet<AddictionStage> _appliedStageEffects = new();
+
+        public Addiction(int humanId, AddictionType addictionType)
+        {
+            HumanId = humanId;
+            AddictionType = addictionType;
+            IsActive = true;
+            _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
+            ApplyStageEffects();
+        }
+
+        /// <summary>
+        /// Worsens the addictions
+        /// </summary>
+        /// <param name="progressAmount"></param>
+        public void AdjustProgress(float progressAmount)
+        {
+            if (!IsActive) return;
+
+            if (progressAmount > 0)
+                _timeSinceLastWorsening = Lib.Time.CurrentDateTime;
+
+            StageProgress += progressAmount;
+
+            if (StageProgress >= 1f && Stage < AddictionStage.Extreme)
+            {
+                StageProgress = 0f; // Reset progress for the next stage
+                MoveToNextStage();
+            }
+            else if (StageProgress <= 0f)
+            {
+                StageProgress = 0f; // Reset progress for the previous stage
+                MoveToPreviousStage();
+            }
+
+            Plugin.Log.LogInfo($"[{AddictionName}] [Progress]: {StageProgress * 100}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
+        }
+
+        public void Cure()
+        {
+            IsActive = false;
+            StageProgress = 0f;
+
+            // Remove all effects
+            for (int i=(int)Stage; i >= 0; i--)
+            {
+                Stage = (AddictionStage)i;
+                RemoveStageEffects();
+            }
+
+            Plugin.Log.LogInfo($"[{AddictionName}] [Status]: Cured");
+        }
+
+        public abstract Action<bool> MildStageAction();
+        public abstract Action<bool> SevereStageAction();
+        public abstract Action<bool> ExtremeStageAction();
 
         private void ApplyStageEffects()
         {
+            if (_appliedStageEffects.Contains(Stage)) return;
             GetStageAction()?.Invoke(true);
+            _appliedStageEffects.Add(Stage);
             Plugin.Log.LogInfo($"[{AddictionName}] Applied effects of stage \"{Stage}\".");
         }
 
         private void RemoveStageEffects()
         {
+            if (!_appliedStageEffects.Contains(Stage)) return;
             GetStageAction()?.Invoke(false);
+            _appliedStageEffects.Remove(Stage);
             Plugin.Log.LogInfo($"[{AddictionName}] Removed effects of stage \"{Stage}\".");
         }
 
@@ -46,46 +111,26 @@ namespace SOD.Narcotics.AddictionCore
             throw new NotSupportedException($"Stage \"{Stage}\" is not supported.");
         }
 
-        public void Cure()
+        private void MoveToNextStage()
         {
-            IsActive = false;
-            StageProgress = 0f;
-            Recovering = false;
+            Stage++;
+            ApplyStageEffects();
+            Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Worsened to {Stage}.");
+        }
 
-            // Remove all effects
-            foreach (var stage in new[] { AddictionStage.Extreme, AddictionStage.Severe, AddictionStage.Mild })
+        private void MoveToPreviousStage()
+        {
+            RemoveStageEffects();
+
+            // When we're already in mild, we're cured
+            if (Stage == AddictionStage.Mild)
             {
-                Stage = stage;
-                RemoveStageEffects();
+                AddictionManager.Cure(HumanId, AddictionType);
+                return;
             }
 
-            Plugin.Log.LogInfo($"[{AddictionName}] [Status]: Cured");
+            Stage--;
+            Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Improved to {Stage}.");
         }
-
-        public void Update()
-        {
-            if (!IsActive) return;
-
-            ApplyStageEffects();
-            Plugin.Log.LogInfo($"[{AddictionName}] [Status]: {Stage}");
-        }
-
-        public abstract Action<bool> MildStageAction();
-        public abstract Action<bool> SevereStageAction();
-        public abstract Action<bool> ExtremeStageAction();
-    }
-
-    public enum AddictionType
-    {
-        Alcohol,
-        Nicotine,
-        Opioid
-    }
-
-    public enum AddictionStage
-    {
-        Mild,
-        Severe,
-        Extreme
     }
 }
