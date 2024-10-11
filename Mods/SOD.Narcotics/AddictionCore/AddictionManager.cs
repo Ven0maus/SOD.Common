@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.Common.Custom;
 using SOD.Common.Helpers;
+using SOD.Narcotics.AddictionCore.Addictions;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,12 +14,11 @@ namespace SOD.Narcotics.AddictionCore
     public static class AddictionManager
     {
         private readonly static Dictionary<AddictionType, Addiction> _addictions = new();
-        private readonly static Dictionary<AddictionType, int> _consumptionCounters = new();
-        private static float? _susceptibilityModifier;
-        private readonly static Dictionary<AddictionType, Time.TimeData> _lastTimeSinceConsumption = new();
+        private readonly static Dictionary<AddictionType, float> _addictionMeters = new();
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
-        private readonly static Dictionary<AddictionType, float> _consumptionRate = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
+
+        private static float? _susceptibilityModifier;
 
         private static MersenneTwister _random;
         public static MersenneTwister Random
@@ -45,10 +45,6 @@ namespace SOD.Narcotics.AddictionCore
             // Add to collection
             _addictions[addictionType] = addiction;
 
-            // Remove this addiction type from the counter
-            _consumptionCounters.Remove(addictionType);
-            _lastTimeSinceConsumption.Remove(addictionType);
-
             if (Plugin.Instance.Config.DebugMode)
                 Plugin.Log.LogInfo($"You have become addicted to \"{addictionType.ToString().ToLower()}\".");
         }
@@ -72,26 +68,13 @@ namespace SOD.Narcotics.AddictionCore
         /// This method is called when an item related to an addiction is consumed.
         /// It worsens the addiction by progressing its stage.
         /// </summary>
-        public static void OnItemConsumed(AddictionType addictionType, float? itemPotency = null)
+        public static void OnItemConsumed(AddictionType addictionType, float consumptionPercentage, float? itemPotency = null)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
 
-            // Check if the human already has this addiction
-            var addiction = GetAddiction(addictionType);
-            if (addiction != null)
-            {
-                // If already addicted, add stage progression for continued use
-                addiction.AdjustProgress(0.15f);
-                return;
-            }
-
-            // Set current consumption time
-            if (!_lastTimeSinceConsumption.ContainsKey(addictionType))
-                _lastTimeSinceConsumption[addictionType] = Lib.Time.CurrentDateTime;
-
-            // If not addicted, track the consumption count
-            if (!_consumptionCounters.ContainsKey(addictionType))
-                _consumptionCounters[addictionType] = 0;
+            // Add all entries if missing
+            if (!_addictionMeters.ContainsKey(addictionType))
+                _addictionMeters[addictionType] = 0;
 
             // Define the susceptibility of the human
             if (_susceptibilityModifier == null)
@@ -101,86 +84,40 @@ namespace SOD.Narcotics.AddictionCore
                     Plugin.Instance.Config.MaximumSusceptibility);
             }
 
-            // Increment consumption count for this substance
-            _consumptionCounters[addictionType]++;
-            int currentConsumption = _consumptionCounters[addictionType];
-            int addictionThreshold = (int)(Plugin.Instance.Config.BaseAddictionThreshold * _susceptibilityModifier.Value / ((itemPotency ?? 1.0f) * _addictionPotentials[addictionType]));
+            // Calculate how much of the item's potency is consumed based on the consumption percentage
+            // consumptionPercentage should be a value between 0 and 1, representing the proportion of the item consumed.
+            float effectivePotency = (itemPotency ?? 1.0f) * consumptionPercentage;
+
+            // Calculate addiction increment
+            float addictionIncrement = effectivePotency * _susceptibilityModifier.Value * (_addictionPotentials[addictionType] * 100) * UnityEngine.Time.deltaTime;
+
+            // Update addiction meter
+            _addictionMeters[addictionType] += addictionIncrement;
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"You consumed {addictionType.ToString().ToLower()}: {currentConsumption}/{addictionThreshold}");
+            {
+                Plugin.Log.LogInfo($"Consumption percentage: {consumptionPercentage}, Potency: {effectivePotency}, Addiction Increment: {addictionIncrement}");
+                Plugin.Log.LogInfo($"You consumed {addictionType.ToString().ToLower()}: {_addictionMeters[addictionType]}/1");
+            }
 
             // Check if consumption exceeds the threshold, triggering addiction
-            if (currentConsumption >= addictionThreshold)
-                Assign(addictionType);
-        }
-
-        /// <summary>
-        /// Called every tick when consuming a narcotic
-        /// </summary>
-        /// <param name="addictionType"></param>
-        /// <param name="rate"></param>
-        /// <param name="potency"></param>
-        public static void AddConsumptionRate(AddictionType addictionType, float rate, float potency)
-        {
-            if (!_consumptionRate.ContainsKey(addictionType))
-                _consumptionRate.Add(addictionType, 0);
-
-            _consumptionRate[addictionType] += rate;
-
-            // Every 1f of consuming (1 second)
-            if (_consumptionRate[addictionType] >= 1f)
+            if (_addictionMeters[addictionType] >= 1f)
             {
-                _consumptionRate[addictionType] = 1f - _consumptionRate[addictionType];
+                _addictionMeters[addictionType] = 0f;
 
-                // We apply a lower potency consumption for this addiction type
-                OnItemConsumed(addictionType, potency);
-
-                if (Plugin.Instance.Config.DebugMode)
-                    Plugin.Log.LogInfo($"Consumed \"{addictionType}\" with potency \"{potency}\".");
-            }
-        }
-
-        /// <summary>
-        /// This method is called when an action that helps recovery is performed.
-        /// It improves the addiction by reducing its stage.
-        /// </summary>
-        public static void OnRecoveryAction(AddictionType addictionType, float recoveryAmount)
-        {
-            if (!_enabledAddictions.ContainsKey(addictionType)) return;
-            var addiction = GetAddiction(addictionType);
-            if (addiction != null)
-            {
-                addiction.AdjustProgress(-recoveryAmount);
-            }
-        }
-
-        public static void ForgetConsumptionCounters()
-        {
-            var cdt = Lib.Time.CurrentDateTime;
-            var toBeRemoved = new List<AddictionType>();
-            var hours = Plugin.Instance.Config.ResetConsumptionCounterAfterHours;
-            foreach (var consumptionCounter in _lastTimeSinceConsumption)
-            {
-                // After a half day of not consuming, it will do a full reset of the counter
-                if (consumptionCounter.Value.AddHours(hours) <= cdt)
+                var addiction = GetAddiction(addictionType);
+                if (addiction == null)
                 {
-                    if (_consumptionCounters.ContainsKey(consumptionCounter.Key))
-                        _consumptionCounters.Remove(consumptionCounter.Key);
-                    if (_consumptionRate.ContainsKey(consumptionCounter.Key))
-                        _consumptionRate.Remove(consumptionCounter.Key);
-
-                    if (Plugin.Instance.Config.DebugMode)
-                        Plugin.Log.LogInfo($"Forgot consumption counters for addiction \"{consumptionCounter.Key}\".");
-
-                    toBeRemoved.Add(consumptionCounter.Key);
+                    Assign(addictionType);
                 }
-            }
-
-            if (toBeRemoved.Count > 0)
-            {
-                foreach (var tbr in toBeRemoved)
-                    _lastTimeSinceConsumption.Remove(tbr);
-                toBeRemoved.Clear();
+                else
+                {
+                    // Remain at 100 if we're already at extreme
+                    if (addiction.Stage == AddictionStage.Extreme)
+                        _addictionMeters[addictionType] = 0f;
+                    else
+                        addiction.MoveToNextStage();
+                }
             }
         }
 
@@ -189,14 +126,20 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void NaturalRecovery()
         {
-            ForgetConsumptionCounters();
+            // Time since last use
+            foreach (var addictionMeter in _addictionMeters.ToArray()) 
+            {
+                // TODO: Decay overtime
 
-            // Make sure to clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
-            var addictions = _addictions.Values
-                .Where(a => a.Recovering)
-                .ToArray();
-            foreach (var addiction in addictions)
-                addiction.AdjustProgress(-0.03f);
+                // Ensure addiction meter doesn't go below zero
+                if (_addictionMeters[addictionMeter.Key] <= 0f)
+                {
+                    _addictionMeters[addictionMeter.Key] = 1f;
+                    var addiction = GetAddiction(addictionMeter.Key);
+                    if (addiction != null)
+                        addiction.MoveToPreviousStage();
+                }
+            }
         }
 
         /// <summary>
@@ -226,10 +169,14 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void Save(string filePath)
         {
-            if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifier == null && _random == null)
+            if (_addictions.Count == 0 && _susceptibilityModifier == null && _random == null && _addictionMeters.Count == 0)
                 return;
 
-            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifier.Value, _lastTimeSinceConsumption, _random);
+            var saveData = AddictionsSaveData.Create(
+                _addictions, 
+                _susceptibilityModifier.Value,
+                _random, 
+                _addictionMeters);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -247,9 +194,8 @@ namespace SOD.Narcotics.AddictionCore
         {
             // When we are loading, they should be cleared anyway
             _addictions.Clear();
-            _consumptionCounters.Clear();
+            _addictionMeters.Clear();
             _susceptibilityModifier = null;
-            _lastTimeSinceConsumption.Clear();
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"addictions_{seed}.json");
@@ -271,11 +217,8 @@ namespace SOD.Narcotics.AddictionCore
 
             _susceptibilityModifier = saveData.SusceptibilityModifier;
 
-            foreach (var entry in saveData.ConsumptionCounters)
-                _consumptionCounters[entry.Key] = entry.Value;
-
-            foreach (var entry in saveData.LastTimeSinceConsumption)
-                _lastTimeSinceConsumption[entry.Key] = Time.TimeData.Deserialize(entry.Value);
+            foreach (var entry in saveData.AddictionMeters)
+                _addictionMeters[entry.Key] = entry.Value;
 
             if (saveData.Mt != null)
                 _random = new MersenneTwister((saveData.Index, saveData.Mt));
@@ -284,8 +227,6 @@ namespace SOD.Narcotics.AddictionCore
             {
                 _addictions[entry.Key] = AddictionFactory.Get(entry.Value.AddictionType);
                 _addictions[entry.Key].AppliedStageEffects = entry.Value.AppliedStageEffects.ToHashSet();
-                _addictions[entry.Key].Progression = entry.Value.Progression;
-                _addictions[entry.Key].TimeSinceLastWorsening = Time.TimeData.Deserialize(entry.Value.TimeSinceLastWorsening);
                 _addictions[entry.Key].Stage = entry.Value.Stage;
                 _addictions[entry.Key].Initialize();
             }
@@ -305,15 +246,18 @@ namespace SOD.Narcotics.AddictionCore
                 if (interactable.preset.name != "Bandage" && interactable.preset.name != "Splint" && interactable.preset.name != "HeatPack")
                     return (AddictionType.Opioid, null);
             }
-            else if (interactable.preset.name == "ChocolateBar" || interactable.preset.name == "Donut" || interactable.preset.name == "Eclair")
+            else if (SugarAddiction.Sugars.TryGetValue(interactable.preset.name, out var potency))
             {
-                return (AddictionType.Sugar, null);
+                return (AddictionType.Sugar, potency);
             }
             else if (ri.desireCategory == CompanyPreset.CompanyCategory.caffeine)
             {
                 if (interactable.preset.name == "MugCoffee" || interactable.preset.name == "TakeawayCoffee")
                     return (AddictionType.Caffeine, null);
             }
+
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo("Name: " + interactable.name);
 
             return null;
         }

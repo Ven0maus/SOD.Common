@@ -48,18 +48,30 @@ namespace SOD.Narcotics.Patches
             class Consumable
             {
                 public Interactable Interactable { get; set; }
-                public bool State { get; set; }
+                public bool IsConsuming { get; set; }
+                public float RemainingAmount { get; set; }
             }
 
-            private static Consumable _consumable;
+            private static Consumable _consumable = new Consumable();
 
             [HarmonyPrefix]
             private static void Prefix(FirstPersonItemController __instance, ref Consumable __state)
             {
-                __state = _consumable ??= new Consumable();
-                __state.Interactable = BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1 ?
-                        BioScreenController.Instance.selectedSlot.GetInteractable() : null;
-                __state.State = __instance.isConsuming && !__instance.takeOneActive;
+                __state ??= _consumable;
+                if (!__state.IsConsuming && __instance.isConsuming && !__instance.takeOneActive)
+                {
+                    if (BioScreenController.Instance.selectedSlot != null && BioScreenController.Instance.selectedSlot.interactableID > -1)
+                    {
+                        if (__state.Interactable == null || __state.Interactable.id != BioScreenController.Instance.selectedSlot.interactableID)
+                            __state.Interactable = BioScreenController.Instance.selectedSlot.GetInteractable();
+                    }
+                    else
+                    {
+                        __state.Interactable = null;
+                    }
+                    __state.IsConsuming = true;
+                    __state.RemainingAmount = __state.Interactable?.cs ?? 0f;
+                }
             }
 
             [HarmonyPostfix]
@@ -67,29 +79,19 @@ namespace SOD.Narcotics.Patches
             {
                 if (SessionData.Instance.play)
                 {
-                    if (__instance.isConsuming && !__instance.takeOneActive && __state.Interactable != null)
+                    // We stopped consuming
+                    if (__state.IsConsuming && (!__instance.isConsuming || __instance.takeOneActive)) 
                     {
-                        Interactable interactable = __state.Interactable;
-                        if (interactable.cs > 0f)
-                        {
-                            // Keep track of how much we consumed per type and potency
-                            // if we've consumed enough reset the consumation and apply addiction consumption
-                            var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(interactable);
-                            if (addictionInfo != null)
-                            {
-                                // The full potency for consuming the entire item is basically == to the full consumable amount
-                                // So to calculate how much 1 cs would equal we divide the potency by the full consumable amount
-                                var potency = addictionInfo.Value.potency ?? 1f;
-                                potency /= interactable.preset.consumableAmount;
-                                AddictionManager.AddConsumptionRate(addictionInfo.Value.addictionType, UnityEngine.Time.deltaTime, potency);
-                            }
-                        }
-                    }
-                    else if (__state.State && __state.Interactable != null)
-                    {
-                        // We stopped consuming$
-                        if (Plugin.Instance.Config.DebugMode)
-                            Plugin.Log.LogInfo("Stopped consuming: " + __state.Interactable.name);
+                        __state.IsConsuming = false;
+
+                        var fullAmount = __state.Interactable.preset.consumableAmount;
+                        var leftOverPercentage = __state.RemainingAmount / fullAmount;
+                        var consumedPercentage = leftOverPercentage - (__state.Interactable.cs / __state.RemainingAmount);
+                        __state.RemainingAmount = __state.Interactable.cs;
+
+                        var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(__state.Interactable);
+                        if (addictionInfo != null)
+                            AddictionManager.OnItemConsumed(addictionInfo.Value.addictionType, consumedPercentage, addictionInfo.Value.potency);
                     }
                 }
             }

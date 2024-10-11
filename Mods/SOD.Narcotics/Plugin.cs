@@ -47,7 +47,7 @@ namespace SOD.Narcotics
 
             var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(e);
             if (addictionInfo != null)
-                AddictionManager.OnItemConsumed(addictionInfo.Value.addictionType, addictionInfo.Value.potency);
+                AddictionManager.OnItemConsumed(addictionInfo.Value.addictionType, 1f, addictionInfo.Value.potency);
         }
 
         public override void OnConfigureBindings()

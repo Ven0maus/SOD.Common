@@ -8,8 +8,7 @@ namespace SOD.Narcotics.AddictionCore
     public class AddictionsSaveData
     {
         public Dictionary<AddictionType, Addiction> Addictions { get; set; } = new();
-        public Dictionary<AddictionType, int> ConsumptionCounters { get; set; } = new();
-        public Dictionary<AddictionType, string> LastTimeSinceConsumption { get; set; } = new();
+        public Dictionary<AddictionType, float> AddictionMeters { get; set; } = new();
         public float SusceptibilityModifier { get; set; } = new();
         public int Index { get; set; }
         public uint[] Mt { get; set; }
@@ -26,10 +25,9 @@ namespace SOD.Narcotics.AddictionCore
 
         public static AddictionsSaveData Create(
             Dictionary<AddictionType, AddictionCore.Addiction> addictionDatas,
-            Dictionary<AddictionType, int> consumptionCounters,
             float susceptibilityModifier,
-            Dictionary<AddictionType, Time.TimeData> lastTimeSinceConsumption,
-            MersenneTwister random)
+            MersenneTwister random,
+            Dictionary<AddictionType, float> addictionMeters)
         {
             var saveData = new AddictionsSaveData();
             foreach (var entry in addictionDatas)
@@ -39,9 +37,7 @@ namespace SOD.Narcotics.AddictionCore
                 {
                     AddictionType = addictionDatas[entry.Key].AddictionType,
                     Stage = addictionDatas[entry.Key].Stage,
-                    AppliedStageEffects = addictionDatas[entry.Key].AppliedStageEffects.ToArray(),
-                    Progression = addictionDatas[entry.Key].Progression,
-                    TimeSinceLastWorsening = addictionDatas[entry.Key].TimeSinceLastWorsening.Serialize()
+                    AppliedStageEffects = addictionDatas[entry.Key].AppliedStageEffects.ToArray()
                 };
             }
             if (random != null)
@@ -50,10 +46,8 @@ namespace SOD.Narcotics.AddictionCore
                 saveData.Index = state.index;
                 saveData.Mt = state.mt;
             }
-            saveData.LastTimeSinceConsumption = lastTimeSinceConsumption
-                .ToDictionary(a => a.Key, a => a.Value.Serialize());
-            saveData.ConsumptionCounters = consumptionCounters;
             saveData.SusceptibilityModifier = susceptibilityModifier;
+            saveData.AddictionMeters = addictionMeters;
             return saveData;
         }
     }
