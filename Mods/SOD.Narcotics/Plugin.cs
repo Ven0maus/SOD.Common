@@ -23,7 +23,7 @@ namespace SOD.Narcotics
             Lib.Time.OnHourChanged += Time_OnHourChanged;
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnAfterLoad += SaveGame_OnAfterLoad;
-            TakeOnePatches.FirstPersonItemController_TakeOne.OnItemConsumed += OnItemConsumed;
+            TakeOnePatches.OnItemConsumed += OnItemConsumed;
         }
 
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)
