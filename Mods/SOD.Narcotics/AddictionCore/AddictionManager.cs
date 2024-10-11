@@ -127,6 +127,8 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void NaturalRecovery()
         {
+            return;
+            // TODO: FIX
             // Time since last use
             foreach (var addictionMeter in _addictionMeters.ToArray()) 
             {
