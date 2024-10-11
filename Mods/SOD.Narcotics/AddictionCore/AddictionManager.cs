@@ -12,10 +12,13 @@ namespace SOD.Narcotics.AddictionCore
 {
     public static class AddictionManager
     {
+        // Dynamic data
         private readonly static Dictionary<AddictionType, Addiction> _addictions = new();
         private readonly static Dictionary<AddictionType, float> _addictionMeters = new();
-        private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, float> _susceptibilityFactors = new();
+
+        // Config loaded on plugin start
+        private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
 
         private static MersenneTwister _random;
