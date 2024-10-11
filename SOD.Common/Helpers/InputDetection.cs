@@ -474,7 +474,7 @@ namespace SOD.Common.Helpers
                         {
                             entry = new InputSuppressionEntry(data.CallerGuid, data.KeyCode, data.Time == 0f ? null : TimeSpan.FromSeconds(data.Time));
                         }
-                        InputSuppressionDictionary[entry.ConvertToDictionaryKey()] = entry;
+                        InputSuppressionDictionary[entry.DictionaryKey] = entry;
                         entry.Start();
                     }
                 }

@@ -18,6 +18,7 @@ namespace SOD.Common.Custom
             ElementIdentifierId = -1;
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
             IsSetOnInteractionKey = false;
+            DictionaryKey = Lib.InputDetection.ConvertToDictionaryKey(CallerGuid, InteractionKey, KeyCode);
         }
 
         public InputSuppressionEntry(string callerGuid, InteractablePreset.InteractionKey interactionKey, TimeSpan? time = null)
@@ -30,6 +31,7 @@ namespace SOD.Common.Custom
             KeyCode = Lib.InputDetection.GetApproximateKeyCode(binding);
             TimeRemainingSec = (float)(time?.TotalSeconds ?? 0d);
             IsSetOnInteractionKey = true;
+            DictionaryKey = Lib.InputDetection.ConvertToDictionaryKey(CallerGuid, InteractionKey, KeyCode);
         }
 
         public KeyCode KeyCode { get; }
@@ -38,6 +40,7 @@ namespace SOD.Common.Custom
         public string CallerGuid { get; }
         public InteractablePreset.InteractionKey InteractionKey { get; }
         public bool IsSetOnInteractionKey { get; }
+        public string DictionaryKey { get; }
         public float TimeRemainingSec { get; set; }
 
         private Coroutine _coroutine;
@@ -56,11 +59,6 @@ namespace SOD.Common.Custom
             _coroutine = null;
         }
 
-        internal string ConvertToDictionaryKey()
-        {
-            return Lib.InputDetection.ConvertToDictionaryKey(CallerGuid, InteractionKey, KeyCode);
-        }
-
         private IEnumerator Tick()
         {
             while (TimeRemainingSec > 0f)
@@ -75,7 +73,7 @@ namespace SOD.Common.Custom
             }
 
             TimeRemainingSec = 0f;
-            Lib.InputDetection.InputSuppressionDictionary.Remove(ConvertToDictionaryKey());
+            Lib.InputDetection.InputSuppressionDictionary.Remove(DictionaryKey);
             _coroutine = null;
         }
 
