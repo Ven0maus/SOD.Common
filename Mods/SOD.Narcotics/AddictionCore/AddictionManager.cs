@@ -271,14 +271,15 @@ namespace SOD.Narcotics.AddictionCore
         public static (AddictionType addictionType, float? potency)? GetAddictionTypeAndPotency(Interactable interactable)
         {
             var ri = interactable.preset.retailItem;
+
             if (ri.drunk > 0)
             {
                 return (AddictionType.Alcohol, ri.drunk);
             }
             else if (ri.numb > 0 || ri.desireCategory == CompanyPreset.CompanyCategory.medical)
             {
-                if (interactable.preset.name != "Bandage" && interactable.preset.name != "Splint" && interactable.preset.name != "HeatPack")
-                    return (AddictionType.Opioid, null);
+                if (!OpioidAddiction.ExcludedItems.Contains(interactable.preset.name))
+                    return (AddictionType.Opioid, ri.numb > 0f ? (1.0f + ri.numb) : null);
             }
             else if (SugarAddiction.Sugars.TryGetValue(interactable.preset.name, out var potency))
             {
@@ -291,7 +292,7 @@ namespace SOD.Narcotics.AddictionCore
             }
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo("Name: " + interactable.name);
+                Plugin.Log.LogInfo($"Not supported interactable \"{interactable.preset.name}\" consumed, skipped.");
 
             return null;
         }

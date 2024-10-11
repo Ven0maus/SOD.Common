@@ -37,7 +37,7 @@ namespace SOD.Narcotics
             if (File.Exists(path))
                 File.Delete(path);
 
-            Plugin.Log.LogInfo("Addictions save data has been removed.");
+            Log.LogInfo("Addictions save data has been removed.");
         }
 
         private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)
