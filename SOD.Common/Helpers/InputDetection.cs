@@ -520,7 +520,7 @@ namespace SOD.Common.Helpers
             // Clear out the modifiers and the dictionary for a new game
             foreach (var entry in InputSuppressionDictionary.Values)
                 entry.Stop();
-            InputSuppressionDictionary = new();
+            InputSuppressionDictionary.Clear();
         }
     }
 
