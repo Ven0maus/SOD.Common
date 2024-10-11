@@ -46,6 +46,35 @@ namespace SOD.Common.Patches
             return interactionKey;
         }
 
+        private static UnityEngine.KeyCode GetKeyCode(string actionName)
+        {
+            switch (actionName)
+            {
+                case "0":
+                    return UnityEngine.KeyCode.Alpha0;
+                case "1":
+                    return UnityEngine.KeyCode.Alpha1;
+                case "2":
+                    return UnityEngine.KeyCode.Alpha2;
+                case "3":
+                    return UnityEngine.KeyCode.Alpha3;
+                case "4":
+                    return UnityEngine.KeyCode.Alpha4;
+                case "5":
+                    return UnityEngine.KeyCode.Alpha5;
+                case "6":
+                    return UnityEngine.KeyCode.Alpha6;
+                case "7":
+                    return UnityEngine.KeyCode.Alpha7;
+                case "8":
+                    return UnityEngine.KeyCode.Alpha8;
+                case "9":
+                    return UnityEngine.KeyCode.Alpha9;
+                default:
+                    return UnityEngine.KeyCode.None;
+            }
+        }
+
         [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetAxis), argumentTypes: [typeof(string)])]
         internal class Rewired_Player_GetAxis
         {
@@ -91,17 +120,30 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
-                if (interactionKey == InteractablePreset.InteractionKey.none)
+                List<string> entryIds;
+                if (interactionKey != InteractablePreset.InteractionKey.none)
                 {
-                    return;
-                }
-                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
-                {
+                    if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out entryIds, out _))
+                    {
+                        Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
+                        return;
+                    }
+                    __result = false;
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
                     return;
                 }
+                var keyCode = GetKeyCode(actionName);
+                if (keyCode == UnityEngine.KeyCode.None)
+                {
+                    return;
+                }
+                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(keyCode, out entryIds, out _))
+                {
+                    Lib.InputDetection.ReportButtonStateChange(actionName, InteractablePreset.InteractionKey.none, true, entryIds);
+                    return;
+                }
                 __result = false;
-                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
+                Lib.InputDetection.ReportButtonStateChange(actionName, InteractablePreset.InteractionKey.none, true, entryIds);
             }
         }
 
@@ -117,17 +159,30 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
-                if (interactionKey == InteractablePreset.InteractionKey.none)
+                List<string> entryIds;
+                if (interactionKey != InteractablePreset.InteractionKey.none)
                 {
-                    return;
-                }
-                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
-                {
+                    if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out entryIds, out _))
+                    {
+                        Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
+                        return;
+                    }
+                    __result = false;
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
                     return;
                 }
+                var keyCode = GetKeyCode(actionName);
+                if (keyCode == UnityEngine.KeyCode.None)
+                {
+                    return;
+                }
+                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(keyCode, out entryIds, out _))
+                {
+                    Lib.InputDetection.ReportButtonStateChange(actionName, InteractablePreset.InteractionKey.none, false, entryIds);
+                    return;
+                }
                 __result = false;
-                Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
+                Lib.InputDetection.ReportButtonStateChange(actionName, InteractablePreset.InteractionKey.none, false, entryIds);
             }
         }
     }
