@@ -9,7 +9,7 @@ namespace SOD.Narcotics.AddictionCore
     {
         public Dictionary<AddictionType, Addiction> Addictions { get; set; } = new();
         public Dictionary<AddictionType, float> AddictionMeters { get; set; } = new();
-        public float SusceptibilityModifier { get; set; } = new();
+        public Dictionary<AddictionType, float> SusceptibilityFactors { get; set; } = new();
         public int Index { get; set; }
         public uint[] Mt { get; set; }
 
@@ -25,9 +25,9 @@ namespace SOD.Narcotics.AddictionCore
 
         public static AddictionsSaveData Create(
             Dictionary<AddictionType, AddictionCore.Addiction> addictionDatas,
-            float susceptibilityModifier,
-            MersenneTwister random,
-            Dictionary<AddictionType, float> addictionMeters)
+            Dictionary<AddictionType, float> susceptibilityFactors,
+            Dictionary<AddictionType, float> addictionMeters,
+            MersenneTwister random)
         {
             var saveData = new AddictionsSaveData();
             foreach (var entry in addictionDatas)
@@ -46,7 +46,7 @@ namespace SOD.Narcotics.AddictionCore
                 saveData.Index = state.index;
                 saveData.Mt = state.mt;
             }
-            saveData.SusceptibilityModifier = susceptibilityModifier;
+            saveData.SusceptibilityFactors = susceptibilityFactors;
             saveData.AddictionMeters = addictionMeters;
             return saveData;
         }

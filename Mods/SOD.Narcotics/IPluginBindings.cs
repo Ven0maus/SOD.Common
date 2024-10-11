@@ -28,28 +28,28 @@ namespace SOD.Narcotics
 
     public interface IAddictionPotentialBindings
     {
-        [Binding(0.3f, "How quickly does alcohol lead to addiction (higher = faster)", "Addiction.Potential.AlcoholAddictionPotential")]
+        [Binding(0.25f, "How quickly does alcohol lead to addiction (higher = faster)", "Addiction.Potential.AlcoholAddictionPotential")]
         float AlcoholAddictionPotential { get; set; }
 
-        [Binding(0.2f, "How quickly does nicotine lead to addiction (higher = faster)", "Addiction.Potential.NicotineAddictionPotential")]
+        [Binding(0.25f, "How quickly does nicotine lead to addiction (higher = faster)", "Addiction.Potential.NicotineAddictionPotential")]
         float NicotineAddictionPotential { get; set; }
 
-        [Binding(0.5f, "How quickly does opioid lead to addiction (higher = faster)", "Addiction.Potential.OpioidAddictionPotential")]
+        [Binding(0.4f, "How quickly does opioid lead to addiction (higher = faster)", "Addiction.Potential.OpioidAddictionPotential")]
         float OpioidAddictionPotential { get; set; }
 
-        [Binding(0.1f, "How quickly does sugar lead to addiction (higher = faster)", "Addiction.Potential.SugarAddictionPotential")]
+        [Binding(0.15f, "How quickly does sugar lead to addiction (higher = faster)", "Addiction.Potential.SugarAddictionPotential")]
         float SugarAddictionPotential { get; set; }
 
-        [Binding(0.15f, "How quickly does caffeine lead to addiction (higher = faster)", "Addiction.Potential.CaffeineAddictionPotential")]
+        [Binding(0.10f, "How quickly does caffeine lead to addiction (higher = faster)", "Addiction.Potential.CaffeineAddictionPotential")]
         float CaffeineAddictionPotential { get; set; }
     }
 
     public interface IAddictionCalculationBindings
     {
-        [Binding(0.48f, "The minimum susceptible a person can be (random chosen between min/max).", "Addiction.Calculations.MinimumSusceptibility")]
+        [Binding(0.48f, "The minimum susceptible the player can be (random chosen between min/max for each addiction type).", "Addiction.Calculations.MinimumSusceptibility")]
         float MinimumSusceptibility { get; set; }
 
-        [Binding(0.52f, "The maximum susceptible a person can be (random chosen between min/max).", "Addiction.Calculations.MaximumSusceptibility")]
+        [Binding(0.52f, "The maximum susceptible the player can be (random chosen between min/max for each addiction type).", "Addiction.Calculations.MaximumSusceptibility")]
         float MaximumSusceptibility { get; set; }
     }
 }

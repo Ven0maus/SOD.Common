@@ -1,6 +1,5 @@
 ﻿using SOD.Common;
 using SOD.Common.Custom;
-using SOD.Common.Helpers;
 using SOD.Narcotics.AddictionCore.Addictions;
 using System;
 using System.Collections.Generic;
@@ -16,9 +15,8 @@ namespace SOD.Narcotics.AddictionCore
         private readonly static Dictionary<AddictionType, Addiction> _addictions = new();
         private readonly static Dictionary<AddictionType, float> _addictionMeters = new();
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
+        private readonly static Dictionary<AddictionType, float> _susceptibilityFactors = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
-
-        private static float? _susceptibilityModifier;
 
         private static MersenneTwister _random;
         public static MersenneTwister Random
@@ -76,10 +74,10 @@ namespace SOD.Narcotics.AddictionCore
             if (!_addictionMeters.ContainsKey(addictionType))
                 _addictionMeters[addictionType] = 0;
 
-            // Define the susceptibility of the human
-            if (_susceptibilityModifier == null)
+            // Define the susceptibility of the player
+            if (!_susceptibilityFactors.ContainsKey(addictionType))
             {
-                _susceptibilityModifier = Random.NextFloat(
+                _susceptibilityFactors[addictionType] = Random.NextFloat(
                     Plugin.Instance.Config.MinimumSusceptibility, 
                     Plugin.Instance.Config.MaximumSusceptibility);
             }
@@ -89,7 +87,7 @@ namespace SOD.Narcotics.AddictionCore
             float effectivePotency = (itemPotency ?? 1.0f) * consumptionPercentage;
 
             // Calculate addiction increment
-            float addictionIncrement = effectivePotency * _susceptibilityModifier.Value * (_addictionPotentials[addictionType] * 100) * UnityEngine.Time.deltaTime;
+            float addictionIncrement = effectivePotency * _susceptibilityFactors[addictionType] * (_addictionPotentials[addictionType] * 100) * UnityEngine.Time.deltaTime;
 
             // Update addiction meter
             _addictionMeters[addictionType] += addictionIncrement;
@@ -169,14 +167,14 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void Save(string filePath)
         {
-            if (_addictions.Count == 0 && _susceptibilityModifier == null && _random == null && _addictionMeters.Count == 0)
+            if (_addictions.Count == 0 && _susceptibilityFactors.Count == 0 && _addictionMeters.Count == 0 && _random == null)
                 return;
 
             var saveData = AddictionsSaveData.Create(
-                _addictions, 
-                _susceptibilityModifier.Value,
-                _random, 
-                _addictionMeters);
+                _addictions,
+                _susceptibilityFactors,
+                _addictionMeters, 
+                _random);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -195,7 +193,7 @@ namespace SOD.Narcotics.AddictionCore
             // When we are loading, they should be cleared anyway
             _addictions.Clear();
             _addictionMeters.Clear();
-            _susceptibilityModifier = null;
+            _susceptibilityFactors.Clear();
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"addictions_{seed}.json");
@@ -215,7 +213,8 @@ namespace SOD.Narcotics.AddictionCore
                 return;
             }
 
-            _susceptibilityModifier = saveData.SusceptibilityModifier;
+            foreach (var entry in saveData.SusceptibilityFactors)
+                _susceptibilityFactors[entry.Key] = entry.Value;
 
             foreach (var entry in saveData.AddictionMeters)
                 _addictionMeters[entry.Key] = entry.Value;
