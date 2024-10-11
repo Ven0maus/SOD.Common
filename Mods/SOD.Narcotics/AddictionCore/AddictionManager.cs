@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Custom;
 using SOD.Common.Helpers;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,15 @@ namespace SOD.Narcotics.AddictionCore
         private readonly static Dictionary<int, Dictionary<AddictionType, Time.TimeData>> _lastTimeSinceConsumption = new();
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
+
+        private static MersenneTwister _random;
+        public static MersenneTwister Random
+        {
+            get
+            {
+                return _random ??= new MersenneTwister((int)Lib.SaveGame.GetUniqueNumber(CityData.Instance.seed));
+            }
+        }
 
         /// <summary>
         /// Assigns a new addiction.
@@ -101,7 +111,7 @@ namespace SOD.Narcotics.AddictionCore
             // Define the susceptibility of the human
             if (!_susceptibilityModifiers.TryGetValue(humanId, out var susceptibility))
             {
-                susceptibility = _susceptibilityModifiers[humanId] = UnityEngine.Random.Range(
+                susceptibility = _susceptibilityModifiers[humanId] = Random.NextFloat(
                     Plugin.Instance.Config.MinimumSusceptibility, 
                     Plugin.Instance.Config.MaximumSusceptibility);
             }
@@ -213,7 +223,7 @@ namespace SOD.Narcotics.AddictionCore
             if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifiers.Count == 0)
                 return;
 
-            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers, _lastTimeSinceConsumption);
+            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers, _lastTimeSinceConsumption, _random);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -251,6 +261,9 @@ namespace SOD.Narcotics.AddictionCore
 
             foreach (var entry in saveData.LastTimeSinceConsumption)
                 _lastTimeSinceConsumption[entry.Key] = entry.Value.ToDictionary(a => a.Key, a => Time.TimeData.Deserialize(a.Value));
+
+            if (saveData.Mt != null)
+                _random = new MersenneTwister((saveData.Index, saveData.Mt));
 
             foreach (var entry in saveData.Addictions) 
             {

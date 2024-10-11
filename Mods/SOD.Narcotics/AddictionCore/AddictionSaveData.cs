@@ -1,4 +1,5 @@
-﻿using SOD.Common.Helpers;
+﻿using SOD.Common.Custom;
+using SOD.Common.Helpers;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,6 +11,8 @@ namespace SOD.Narcotics.AddictionCore
         public Dictionary<int, Dictionary<AddictionType, int>> ConsumptionCounters { get; set; } = new();
         public Dictionary<int, Dictionary<AddictionType, string>> LastTimeSinceConsumption { get; set; } = new();
         public Dictionary<int, float> SusceptibilityModifiers { get; set; } = new();
+        public int Index { get; set; }
+        public uint[] Mt { get; set; }
 
         public class Addiction
         {
@@ -25,7 +28,8 @@ namespace SOD.Narcotics.AddictionCore
             Dictionary<int, List<AddictionCore.Addiction>> addictionDatas,
             Dictionary<int, Dictionary<AddictionType, int>> consumptionCounters,
             Dictionary<int, float> susceptibilityModifiers,
-            Dictionary<int, Dictionary<AddictionType, Time.TimeData>> lastTimeSinceConsumption)
+            Dictionary<int, Dictionary<AddictionType, Time.TimeData>> lastTimeSinceConsumption,
+            MersenneTwister random)
         {
             var saveData = new AddictionsSaveData();
             foreach (var entry in addictionDatas)
@@ -46,6 +50,12 @@ namespace SOD.Narcotics.AddictionCore
             {
                 saveData.LastTimeSinceConsumption[entry.Key] = lastTimeSinceConsumption[entry.Key]
                     .ToDictionary(a => a.Key, a => a.Value.Serialize());
+            }
+            if (random != null)
+            {
+                var state = random.SaveState();
+                saveData.Index = state.index;
+                saveData.Mt = state.mt;
             }
             saveData.ConsumptionCounters = consumptionCounters;
             saveData.SusceptibilityModifiers = susceptibilityModifiers;
