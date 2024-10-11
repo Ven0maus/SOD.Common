@@ -21,9 +21,15 @@ namespace SOD.Narcotics
             Log.LogInfo("Plugin is patched.");
 
             Lib.Time.OnHourChanged += Time_OnHourChanged;
+            Lib.SaveGame.OnBeforeNewGame += SaveGame_OnBeforeNewGame;
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnAfterLoad += SaveGame_OnAfterLoad;
             TakeOnePatches.OnItemConsumed += OnItemConsumed;
+        }
+
+        private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)
+        {
+            AddictionManager.ClearExistingData();
         }
 
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)

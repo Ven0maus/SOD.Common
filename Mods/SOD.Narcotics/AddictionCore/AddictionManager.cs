@@ -194,9 +194,7 @@ namespace SOD.Narcotics.AddictionCore
         public static void Load(string filePath)
         {
             // When we are loading, they should be cleared anyway
-            _addictions.Clear();
-            _addictionMeters.Clear();
-            _susceptibilityFactors.Clear();
+            ClearExistingData();
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"addictions_{seed}.json");
@@ -234,6 +232,14 @@ namespace SOD.Narcotics.AddictionCore
             }
 
             Plugin.Log.LogInfo("Addictions information loaded.");
+        }
+
+        public static void ClearExistingData()
+        {
+            _addictions.Clear();
+            _addictionMeters.Clear();
+            _susceptibilityFactors.Clear();
+            _random = null;
         }
 
         public static (AddictionType addictionType, float? potency)? GetAddictionTypeAndPotency(Interactable interactable)
