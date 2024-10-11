@@ -19,14 +19,12 @@ namespace SOD.Narcotics.AddictionCore
             }
         }
         public AddictionStage Stage { get; set; }
-        public int HumanId { get; }
         public Time.TimeData TimeSinceLastWorsening { get; set; }
 
         public HashSet<AddictionStage> AppliedStageEffects { get; set; } = new();
 
-        public Addiction(int humanId, AddictionType addictionType)
+        public Addiction(AddictionType addictionType)
         {
-            HumanId = humanId;
             AddictionType = addictionType;
             Stage = AddictionStage.Mild;
         }
@@ -54,7 +52,7 @@ namespace SOD.Narcotics.AddictionCore
             }
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Progress]: {(progressAmount > 0 ? Progression * 100 : 100 - Progression * 100)}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
+                Plugin.Log.LogInfo($"[{AddictionName}] [Progress]: {(progressAmount > 0 ? Progression * 100 : 100 - Progression * 100)}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
         }
 
         public void Cure()
@@ -69,7 +67,7 @@ namespace SOD.Narcotics.AddictionCore
             }
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] has now been cured of his \"{AddictionName}\".");
+                Plugin.Log.LogInfo($"You have now been cured of \"{AddictionName}\".");
         }
 
         public void Initialize()
@@ -105,7 +103,7 @@ namespace SOD.Narcotics.AddictionCore
             AppliedStageEffects.Add(Stage);
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] Applied effects of stage \"{Stage}\".");
+                Plugin.Log.LogInfo($"[{AddictionName}] Applied effects of stage \"{Stage}\".");
         }
 
         private void RemoveStageEffects()
@@ -115,7 +113,7 @@ namespace SOD.Narcotics.AddictionCore
             AppliedStageEffects.Remove(Stage);
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] Removed effects of stage \"{Stage}\".");
+                Plugin.Log.LogInfo($"[{AddictionName}] Removed effects of stage \"{Stage}\".");
         }
 
         private Action<bool> GetStageAction()
@@ -139,7 +137,7 @@ namespace SOD.Narcotics.AddictionCore
             ApplyStageEffects();
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Stage]: Worsened to {Stage}.");
+                Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Worsened to {Stage}.");
         }
 
         private void MoveToPreviousStage()
@@ -149,14 +147,14 @@ namespace SOD.Narcotics.AddictionCore
             // When we're already in mild, we're cured
             if (Stage == AddictionStage.Mild)
             {
-                AddictionManager.Cure(HumanId, AddictionType);
+                AddictionManager.Cure(AddictionType);
                 return;
             }
 
             Stage--;
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Stage]: Improved to {Stage}.");
+                Plugin.Log.LogInfo($"[{AddictionName}] [Stage]: Improved to {Stage}.");
         }
     }
 }

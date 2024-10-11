@@ -1,6 +1,7 @@
 ﻿using SOD.Common;
 using SOD.Common.Custom;
 using SOD.Common.Helpers;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,11 +12,12 @@ namespace SOD.Narcotics.AddictionCore
 {
     public static class AddictionManager
     {
-        private readonly static Dictionary<int, List<Addiction>> _addictions = new();
-        private readonly static Dictionary<int, Dictionary<AddictionType, int>> _consumptionCounters = new();
-        private readonly static Dictionary<int, float> _susceptibilityModifiers = new();
-        private readonly static Dictionary<int, Dictionary<AddictionType, Time.TimeData>> _lastTimeSinceConsumption = new();
+        private readonly static Dictionary<AddictionType, Addiction> _addictions = new();
+        private readonly static Dictionary<AddictionType, int> _consumptionCounters = new();
+        private static float? _susceptibilityModifier;
+        private readonly static Dictionary<AddictionType, Time.TimeData> _lastTimeSinceConsumption = new();
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
+        private readonly static Dictionary<AddictionType, float> _consumptionRate = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
 
         private static MersenneTwister _random;
@@ -32,47 +34,36 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         /// <param name="addictionType"></param>
         /// <param name="stage"></param>
-        public static void Assign(int humanId, AddictionType addictionType)
+        public static void Assign(AddictionType addictionType)
         {
-            if (!_enabledAddictions.ContainsKey(addictionType)) return;
-            if (!_addictions.TryGetValue(humanId, out var addictions))
-                addictions = _addictions[humanId] = new List<Addiction>();
+            if (!_enabledAddictions.ContainsKey(addictionType) || _addictions.ContainsKey(addictionType)) return;
 
-            if (!addictions.Any(a => a.AddictionType == addictionType))
-            {
-                // Get a new addiction class
-                Addiction addiction = AddictionFactory.Get(humanId, addictionType);
-                addiction.Initialize();
+            // Get a new addiction class
+            Addiction addiction = AddictionFactory.Get(addictionType);
+            addiction.Initialize();
 
-                // Add to collection
-                addictions.Add(addiction);
+            // Add to collection
+            _addictions[addictionType] = addiction;
 
-                // Remove this addiction type from the counter
-                _consumptionCounters[humanId].Remove(addictionType);
-                if (_consumptionCounters[humanId].Count == 0)
-                    _consumptionCounters.Remove(humanId);
-                _lastTimeSinceConsumption[humanId].Remove(addictionType);
-                if (_lastTimeSinceConsumption[humanId].Count == 0)
-                    _lastTimeSinceConsumption.Remove(humanId);
+            // Remove this addiction type from the counter
+            _consumptionCounters.Remove(addictionType);
+            _lastTimeSinceConsumption.Remove(addictionType);
 
-                if (Plugin.Instance.Config.DebugMode)
-                    Plugin.Log.LogInfo($"[Human: {humanId}] has become addicted to \"{addictionType.ToString().ToLower()}\".");
-            }
+            if (Plugin.Instance.Config.DebugMode)
+                Plugin.Log.LogInfo($"You have become addicted to \"{addictionType.ToString().ToLower()}\".");
         }
 
         /// <summary>
         /// Cures the given addiction.
         /// </summary>
         /// <param name="addictionType"></param>
-        public static void Cure(int humanId, AddictionType addictionType)
+        public static void Cure(AddictionType addictionType)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
-            var addiction = GetAddiction(humanId, addictionType);
+            var addiction = GetAddiction(addictionType);
             if (addiction != null)
             {
-                _addictions[humanId].Remove(addiction);
-                if (_addictions[humanId].Count == 0)
-                    _addictions.Remove(humanId);
+                _addictions.Remove(addictionType);
                 addiction.Cure();
             }
         }
@@ -81,12 +72,12 @@ namespace SOD.Narcotics.AddictionCore
         /// This method is called when an item related to an addiction is consumed.
         /// It worsens the addiction by progressing its stage.
         /// </summary>
-        public static void OnItemConsumed(int humanId, AddictionType addictionType, float itemPotency = 1.0f)
+        public static void OnItemConsumed(AddictionType addictionType, float? itemPotency = null)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
 
             // Check if the human already has this addiction
-            var addiction = GetAddiction(humanId, addictionType);
+            var addiction = GetAddiction(addictionType);
             if (addiction != null)
             {
                 // If already addicted, add stage progression for continued use
@@ -94,49 +85,69 @@ namespace SOD.Narcotics.AddictionCore
                 return;
             }
 
-            // Ensure the consumption counter is initialized for the human
-            if (!_consumptionCounters.ContainsKey(humanId))
-                _consumptionCounters[humanId] = new Dictionary<AddictionType, int>();
-
             // Set current consumption time
-            if (!_lastTimeSinceConsumption.ContainsKey(humanId))
-                _lastTimeSinceConsumption[humanId] = new Dictionary<AddictionType, Time.TimeData>();
-            if (!_lastTimeSinceConsumption[humanId].ContainsKey(addictionType))
-                _lastTimeSinceConsumption[humanId][addictionType] = Lib.Time.CurrentDateTime;
+            if (!_lastTimeSinceConsumption.ContainsKey(addictionType))
+                _lastTimeSinceConsumption[addictionType] = Lib.Time.CurrentDateTime;
 
             // If not addicted, track the consumption count
-            if (!_consumptionCounters[humanId].ContainsKey(addictionType))
-                _consumptionCounters[humanId][addictionType] = 0;
+            if (!_consumptionCounters.ContainsKey(addictionType))
+                _consumptionCounters[addictionType] = 0;
 
             // Define the susceptibility of the human
-            if (!_susceptibilityModifiers.TryGetValue(humanId, out var susceptibility))
+            if (_susceptibilityModifier == null)
             {
-                susceptibility = _susceptibilityModifiers[humanId] = Random.NextFloat(
+                _susceptibilityModifier = Random.NextFloat(
                     Plugin.Instance.Config.MinimumSusceptibility, 
                     Plugin.Instance.Config.MaximumSusceptibility);
             }
 
             // Increment consumption count for this substance
-            _consumptionCounters[humanId][addictionType]++;
-            int currentConsumption = _consumptionCounters[humanId][addictionType];
-            int addictionThreshold = (int)(Plugin.Instance.Config.BaseAddictionThreshold * susceptibility / (itemPotency * _addictionPotentials[addictionType]));
+            _consumptionCounters[addictionType]++;
+            int currentConsumption = _consumptionCounters[addictionType];
+            int addictionThreshold = (int)(Plugin.Instance.Config.BaseAddictionThreshold * _susceptibilityModifier.Value / ((itemPotency ?? 1.0f) * _addictionPotentials[addictionType]));
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human: {humanId}] consumed {addictionType.ToString().ToLower()}: {currentConsumption}/{addictionThreshold}");
+                Plugin.Log.LogInfo($"You consumed {addictionType.ToString().ToLower()}: {currentConsumption}/{addictionThreshold}");
 
             // Check if consumption exceeds the threshold, triggering addiction
             if (currentConsumption >= addictionThreshold)
-                Assign(humanId, addictionType);
+                Assign(addictionType);
+        }
+
+        /// <summary>
+        /// Called every tick when consuming a narcotic
+        /// </summary>
+        /// <param name="addictionType"></param>
+        /// <param name="rate"></param>
+        /// <param name="potency"></param>
+        public static void AddConsumptionRate(AddictionType addictionType, float rate, float potency)
+        {
+            if (!_consumptionRate.ContainsKey(addictionType))
+                _consumptionRate.Add(addictionType, 0);
+
+            _consumptionRate[addictionType] += rate;
+
+            // Every 1f of consuming (1 second)
+            if (_consumptionRate[addictionType] >= 1f)
+            {
+                _consumptionRate[addictionType] = 1f - _consumptionRate[addictionType];
+
+                // We apply a lower potency consumption for this addiction type
+                OnItemConsumed(addictionType, potency);
+
+                if (Plugin.Instance.Config.DebugMode)
+                    Plugin.Log.LogInfo($"Consumed \"{addictionType}\" with potency \"{potency}\".");
+            }
         }
 
         /// <summary>
         /// This method is called when an action that helps recovery is performed.
         /// It improves the addiction by reducing its stage.
         /// </summary>
-        public static void OnRecoveryAction(int humanId, AddictionType addictionType, float recoveryAmount)
+        public static void OnRecoveryAction(AddictionType addictionType, float recoveryAmount)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
-            var addiction = GetAddiction(humanId, addictionType);
+            var addiction = GetAddiction(addictionType);
             if (addiction != null)
             {
                 addiction.AdjustProgress(-recoveryAmount);
@@ -150,33 +161,26 @@ namespace SOD.Narcotics.AddictionCore
             var hours = Plugin.Instance.Config.ResetConsumptionCounterAfterHours;
             foreach (var consumptionCounter in _lastTimeSinceConsumption)
             {
-                if (!_consumptionCounters.TryGetValue(consumptionCounter.Key, out var counter)) continue;
-                
-                foreach (var timeData in consumptionCounter.Value)
+                // After a half day of not consuming, it will do a full reset of the counter
+                if (consumptionCounter.Value.AddHours(hours) <= cdt)
                 {
-                    // After a half day of not consuming, it will do a full reset of the counter
-                    if (timeData.Value.AddHours(hours) <= cdt)
-                    {
-                        if (counter.ContainsKey(timeData.Key))
-                        {
-                            if (Plugin.Instance.Config.DebugMode)
-                                Plugin.Log.LogInfo($"Forgot counter for addiction \"{timeData.Key}\".");
+                    if (_consumptionCounters.ContainsKey(consumptionCounter.Key))
+                        _consumptionCounters.Remove(consumptionCounter.Key);
+                    if (_consumptionRate.ContainsKey(consumptionCounter.Key))
+                        _consumptionRate.Remove(consumptionCounter.Key);
 
-                            counter.Remove(timeData.Key);
-                            if (counter.Count == 0)
-                                _consumptionCounters.Remove(consumptionCounter.Key);
-                        }
+                    if (Plugin.Instance.Config.DebugMode)
+                        Plugin.Log.LogInfo($"Forgot consumption counters for addiction \"{consumptionCounter.Key}\".");
 
-                        toBeRemoved.Add(timeData.Key);
-                    }
+                    toBeRemoved.Add(consumptionCounter.Key);
                 }
+            }
 
-                if (toBeRemoved.Count > 0)
-                {
-                    foreach (var tbr in toBeRemoved)
-                        consumptionCounter.Value.Remove(tbr);
-                    toBeRemoved.Clear();
-                }
+            if (toBeRemoved.Count > 0)
+            {
+                foreach (var tbr in toBeRemoved)
+                    _lastTimeSinceConsumption.Remove(tbr);
+                toBeRemoved.Clear();
             }
         }
 
@@ -189,7 +193,6 @@ namespace SOD.Narcotics.AddictionCore
 
             // Make sure to clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
             var addictions = _addictions.Values
-                .SelectMany(a => a)
                 .Where(a => a.Recovering)
                 .ToArray();
             foreach (var addiction in addictions)
@@ -223,10 +226,10 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void Save(string filePath)
         {
-            if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifiers.Count == 0 && _random == null)
+            if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifier == null && _random == null)
                 return;
 
-            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers, _lastTimeSinceConsumption, _random);
+            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifier.Value, _lastTimeSinceConsumption, _random);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -245,7 +248,7 @@ namespace SOD.Narcotics.AddictionCore
             // When we are loading, they should be cleared anyway
             _addictions.Clear();
             _consumptionCounters.Clear();
-            _susceptibilityModifiers.Clear();
+            _susceptibilityModifier = null;
             _lastTimeSinceConsumption.Clear();
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -254,42 +257,70 @@ namespace SOD.Narcotics.AddictionCore
             if (!File.Exists(path)) return;
 
             var jsonData = File.ReadAllText(path);
-            var saveData = JsonSerializer.Deserialize<AddictionsSaveData>(jsonData);
+
+            AddictionsSaveData saveData;
+            try
+            {
+                saveData = JsonSerializer.Deserialize<AddictionsSaveData>(jsonData);
+            }
+            catch (Exception)
+            {
+                Plugin.Log.LogWarning("Corrupted or outdated addictions savedata found, loading addictions skipped.");
+                return;
+            }
+
+            _susceptibilityModifier = saveData.SusceptibilityModifier;
 
             foreach (var entry in saveData.ConsumptionCounters)
                 _consumptionCounters[entry.Key] = entry.Value;
 
-            foreach (var entry in saveData.SusceptibilityModifiers)
-                _susceptibilityModifiers[entry.Key] = entry.Value;
-
             foreach (var entry in saveData.LastTimeSinceConsumption)
-                _lastTimeSinceConsumption[entry.Key] = entry.Value.ToDictionary(a => a.Key, a => Time.TimeData.Deserialize(a.Value));
+                _lastTimeSinceConsumption[entry.Key] = Time.TimeData.Deserialize(entry.Value);
 
             if (saveData.Mt != null)
                 _random = new MersenneTwister((saveData.Index, saveData.Mt));
 
             foreach (var entry in saveData.Addictions)
             {
-                _addictions[entry.Key] = entry.Value.Select(a =>
-                {
-                    var addiction = AddictionFactory.Get(a.HumanId, a.AddictionType);
-                    addiction.AppliedStageEffects = a.AppliedStageEffects.ToHashSet();
-                    addiction.Progression = a.Progression;
-                    addiction.TimeSinceLastWorsening = Time.TimeData.Deserialize(a.TimeSinceLastWorsening);
-                    addiction.Stage = a.Stage;
-                    addiction.Initialize();
-                    return addiction;
-                }).ToList();
+                _addictions[entry.Key] = AddictionFactory.Get(entry.Value.AddictionType);
+                _addictions[entry.Key].AppliedStageEffects = entry.Value.AppliedStageEffects.ToHashSet();
+                _addictions[entry.Key].Progression = entry.Value.Progression;
+                _addictions[entry.Key].TimeSinceLastWorsening = Time.TimeData.Deserialize(entry.Value.TimeSinceLastWorsening);
+                _addictions[entry.Key].Stage = entry.Value.Stage;
+                _addictions[entry.Key].Initialize();
             }
 
             Plugin.Log.LogInfo("Addictions information loaded.");
         }
 
-        private static Addiction GetAddiction(int humanId, AddictionType addictionType)
+        public static (AddictionType addictionType, float? potency)? GetAddictionTypeAndPotency(Interactable interactable)
         {
-            if (_addictions.TryGetValue(humanId, out var addictions))
-                return addictions.FirstOrDefault(a => a.AddictionType == addictionType);
+            var ri = interactable.preset.retailItem;
+            if (ri.drunk > 0)
+            {
+                return (AddictionType.Alcohol, ri.drunk);
+            }
+            else if (ri.numb > 0 || ri.desireCategory == CompanyPreset.CompanyCategory.medical)
+            {
+                if (interactable.preset.name != "Bandage" && interactable.preset.name != "Splint" && interactable.preset.name != "HeatPack")
+                    return (AddictionType.Opioid, null);
+            }
+            else if (interactable.preset.name == "ChocolateBar" || interactable.preset.name == "Donut" || interactable.preset.name == "Eclair")
+            {
+                return (AddictionType.Sugar, null);
+            }
+            else if (ri.desireCategory == CompanyPreset.CompanyCategory.caffeine)
+            {
+                if (interactable.preset.name == "MugCoffee" || interactable.preset.name == "TakeawayCoffee")
+                    return (AddictionType.Caffeine, null);
+            }
+
             return null;
+        }
+
+        private static Addiction GetAddiction(AddictionType addictionType)
+        {
+            return _addictions.TryGetValue(addictionType, out var addiction) ? addiction : null;
         }
     }
 }

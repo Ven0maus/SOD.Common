@@ -5,21 +5,21 @@ namespace SOD.Narcotics.AddictionCore
 {
     public static class AddictionFactory
     {
-        public static Addiction Get(int humanId, AddictionType addictionType)
+        public static Addiction Get(AddictionType addictionType)
         {
             // No fancy reflection here, doesn't work with il2cpp for some reason
             switch (addictionType)
             {
                 case AddictionType.Alcohol:
-                    return new AlcoholAddiction(humanId);
+                    return new AlcoholAddiction();
                 case AddictionType.Nicotine:
-                    return new NicotineAddiction(humanId);
+                    return new NicotineAddiction();
                 case AddictionType.Opioid:
-                    return new OpioidAddiction(humanId);
+                    return new OpioidAddiction();
                 case AddictionType.Sugar:
-                    return new SugarAddiction(humanId);
+                    return new SugarAddiction();
                 case AddictionType.Caffeine:
-                    return new CaffeineAddiction(humanId);
+                    return new CaffeineAddiction();
                 default:
                     throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
             }

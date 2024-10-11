@@ -7,10 +7,10 @@ namespace SOD.Narcotics.AddictionCore
 {
     public class AddictionsSaveData
     {
-        public Dictionary<int, List<Addiction>> Addictions { get; set; } = new();
-        public Dictionary<int, Dictionary<AddictionType, int>> ConsumptionCounters { get; set; } = new();
-        public Dictionary<int, Dictionary<AddictionType, string>> LastTimeSinceConsumption { get; set; } = new();
-        public Dictionary<int, float> SusceptibilityModifiers { get; set; } = new();
+        public Dictionary<AddictionType, Addiction> Addictions { get; set; } = new();
+        public Dictionary<AddictionType, int> ConsumptionCounters { get; set; } = new();
+        public Dictionary<AddictionType, string> LastTimeSinceConsumption { get; set; } = new();
+        public float SusceptibilityModifier { get; set; } = new();
         public int Index { get; set; }
         public uint[] Mt { get; set; }
 
@@ -25,31 +25,24 @@ namespace SOD.Narcotics.AddictionCore
         }
 
         public static AddictionsSaveData Create(
-            Dictionary<int, List<AddictionCore.Addiction>> addictionDatas,
-            Dictionary<int, Dictionary<AddictionType, int>> consumptionCounters,
-            Dictionary<int, float> susceptibilityModifiers,
-            Dictionary<int, Dictionary<AddictionType, Time.TimeData>> lastTimeSinceConsumption,
+            Dictionary<AddictionType, AddictionCore.Addiction> addictionDatas,
+            Dictionary<AddictionType, int> consumptionCounters,
+            float susceptibilityModifier,
+            Dictionary<AddictionType, Time.TimeData> lastTimeSinceConsumption,
             MersenneTwister random)
         {
             var saveData = new AddictionsSaveData();
             foreach (var entry in addictionDatas)
             {
                 // Convert
-                saveData.Addictions[entry.Key] = addictionDatas[entry.Key]
-                    .Select(a => new Addiction
+                saveData.Addictions[entry.Key] = new Addiction
                 {
-                    AddictionType = a.AddictionType,
-                    Stage = a.Stage,
-                    AppliedStageEffects = a.AppliedStageEffects.ToArray(),
-                    HumanId = a.HumanId,
-                    Progression = a.Progression,
-                    TimeSinceLastWorsening = a.TimeSinceLastWorsening.Serialize()
-                }).ToList();
-            }
-            foreach (var entry in lastTimeSinceConsumption)
-            {
-                saveData.LastTimeSinceConsumption[entry.Key] = lastTimeSinceConsumption[entry.Key]
-                    .ToDictionary(a => a.Key, a => a.Value.Serialize());
+                    AddictionType = addictionDatas[entry.Key].AddictionType,
+                    Stage = addictionDatas[entry.Key].Stage,
+                    AppliedStageEffects = addictionDatas[entry.Key].AppliedStageEffects.ToArray(),
+                    Progression = addictionDatas[entry.Key].Progression,
+                    TimeSinceLastWorsening = addictionDatas[entry.Key].TimeSinceLastWorsening.Serialize()
+                };
             }
             if (random != null)
             {
@@ -57,8 +50,10 @@ namespace SOD.Narcotics.AddictionCore
                 saveData.Index = state.index;
                 saveData.Mt = state.mt;
             }
+            saveData.LastTimeSinceConsumption = lastTimeSinceConsumption
+                .ToDictionary(a => a.Key, a => a.Value.Serialize());
             saveData.ConsumptionCounters = consumptionCounters;
-            saveData.SusceptibilityModifiers = susceptibilityModifiers;
+            saveData.SusceptibilityModifier = susceptibilityModifier;
             return saveData;
         }
     }

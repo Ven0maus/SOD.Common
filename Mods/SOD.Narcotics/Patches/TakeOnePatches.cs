@@ -72,7 +72,17 @@ namespace SOD.Narcotics.Patches
                         Interactable interactable = __state.Interactable;
                         if (interactable.cs > 0f)
                         {
-                            // TODO: Keep track of how much we consumed per type and potency, and if we've consumed enough reset the consumation and apply addiction consumption
+                            // Keep track of how much we consumed per type and potency
+                            // if we've consumed enough reset the consumation and apply addiction consumption
+                            var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(interactable);
+                            if (addictionInfo != null)
+                            {
+                                // The full potency for consuming the entire item is basically == to the full consumable amount
+                                // So to calculate how much 1 cs would equal we divide the potency by the full consumable amount
+                                var potency = addictionInfo.Value.potency ?? 1f;
+                                potency /= interactable.preset.consumableAmount;
+                                AddictionManager.AddConsumptionRate(addictionInfo.Value.addictionType, UnityEngine.Time.deltaTime, potency);
+                            }
                         }
                     }
                     else if (__state.State && __state.Interactable != null)

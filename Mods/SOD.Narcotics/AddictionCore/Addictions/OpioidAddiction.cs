@@ -4,7 +4,7 @@ namespace SOD.Narcotics.AddictionCore.Addictions
 {
     public class OpioidAddiction : Addiction
     {
-        public OpioidAddiction(int humanId) : base(humanId, AddictionType.Opioid)
+        public OpioidAddiction() : base(AddictionType.Opioid)
         { }
 
         public override Action<bool> ExtremeStageAction()

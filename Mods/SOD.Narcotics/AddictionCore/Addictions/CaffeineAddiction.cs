@@ -4,7 +4,7 @@ namespace SOD.Narcotics.AddictionCore.Addictions
 {
     internal class CaffeineAddiction : Addiction
     {
-        public CaffeineAddiction(int humanId) : base(humanId, AddictionType.Caffeine)
+        public CaffeineAddiction() : base(AddictionType.Caffeine)
         { }
 
         public override Action<bool> ExtremeStageAction()
