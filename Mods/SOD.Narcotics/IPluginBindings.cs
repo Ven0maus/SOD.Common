@@ -51,5 +51,8 @@ namespace SOD.Narcotics
 
         [Binding(0.52f, "The maximum susceptible the player can be (random chosen between min/max for each addiction type).", "Addiction.Calculations.MaximumSusceptibility")]
         float MaximumSusceptibility { get; set; }
+
+        [Binding(0.1f, "The hourly exponential rate to recover from addictions. (Formula used(e: Euler’s constant): currentAddictionValue * e^-hourlyRecoveryRate).", "Addiction.Calculations.AddictionHourlyRecoveryRate")]
+        float AddictionHourlyRecoveryRate { get; set; }
     }
 }

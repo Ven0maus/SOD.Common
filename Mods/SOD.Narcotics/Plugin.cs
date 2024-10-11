@@ -3,6 +3,7 @@ using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.Narcotics.AddictionCore;
 using SOD.Narcotics.Patches;
+using System.IO;
 using System.Reflection;
 
 namespace SOD.Narcotics
@@ -24,7 +25,19 @@ namespace SOD.Narcotics
             Lib.SaveGame.OnBeforeNewGame += SaveGame_OnBeforeNewGame;
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
             Lib.SaveGame.OnAfterLoad += SaveGame_OnAfterLoad;
+            Lib.SaveGame.OnAfterDelete += SaveGame_OnAfterDelete;
             TakeOnePatches.OnItemConsumed += OnItemConsumed;
+        }
+
+        private void SaveGame_OnAfterDelete(object sender, Common.Helpers.SaveGameArgs e)
+        {
+            var seed = Lib.SaveGame.GetUniqueString(e.FilePath);
+            var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"addictions_{seed}.json");
+
+            if (File.Exists(path))
+                File.Delete(path);
+
+            Plugin.Log.LogInfo("Addictions save data has been removed.");
         }
 
         private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)

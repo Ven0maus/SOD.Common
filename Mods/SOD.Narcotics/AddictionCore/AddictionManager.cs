@@ -20,6 +20,7 @@ namespace SOD.Narcotics.AddictionCore
         // Config loaded on plugin start
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
+        private static float _hourlyAddictionRecoveryRate = 0.1f;
 
         private static MersenneTwister _random;
         public static MersenneTwister Random
@@ -115,7 +116,7 @@ namespace SOD.Narcotics.AddictionCore
                 {
                     // Remain at 100 if we're already at extreme
                     if (addiction.Stage == AddictionStage.Extreme)
-                        _addictionMeters[addictionType] = 0f;
+                        _addictionMeters[addictionType] = 1f;
                     else
                         addiction.MoveToNextStage();
                 }
@@ -127,22 +128,43 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void NaturalRecovery()
         {
-            return;
-            // TODO: FIX
-            // Time since last use
+            // This method is called once every in-game hour
             foreach (var addictionMeter in _addictionMeters.ToArray()) 
             {
-                // TODO: Decay overtime
+                // Exponential decay over-time
+                var currentValue = _addictionMeters[addictionMeter.Key];
+                _addictionMeters[addictionMeter.Key] = ApplyExponentialDecay(currentValue);
+
+                if (Plugin.Instance.Config.DebugMode)
+                    Plugin.Log.LogInfo($"\"{addictionMeter.Key} addiction\" naturally decayed from \"{currentValue}\" to \"{_addictionMeters[addictionMeter.Key]}\".");
 
                 // Ensure addiction meter doesn't go below zero
                 if (_addictionMeters[addictionMeter.Key] <= 0f)
                 {
-                    _addictionMeters[addictionMeter.Key] = 1f;
                     var addiction = GetAddiction(addictionMeter.Key);
                     if (addiction != null)
+                    {
+                        // Reset, and move to the previous stage
+                        _addictionMeters[addictionMeter.Key] = 0.99f;
                         addiction.MoveToPreviousStage();
+                    }
+                    else
+                    {
+                        // If we're trying to go under or equal to 0, and no addiction then remove.
+                        _addictionMeters.Remove(addictionMeter.Key);
+                    }
                 }
             }
+        }
+
+        private static float ApplyExponentialDecay(float addictionValue)
+        {
+            // Exponential decay: addictionValue * e^(-decayRate * timeElapsed)
+            // Since timeElapsed is 1 per in-game hour, we can simplify the formula
+            float newAddictionValue = addictionValue * (float)Math.Exp(-_hourlyAddictionRecoveryRate);
+
+            // Clamp to avoid negative values, just in case
+            return Math.Max(newAddictionValue, 0f);
         }
 
         /// <summary>
@@ -165,6 +187,8 @@ namespace SOD.Narcotics.AddictionCore
             _addictionPotentials.Add(AddictionType.Opioid, Plugin.Instance.Config.OpioidAddictionPotential);
             _addictionPotentials.Add(AddictionType.Sugar, Plugin.Instance.Config.SugarAddictionPotential);
             _addictionPotentials.Add(AddictionType.Caffeine, Plugin.Instance.Config.CaffeineAddictionPotential);
+
+            _hourlyAddictionRecoveryRate = Plugin.Instance.Config.AddictionHourlyRecoveryRate;
         }
 
         /// <summary>
@@ -187,7 +211,7 @@ namespace SOD.Narcotics.AddictionCore
 
             File.WriteAllText(path, jsonData);
 
-            Plugin.Log.LogInfo("Saved addictions information.");
+            Plugin.Log.LogInfo("Saved addictions data.");
         }
 
         /// <summary>
@@ -233,7 +257,7 @@ namespace SOD.Narcotics.AddictionCore
                 _addictions[entry.Key].Initialize();
             }
 
-            Plugin.Log.LogInfo("Addictions information loaded.");
+            Plugin.Log.LogInfo("Addictions save data has been loaded.");
         }
 
         public static void ClearExistingData()
