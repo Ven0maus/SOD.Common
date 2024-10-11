@@ -46,6 +46,10 @@ namespace SOD.Narcotics
             if (e.preset == null || e.preset.retailItem == null) return;
             var ri = e.preset.retailItem;
 
+            // TODO: Check why donut etc, doesn't trigger this method
+            if (Config.DebugMode)
+                Log.LogInfo("Finished consuming item: " + e.name);
+
             if (ri.drunk > 0)
             {
                 AddictionManager.OnItemConsumed(Player.Instance.humanID, AddictionType.Alcohol, ri.drunk);
@@ -55,10 +59,9 @@ namespace SOD.Narcotics
                 if (e.preset.name != "Bandage" && e.preset.name != "Splint" && e.preset.name != "HeatPack")
                     AddictionManager.OnItemConsumed(Player.Instance.humanID, AddictionType.Opioid);
             }
-            else if (ri.nourishment > 0)
+            else if (e.preset.name == "ChocolateBar" || e.preset.name == "Donut" || e.preset.name == "Eclair")
             {
-                if (e.preset.name == "ChocolateBar" || e.preset.name == "Donut" || e.preset.name == "Eclair")
-                    AddictionManager.OnItemConsumed(Player.Instance.humanID, AddictionType.Sugar);
+                AddictionManager.OnItemConsumed(Player.Instance.humanID, AddictionType.Sugar);
             }
             else if (ri.desireCategory == CompanyPreset.CompanyCategory.caffeine)
             {

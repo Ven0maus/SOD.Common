@@ -159,6 +159,9 @@ namespace SOD.Narcotics.AddictionCore
                     {
                         if (counter.ContainsKey(timeData.Key))
                         {
+                            if (Plugin.Instance.Config.DebugMode)
+                                Plugin.Log.LogInfo($"Forgot counter for addiction \"{timeData.Key}\".");
+
                             counter.Remove(timeData.Key);
                             if (counter.Count == 0)
                                 _consumptionCounters.Remove(consumptionCounter.Key);
@@ -184,7 +187,7 @@ namespace SOD.Narcotics.AddictionCore
         {
             ForgetConsumptionCounters();
 
-            // Make sure the clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
+            // Make sure to clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
             var addictions = _addictions.Values
                 .SelectMany(a => a)
                 .Where(a => a.Recovering)
@@ -220,7 +223,7 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void Save(string filePath)
         {
-            if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifiers.Count == 0)
+            if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifiers.Count == 0 && _random == null)
                 return;
 
             var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers, _lastTimeSinceConsumption, _random);
@@ -265,7 +268,7 @@ namespace SOD.Narcotics.AddictionCore
             if (saveData.Mt != null)
                 _random = new MersenneTwister((saveData.Index, saveData.Mt));
 
-            foreach (var entry in saveData.Addictions) 
+            foreach (var entry in saveData.Addictions)
             {
                 _addictions[entry.Key] = entry.Value.Select(a =>
                 {

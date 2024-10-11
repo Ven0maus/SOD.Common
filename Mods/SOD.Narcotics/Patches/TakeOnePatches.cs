@@ -38,9 +38,6 @@ namespace SOD.Narcotics.Patches
                     yield return null;
 
                 OnItemConsumed?.Invoke(instance, consumable);
-
-                if (Plugin.Instance.Config.DebugMode)
-                    Plugin.Log.LogInfo($"Finished consuming consumable \"{consumable.name}\".");
             }
         }
     }

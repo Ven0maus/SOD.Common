@@ -11,17 +11,17 @@ namespace SOD.Narcotics.AddictionCore
 
     public enum AddictionType
     {
-        Alcohol,
-        Nicotine,
-        Opioid,
-        Sugar,
-        Caffeine
+        Alcohol = 0,
+        Nicotine = 1,
+        Opioid = 2,
+        Sugar = 3,
+        Caffeine = 4
     }
 
     public enum AddictionStage
     {
-        Mild,
-        Severe,
-        Extreme
+        Mild = 0,
+        Severe = 1,
+        Extreme = 2
     }
 }

@@ -29,7 +29,6 @@ namespace SOD.Narcotics.AddictionCore
             HumanId = humanId;
             AddictionType = addictionType;
             Stage = AddictionStage.Mild;
-            TimeSinceLastWorsening = Lib.Time.CurrentDateTime;
         }
 
         /// <summary>
@@ -90,6 +89,7 @@ namespace SOD.Narcotics.AddictionCore
             }
             else
             {
+                TimeSinceLastWorsening = Lib.Time.CurrentDateTime;
                 ApplyStageEffects();
             }
         }
