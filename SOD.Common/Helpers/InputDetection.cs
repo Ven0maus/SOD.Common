@@ -265,13 +265,12 @@ namespace SOD.Common.Helpers
         /// Stops and removes matching input suppression entries, if present.
         /// </summary>
         /// <param name="interactionKey">The interaction to search for.</param>
-        /// <param name="removeOverlappingEntries">Whether to remove entries which indirectly suppress the key code bound to the interaction, in addition to those which specifically target the interaction.</param>
-        public void RemoveInputSuppression(InteractablePreset.InteractionKey interactionKey, bool removeOverlappingEntries)
+        public void RemoveInputSuppression(InteractablePreset.InteractionKey interactionKey)
         {
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
 
-            var entries = FindInputSuppressionEntries(entry => entry.InteractionKey == interactionKey || (removeOverlappingEntries && IsOverlappingEntryForInteractionKey(entry, interactionKey)));
+            var entries = FindInputSuppressionEntries(entry => entry.InteractionKey == interactionKey || IsOverlappingEntryForInteractionKey(entry, interactionKey));
             foreach (var (key, value) in entries)
             {
                 value.Stop();
@@ -372,11 +371,10 @@ namespace SOD.Common.Helpers
         /// Determines if an input is being suppressed by any plugin.
         /// </summary>
         /// <param name="interactionKey">The interaction (virtual action name) associated with the input.</param>
-        /// <param name="checkOverlappingEntries">Whether to account for indirect suppression of the key code bound to the interaction, in addition to targeted/specific suppression of the interaction.</param>
         /// <param name="suppressedBy">The guids of all plugins involved in suppressing the KeyCode.</param>
         /// <param name="maxTimeLeft">The maximum time that the input will be suppressed for, across all suppression entries.</param>
         /// <returns></returns>
-        public bool IsInputSuppressedByAnyPlugin(InteractablePreset.InteractionKey interactionKey, bool checkOverlappingEntries, out List<string> suppressedBy, out TimeSpan? maxTimeLeft)
+        public bool IsInputSuppressedByAnyPlugin(InteractablePreset.InteractionKey interactionKey, out List<string> suppressedBy, out TimeSpan? maxTimeLeft)
         {
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
@@ -388,7 +386,7 @@ namespace SOD.Common.Helpers
             foreach (var (key, value) in InputSuppressionDictionary)
             {
                 bool isOverlappingEntry = IsOverlappingEntryForInteractionKey(value, interactionKey);
-                if (value.InteractionKey != interactionKey && (!checkOverlappingEntries || !isOverlappingEntry))
+                if (value.InteractionKey != interactionKey && !isOverlappingEntry)
                 {
                     continue;
                 }
@@ -406,17 +404,16 @@ namespace SOD.Common.Helpers
         /// </summary>
         /// <param name="pluginGuid">The guid of the plugin.</param>
         /// <param name="interactionKey">The interaction (virtual action name) associated with the input.</param>
-        /// <param name="checkOverlappingEntries">Whether to account for indirect suppression of the key code bound to the interaction, in addition to targeted/specific suppression of the interaction.</param>
         /// <param name="maxTimeLeft">The maximum time that the input will be suppressed for, across all suppression entries.</param>
         /// <returns></returns>
-        public bool IsInputSuppressed(string pluginGuid, InteractablePreset.InteractionKey interactionKey, bool checkOverlappingEntries, out TimeSpan? maxTimeLeft)
+        public bool IsInputSuppressed(string pluginGuid, InteractablePreset.InteractionKey interactionKey, out TimeSpan? maxTimeLeft)
         {
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
 
             maxTimeLeft = null;
             var isSuppressed = false;
-            var predicate = new Func<InputSuppressionEntry, bool>(entry => entry.CallerGuid == pluginGuid && (entry.InteractionKey == interactionKey || (checkOverlappingEntries && IsOverlappingEntryForInteractionKey(entry, interactionKey))));
+            var predicate = new Func<InputSuppressionEntry, bool>(entry => entry.CallerGuid == pluginGuid && (entry.InteractionKey == interactionKey || IsOverlappingEntryForInteractionKey(entry, interactionKey)));
             var entries = FindInputSuppressionEntries(predicate);
             foreach (var (key, value) in entries)
             {

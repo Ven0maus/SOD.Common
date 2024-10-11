@@ -57,7 +57,7 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
-                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, true, out var entryIds, out _))
+                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportAxisStateChange(actionName, interactionKey, __result, entryIds);
                     return;
@@ -86,7 +86,7 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
-                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, true, out var entryIds, out _))
+                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
                     return;
@@ -95,50 +95,6 @@ namespace SOD.Common.Patches
                 Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
             }
         }
-
-        // [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonDown), argumentTypes: [typeof(string)])]
-        // internal class Rewired_Player_GetButtonDown
-        // {
-        //     [HarmonyPostfix]
-        //     internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
-        //     {
-        //         if (!ReInput.isReady)
-        //         {
-        //             return;
-        //         }
-        //         InitializeActionsIfNecessary();
-        //         var interactionKey = GetInteractionKey(actionName);
-        //         if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out var entryIds, out _))
-        //         {
-        //             Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, false);
-        //             return;
-        //         }
-        //         __result = false;
-        //         Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, true);
-        //     }
-        // }
-
-        // [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButton), argumentTypes: [typeof(string)])]
-        // internal class Rewired_Player_GetButton
-        // {
-        //     [HarmonyPostfix]
-        //     internal static void Postfix(Rewired.Player __instance, string actionName, ref bool __result)
-        //     {
-        //         if (!ReInput.isReady)
-        //         {
-        //             return;
-        //         }
-        //         InitializeActionsIfNecessary();
-        //         var interactionKey = GetInteractionKey(actionName);
-        //         if (!Lib.InputDetection.IsInputSuppressed(interactionKey, true, out _))
-        //         {
-        //             Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, false);
-        //             return;
-        //         }
-        //         __result = false;
-        //         Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, true);
-        //     }
-        // }
 
         [HarmonyPatch(typeof(Rewired.Player), nameof(Rewired.Player.GetButtonUp), argumentTypes: [typeof(string)])]
         internal class Rewired_Player_GetButtonUp
@@ -152,7 +108,7 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
-                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, true, out var entryIds, out _))
+                if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
                     return;
