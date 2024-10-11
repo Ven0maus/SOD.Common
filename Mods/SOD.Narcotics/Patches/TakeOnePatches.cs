@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SOD.Narcotics.AddictionCore;
 using System;
 using System.Collections;
 
@@ -71,13 +72,14 @@ namespace SOD.Narcotics.Patches
                         Interactable interactable = __state.Interactable;
                         if (interactable.cs > 0f)
                         {
-                            
+                            // TODO: Keep track of how much we consumed per type and potency, and if we've consumed enough reset the consumation and apply addiction consumption
                         }
                     }
                     else if (__state.State && __state.Interactable != null)
                     {
-                        // We stopped consuming
-                        Plugin.Log.LogInfo("Stopped consuming: " + __state.Interactable.name);
+                        // We stopped consuming$
+                        if (Plugin.Instance.Config.DebugMode)
+                            Plugin.Log.LogInfo("Stopped consuming: " + __state.Interactable.name);
                     }
                 }
             }
