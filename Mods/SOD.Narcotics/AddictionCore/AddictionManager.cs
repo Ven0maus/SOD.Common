@@ -233,6 +233,7 @@ namespace SOD.Narcotics.AddictionCore
             _addictions.Clear();
             _consumptionCounters.Clear();
             _susceptibilityModifiers.Clear();
+            _lastTimeSinceConsumption.Clear();
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"addictions_{seed}.json");
