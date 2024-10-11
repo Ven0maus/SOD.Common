@@ -9,17 +9,17 @@ namespace SOD.Narcotics.AddictionCore.Addictions
 
         public override Action<bool> ExtremeStageAction()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override Action<bool> MildStageAction()
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override Action<bool> SevereStageAction()
         {
-            throw new NotImplementedException();
+            return null;
         }
     }
 }
