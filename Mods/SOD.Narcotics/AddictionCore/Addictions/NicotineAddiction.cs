@@ -7,17 +7,17 @@ namespace SOD.Narcotics.AddictionCore.Addictions
         public NicotineAddiction() : base(AddictionType.Nicotine)
         { }
 
-        public override Action<bool> ExtremeStageAction()
-        {
-            return null;
-        }
-
         public override Action<bool> MildStageAction()
         {
             return null;
         }
 
         public override Action<bool> SevereStageAction()
+        {
+            return null;
+        }
+
+        public override Action<bool> ExtremeStageAction()
         {
             return null;
         }
