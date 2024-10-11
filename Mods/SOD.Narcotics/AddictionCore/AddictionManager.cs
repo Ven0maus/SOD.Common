@@ -13,6 +13,7 @@ namespace SOD.Narcotics.AddictionCore
         private readonly static Dictionary<int, List<Addiction>> _addictions = new();
         private readonly static Dictionary<int, Dictionary<AddictionType, int>> _consumptionCounters = new();
         private readonly static Dictionary<int, float> _susceptibilityModifiers = new();
+        private readonly static Dictionary<int, Dictionary<AddictionType, Time.TimeData>> _lastTimeSinceConsumption = new();
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
         private readonly static Dictionary<AddictionType, bool> _enabledAddictions = new();
 
@@ -35,6 +36,14 @@ namespace SOD.Narcotics.AddictionCore
 
                 // Add to collection
                 addictions.Add(addiction);
+
+                // Remove this addiction type from the counter
+                _consumptionCounters[humanId].Remove(addictionType);
+                if (_consumptionCounters[humanId].Count == 0)
+                    _consumptionCounters.Remove(humanId);
+                _lastTimeSinceConsumption[humanId].Remove(addictionType);
+                if (_lastTimeSinceConsumption[humanId].Count == 0)
+                    _lastTimeSinceConsumption.Remove(humanId);
 
                 if (Plugin.Instance.Config.DebugMode)
                     Plugin.Log.LogInfo($"[Human: {humanId}] has become addicted to \"{addictionType.ToString().ToLower()}\".");
@@ -65,9 +74,6 @@ namespace SOD.Narcotics.AddictionCore
         public static void OnItemConsumed(int humanId, AddictionType addictionType, float itemPotency = 1.0f)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
-            // Ensure the consumption counter is initialized for the human
-            if (!_consumptionCounters.ContainsKey(humanId))
-                _consumptionCounters[humanId] = new Dictionary<AddictionType, int>();
 
             // Check if the human already has this addiction
             var addiction = GetAddiction(humanId, addictionType);
@@ -77,6 +83,16 @@ namespace SOD.Narcotics.AddictionCore
                 addiction.AdjustProgress(0.15f);
                 return;
             }
+
+            // Ensure the consumption counter is initialized for the human
+            if (!_consumptionCounters.ContainsKey(humanId))
+                _consumptionCounters[humanId] = new Dictionary<AddictionType, int>();
+
+            // Set current consumption time
+            if (!_lastTimeSinceConsumption.ContainsKey(humanId))
+                _lastTimeSinceConsumption[humanId] = new Dictionary<AddictionType, Time.TimeData>();
+            if (!_lastTimeSinceConsumption[humanId].ContainsKey(addictionType))
+                _lastTimeSinceConsumption[humanId][addictionType] = Lib.Time.CurrentDateTime;
 
             // If not addicted, track the consumption count
             if (!_consumptionCounters[humanId].ContainsKey(addictionType))
@@ -117,11 +133,47 @@ namespace SOD.Narcotics.AddictionCore
             }
         }
 
+        public static void ForgetConsumptionCounters()
+        {
+            var cdt = Lib.Time.CurrentDateTime;
+            var toBeRemoved = new List<AddictionType>();
+            var hours = Plugin.Instance.Config.ResetConsumptionCounterAfterHours;
+            foreach (var consumptionCounter in _lastTimeSinceConsumption)
+            {
+                if (!_consumptionCounters.TryGetValue(consumptionCounter.Key, out var counter)) continue;
+                
+                foreach (var timeData in consumptionCounter.Value)
+                {
+                    // After a half day of not consuming, it will do a full reset of the counter
+                    if (timeData.Value.AddHours(hours) <= cdt)
+                    {
+                        if (counter.ContainsKey(timeData.Key))
+                        {
+                            counter.Remove(timeData.Key);
+                            if (counter.Count == 0)
+                                _consumptionCounters.Remove(consumptionCounter.Key);
+                        }
+
+                        toBeRemoved.Add(timeData.Key);
+                    }
+                }
+
+                if (toBeRemoved.Count > 0)
+                {
+                    foreach (var tbr in toBeRemoved)
+                        consumptionCounter.Value.Remove(tbr);
+                    toBeRemoved.Clear();
+                }
+            }
+        }
+
         /// <summary>
         /// Call this periodically (e.g., once per hour) to allow natural recovery.
         /// </summary>
         public static void NaturalRecovery()
         {
+            ForgetConsumptionCounters();
+
             // Make sure the clone the collection into a new array, because addictions can cure during recovery and be removed from _addictions
             var addictions = _addictions.Values
                 .SelectMany(a => a)
@@ -161,7 +213,7 @@ namespace SOD.Narcotics.AddictionCore
             if (_addictions.Count == 0 && _consumptionCounters.Count == 0 && _susceptibilityModifiers.Count == 0)
                 return;
 
-            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers);
+            var saveData = AddictionsSaveData.Create(_addictions, _consumptionCounters, _susceptibilityModifiers, _lastTimeSinceConsumption);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
             var seed = Lib.SaveGame.GetUniqueString(filePath);
@@ -195,6 +247,9 @@ namespace SOD.Narcotics.AddictionCore
 
             foreach (var entry in saveData.SusceptibilityModifiers)
                 _susceptibilityModifiers[entry.Key] = entry.Value;
+
+            foreach (var entry in saveData.LastTimeSinceConsumption)
+                _lastTimeSinceConsumption[entry.Key] = entry.Value.ToDictionary(a => a.Key, a => Time.TimeData.Deserialize(a.Value));
 
             foreach (var entry in saveData.Addictions) 
             {

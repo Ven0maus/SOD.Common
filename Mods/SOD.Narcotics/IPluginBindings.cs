@@ -56,6 +56,9 @@ namespace SOD.Narcotics
         float MaximumSusceptibility { get; set; }
 
         [Binding(4, "The amount of hours the person must have not taken anymore narcotics to start recovering from their addiction.", "Addiction.Calculations.RecoveryStartTime")]
-        int RecoveryStartTime { get; set; }
+        int RecoveryStartTimeAfterHours { get; set; }
+
+        [Binding(12, "The amount of hours needed for the count of the narcotic consumption to reset (12-24 is a good balance), example: if you put 12 then you can drink max X amount of vodkas every 12 hours and not get addicted.", "Addiction.Calculations.ResetConsumptionCounterAfterHours")]
+        int ResetConsumptionCounterAfterHours { get; set; }
     }
 }
