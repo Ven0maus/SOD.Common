@@ -50,12 +50,12 @@ namespace SOD.Narcotics.AddictionCore
             }
             else if (Progression <= 0f)
             {
-                Progression = 0f; // Reset progress for the previous stage
+                Progression = 1f; // Make sure progression starts at the top
                 MoveToPreviousStage();
             }
 
             if (Plugin.Instance.Config.DebugMode)
-                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Progress]: {Progression * 100}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
+                Plugin.Log.LogInfo($"[Human:{HumanId}] [{AddictionName}] [Progress]: {(progressAmount > 0 ? Progression * 100 : 100 - Progression * 100)}% towards {(progressAmount > 0 ? "worsening" : "recovery")}.");
         }
 
         public void Cure()

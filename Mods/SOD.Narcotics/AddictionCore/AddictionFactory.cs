@@ -1,26 +1,28 @@
 ﻿using SOD.Narcotics.AddictionCore.Addictions;
 using System;
-using System.Collections.Generic;
 
 namespace SOD.Narcotics.AddictionCore
 {
     public static class AddictionFactory
     {
-        private static readonly Dictionary<AddictionType, Type> _addictionTypes = new()
-        {
-            { AddictionType.Alcohol, typeof(AlcoholAddiction) },
-            { AddictionType.Nicotine, typeof(NicotineAddiction) },
-            { AddictionType.Opioid, typeof(OpioidAddiction) },
-            { AddictionType.Sugar, typeof(SugarAddiction) },
-            { AddictionType.Caffeine, typeof(CaffeineAddiction) }
-        };
-
         public static Addiction Get(int humanId, AddictionType addictionType)
         {
-            if (!_addictionTypes.TryGetValue(addictionType, out var type))
-                throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
-
-            return (Addiction)Activator.CreateInstance(type, new[] {humanId});
+            // No fancy reflection here, doesn't work with il2cpp for some reason
+            switch (addictionType)
+            {
+                case AddictionType.Alcohol:
+                    return new AlcoholAddiction(humanId);
+                case AddictionType.Nicotine:
+                    return new NicotineAddiction(humanId);
+                case AddictionType.Opioid:
+                    return new OpioidAddiction(humanId);
+                case AddictionType.Sugar:
+                    return new SugarAddiction(humanId);
+                case AddictionType.Caffeine:
+                    return new CaffeineAddiction(humanId);
+                default:
+                    throw new NotSupportedException($"AddictionType \"{addictionType}\" is not supported.");
+            }
         }
     }
 }
