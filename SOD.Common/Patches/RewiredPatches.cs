@@ -1,4 +1,5 @@
 using HarmonyLib;
+using LibCpp2IL;
 using Rewired;
 using SOD.Common.Extensions;
 using System.Collections.Generic;
@@ -57,6 +58,10 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
+                if (interactionKey == InteractablePreset.InteractionKey.none)
+                {
+                    return;
+                }
                 if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportAxisStateChange(actionName, interactionKey, __result, entryIds);
@@ -86,6 +91,10 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
+                if (interactionKey == InteractablePreset.InteractionKey.none)
+                {
+                    return;
+                }
                 if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, true, entryIds);
@@ -108,6 +117,10 @@ namespace SOD.Common.Patches
                 }
                 InitializeActionsIfNecessary();
                 var interactionKey = GetInteractionKey(actionName);
+                if (interactionKey == InteractablePreset.InteractionKey.none)
+                {
+                    return;
+                }
                 if (!Lib.InputDetection.IsInputSuppressedByAnyPlugin(interactionKey, out var entryIds, out _))
                 {
                     Lib.InputDetection.ReportButtonStateChange(actionName, interactionKey, false, entryIds);
