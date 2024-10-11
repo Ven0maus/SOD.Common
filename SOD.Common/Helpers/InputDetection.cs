@@ -54,16 +54,11 @@ namespace SOD.Common.Helpers
             List<ActionElementMap> controllerMappings = KeyboardAndMouseMappings;
             try
             {
-                return controllerMappings.First(x => x.actionId == GetRewiredAction(interactionKey).id);
+                return controllerMappings.First(x => x.actionId == GetRewiredAction(interactionKey)?.id);
             }
             catch (InvalidOperationException)
             {
                 Plugin.Log.LogDebug($"Could not find action controller binding for interactionKey: {interactionKey}");
-                return null;
-            }
-            catch (NullReferenceException)
-            {
-                Plugin.Log.LogDebug($"Null reference exception for interactionKey: {interactionKey}");
                 return null;
             }
         }
@@ -173,7 +168,7 @@ namespace SOD.Common.Helpers
             }
 
             // Add modifier to dictionary to track
-            entry = new InputSuppressionEntry(key, keyCode, duration);
+            entry = new InputSuppressionEntry(callerGuid, keyCode, duration);
             InputSuppressionDictionary.Add(key, entry);
 
             // Start timer
