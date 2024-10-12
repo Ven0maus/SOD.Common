@@ -24,13 +24,16 @@ namespace SOD.Narcotics.AddictionCore.Addictions
                 var player = Player.Instance;
                 if (apply)
                 {
-                    // Apply mild positive effects
-                    player.SetMaxSpeed(player.movementWalkSpeed + 0.5f, player.movementRunSpeed + 0.5f);
+                    AddictionManager.StorePreviousPlayerDataValue("walkSpeed_mild", player.movementWalkSpeed);
+                    AddictionManager.StorePreviousPlayerDataValue("runSpeed_mild", player.movementRunSpeed);
+                    player.SetMaxSpeed(Helpers.ApplyPercentageChange(player.movementWalkSpeed, 0, false), 
+                        Helpers.ApplyPercentageChange(player.movementRunSpeed, 5, false));
                 }
                 else
                 {
-                    // Remove effects when addiction is not active or relieved
-                    player.SetMaxSpeed(player.movementWalkSpeed - 0.5f, player.movementRunSpeed - 0.5f);
+                    var walkSpeed = AddictionManager.GetPreviousPlayerDataValue("walkSpeed_mild");
+                    var runSpeed = AddictionManager.GetPreviousPlayerDataValue("runSpeed_mild");
+                    player.SetMaxSpeed(walkSpeed, runSpeed);
                 }
             };
         }
@@ -42,13 +45,16 @@ namespace SOD.Narcotics.AddictionCore.Addictions
                 var player = Player.Instance;
                 if (apply)
                 {
-                    // Apply mild positive effects
-                    player.SetMaxSpeed(player.movementWalkSpeed - 0.75f, player.movementRunSpeed - 0.75f);
+                    AddictionManager.StorePreviousPlayerDataValue("walkSpeed_severe", player.movementWalkSpeed);
+                    AddictionManager.StorePreviousPlayerDataValue("runSpeed_severe", player.movementRunSpeed);
+                    player.SetMaxSpeed(Helpers.ApplyPercentageChange(player.movementWalkSpeed, 5, false),
+                        Helpers.ApplyPercentageChange(player.movementRunSpeed, 15, false));
                 }
                 else
                 {
-                    // Remove effects when addiction is not active or relieved
-                    player.SetMaxSpeed(player.movementWalkSpeed + 0.75f, player.movementRunSpeed + 0.75f);
+                    var walkSpeed = AddictionManager.GetPreviousPlayerDataValue("walkSpeed_severe");
+                    var runSpeed = AddictionManager.GetPreviousPlayerDataValue("runSpeed_severe");
+                    player.SetMaxSpeed(walkSpeed, runSpeed);
                 }
             };
         }
@@ -60,13 +66,16 @@ namespace SOD.Narcotics.AddictionCore.Addictions
                 var player = Player.Instance;
                 if (apply)
                 {
-                    // Apply mild positive effects
-                    player.SetMaxSpeed(player.movementWalkSpeed - 0.75f, player.movementRunSpeed - 0.75f);
+                    AddictionManager.StorePreviousPlayerDataValue("walkSpeed_extreme", player.movementWalkSpeed);
+                    AddictionManager.StorePreviousPlayerDataValue("runSpeed_extreme", player.movementRunSpeed);
+                    player.SetMaxSpeed(Helpers.ApplyPercentageChange(player.movementWalkSpeed, 10, false),
+                        Helpers.ApplyPercentageChange(player.movementRunSpeed, 30, false));
                 }
                 else
                 {
-                    // Remove effects when addiction is not active or relieved
-                    player.SetMaxSpeed(player.movementWalkSpeed + 0.75f, player.movementRunSpeed + 0.75f);
+                    var walkSpeed = AddictionManager.GetPreviousPlayerDataValue("walkSpeed_extreme");
+                    var runSpeed = AddictionManager.GetPreviousPlayerDataValue("runSpeed_extreme");
+                    player.SetMaxSpeed(walkSpeed, runSpeed);
                 }
             };
         }

@@ -10,6 +10,7 @@ namespace SOD.Narcotics.AddictionCore
         public Dictionary<AddictionType, Addiction> Addictions { get; set; } = new();
         public Dictionary<AddictionType, float> AddictionMeters { get; set; } = new();
         public Dictionary<AddictionType, float> SusceptibilityFactors { get; set; } = new();
+        public Dictionary<string, float> PreviousPlayerDataValues { get; set; } = new();
         public int Index { get; set; }
         public uint[] Mt { get; set; }
 
@@ -27,6 +28,7 @@ namespace SOD.Narcotics.AddictionCore
             Dictionary<AddictionType, AddictionCore.Addiction> addictionDatas,
             Dictionary<AddictionType, float> susceptibilityFactors,
             Dictionary<AddictionType, float> addictionMeters,
+            Dictionary<string, float> previousPlayerDataValues,
             MersenneTwister random)
         {
             var saveData = new AddictionsSaveData();
@@ -48,6 +50,7 @@ namespace SOD.Narcotics.AddictionCore
             }
             saveData.SusceptibilityFactors = susceptibilityFactors;
             saveData.AddictionMeters = addictionMeters;
+            saveData.PreviousPlayerDataValues = previousPlayerDataValues;
             return saveData;
         }
     }

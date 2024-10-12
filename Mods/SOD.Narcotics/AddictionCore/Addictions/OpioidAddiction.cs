@@ -15,17 +15,56 @@ namespace SOD.Narcotics.AddictionCore.Addictions
 
         public override Action<bool> MildStageAction()
         {
-            return null;
+            return (apply) =>
+            {
+                var player = Player.Instance;
+                if (apply)
+                {
+                    AddictionManager.StorePreviousPlayerDataValue("recoveryRate_mild", player.recoveryRate);
+                    player.SetRecoveryRate(Helpers.ApplyPercentageChange(player.recoveryRate, 20, false));
+                }
+                else
+                {
+                    var recoveryRate = AddictionManager.GetPreviousPlayerDataValue("recoveryRate_mild");
+                    player.SetRecoveryRate(recoveryRate);
+                }
+            };
         }
 
         public override Action<bool> SevereStageAction()
         {
-            return null;
+            return (apply) =>
+            {
+                var player = Player.Instance;
+                if (apply)
+                {
+                    AddictionManager.StorePreviousPlayerDataValue("recoveryRate_severe", player.recoveryRate);
+                    player.SetRecoveryRate(Helpers.ApplyPercentageChange(player.recoveryRate, 40, false));
+                }
+                else
+                {
+                    var recoveryRate = AddictionManager.GetPreviousPlayerDataValue("recoveryRate_severe");
+                    player.SetRecoveryRate(recoveryRate);
+                }
+            };
         }
 
         public override Action<bool> ExtremeStageAction()
         {
-            return null;
+            return (apply) =>
+            {
+                var player = Player.Instance;
+                if (apply)
+                {
+                    AddictionManager.StorePreviousPlayerDataValue("recoveryRate_extreme", player.recoveryRate);
+                    player.SetRecoveryRate(Helpers.ApplyPercentageChange(player.recoveryRate, 60, false));
+                }
+                else
+                {
+                    var recoveryRate = AddictionManager.GetPreviousPlayerDataValue("recoveryRate_extreme");
+                    player.SetRecoveryRate(recoveryRate);
+                }
+            };
         }
     }
 }

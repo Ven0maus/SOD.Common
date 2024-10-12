@@ -32,23 +32,7 @@ namespace SOD.Narcotics.AddictionCore
 
         public void Initialize()
         {
-            // For loading, or creating new
-            if (AppliedStageEffects.Count > 0)
-            {
-                var currentStage = Stage;
-                var effects = AppliedStageEffects.ToArray();
-                AppliedStageEffects.Clear();
-                foreach (var effect in effects)
-                {
-                    Stage = effect;
-                    ApplyStageEffects();
-                }
-                Stage = currentStage;
-            }
-            else
-            {
-                ApplyStageEffects();
-            }
+            ApplyStageEffects();
         }
 
         public abstract Action<bool> MildStageAction();

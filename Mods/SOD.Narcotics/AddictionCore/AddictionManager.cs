@@ -16,6 +16,7 @@ namespace SOD.Narcotics.AddictionCore
         private readonly static Dictionary<AddictionType, Addiction> _addictions = new();
         private readonly static Dictionary<AddictionType, float> _addictionMeters = new();
         private readonly static Dictionary<AddictionType, float> _susceptibilityFactors = new();
+        private readonly static Dictionary<string, float> _previousPlayerDataValues = new();
 
         // Config loaded on plugin start
         private readonly static Dictionary<AddictionType, float> _addictionPotentials = new();
@@ -73,6 +74,10 @@ namespace SOD.Narcotics.AddictionCore
         public static void OnItemConsumed(AddictionType addictionType, float consumptionPercentage, float? itemPotency = null)
         {
             if (!_enabledAddictions.ContainsKey(addictionType)) return;
+
+            Plugin.Log.LogInfo("Recovery rate: " + Player.Instance.recoveryRate);
+            Plugin.Log.LogInfo("Max health: " + Player.Instance.maximumHealth);
+            Plugin.Log.LogInfo("Max nerve: " + Player.Instance.maxNerve);
 
             // Add all entries if missing
             if (!_addictionMeters.ContainsKey(addictionType))
@@ -157,16 +162,6 @@ namespace SOD.Narcotics.AddictionCore
             }
         }
 
-        private static float ApplyExponentialDecay(float addictionValue)
-        {
-            // Exponential decay: addictionValue * e^(-decayRate * timeElapsed)
-            // Since timeElapsed is 1 per in-game hour, we can simplify the formula
-            float newAddictionValue = addictionValue * (float)Math.Exp(-_hourlyAddictionRecoveryRate);
-
-            // Clamp to avoid negative values, just in case
-            return Math.Max(newAddictionValue, 0f);
-        }
-
         /// <summary>
         /// Inits configuration values so the manager can properly work.
         /// </summary>
@@ -196,13 +191,16 @@ namespace SOD.Narcotics.AddictionCore
         /// </summary>
         public static void Save(string filePath)
         {
-            if (_addictions.Count == 0 && _susceptibilityFactors.Count == 0 && _addictionMeters.Count == 0 && _random == null)
+            if (_addictions.Count == 0 && _susceptibilityFactors.Count == 0 && 
+                _addictionMeters.Count == 0 && _previousPlayerDataValues.Count == 0 && 
+                _random == null)
                 return;
 
             var saveData = AddictionsSaveData.Create(
                 _addictions,
                 _susceptibilityFactors,
-                _addictionMeters, 
+                _addictionMeters,
+                _previousPlayerDataValues,
                 _random);
             var jsonData = JsonSerializer.Serialize(saveData, new JsonSerializerOptions { WriteIndented = false });
 
@@ -246,6 +244,9 @@ namespace SOD.Narcotics.AddictionCore
             foreach (var entry in saveData.AddictionMeters)
                 _addictionMeters[entry.Key] = entry.Value;
 
+            foreach (var entry in saveData.PreviousPlayerDataValues)
+                _previousPlayerDataValues[entry.Key] = entry.Value;
+
             if (saveData.Mt != null)
                 _random = new MersenneTwister((saveData.Index, saveData.Mt));
 
@@ -254,7 +255,6 @@ namespace SOD.Narcotics.AddictionCore
                 _addictions[entry.Key] = AddictionFactory.Get(entry.Value.AddictionType);
                 _addictions[entry.Key].AppliedStageEffects = entry.Value.AppliedStageEffects.ToHashSet();
                 _addictions[entry.Key].Stage = entry.Value.Stage;
-                _addictions[entry.Key].Initialize();
             }
 
             Plugin.Log.LogInfo("Addictions save data has been loaded.");
@@ -266,6 +266,27 @@ namespace SOD.Narcotics.AddictionCore
             _addictionMeters.Clear();
             _susceptibilityFactors.Clear();
             _random = null;
+        }
+
+        public static void StorePreviousPlayerDataValue(string key, float value)
+        {
+            _previousPlayerDataValues[key] = value;
+        }
+
+        public static float GetPreviousPlayerDataValue(string key)
+        {
+            return _previousPlayerDataValues.TryGetValue(key, out var value) ? value : 
+                throw new Exception($"No previous value for entry \"{key}\" exists.");
+        }
+
+        private static float ApplyExponentialDecay(float addictionValue)
+        {
+            // Exponential decay: addictionValue * e^(-decayRate * timeElapsed)
+            // Since timeElapsed is 1 per in-game hour, we can simplify the formula
+            float newAddictionValue = addictionValue * (float)Math.Exp(-_hourlyAddictionRecoveryRate);
+
+            // Clamp to avoid negative values, just in case
+            return Math.Max(newAddictionValue, 0f);
         }
 
         private static Addiction GetAddiction(AddictionType addictionType)
