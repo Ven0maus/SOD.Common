@@ -89,7 +89,7 @@ namespace SOD.Narcotics.Patches
                         var consumedPercentage = leftOverPercentage - (__state.Interactable.cs / __state.RemainingAmount);
                         __state.RemainingAmount = __state.Interactable.cs;
 
-                        var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(__state.Interactable);
+                        var addictionInfo = AddictionFactory.GetAddictionTypeAndPotency(__state.Interactable);
                         if (addictionInfo != null)
                             AddictionManager.OnItemConsumed(addictionInfo.Value.addictionType, consumedPercentage, addictionInfo.Value.potency);
                     }

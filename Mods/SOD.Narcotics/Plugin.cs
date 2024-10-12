@@ -64,7 +64,7 @@ namespace SOD.Narcotics
         {
             if (e.preset == null || e.preset.retailItem == null) return;
 
-            var addictionInfo = AddictionManager.GetAddictionTypeAndPotency(e);
+            var addictionInfo = AddictionFactory.GetAddictionTypeAndPotency(e);
             if (addictionInfo != null)
                 AddictionManager.OnItemConsumed(addictionInfo.Value.addictionType, 1f, addictionInfo.Value.potency);
         }
