@@ -296,12 +296,33 @@ namespace SOD.Common.Helpers
             if (interactionKey == InteractablePreset.InteractionKey.none)
                 throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
 
-            var entries = FindInputSuppressionEntries(entry => entry.InteractionKey == interactionKey || IsOverlappingEntryForInteractionKey(entry, interactionKey));
-            foreach (var (key, value) in entries)
-            {
-                value.Stop();
-                InputSuppressionDictionary.Remove(key);
-            }
+            RemoveInputSuppression(entry => entry.InteractionKey == interactionKey || IsOverlappingEntryForInteractionKey(entry, interactionKey));
+        }
+
+        /// <summary>
+        /// Stops and removes matching input suppression entries, if present. Limits removal to entries added by the plugin with the matching guid.
+        /// </summary>
+        /// <param name="pluginGuid">The guid of the plugin.</param>
+        /// <param name="keyCode">The KeyCode to search for.</param>
+        public void RemoveInputSuppression(string pluginGuid, KeyCode keyCode)
+        {
+            if (keyCode == KeyCode.None)
+                throw new ArgumentException("KeyCode cannot be none.", nameof(keyCode));
+
+            RemoveInputSuppression(entry => entry.KeyCode == keyCode && entry.CallerGuid == pluginGuid);
+        }
+
+        /// <summary>
+        /// Stops and removes matching input suppression entries, if present. Limits removal to entries added by the plugin with the matching guid.
+        /// </summary>
+        /// <param name="pluginGuid">The guid of the plugin.</param>
+        /// <param name="interactionKey">The interaction to search for.</param>
+        public void RemoveInputSuppression(string pluginGuid, InteractablePreset.InteractionKey interactionKey)
+        {
+            if (interactionKey == InteractablePreset.InteractionKey.none)
+                throw new ArgumentException("InteractionKey cannot be none.", nameof(interactionKey));
+
+            RemoveInputSuppression(entry => (entry.InteractionKey == interactionKey || IsOverlappingEntryForInteractionKey(entry, interactionKey)) && entry.CallerGuid == pluginGuid);
         }
 
         /// <summary>
