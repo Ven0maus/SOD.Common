@@ -63,6 +63,16 @@
         "bin\\Release\\net6.0\\SOD.RelationsPlus.dll"
       ],
       "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods",
+      "ProjectName": "SOD.ThreatOverhaul",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "ExtraFiles": [
+        "bin\\Release\\net6.0\\SOD.ThreatOverhaul.dll"
+      ],
+      "Package": true
     }
   ]
 }
