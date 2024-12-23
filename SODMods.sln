@@ -28,6 +28,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.LethalActionReborn", "M
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.RelationsPlus", "Mods\SOD.RelationsPlus\SOD.RelationsPlus.csproj", "{CEA1F0B1-F666-4B91-A679-526DDDE967F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.ThreatOverhaul", "Mods\SOD.ThreatOverhaul\SOD.ThreatOverhaul.csproj", "{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,6 +64,10 @@ Global
 		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CEA1F0B1-F666-4B91-A679-526DDDE967F4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -74,6 +80,7 @@ Global
 		{093E8556-E4D7-44C9-B428-E80BCAE8BCBC} = {D6470792-AB41-40B1-B029-4E67A5D91F1C}
 		{97ECAA26-E721-407C-8C08-A38DA65B4766} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 		{CEA1F0B1-F666-4B91-A679-526DDDE967F4} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
+		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92CC1827-8FE6-4E8C-8518-DE8D0EAEE515}
