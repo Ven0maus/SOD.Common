@@ -24,6 +24,7 @@ namespace SOD.Common.Patches
                     MethodInfo warnNotewriterMI = null;
                     foreach (var dialogPreset in Toolbox.Instance.allDialog)
                     {
+                        if (dialogPreset == null || string.IsNullOrEmpty(dialogPreset.name)) continue;
                         if (dialogPreset.name == "WarnNotewriter")
                         {
                             warnNotewriterMI = __instance.dialogRef[dialogPreset];
