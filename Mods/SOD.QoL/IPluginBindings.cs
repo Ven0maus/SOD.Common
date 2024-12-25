@@ -2,7 +2,7 @@
 
 namespace SOD.QoL
 {
-    public interface IPluginBindings : IConversationBindings, IMainMenuBindings, IMapBindings, IGameplayPatchBindings
+    public interface IPluginBindings : IConversationBindings, IMainMenuBindings, IMapBindings, IGameplayPatchBindings, IJobExpirationBindings
     { }
 
     public interface IGameplayPatchBindings
@@ -12,6 +12,21 @@ namespace SOD.QoL
 
         [Binding(12, "The percentage that is taken of alertness and added to energy restore for caffeine items. (12 seems balanced)", "QoL.Gameplay.PercentageEnergyRestore")]
         int PercentageEnergyRestore { get; set; }
+    }
+
+    public interface IJobExpirationBindings
+    {
+        [Binding(true, "Side jobs and LostAndFound jobs will automatically expire after some in-game hours to prevent stale evidence. (accepted side jobs are excluded)", "QoL.Gameplay.AutoExpireJobs")]
+        bool AutoExpireJobs { get; set; }
+
+        [Binding(true, "Should the expire time be randomized for more immersion in the game world? (If false, it will take ExpireTimeMax)", "QoL.Gameplay.RandomizeExpireTime")]
+        bool RandomizeExpireTime { get; set; }
+
+        [Binding(24, "The minimum time for expiration to occur.", "QoL.Gameplay.ExpireTimeMin")]
+        int ExpireTimeMin { get; set; }
+
+        [Binding(48, "The maximum time for expiration to occur.", "QoL.Gameplay.ExpireTimeMax")]
+        int ExpireTimeMax { get; set; }
     }
 
     public interface IConversationBindings
