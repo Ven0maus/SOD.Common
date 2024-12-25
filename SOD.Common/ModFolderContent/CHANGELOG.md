@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.7**
+- Null reference fix in DialogController.Start postfix
+
 **2.0.6**
 - Removed TryCast extension as it was interfering with universelib
 - [Compatibility fix] Sync disk helper now works again on main branch

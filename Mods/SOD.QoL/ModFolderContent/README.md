@@ -6,6 +6,7 @@
 - Map is by default zoomed out
 - PlayerMarker is now slightly larger and green (customizable)
 - Skips the "press any key" screen at start game, immediately loading the mainmenu
+- Automatically expire Side jobs and LostAndFound items after some hours to prevent stale evidence from accumulating. (accepted side jobs are excluded)
 
 **Bugfixes**
 - Center on player button now properly zooms in to the player after zooming and moving camera
