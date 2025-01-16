@@ -13,11 +13,13 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             [HarmonyPostfix]
             internal static void Postfix(BuyInterfaceController __instance)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 var value = __instance.spawned;
 
                 var isIllegal = __instance.company != null && __instance.company.preset.enableSellingOfIllegalItems;
                 var maxSellPriceGeneral = Plugin.Instance.Config.MaxSellPriceAllItemsGeneral;
                 var maxSellPriceBlackMarket = Plugin.Instance.Config.MaxSellPriceAllItemsBlackMarket;
+                var disablePriceClamping = Plugin.Instance.Config.DisableSellPriceClamping;
 
                 bool updates = false;
                 int count = 0;
@@ -28,7 +30,8 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                     {
                         var prev = component.price;
 
-                        component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
+                        if (!disablePriceClamping)
+                            component.price = Math.Min(component.price, isIllegal ? maxSellPriceBlackMarket : maxSellPriceGeneral);
                         if (prev != component.price)
                         {
                             component.UpdateButtonText();

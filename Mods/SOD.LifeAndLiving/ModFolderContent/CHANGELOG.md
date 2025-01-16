@@ -1,4 +1,14 @@
 # CHANGELOG
+**V3.0.1**
+Added following configuration options under the "General" section:
+- DisableEconomyRebalance : (default false)
+- DisableSocialRelations : (default false)
+- DisableImmersiveRequirements : (default false)
+- DisableExtraSyncDisks : (default false)
+
+Added following configuration option under the "LifeAndLiving.Shops" section:
+- DisableSellPriceClamping : (default false)
+
 **V3.0.0**
 - Fixed method not found for "TheUsualDialog"
 - Updated RelationsPlus dependency to the latest version

@@ -15,6 +15,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             {
                 if (_appliedOnce) return;
                 _appliedOnce = true;
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
 
                 ReduceMurderPayouts(__instance);
             }

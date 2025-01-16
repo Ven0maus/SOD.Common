@@ -24,6 +24,7 @@ namespace SOD.LifeAndLiving.Patches.ImmersiveRequirementPatches
                 if (__instance.preset == null || string.IsNullOrWhiteSpace(__instance.preset.presetName) || !__instance.preset.presetName.Equals("AirVent")) return;
                 if (action == null || who == null || !who.isPlayer || !Plugin.Instance.Config.RequireScrewdriverForVents) return;
                 if (!action.interactionName.Equals("Open") && !action.interactionName.Equals("Close")) return;
+                if (Plugin.Instance.Config.DisableImmersiveRequirements) return;
 
                 // We are opening or closing an airvent
                 _attemptOpenOrCloseAirVent = true;

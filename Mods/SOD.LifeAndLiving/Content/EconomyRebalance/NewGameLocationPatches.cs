@@ -19,6 +19,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             [HarmonyPostfix]
             internal static void Postfix(NewGameLocation __instance, ref int __result)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 var key = __instance.building.buildingID + "_" + __instance.residenceNumber;
                 if (ApartementPriceCache.TryGetValue(key, out int newValue))
                 {

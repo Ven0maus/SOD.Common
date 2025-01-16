@@ -19,6 +19,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             [HarmonyPostfix]
             internal static void Postfix()
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 var currentLockpicks = GameplayController.Instance.lockPicks;
                 var differenceLockpicks = currentLockpicks - _previousLockPicks;
 

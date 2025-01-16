@@ -12,6 +12,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             internal static void Prefix(Interactable __instance)
             {
                 if (__instance.preset == null) return;
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
 
                 var moneyPresets = new Dictionary<string, int>
                 {
