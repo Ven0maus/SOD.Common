@@ -16,6 +16,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
             [HarmonyPrefix]
             internal static void Prefix(NewBuilding __instance)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 // Store the original (before modification)
                 _lostAndFound = __instance.lostAndFound.AsEnumerable()
                     .Select(a => HashCode.Combine(a.ownerID, a.buildingID, a.spawnedItem, a.rewardMoney))
@@ -25,6 +26,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
             [HarmonyPostfix]
             internal static void Postfix(NewBuilding __instance)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 // This reduces the amount that is eventually paid out
                 var reductionPercentage = Plugin.Instance.Config.PayoutReductionLostItems;
                 int count = 0;

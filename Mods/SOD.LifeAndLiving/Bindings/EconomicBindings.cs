@@ -108,6 +108,9 @@ namespace SOD.LifeAndLiving.Bindings.EconomicBindings
 
         [Binding(200, "The max price an item can be sold for in blackmarket. (diamond excluded)", "LifeAndLiving.Shops.MaxSellPriceAllItemsBlackMarket")]
         public int MaxSellPriceAllItemsBlackMarket { get; set; }
+
+        [Binding(false, "Should the max selling price clamp be disabled? Max price defined by \"MaxSellPriceAllItemsGeneral\" and \"MaxSellPriceAllItemsBlackMarket\" (diamond excluded)", "LifeAndLiving.Shops.DisableSellPriceClamping")]
+        public bool DisableSellPriceClamping { get; set; }
     }
 
     public interface IItemPriceBindings
