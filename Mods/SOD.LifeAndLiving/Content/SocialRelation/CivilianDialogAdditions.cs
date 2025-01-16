@@ -6,6 +6,7 @@ namespace SOD.LifeAndLiving.Content.SocialRelation
     {
         public static void Initialize()
         {
+            if (Plugin.Instance.Config.DisableSocialRelations) return;
             TheUsualDialog.Register();
         }
     }

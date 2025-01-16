@@ -17,6 +17,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             {
                 if (_appliedOnce) return;
                 _appliedOnce = true;
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
 
                 // Reduces job payouts from rewards by a percentage
                 ReduceJobPayouts(__instance);

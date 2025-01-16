@@ -19,7 +19,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
 
         internal static void Initialize() 
         {
-            if (!Plugin.Instance.Config.IncludeEcholocationSyncDisk) return;
+            if (Plugin.Instance.Config.DisableExtraSyncDisks || !Plugin.Instance.Config.IncludeEcholocationSyncDisk) return;
 
             // Read color from config
             try

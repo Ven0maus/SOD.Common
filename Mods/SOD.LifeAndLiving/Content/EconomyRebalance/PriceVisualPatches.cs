@@ -11,6 +11,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             [HarmonyPostfix]
             internal static void Postfix(MurderController __instance)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 if (__instance.currentActiveCase == null) return;
 
                 // This will remove the 50 incrementals from reward and penalty
@@ -28,6 +29,7 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             [HarmonyPostfix]
             internal static void Postfix(SideJob __instance)
             {
+                if (Plugin.Instance.Config.DisableEconomyRebalance) return;
                 // This will remove the 50 incrementals from reward and penalty
                 __instance.reward = 0;
                 foreach (var resolveQuestion in __instance.resolveQuestions)
