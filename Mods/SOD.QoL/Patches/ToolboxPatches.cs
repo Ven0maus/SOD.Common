@@ -25,6 +25,17 @@ namespace SOD.QoL.Patches
                         }
                     }
                 }
+
+                if (Plugin.Instance.Config.AddWalletLinkToAddress)
+                {
+                    if (Toolbox.Instance.evidencePresetDictionary.TryGetValue("wallet", out var walletPreset))
+                    {
+                        if (walletPreset.keyMergeOnDiscovery.Count > 0 && walletPreset.keyMergeOnDiscovery[0].mergeKeys != null)
+                        {
+                            walletPreset.keyMergeOnDiscovery[0].mergeKeys.Add(Evidence.DataKey.address);
+                        }
+                    }
+                }
             }
         }
     }
