@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.6**
+- Added an evidence link from the wallet to the address
+
 **1.1.5**
 - Side jobs and LostAndFound items will now automatically expire after some hours to prevent stale evidence from accumulating. (accepted side jobs are excluded)
 (hours is by default a random value between 24 and 48, which can be configured)

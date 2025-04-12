@@ -12,6 +12,9 @@ namespace SOD.QoL
 
         [Binding(12, "The percentage that is taken of alertness and added to energy restore for caffeine items. (12 seems balanced)", "QoL.Gameplay.PercentageEnergyRestore")]
         int PercentageEnergyRestore { get; set; }
+
+        [Binding(true, "Adds a link to the address from the wallet.", "QoL.Gameplay.AddWalletLinkToAddress")]
+        bool AddWalletLinkToAddress { get; set; }
     }
 
     public interface IJobExpirationBindings
