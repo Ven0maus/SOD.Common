@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.8**
+- Fix issues with sync disk helper not re-initializing sync disk preset on load
+
 **2.0.7**
 - Null reference fix in DialogController.Start postfix
 
