@@ -13,16 +13,11 @@ namespace SOD.Common.Patches
         [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.LoadAll))]
         internal static class Toolbox_LoadAll
         {
-            private static bool _loaded = false;
-
             [HarmonyPostfix]
             internal static void Postfix()
             {
                 // This should happen each time the toolbox is loaded.
                 LoadDDSEntries();
-
-                if (_loaded) return;
-                _loaded = true;
 
                 var sprites = Lib.SyncDisks.RegisteredSyncDisks
                     .SelectMany(a => a.Icons)
@@ -56,9 +51,6 @@ namespace SOD.Common.Patches
 
                 if (Lib.SyncDisks.RegisteredSyncDisks.Count > 0)
                     Plugin.Log.LogInfo($"Loaded {Lib.SyncDisks.RegisteredSyncDisks.Count} custom sync disks.");
-
-                // Clear out memory usage for icons as its no longer used
-                Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.Icons = null);
 
                 // Set sync disk numbers
                 var total = Toolbox.Instance.allSyncDisks.Count;
@@ -111,9 +103,6 @@ namespace SOD.Common.Patches
                             menu.syncDisks.Add(syncDiskPreset);
                     }
                 }
-
-                // Remove the memory usage of this, no longer needed
-                Lib.SyncDisks.RegisteredSyncDisks.ForEach(a => a.MenuPresetLocations = null);
             }
 
             /// <summary>
