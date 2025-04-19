@@ -15,6 +15,9 @@ namespace SOD.QoL
 
         [Binding(true, "Adds a link to the address from the wallet.", "QoL.Gameplay.AddWalletLinkToAddress")]
         bool AddWalletLinkToAddress { get; set; }
+
+        [Binding(true, "Adds a link to the address from the employment contract.", "QoL.Gameplay.AddEmploymentContractLinkToAddress")]
+        bool AddEmploymentContractLinkToAddress { get; set; }
     }
 
     public interface IJobExpirationBindings

@@ -13,7 +13,7 @@ namespace SOD.QoL
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.QoL";
         public const string PLUGIN_NAME = "QoL";
-        public const string PLUGIN_VERSION = "1.1.6";
+        public const string PLUGIN_VERSION = "1.1.7";
 
         internal static Random Random { get; } = new Random(1337);
 
