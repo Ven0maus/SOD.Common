@@ -34,6 +34,21 @@ namespace SOD.QoL.Patches
                         {
                             walletPreset.keyMergeOnDiscovery[0].mergeKeys.Add(Evidence.DataKey.address);
                         }
+                        walletPreset.addFactLinks.Add(new EvidencePreset.FactLinkSetup
+                        {
+                            discovery = true,
+                            factDictionary = "LivesAt",
+                            subject = EvidencePreset.FactLinkSubject.writer,
+                            key = Evidence.DataKey.name
+                        });
+                    }
+                }
+
+                if (Plugin.Instance.Config.EmploymentContractLinksResidence) {
+                    if (Toolbox.Instance.evidencePresetDictionary.TryGetValue("employmentcontract",
+                            out var employmentContractPreset))
+                    {
+                        employmentContractPreset.addFactLinks[0].subject = EvidencePreset.FactLinkSubject.writer;
                     }
                 }
             }
