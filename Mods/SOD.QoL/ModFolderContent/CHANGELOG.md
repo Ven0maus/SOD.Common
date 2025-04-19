@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.7**
+- Added an evidence link from the employmentcontract to the address
+
 **1.1.6**
 - Added an evidence link from the wallet to the address
 
