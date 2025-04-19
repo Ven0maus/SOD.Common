@@ -43,6 +43,14 @@ namespace SOD.QoL.Patches
                         });
                     }
                 }
+
+                if (Plugin.Instance.Config.EmploymentContractLinksResidence) {
+                    if (Toolbox.Instance.evidencePresetDictionary.TryGetValue("employmentcontract",
+                            out var employmentContractPreset))
+                    {
+                        employmentContractPreset.addFactLinks[0].subject = EvidencePreset.FactLinkSubject.writer;
+                    }
+                }
             }
         }
     }
