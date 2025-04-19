@@ -44,7 +44,8 @@ namespace SOD.QoL.Patches
                     }
                 }
 
-                if (Plugin.Instance.Config.EmploymentContractLinksResidence) {
+                if (Plugin.Instance.Config.AddEmploymentContractLinkToAddress) 
+                {
                     if (Toolbox.Instance.evidencePresetDictionary.TryGetValue("employmentcontract",
                             out var employmentContractPreset))
                     {
