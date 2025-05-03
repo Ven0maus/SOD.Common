@@ -67,7 +67,15 @@ namespace SOD.Common.Helpers
                 true,
                 0f,
                 true,
-                Color.white
+                Color.white,
+                null,
+                false,
+                false,
+                null,
+                null,
+                null,
+                null, 
+                null
             );
             UniverseLib.RuntimeHelper.StartCoroutine(
                 ShowPlayerSpeechWaitForBubble(message, durationSec)
