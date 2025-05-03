@@ -78,12 +78,11 @@ namespace SOD.LifeAndLiving.Content.SocialRelation.Dialogs
                 if (_item.Price > 0)
                 {
                     GameplayController.Instance.AddMoney(-_item.Price, false, "Purchase");
-                    saysTo.speechController.Speak("dds.blocks", _item.Discount ?
-                        _positiveDiscountResponse.ToString() : _positiveResponse.ToString(), endsDialog: true);
+                    Lib.Dialogs.Speak(saysTo, _item.Discount ? _positiveDiscountResponse : _positiveResponse, true);
                 }
                 else if (_item.Price == 0)
                 {
-                    saysTo.speechController.Speak("dds.blocks", _positiveFreeResponse.ToString(), endsDialog: true);
+                    Lib.Dialogs.Speak(saysTo, _positiveFreeResponse, true);
                 }
 
                 // New prevent loitering

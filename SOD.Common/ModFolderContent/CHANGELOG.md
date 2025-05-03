@@ -1,4 +1,8 @@
 # CHANGELOG
+**2.1.0**
+- Added two new Lib.Dialog.Speak variants to improve accessibility to citizen speak
+- Removed two overloads of method AddCustomResponse in DialogBuilder that were pointless
+
 **2.0.9**
 - Fixed SpeechController.Speak missing method exception introduced in new game update
 

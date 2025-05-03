@@ -97,25 +97,7 @@ namespace SOD.Common.Helpers.DialogObjects
 
         /// <summary>
         /// Add's a new custom response that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(messageId);"</br>
-        /// </summary>
-        /// <param name="text"></param>
-        /// <param name="messageId">The guid that you generate, so you can trigger it yourself.</param>
-        public DialogBuilder AddCustomResponse(string text, Guid messageId)
-            => AddResponse(new DialogResponse(messageId, text, null));
-
-        /// <summary>
-        /// Add's a new custom response that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(messageId);"</br>
-        /// </summary>
-        /// <param name="textGetter"></param>
-        /// <param name="messageId">The guid that you generate, so you can trigger it yourself.</param>
-        public DialogBuilder AddCustomResponse(Func<string> textGetter, Guid messageId)
-            => AddResponse(new DialogResponse(messageId, null, textGetter));
-
-        /// <summary>
-        /// Add's a new custom response that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(dictionary, entryRef, ..);", you must pass "dds.blocks" as dictionary and the blockId as entryRef.</br>
+        /// <br>Example of triggering it: "Lib.Dialog.Speak(citizen, blockId, endsDialog);"</br>
         /// </summary>
         /// <param name="text"></param>
         /// <param name="blockId">The guid for the specific block of this message.</param>
@@ -129,7 +111,7 @@ namespace SOD.Common.Helpers.DialogObjects
 
         /// <summary>
         /// Add's a new custom response that can only be triggered by code.
-        /// <br>Example of triggering it: "citizen.speechController.Speak(dictionary, entryRef, ..);", you must pass "dds.blocks" as dictionary and the blockId as entryRef.</br>
+        /// <br>Example of triggering it: "Lib.Dialog.Speak(citizen, blockId, endsDialog);"</br>
         /// </summary>
         /// <param name="textGetter"></param>
         /// <param name="blockId">The guid for the specific block of this message.</param>
