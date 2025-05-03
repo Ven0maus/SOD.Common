@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.0.9**
+- Fixed SpeechController.Speak missing method exception introduced in new game update
+
 **2.0.8**
 - Fix issues with sync disk helper not re-initializing sync disk preset on load
 
