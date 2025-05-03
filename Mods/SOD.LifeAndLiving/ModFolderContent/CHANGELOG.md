@@ -1,4 +1,7 @@
 # CHANGELOG
+**V3.0.2**
+- Fixed The Usual Dialog not working since last game update
+
 **V3.0.1**
 Added following configuration options under the "General" section:
 - DisableEconomyRebalance : (default false)

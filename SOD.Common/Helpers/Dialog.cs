@@ -1,4 +1,5 @@
 ﻿using SOD.Common.Helpers.DialogObjects;
+using System;
 using System.Collections.Generic;
 
 namespace SOD.Common.Helpers
@@ -29,6 +30,55 @@ namespace SOD.Common.Helpers
         public DialogBuilder Builder(string dialogName = null)
         {
             return new DialogBuilder(dialogName);
+        }
+
+        /// <summary>
+        /// Force a citizen to say a specific dds entry from a dialog.
+        /// </summary>
+        /// <param name="citizen"></param>
+        /// <param name="ddsEntryRef"></param>
+        /// <param name="endsDialog"></param>
+        public void Speak(Citizen citizen, Guid blockId, bool endsDialog)
+        {
+            SpeakInternal(citizen, blockId.ToString(), endsDialog);
+        }
+
+        /// <summary>
+        /// Force a citizen to say a specific text string.
+        /// </summary>
+        /// <param name="citizen"></param>
+        /// <param name="customText"></param>
+        /// <param name="endsDialog"></param>
+        public void Speak(Citizen citizen, string customText, bool endsDialog)
+        {
+            // Get unique code for the text value
+            var fnv = Lib.SaveGame.GetUniqueString(customText);
+
+            // Add to dds cache
+            if (!Lib.DdsStrings.Exists("dds.blocks", fnv))
+                Lib.DdsStrings["dds.blocks", fnv] = customText;
+
+            SpeakInternal(citizen, fnv, endsDialog);
+        }
+
+        private static void SpeakInternal(Citizen citizen, string blockId, bool endsDialog)
+        {
+            citizen.speechController.Speak("dds.blocks", blockId,
+                false,
+                false,
+                true,
+                0f,
+                false,
+                default,
+                null,
+                false,
+                false,
+                null,
+                null,
+                null,
+                null,
+                null
+            );
         }
     }
 }
