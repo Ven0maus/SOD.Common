@@ -37,6 +37,9 @@ namespace SOD.Common.Helpers
                 col: color.Value,
                 newMessageDelay: delay
             );
+
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Broadcasted message \"{message}\".");
         }
 
         private readonly HashSet<string> _queuedPlayerSpeechMessages = new(StringComparer.OrdinalIgnoreCase);
@@ -80,6 +83,9 @@ namespace SOD.Common.Helpers
             UniverseLib.RuntimeHelper.StartCoroutine(
                 ShowPlayerSpeechWaitForBubble(message, durationSec)
             );
+
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Showed player speech message \"{message}\".");
         }
 
         private IEnumerator ShowPlayerSpeechWaitForBubble(string message, float durationSec)

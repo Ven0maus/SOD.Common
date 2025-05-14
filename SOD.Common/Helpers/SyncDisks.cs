@@ -240,6 +240,9 @@ namespace SOD.Common.Helpers
                             disks1.Add(new InstalledSyncDiskData(installArgs.SyncDisk.Preset.name, installArgs.Effect.Value.Name));
                         }
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Installed sync disk upgrade \"{installArgs.SyncDisk.Preset.name}\" | effect: \"{installArgs.Effect.Value.Name}\".");
                     break;
                 case SyncDiskEvent.OnUninstall:
                     var uninstallArgs = new SyncDiskArgs(upgrade, true, false);
@@ -270,6 +273,9 @@ namespace SOD.Common.Helpers
                         if (disks2.Count == 0)
                             InstalledSyncDisks.Remove(uninstallArgs.SyncDisk.Preset.name);
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Uninstalled sync disk upgrade \"{uninstallArgs.SyncDisk.Preset.name}\" | effect: \"{uninstallArgs.Effect.Value.Name}\".");
                     break;
                 case SyncDiskEvent.OnUpgrade:
                     var upgradeArgs = new SyncDiskArgs(upgrade);
@@ -297,6 +303,9 @@ namespace SOD.Common.Helpers
 
                         cEffect.UpgradeOptions.Add(upgradeArgs.UpgradeOption.Value.Name);
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Upgraded sync disk \"{upgradeArgs.SyncDisk.Preset.name}\" | effect: \"{upgradeArgs.UpgradeOption.Value.Name}\".");
                     break;
                 default:
                     throw new NotSupportedException($"Invalid event: {syncDiskEvent}");

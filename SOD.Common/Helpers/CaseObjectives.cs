@@ -47,12 +47,18 @@ namespace SOD.Common.Helpers
             switch(@event)
             {
                 case Event.ObjectiveCreated:
+                    if (Plugin.InDebugMode && isCustom)
+                        Plugin.Log.LogInfo($"[DebugMode]: Objective Created: {objective.queueElement?.entryRef}");
                     OnObjectiveCreated?.Invoke(this, new ObjectiveArgs(objective, isCustom));
                     break;
                 case Event.ObjectiveCompleted:
+                    if (Plugin.InDebugMode && isCustom)
+                        Plugin.Log.LogInfo($"[DebugMode]: Objective Completed: {objective.queueElement?.entryRef}");
                     OnObjectiveCompleted?.Invoke(this, new ObjectiveArgs(objective, isCustom));
                     break;
                 case Event.ObjectiveCanceled:
+                    if (Plugin.InDebugMode && isCustom)
+                        Plugin.Log.LogInfo($"[DebugMode]: Objective Canceled: {objective.queueElement?.entryRef}");
                     OnObjectiveCanceled?.Invoke(this, new ObjectiveArgs(objective, isCustom));
                     break;
             }

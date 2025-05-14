@@ -55,6 +55,58 @@ namespace SOD.Common.Patches
             }
         }
 
+        [HarmonyPatch(typeof(MurderController), nameof(MurderController.PickNewMurderer))]
+        internal class MurderController_PickNewMurderer
+        {
+            [HarmonyPrefix]
+            internal static void Prefix(MurderController __instance, ref Human __state)
+            {
+                // Previous human
+                __state = __instance.currentMurderer;
+            }
+
+            [HarmonyPostfix]
+            internal static void Postfix(MurderController __instance, ref Human __state)
+            {
+                var previous = __state;
+                var @new = __instance.currentMurderer;
+
+                if (@new == null || @new.humanID <= 0 || previous.humanID == @new.humanID)
+                {
+                    // Unable to pick new human
+                    return;
+                }
+
+                Lib.Gameplay.MurdererPicked(previous, @new);
+            }
+        }
+
+        [HarmonyPatch(typeof(MurderController), nameof(MurderController.PickNewVictim))]
+        internal class MurderController_PickNewVictim
+        {
+            [HarmonyPrefix]
+            internal static void Prefix(MurderController __instance, ref Human __state)
+            {
+                // Previous human
+                __state = __instance.currentVictim;
+            }
+
+            [HarmonyPostfix]
+            internal static void Postfix(MurderController __instance, ref Human __state)
+            {
+                var previous = __state;
+                var @new = __instance.currentVictim;
+
+                if (@new == null || @new.humanID <= 0 || previous.humanID == @new.humanID)
+                {
+                    // Unable to pick new human
+                    return;
+                }
+
+                Lib.Gameplay.VictimPicked(previous, @new);
+            }
+        }
+
         [HarmonyPatch(typeof(FirstPersonItemController), nameof(FirstPersonItemController.PickUpItem))]
         internal class FirstPersonItemController_PickUpItem
         {

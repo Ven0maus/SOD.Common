@@ -48,10 +48,18 @@ namespace SOD.Common.Helpers
                     {
                         if (value == null)
                         {
+                            if (Plugin.InDebugMode)
+                                Plugin.Log.LogInfo($"[DebugMode]: Removed dds strings entry: (dict: \"{dictionaryLower}\" | key: \"{keyLower}\")");
+
                             table.Remove(keyLower);
                             if (table.Count == 0)
                                 Strings.stringTable.Remove(dictionaryLower);
                             return;
+                        }
+                        else
+                        {
+                            if (Plugin.InDebugMode)
+                                Plugin.Log.LogInfo($"[DebugMode]: Updated dds strings entry: (dict: \"{dictionaryLower}\" | key: \"{keyLower}\" | value: \"{value}\")");
                         }
                         ddsString.displayStr = value;
                     }
@@ -63,15 +71,23 @@ namespace SOD.Common.Helpers
                                 Strings.stringTable.Remove(dictionaryLower);
                             return;
                         }
+
+                        if (Plugin.InDebugMode)
+                            Plugin.Log.LogInfo($"[DebugMode]: Added dds strings entry: (dict: \"{dictionaryLower}\" | key: \"{keyLower}\" | value: \"{value}\")");
+
                         table[keyLower] = new Strings.DisplayString() { displayStr = value };
                     }
                 }
                 else
                 {
                     if (value == null) return;
+
                     var dict = new Il2CppSystem.Collections.Generic.Dictionary<string, Strings.DisplayString>();
                     dict.Add(keyLower, new Strings.DisplayString { displayStr = value });
                     Strings.stringTable.Add(dictionaryLower, dict);
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Added dds strings entry: (dict: \"{dictionaryLower}\" | key: \"{keyLower}\" | value: \"{value}\")");
                 }
             }
         }

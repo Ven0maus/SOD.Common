@@ -12,6 +12,8 @@ namespace SOD.Common
         public const string PLUGIN_NAME = "SOD.Common";
         public const string PLUGIN_VERSION = "2.1.0";
 
+        internal static bool InDebugMode => Instance != null && Instance.Config.DebugMode;
+
         public override void Load()
         {
             // Init universe lib
