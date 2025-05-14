@@ -71,7 +71,7 @@ namespace SOD.Common.Patches
                 var previous = __state;
                 var @new = __instance.currentMurderer;
 
-                if (@new == null || @new.humanID <= 0 || previous.humanID == @new.humanID)
+                if (@new == null || @new.humanID <= 0 || (previous != null && previous.humanID == @new.humanID))
                 {
                     // Unable to pick new human
                     return;
@@ -97,7 +97,7 @@ namespace SOD.Common.Patches
                 var previous = __state;
                 var @new = __instance.currentVictim;
 
-                if (@new == null || @new.humanID <= 0 || previous.humanID == @new.humanID)
+                if (@new == null || @new.humanID <= 0 || (previous != null && previous.humanID == @new.humanID))
                 {
                     // Unable to pick new human
                     return;

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common.Custom;
+using System;
 using System.IO;
 using System.Reflection;
 
@@ -145,6 +146,7 @@ namespace SOD.Common.Helpers
 
                 Lib.SyncDisks.CheckForSyncDiskData(false, path);
                 Lib.PlayerStatus.Save(path);
+                ExpirationObjectManager.SaveState(path);
             }
             else
             {
@@ -167,6 +169,7 @@ namespace SOD.Common.Helpers
             {
                 Lib.SyncDisks.CheckForSyncDiskData(true, path);
                 Lib.PlayerStatus.Load(path);
+                ExpirationObjectManager.LoadState(path);
             }
             else
             {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SOD.Common.Custom;
+using System;
 using System.Linq;
 
 namespace SOD.Common.Helpers
@@ -169,7 +170,13 @@ namespace SOD.Common.Helpers
         internal void OnTimeChanged(TimeData previous, TimeData current)
         {
             if (previous.Minute != current.Minute)
+            {
                 OnMinuteChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+
+                // Tick object expiration
+                ExpirationObjectManager.Update();
+            }
+
             if (previous.Hour != current.Hour)
             {
                 OnHourChanged?.Invoke(this, new TimeChangedArgs(previous, current));
@@ -226,10 +233,11 @@ namespace SOD.Common.Helpers
 
             if (_initialized) return;
             _initialized = true;
-            OnTimeInitialized?.Invoke(this, new TimeChangedArgs(CurrentDateTime, CurrentDateTime));
 
             if (Plugin.InDebugMode)
                 Plugin.Log.LogInfo($"[DebugMode]: Initialized time component.");
+
+            OnTimeInitialized?.Invoke(this, new TimeChangedArgs(CurrentDateTime, CurrentDateTime));
         }
 
         public readonly struct TimeData : IEquatable<TimeData>, IComparable<TimeData>, IComparable
