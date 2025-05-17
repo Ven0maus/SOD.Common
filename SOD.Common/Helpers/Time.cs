@@ -172,11 +172,7 @@ namespace SOD.Common.Helpers
             if (previous.Minute != current.Minute)
             {
                 OnMinuteChanged?.Invoke(this, new TimeChangedArgs(previous, current));
-
-                // Tick object expiration
-                ExpirationObjectManager.Update();
             }
-
             if (previous.Hour != current.Hour)
             {
                 OnHourChanged?.Invoke(this, new TimeChangedArgs(previous, current));

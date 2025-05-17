@@ -2,7 +2,6 @@
 **2.1.1**
 - Added a lot more debug logging for development purposes
 - Added OnVictimPicked and OnMurdererPicked events in Lib.Gameplay
-- Added ExpirationObjectManager static class that can store and handle automatic expiration of objects based on in-game time
 
 **2.1.0**
 - Added two new Lib.Dialog.Speak variants to improve accessibility to citizen speak
