@@ -13,6 +13,7 @@ Put these in this folder, so the project can compile properly.
 * UnityEngine.InputLegacyModule.dll
 * UnityEngine.PhysicsModule.dll
 * UnityEngine.UI.dll
+* UnityEngine.dll
 
 ### Mod dlls required
 

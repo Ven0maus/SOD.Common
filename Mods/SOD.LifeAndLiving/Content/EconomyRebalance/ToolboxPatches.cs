@@ -70,8 +70,9 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
             {
                 var generalPercentage = Plugin.Instance.Config.PercentageSalePriceGeneral;
                 var blackMarketPercentage = Plugin.Instance.Config.PercentageSalePriceBlackMarket;
+                var allCompanyPresets = __instance.GetFromResourceCache<CompanyPreset>();
                 int count = 0;
-                foreach (var companyPreset in __instance.allCompanyPresets)
+                foreach (var companyPreset in allCompanyPresets)
                 {
                     if (companyPreset.enableSellingOfIllegalItems)
                     {

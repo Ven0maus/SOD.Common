@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Il2CppInterop.Runtime;
+using System.Collections.Generic;
+using UnityEngine;
+using static Il2CppSystem.Linq.Expressions.Interpreter.NullableMethodCallInstruction;
 
 namespace SOD.Common.Extensions
 {
@@ -27,6 +30,44 @@ namespace SOD.Common.Extensions
                 }
             }
             return false;
+        }
+
+        private static Il2CppSystem.Collections.Generic.Dictionary<string, ScriptableObject> GetResourceCacheCollection<T>(Toolbox toolbox)
+        {
+            var type = Il2CppType.Of<T>();
+            if (!toolbox.resourcesCache.TryGetValue(type, out var dict))
+            {
+                if (Plugin.Instance.Config.DebugMode)
+                    Plugin.Log.LogInfo($"[Debug]: GetFromResourceCache<{typeof(T).Name}> no resources found for the specified type.");
+                return default;
+            }
+            return dict;
+        }
+
+        public static T GetFromResourceCache<T>(this Toolbox toolbox, string itemName)
+            where T : ScriptableObject
+        {
+            var resourceCache = GetResourceCacheCollection<T>(toolbox);
+            if (resourceCache == null) return default;
+
+            if (!resourceCache.TryGetValue(itemName, out var scriptableObject))
+            {
+                if (Plugin.Instance.Config.DebugMode)
+                    Plugin.Log.LogInfo($"[Debug]: GetFromResourceCache<{typeof(T).Name}>({itemName}) no resource found for the specified item name.");
+                return default;
+            }
+
+            return scriptableObject.TryCast<T>();
+        }
+
+        public static IEnumerable<T> GetFromResourceCache<T>(this Toolbox toolbox)
+            where T : ScriptableObject
+        {
+            var resourceCache = GetResourceCacheCollection<T>(toolbox);
+            if (resourceCache == null) yield break;
+
+            foreach (var value in resourceCache.Values)
+                yield return value.TryCast<T>();
         }
     }
 }

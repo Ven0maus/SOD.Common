@@ -1,6 +1,7 @@
 ﻿using HarmonyLib;
 using SOD.Common.Extensions;
 using System;
+using System.Linq;
 
 namespace SOD.QoL.Patches
 {
@@ -14,7 +15,8 @@ namespace SOD.QoL.Patches
             {
                 if (Plugin.Instance.Config.FixTiredness)
                 {
-                    foreach (var item in __instance.allItems
+                    var allItems = __instance.GetFromResourceCache<RetailItemPreset>();
+                    foreach (var item in allItems
                         .Where(a => a.desireCategory == CompanyPreset.CompanyCategory.caffeine))
                     {
                         // If the energy is 0 or smaller, we take 12% of the alertness value
