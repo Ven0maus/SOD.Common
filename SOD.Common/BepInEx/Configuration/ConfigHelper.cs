@@ -168,7 +168,7 @@ namespace SOD.Common.BepInEx.Configuration
 
                 foreach (var setting in kvp.Value)
                 {
-                    if (!string.IsNullOrEmpty(setting.Description)) 
+                    if (!string.IsNullOrEmpty(setting.Description))
                     {
                         var descriptions = setting.Description.Split('\n');
                         foreach (var desc in descriptions)

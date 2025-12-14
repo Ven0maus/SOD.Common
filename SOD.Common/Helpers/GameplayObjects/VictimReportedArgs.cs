@@ -12,7 +12,7 @@ namespace SOD.Common.Helpers.GameplayObjects
         /// </summary>
         public Human.Death.ReportType ReportType { get; }
 
-        internal VictimReportedArgs(Human victim, Human reporter, Human.Death.ReportType reportType) 
+        internal VictimReportedArgs(Human victim, Human reporter, Human.Death.ReportType reportType)
             : base(MurderController.Instance.activeMurders
                 .AsEnumerable()
                 .FirstOrDefault(a => a.victim != null && a.victim.humanID == victim.humanID), victim)

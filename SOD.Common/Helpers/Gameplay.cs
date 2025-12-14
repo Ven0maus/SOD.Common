@@ -80,14 +80,14 @@ namespace SOD.Common.Helpers
         /// <param name="receiver"></param>
         /// <param name="placementRule"></param>
         /// <exception cref="Exception"></exception>
-        public void AddInteractableToHouse(string interactablePresetName, NewAddress address, 
+        public void AddInteractableToHouse(string interactablePresetName, NewAddress address,
             out FurnitureLocation furnitureLocation, out Interactable interactable,
             Human belongsTo = null, Human writer = null, Human receiver = null, InteractablePreset.OwnedPlacementRule placementRule = InteractablePreset.OwnedPlacementRule.nonOwnedOnly)
         {
             if (!Toolbox.Instance.objectPresetDictionary.TryGetValue(interactablePresetName, out var preset))
                 throw new Exception($"No interactable preset exists by name \"{interactablePresetName}\".");
 
-            interactable = address.PlaceObject(preset, belongsTo, writer, receiver, out furnitureLocation, false, 
+            interactable = address.PlaceObject(preset, belongsTo, writer, receiver, out furnitureLocation, false,
                 Interactable.PassedVarType.jobID, -1, true, 0, placementRule, 0, null, false, null, null, null, "", true);
         }
 

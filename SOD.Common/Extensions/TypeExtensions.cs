@@ -1,6 +1,4 @@
-﻿using BepInEx.Unity.IL2CPP;
-using BepInEx;
-using System;
+﻿using System;
 using System.Linq;
 using UniverseLib;
 

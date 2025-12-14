@@ -44,7 +44,7 @@ namespace SOD.Common.Helpers
 
         internal void RaiseEvent(Event @event, Objective objective, bool isCustom)
         {
-            switch(@event)
+            switch (@event)
             {
                 case Event.ObjectiveCreated:
                     if (Plugin.InDebugMode && isCustom)

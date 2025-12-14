@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace SOD.Common.Helpers.ObjectiveObjects
+﻿namespace SOD.Common.Helpers.ObjectiveObjects
 {
     /// <summary>
     /// Contains static methods to create some predefined triggers.

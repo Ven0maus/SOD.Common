@@ -60,7 +60,7 @@ namespace SOD.Common.Patches
                         var key = _gameMappedKeyDictionary.ContainsKey(actionName)
                             ? _gameMappedKeyDictionary[actionName]
                             : InteractablePreset.InteractionKey.none;
-        
+
                         Lib.InputDetection.ReportButtonStateChange(actionName, key, isBtnDown);
                     }
                 }

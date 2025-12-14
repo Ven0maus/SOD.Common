@@ -13,7 +13,7 @@ namespace SOD.Common.Helpers.GameplayObjects
         /// The murder victim.
         /// </summary>
         public Human Victim { get; }
-        
+
         internal VictimKilledArgs(MurderController.Murder murder, Human victim = null)
         {
             Murder = murder;

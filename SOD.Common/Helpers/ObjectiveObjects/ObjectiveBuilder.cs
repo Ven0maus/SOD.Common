@@ -21,7 +21,7 @@ namespace SOD.Common.Helpers.ObjectiveObjects
         /// </summary>
         internal ObjectiveBuilder Parent { get; private set; }
 
-        internal ObjectiveBuilder(Case @case) 
+        internal ObjectiveBuilder(Case @case)
         {
             if (@case == null)
                 throw new ArgumentException("Case cannot be null.", nameof(@case));

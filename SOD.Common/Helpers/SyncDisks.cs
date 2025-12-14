@@ -167,7 +167,7 @@ namespace SOD.Common.Helpers
                             // Get real option id
                             var realOption = realOptions.Name1 != null && realOptions.Name1.Equals(option) ? realOptions.Id1 :
                                 realOptions.Name2 != null && realOptions.Name2.Equals(option) ? realOptions.Id2 : realOptions.Id3;
-                            if (realOption == null) 
+                            if (realOption == null)
                             {
                                 Plugin.Log.LogInfo($"[Skipped]: Could not find upgrade option \"{option}\" within sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)}\".");
                                 continue;
@@ -196,12 +196,12 @@ namespace SOD.Common.Helpers
                 }
 
                 // On save, serialize all sync disk data
-                var toBeSaved = new SyncDiskJsonData() 
-                { 
+                var toBeSaved = new SyncDiskJsonData()
+                {
                     SyncDiskData = InstalledSyncDisks.Values
                         .SelectMany(a => a)
                         .OrderBy(a => a.SyncDiskName)
-                        .ToList() 
+                        .ToList()
                 };
                 var json = JsonSerializer.Serialize(toBeSaved, new JsonSerializerOptions { WriteIndented = false });
                 File.WriteAllText(path, json);
