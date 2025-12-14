@@ -1,4 +1,8 @@
 # Ignore everything in this directory
 *
-# Except this file
+# Allow gitignore obviously
 !.gitignore
+
+# Allow all Markdown files
+!*.md
+!*.MD
