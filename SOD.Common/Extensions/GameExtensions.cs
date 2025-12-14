@@ -31,18 +31,13 @@ namespace SOD.Common.Extensions
             return false;
         }
 
-        private static Il2CppSystem.Collections.Generic.Dictionary<string, ScriptableObject> GetResourceCacheCollection<T>(Toolbox toolbox)
-        {
-            var type = Il2CppType.Of<T>();
-            if (!toolbox.resourcesCache.TryGetValue(type, out var dict))
-            {
-                if (Plugin.Instance.Config.DebugMode)
-                    Plugin.Log.LogInfo($"[Debug]: GetFromResourceCache<{typeof(T).Name}> no resources found for the specified type.");
-                return default;
-            }
-            return dict;
-        }
-
+        /// <summary>
+        /// Return a specific scriptable object from the resource cache by item name.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="toolbox"></param>
+        /// <param name="itemName"></param>
+        /// <returns></returns>
         public static T GetFromResourceCache<T>(this Toolbox toolbox, string itemName)
             where T : ScriptableObject
         {
@@ -59,6 +54,12 @@ namespace SOD.Common.Extensions
             return scriptableObject.TryCast<T>();
         }
 
+        /// <summary>
+        /// Returns all resources of the specified scriptable object preset type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="toolbox"></param>
+        /// <returns></returns>
         public static IEnumerable<T> GetFromResourceCache<T>(this Toolbox toolbox)
             where T : ScriptableObject
         {
@@ -67,6 +68,18 @@ namespace SOD.Common.Extensions
 
             foreach (var value in resourceCache.Values)
                 yield return value.TryCast<T>();
+        }
+
+        private static Il2CppSystem.Collections.Generic.Dictionary<string, ScriptableObject> GetResourceCacheCollection<T>(Toolbox toolbox)
+        {
+            var type = Il2CppType.Of<T>();
+            if (!toolbox.resourcesCache.TryGetValue(type, out var dict))
+            {
+                if (Plugin.Instance.Config.DebugMode)
+                    Plugin.Log.LogInfo($"[Debug]: GetFromResourceCache<{typeof(T).Name}> no resources found for the specified type.");
+                return default;
+            }
+            return dict;
         }
     }
 }
