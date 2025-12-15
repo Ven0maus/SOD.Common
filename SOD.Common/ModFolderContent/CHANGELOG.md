@@ -1,5 +1,6 @@
 # CHANGELOG
 **2.1.1**
+- Support for new workshop update
 - Added a lot more debug logging for development purposes
 - Added OnVictimPicked and OnMurdererPicked events in Lib.Gameplay
 
