@@ -5,6 +5,6 @@
   "description": "Introduces a new way of earning some cash, by adding several different courier jobs.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-2.1.2"
+    "Venomaus-SODCommon-2.1.1"
   ]
 }
