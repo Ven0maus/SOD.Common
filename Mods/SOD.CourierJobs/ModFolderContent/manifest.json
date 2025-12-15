@@ -1,0 +1,10 @@
+{
+  "name": "SODCourierJobs",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.CourierJobs",
+  "description": "Introduces a new way of earning some cash, by adding several different courier jobs.",
+  "author": "Venomaus",
+  "dependencies": [
+    "Venomaus-SODCommon-2.1.2"
+  ]
+}
