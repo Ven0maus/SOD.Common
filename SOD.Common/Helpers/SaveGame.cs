@@ -156,17 +156,41 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Returns a path to your plugin folder.
-        /// <br>Path will be bepinex/plugins/yourpluginname</br>
+        /// Returns the directory of the plugin assembly.
+        /// <para>
+        /// Typically: <c>bepinex/plugins/YourPluginName</c>
+        /// </para>
         /// </summary>
-        /// <param name="executingAssembly"></param>
-        /// <returns></returns>
+        /// <param name="executingAssembly">The plugin's executing assembly.</param>
+        /// <returns>The absolute path to the plugin directory.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="executingAssembly"/> is null.
+        /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown if the plugin directory cannot be determined.
+        /// </exception>
         public string GetPluginDirectoryPath(Assembly executingAssembly)
         {
-            var path = Path.GetDirectoryName(executingAssembly.Location);
-            if (!Directory.Exists(path))
-                throw new Exception("There is no plugin directory for this assembly location: " + path);
-            return path;
+            if (executingAssembly == null)
+                throw new ArgumentNullException(nameof(executingAssembly));
+
+            var location = executingAssembly.Location;
+
+            if (string.IsNullOrWhiteSpace(location))
+                throw new InvalidOperationException(
+                    "Assembly location is not available. The assembly may be loaded dynamically.");
+
+            var directory = Path.GetDirectoryName(location);
+
+            if (string.IsNullOrWhiteSpace(directory))
+                throw new InvalidOperationException(
+                    "Could not determine the plugin directory from the assembly location.");
+
+            if (!Directory.Exists(directory))
+                throw new DirectoryNotFoundException(
+                    $"Plugin directory does not exist: {directory}");
+
+            return directory;
         }
 
         /// <summary>
@@ -177,11 +201,23 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string GetSaveGameDataPath(SaveGameArgs saveGameArgs)
         {
-            var path = Path.GetDirectoryName(saveGameArgs.FilePath);
-            var folderName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
-            var saveGameDataPath = Path.Combine(path, folderName + "_mod_savestore");
-            if (!Directory.Exists(saveGameDataPath))
-                Directory.CreateDirectory(saveGameDataPath);
+            if (saveGameArgs == null)
+                throw new ArgumentNullException(nameof(saveGameArgs));
+
+            if (string.IsNullOrWhiteSpace(saveGameArgs.FilePath))
+                throw new ArgumentException("Save file path is invalid.", nameof(saveGameArgs));
+
+            var saveDir = Path.GetDirectoryName(saveGameArgs.FilePath)
+                ?? throw new InvalidOperationException("Could not determine save directory.");
+
+            var saveName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
+
+            var saveGameDataPath = Path.Combine(
+                saveDir,
+                saveName + "_mod_savestore");
+
+            Directory.CreateDirectory(saveGameDataPath);
+
             return saveGameDataPath;
         }
 
@@ -194,17 +230,42 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string GetSaveGameDataPath(SaveGameArgs saveGameArgs, string fileName)
         {
-            var path = Path.GetDirectoryName(saveGameArgs.FilePath);
-            var folderName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
-            var saveGameDataPath = Path.Combine(path, folderName + "_mod_savestore");
-            if (!Directory.Exists(saveGameDataPath))
-                Directory.CreateDirectory(saveGameDataPath);
+            if (saveGameArgs == null)
+                throw new ArgumentNullException(nameof(saveGameArgs));
 
-            var newPath = Path.Combine(saveGameDataPath, fileName);
-            path = Path.GetDirectoryName(newPath);
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            return newPath;
+            if (string.IsNullOrWhiteSpace(saveGameArgs.FilePath))
+                throw new ArgumentException("Save file path is invalid.", nameof(saveGameArgs));
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("File name must be provided.", nameof(fileName));
+
+            var saveDir = Path.GetDirectoryName(saveGameArgs.FilePath)
+                ?? throw new InvalidOperationException("Could not determine save directory.");
+
+            var saveName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
+
+            var basePath = Path.Combine(
+                saveDir,
+                saveName + "_mod_savestore");
+
+            // Prevent directory traversal
+            fileName = fileName.Replace('\\', Path.DirectorySeparatorChar)
+                               .Replace('/', Path.DirectorySeparatorChar);
+
+            if (Path.IsPathRooted(fileName))
+                throw new ArgumentException("File name must be relative.", nameof(fileName));
+
+            var fullPath = Path.GetFullPath(
+                Path.Combine(basePath, fileName));
+
+            // Ensure the final path stays inside basePath
+            var fullBasePath = Path.GetFullPath(basePath);
+            if (!fullPath.StartsWith(fullBasePath, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Invalid file path.");
+
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+            return fullPath;
         }
 
         /// <summary>
@@ -215,10 +276,22 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string GetPluginDataPath(Assembly executingAssembly)
         {
-            var path = Path.Combine(GetPluginDirectoryPath(executingAssembly), "PluginData");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            return path;
+            if (executingAssembly == null)
+                throw new ArgumentNullException(nameof(executingAssembly));
+
+            var assemblyLocation = executingAssembly.Location;
+            if (string.IsNullOrWhiteSpace(assemblyLocation))
+                throw new InvalidOperationException("Assembly location is not available.");
+
+            var pluginDir = Path.GetDirectoryName(assemblyLocation)
+                ?? throw new InvalidOperationException("Could not determine plugin directory.");
+
+            var pluginDataPath = Path.Combine(pluginDir, "PluginData");
+
+            // Idempotent and thread-safe
+            Directory.CreateDirectory(pluginDataPath);
+
+            return pluginDataPath;
         }
 
         /// <summary>
@@ -229,10 +302,41 @@ namespace SOD.Common.Helpers
         /// <returns></returns>
         public string GetPluginDataPath(Assembly executingAssembly, string fileName)
         {
-            var path = Path.Combine(GetPluginDirectoryPath(executingAssembly), "PluginData");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-            return Path.Combine(path, fileName);
+            if (executingAssembly == null)
+                throw new ArgumentNullException(nameof(executingAssembly));
+
+            if (string.IsNullOrWhiteSpace(fileName))
+                throw new ArgumentException("File name must be provided.", nameof(fileName));
+
+            var assemblyLocation = executingAssembly.Location;
+            if (string.IsNullOrWhiteSpace(assemblyLocation))
+                throw new InvalidOperationException("Assembly location is not available.");
+
+            var pluginDir = Path.GetDirectoryName(assemblyLocation)
+                ?? throw new InvalidOperationException("Could not determine plugin directory.");
+
+            var basePath = Path.Combine(pluginDir, "PluginData");
+
+            // Normalize separators
+            fileName = fileName
+                .Replace('\\', Path.DirectorySeparatorChar)
+                .Replace('/', Path.DirectorySeparatorChar);
+
+            // Disallow absolute paths
+            if (Path.IsPathRooted(fileName))
+                throw new ArgumentException("File name must be a relative path.", nameof(fileName));
+
+            var fullBasePath = Path.GetFullPath(basePath);
+            var fullPath = Path.GetFullPath(Path.Combine(fullBasePath, fileName));
+
+            // Prevent directory traversal (../)
+            if (!fullPath.StartsWith(fullBasePath, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Invalid file path.");
+
+            // Create directories safely (supports subfolders in fileName)
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+            return fullPath;
         }
 
         internal bool IsSaving { get; private set; }
