@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Helpers;
 using SOD.QoL.Objects;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,8 @@ namespace SOD.QoL.Patches
 {
     internal class LostAndFoundPatches
     {
-        private const string _expirationSaveFile = "LostAndFoundSaveData_{0}.json";
+        private const string _oldExpirationSaveFile = "LostAndFoundSaveData_{0}.json";
+        private const string _newExpirationSaveFile = "sod_qol_LostAndFoundSaveData.json";
         private static ExpirationSaveData _expirationSaveData;
 
         internal static void ExpireTimedOutLafs()
@@ -62,15 +64,19 @@ namespace SOD.QoL.Patches
             _toBeDeleted.Clear();
         }
 
-        internal static void InitializeExpireTimes(string saveFilePath)
+        internal static void InitializeExpireTimes(SaveGameArgs saveGameArgs)
         {
             var filePath = new Lazy<string>(() =>
             {
-                var fileName = string.Format(_expirationSaveFile, Lib.SaveGame.GetUniqueString(saveFilePath));
-                return Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+                var fileName = string.Format(_oldExpirationSaveFile, Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath));
+#pragma warning disable CS0618 // Type or member is obsolete
+                // Support outdated format
+                var oldSavePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+#pragma warning restore CS0618 // Type or member is obsolete
+                return Lib.SaveGame.MigrateOldSaveStructure(oldSavePath, saveGameArgs, _newExpirationSaveFile);
             });
 
-            if (saveFilePath == null || !File.Exists(filePath.Value))
+            if (saveGameArgs == null || !File.Exists(filePath.Value))
             {
                 _expirationSaveData = new()
                 {
@@ -101,17 +107,21 @@ namespace SOD.QoL.Patches
             }
         }
 
-        internal static void SaveExpireTimes(string saveFilePath)
+        internal static void SaveExpireTimes(SaveGameArgs saveGameArgs)
         {
             if (_expirationSaveData != null && _expirationSaveData.Expirations.Count > 0)
             {
-                var fileName = string.Format(_expirationSaveFile, Lib.SaveGame.GetUniqueString(saveFilePath));
-                var filePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+                var fileName = string.Format(_oldExpirationSaveFile, Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath));
+#pragma warning disable CS0618 // Type or member is obsolete
+                // Support outdated format
+                var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+#pragma warning restore CS0618 // Type or member is obsolete
+                var newFilePath = Lib.SaveGame.MigrateOldSaveStructure(oldFilePath, saveGameArgs, _newExpirationSaveFile);
 
                 try
                 {
                     var json = _expirationSaveData.Serialize();
-                    File.WriteAllText(filePath, json);
+                    File.WriteAllText(newFilePath, json);
                     Plugin.Log.LogInfo("Saved LostAndFoundSaveData to file.");
                 }
                 catch (Exception e)
@@ -121,23 +131,15 @@ namespace SOD.QoL.Patches
             }
         }
 
-        internal static void DeleteSaveData(string saveFilePath)
+        internal static void DeleteSaveData(SaveGameArgs saveGameArgs)
         {
-            var fileName = string.Format(_expirationSaveFile, Lib.SaveGame.GetUniqueString(saveFilePath));
-            var filePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
-
-            if (File.Exists(filePath))
-            {
-                try
-                {
-                    File.Delete(filePath);
-                    Plugin.Log.LogInfo("Deleted LostAndFoundSaveData file");
-                }
-                catch (Exception e)
-                {
-                    Plugin.Log.LogInfo($"Unable to delete LostAndFoundSaveData file: {e.Message}");
-                }
-            }
+            // Still support migration, but effective deletion is handled by sod.common
+            var fileName = string.Format(_oldExpirationSaveFile, Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath));
+#pragma warning disable CS0618 // Type or member is obsolete
+            // Support outdated format
+            var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(oldFilePath, saveGameArgs, _newExpirationSaveFile);
         }
 
         internal static string GetUniqueId(GameplayController.LostAndFound laf)

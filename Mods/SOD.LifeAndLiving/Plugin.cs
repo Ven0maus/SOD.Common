@@ -44,35 +44,29 @@ namespace SOD.LifeAndLiving
 
         private void SaveGame_OnBeforeDelete(object sender, Common.Helpers.SaveGameArgs e)
         {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
-
             // Apartment price cache
-            NewGameLocationPatches.NewGameLocation_GetPrice.Delete(hash);
+            NewGameLocationPatches.NewGameLocation_GetPrice.Delete(e);
 
             // Player interests deletion
-            PlayerInterests.Instance.Delete(hash);
+            PlayerInterests.Instance.Delete(e);
         }
 
         private void SaveGame_OnBeforeSave(object sender, Common.Helpers.SaveGameArgs e)
         {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
-
             // Apartment price cache
-            NewGameLocationPatches.NewGameLocation_GetPrice.Save(hash);
+            NewGameLocationPatches.NewGameLocation_GetPrice.Save(e);
 
             // Player interests saving
-            PlayerInterests.Instance.Save(hash);
+            PlayerInterests.Instance.Save(e);
         }
 
         private void SaveGame_OnBeforeLoad(object sender, Common.Helpers.SaveGameArgs e)
         {
-            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
-
             // Apartment price cache
-            NewGameLocationPatches.NewGameLocation_GetPrice.Load(hash);
+            NewGameLocationPatches.NewGameLocation_GetPrice.Load(e);
 
             // Player interests loading
-            PlayerInterests.Instance.Load(hash);
+            PlayerInterests.Instance.Load(e);
         }
 
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)

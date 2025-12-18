@@ -44,9 +44,9 @@ namespace SOD.StockMarket.Implementation
 
             // Setup events
             Lib.SaveGame.OnBeforeNewGame += OnBeforeNewGame;
-            Lib.SaveGame.OnBeforeLoad += OnFileLoad;
-            Lib.SaveGame.OnBeforeSave += OnFileSave;
-            Lib.SaveGame.OnBeforeDelete += OnFileDelete;
+            Lib.SaveGame.OnBeforeLoad += OnLoadSave;
+            Lib.SaveGame.OnBeforeSave += OnSaveGame;
+            Lib.SaveGame.OnBeforeDelete += OnDeleteSave;
             Lib.Time.OnTimeInitialized += InitDdsRecords;
             Lib.Time.OnMinuteChanged += OnMinuteChanged;
             Lib.Time.OnHourChanged += OnHourChanged;
@@ -131,7 +131,7 @@ namespace SOD.StockMarket.Implementation
                 simulation.SimulationTime = simulation.SimulationTime.Value.AddDays(1);
             }
 
-            StockDataIO.Export(simulation, tradeController, Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), "Simulation.csv"), this);
+            StockDataIO.Export(simulation, tradeController, Lib.SaveGame.GetPluginDataPath(Assembly.GetExecutingAssembly(), "Simulation.csv"), this);
         }
 
         private void OnBeforeNewGame(object sender, EventArgs e)
@@ -515,18 +515,18 @@ namespace SOD.StockMarket.Implementation
             return MathHelper.Random.Next(60 * minTrendSteps, 60 * maxTrendSteps);
         }
 
-        private void OnFileSave(object sender, SaveGameArgs e)
+        private void OnSaveGame(object sender, SaveGameArgs e)
         {
-            var path = GetSaveFilePath(e.FilePath);
+            var path = GetSaveFilePath(e);
 
             // Export data to save file
             StockDataIO.Export(this, TradeController, path);
         }
 
         private bool _isLoading = false;
-        private void OnFileLoad(object sender, SaveGameArgs e)
+        private void OnLoadSave(object sender, SaveGameArgs e)
         {
-            var path = GetSaveFilePath(e.FilePath);
+            var path = GetSaveFilePath(e);
             if (!File.Exists(path))
             {
                 // Savegame with no market data,
@@ -556,14 +556,10 @@ namespace SOD.StockMarket.Implementation
             }
         }
 
-        private void OnFileDelete(object sender, SaveGameArgs e)
+        private void OnDeleteSave(object sender, SaveGameArgs e)
         {
-            var path = GetSaveFilePath(e.FilePath);
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-                return;
-            }
+            // Support migration, but handle deletion in sod.common
+            _ = GetSaveFilePath(e);
         }
 
         private void InitPreModInstallEconomyExistingSavegame(string filePath, bool saveImmediately)
@@ -623,17 +619,20 @@ namespace SOD.StockMarket.Implementation
         /// </summary>
         /// <param name="stateSaveData"></param>
         /// <returns></returns>
-        private static string GetSaveFilePath(string filePath)
+        private static string GetSaveFilePath(SaveGameArgs saveGameArgs)
         {
             // Get market savestore
-            var savecode = Lib.SaveGame.GetUniqueString(filePath);
+            var savecode = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
 
             if (!Enum.TryParse<DataSaveFormat>(Plugin.Instance.Config.StockDataSaveFormat.Trim(), true, out var extType))
                 throw new Exception($"Invalid save format \"{Plugin.Instance.Config.StockDataSaveFormat}\".");
 
             string extension = $".{extType.ToString().ToLower()}";
             var fileName = $"stocks_{savecode}{extension}";
-            return Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+#pragma warning disable CS0618 // Type or member is obsolete
+            var oldPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), fileName);
+#pragma warning restore CS0618 // Type or member is obsolete
+            return Lib.SaveGame.MigrateOldSaveStructure(oldPath, saveGameArgs, $"sod_stockmarket_stocks.{extension}");
         }
     }
 

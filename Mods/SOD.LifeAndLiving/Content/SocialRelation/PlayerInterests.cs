@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Helpers;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -60,13 +61,18 @@ namespace SOD.LifeAndLiving.Content.SocialRelation
             }
         }
 
-        internal void Load(string hash)
+        internal void Load(SaveGameArgs saveGameArgs)
         {
+            var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(playerInterestsPath, saveGameArgs, "sod_lifeandliving_PlayerInterests.json");
+            
             // Player interests loading
-            if (File.Exists(playerInterestsPath))
+            if (File.Exists(newPath))
             {
-                var playerInterestsJson = File.ReadAllText(playerInterestsPath);
+                var playerInterestsJson = File.ReadAllText(newPath);
                 var pInterest = JsonSerializer.Deserialize<PlayerInterests>(playerInterestsJson);
 
                 // Set properties
@@ -75,27 +81,34 @@ namespace SOD.LifeAndLiving.Content.SocialRelation
             }
         }
 
-        internal void Save(string hash)
+        internal void Save(SaveGameArgs saveGameArgs)
         {
+            var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(playerInterestsPath, saveGameArgs, "sod_lifeandliving_PlayerInterests.json");
 
             if (!ContainsContent)
             {
-                if (File.Exists(playerInterestsPath))
-                    File.Delete(playerInterestsPath);
+                if (File.Exists(newPath))
+                    File.Delete(newPath);
             }
             else
             {
                 var playerInterestsJson = JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = false });
-                File.WriteAllText(playerInterestsPath, playerInterestsJson);
+                File.WriteAllText(newPath, playerInterestsJson);
             }
         }
 
-        internal void Delete(string hash)
+        internal void Delete(SaveGameArgs saveGameArgs)
         {
+            // Still support migration, deletion handled by sod.common
+            var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var playerInterestsPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"PlayerInterests_{hash}.json");
-            if (File.Exists(playerInterestsPath))
-                File.Delete(playerInterestsPath);
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(playerInterestsPath, saveGameArgs, "sod_lifeandliving_PlayerInterests.json");
         }
     }
 }
