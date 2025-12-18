@@ -11,7 +11,7 @@ namespace SOD.QoL.Patches
     internal class SideJobPatches
     {
         private const string _oldExpirationSaveFile = "SideJobSaveData_{0}.json";
-        private const string _newExpirationSaveFile = "SideJobSaveData.json";
+        private const string _newExpirationSaveFile = "sod_qol_SideJobSaveData.json";
         private static ExpirationSaveData _expirationSaveData;
 
         internal static void ExpireTimedOutJobs()

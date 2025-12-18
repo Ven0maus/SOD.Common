@@ -1,5 +1,6 @@
 ﻿using HarmonyLib;
 using SOD.Common;
+using SOD.Common.Helpers;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -59,14 +60,19 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                 }
             }
 
-            internal static void Load(string hash)
+            internal static void Load(SaveGameArgs saveGameArgs)
             {
                 ApartementPriceCache.Clear();
 
+                var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
                 var apartmentPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
-                if (File.Exists(apartmentPath))
+#pragma warning restore CS0618 // Type or member is obsolete
+                var newPath = Lib.SaveGame.MigrateOldSaveStructure(apartmentPath, saveGameArgs, $"sod_lifeandliving_apartmentpricecache.json");
+                
+                if (File.Exists(newPath))
                 {
-                    var json = File.ReadAllText(apartmentPath);
+                    var json = File.ReadAllText(newPath);
                     var jsonContent = JsonSerializer.Deserialize<Dictionary<string, int>>(json);
                     foreach (var value in jsonContent)
                         ApartementPriceCache.Add(value.Key, value.Value);
@@ -74,25 +80,30 @@ namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
                 }
             }
 
-            internal static void Save(string hash)
+            internal static void Save(SaveGameArgs saveGameArgs)
             {
                 if (ApartementPriceCache.Count > 0)
                 {
-                    var apartmentFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+                    var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
+                    var apartmentPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+                    var newPath = Lib.SaveGame.MigrateOldSaveStructure(apartmentPath, saveGameArgs, $"sod_lifeandliving_apartmentpricecache.json");
+                    
                     var json = JsonSerializer.Serialize(ApartementPriceCache, new JsonSerializerOptions { WriteIndented = false });
-                    File.WriteAllText(apartmentFilePath, json);
+                    File.WriteAllText(newPath, json);
                     Plugin.Log.LogInfo("Saved apartment price cache.");
                 }
             }
 
-            internal static void Delete(string hash)
+            internal static void Delete(SaveGameArgs saveGameArgs)
             {
-                var apartmentFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
-                if (File.Exists(apartmentFilePath))
-                {
-                    File.Delete(apartmentFilePath);
-                    Plugin.Log.LogInfo("Deleted apartment price cache.");
-                }
+                // Still support migration, deletion done by sod.common
+                var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
+                var apartmentPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"apartmentpricecache_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+                _ = Lib.SaveGame.MigrateOldSaveStructure(apartmentPath, saveGameArgs, $"sod_lifeandliving_apartmentpricecache.json");
             }
         }
     }

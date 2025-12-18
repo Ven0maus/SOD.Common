@@ -20,9 +20,9 @@ namespace SOD.RelationsPlus
 
             // SaveGame Events
             Lib.SaveGame.OnBeforeNewGame += (sender, e) => RelationManager.Instance.Clear();
-            Lib.SaveGame.OnBeforeLoad += (sender, e) => RelationManager.Instance.Load(Lib.SaveGame.GetUniqueString(e.FilePath));
-            Lib.SaveGame.OnBeforeSave += (sender, e) => RelationManager.Instance.Save(Lib.SaveGame.GetUniqueString(e.FilePath));
-            Lib.SaveGame.OnBeforeDelete += (sender, e) => RelationManager.Delete(Lib.SaveGame.GetUniqueString(e.FilePath));
+            Lib.SaveGame.OnBeforeLoad += (sender, e) => RelationManager.Instance.Load(e);
+            Lib.SaveGame.OnBeforeSave += (sender, e) => RelationManager.Instance.Save(e);
+            Lib.SaveGame.OnBeforeDelete += (sender, e) => RelationManager.Delete(e);
 
             // Time Events
             Lib.Time.OnMinuteChanged += RelationManager.Instance.Timed_DecayLogic;

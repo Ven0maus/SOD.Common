@@ -199,7 +199,12 @@ namespace SOD.Common.Helpers
             var saveGameDataPath = Path.Combine(path, folderName + "_mod_savestore");
             if (!Directory.Exists(saveGameDataPath))
                 Directory.CreateDirectory(saveGameDataPath);
-            return Path.Combine(saveGameDataPath, fileName);
+
+            var newPath = Path.Combine(saveGameDataPath, fileName);
+            path = Path.GetDirectoryName(newPath);
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return newPath;
         }
 
         /// <summary>
