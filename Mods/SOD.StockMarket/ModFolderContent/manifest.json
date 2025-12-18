@@ -5,7 +5,7 @@
   "description": "Adds a fully functional stock market into the game.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-2.0.3",
+    "Venomaus-SODCommon-2.1.1",
     "Piepieonline-Asset_Bundle_Loader-1.0.4"
   ]
 }
