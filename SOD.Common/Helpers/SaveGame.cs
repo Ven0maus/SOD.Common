@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using UnityEngine;
 
 namespace SOD.Common.Helpers
 {
@@ -49,7 +50,6 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// Creates a unique hash from a string value that is always the same.
         /// <br>Internally it uses FNV hashing.</br>
-        /// <br>Its main use is hashing the savegame filepath, so you can append the hash to your custom files, so you can find them back for a specific savegame.</br>
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
@@ -84,13 +84,38 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Returns a path to a folder where you can store all your data, it is combined with the filename provided.
-        /// Eg. Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), "moddata.json");
-        /// <br>If the folder does not yet exist, it will create it for you.</br>
+        /// Migrates the old savestore folder to the new savegame data path.
+        /// <br>Used specifically to support the old format in older mods.</br>
+        /// </summary>
+        /// <param name="oldFilePath"></param>
+        /// <param name="saveGameArgs"></param>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        internal string MigrateOldSaveStructure(string oldFilePath, SaveGameArgs saveGameArgs, string fileName)
+        {
+            var newPath = GetSaveGameDataPath(saveGameArgs, fileName);
+            if (File.Exists(oldFilePath))
+                File.Move(oldFilePath, newPath);
+
+            // Delete directory if no files remain
+            var dir = Path.GetDirectoryName(oldFilePath);
+            var files = Directory.GetFiles(dir);
+            if (files.Length == 0)
+                Directory.Delete(dir);
+
+            return newPath;
+        }
+
+        /// <summary>
+        /// This method is obsolete.
+        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs, string)"/> to store savegame-specific data.</br>
+        /// <br>Use <see cref="GetPluginDataPath(Assembly, string)"/> to store plugin-specific data.</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
         /// <param name="fileName"></param>
         /// <returns></returns>
+        [Obsolete("Use \"GetSaveGameDataPath\" to store savegame-specific data. " +
+            "Or use \"GetPluginDataPath\" to store plugin-specific data instead.", false)]
         public string GetSavestoreDirectoryPath(Assembly executingAssembly, string fileName)
         {
             var path = GetSavestoreDirectoryPath(executingAssembly);
@@ -100,12 +125,14 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Returns a path to a folder where you can store all your data.
-        /// Eg. Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly());
-        /// <br>If the folder does not yet exist, it will create it for you.</br>
+        /// This method is obsolete.
+        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs)"/> to store savegame-specific data.</br>
+        /// <br>Use <see cref="GetPluginDataPath(Assembly)"/> to store plugin-specific data.</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
         /// <returns></returns>
+        [Obsolete("Use \"GetSaveGameDataPath\" to store savegame-specific data. " +
+            "Or use \"GetPluginDataPath\" to store plugin-specific data instead.", false)]
         public string GetSavestoreDirectoryPath(Assembly executingAssembly)
         {
             var path = Path.Combine(Path.GetDirectoryName(executingAssembly.Location), "Savestore");
@@ -115,7 +142,19 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
+        /// Returns the folder that contains all the save games.
+        /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <returns></returns>
+        public string GetSaveGameDirectoryPath()
+        {
+            string persistantDataPath = Application.persistentDataPath;
+            return Path.Combine(persistantDataPath, "Save");
+        }
+
+        /// <summary>
         /// Returns a path to your plugin folder.
+        /// <br>Path will be bepinex/plugins/yourpluginname</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
         /// <returns></returns>
@@ -127,13 +166,75 @@ namespace SOD.Common.Helpers
             return path;
         }
 
+        /// <summary>
+        /// Returns a save-game specific folder that you can use to store savegame-specific data.
+        /// <br>The SaveGameArgs object can be retrieved from the Lib.SaveGame events.</br>
+        /// </summary>
+        /// <param name="saveGameArgs"></param>
+        /// <returns></returns>
+        public string GetSaveGameDataPath(SaveGameArgs saveGameArgs)
+        {
+            var path = Path.GetDirectoryName(saveGameArgs.FilePath);
+            var folderName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
+            var saveGameDataPath = Path.Combine(path, folderName + "_mod_savestore");
+            if (!Directory.Exists(saveGameDataPath))
+                Directory.CreateDirectory(saveGameDataPath);
+            return saveGameDataPath;
+        }
+
+        /// <summary>
+        /// Returns a save-game specific folder that you can use to store savegame-specific data.
+        /// <br>The SaveGameArgs object can be retrieved from the Lib.SaveGame events.</br>
+        /// </summary>
+        /// <param name="saveGameArgs">The saveFilePath provided by savegame event arguments.</param>
+        /// <param name="fileName">The filename you wish to store.</param>
+        /// <returns></returns>
+        public string GetSaveGameDataPath(SaveGameArgs saveGameArgs, string fileName)
+        {
+            var path = Path.GetDirectoryName(saveGameArgs.FilePath);
+            var folderName = Path.GetFileNameWithoutExtension(saveGameArgs.FilePath);
+            var saveGameDataPath = Path.Combine(path, folderName + "_mod_savestore");
+            if (!Directory.Exists(saveGameDataPath))
+                Directory.CreateDirectory(saveGameDataPath);
+            return Path.Combine(saveGameDataPath, fileName);
+        }
+
+        /// <summary>
+        /// Returns a path to a folder to store plugin specific data.
+        /// <br>Path will be bepinex/plugins/yourpluginname/pluginData</br>
+        /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <returns></returns>
+        public string GetPluginDataPath(Assembly executingAssembly)
+        {
+            var path = Path.Combine(GetPluginDirectoryPath(executingAssembly), "PluginData");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return path;
+        }
+
+        /// <summary>
+        /// Returns a path to a folder to store plugin specific data.
+        /// <br>Path will be bepinex/plugins/yourpluginname/pluginData</br>
+        /// </summary>
+        /// <param name="executingAssembly"></param>
+        /// <returns></returns>
+        public string GetPluginDataPath(Assembly executingAssembly, string fileName)
+        {
+            var path = Path.Combine(GetPluginDirectoryPath(executingAssembly), "PluginData");
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
+            return Path.Combine(path, fileName);
+        }
+
         internal bool IsSaving { get; private set; }
         internal void OnSave(string path, bool after)
         {
+            var args = new SaveGameArgs(path);
             if (after)
-                OnAfterSave?.Invoke(this, new SaveGameArgs(path));
+                OnAfterSave?.Invoke(this, args);
             else
-                OnBeforeSave?.Invoke(this, new SaveGameArgs(path));
+                OnBeforeSave?.Invoke(this, args);
 
             // Handle sync disk data install/upgrade
             if (after)
@@ -143,8 +244,8 @@ namespace SOD.Common.Helpers
                 if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
                     Player.Instance.illegalActionTimer = float.MaxValue;
 
-                Lib.SyncDisks.CheckForSyncDiskData(false, path);
-                Lib.PlayerStatus.Save(path);
+                Lib.SyncDisks.CheckForSyncDiskData(false, args);
+                Lib.PlayerStatus.Save(args);
             }
             else
             {
@@ -157,16 +258,17 @@ namespace SOD.Common.Helpers
 
         internal void OnLoad(string path, bool after)
         {
+            var args = new SaveGameArgs(path);
             if (after)
-                OnAfterLoad?.Invoke(this, new SaveGameArgs(path));
+                OnAfterLoad?.Invoke(this, args);
             else
-                OnBeforeLoad?.Invoke(this, new SaveGameArgs(path));
+                OnBeforeLoad?.Invoke(this, args);
 
             // Handle sync disk data install/upgrade
             if (after)
             {
-                Lib.SyncDisks.CheckForSyncDiskData(true, path);
-                Lib.PlayerStatus.Load(path);
+                Lib.SyncDisks.CheckForSyncDiskData(true, args);
+                Lib.PlayerStatus.Load(args);
             }
             else
             {
@@ -176,20 +278,30 @@ namespace SOD.Common.Helpers
 
         internal void OnDelete(string path, bool after)
         {
+            var args = new SaveGameArgs(path);
             if (after)
-                OnAfterDelete?.Invoke(this, new SaveGameArgs(path));
+                OnAfterDelete?.Invoke(this, args);
             else
-                OnBeforeDelete?.Invoke(this, new SaveGameArgs(path));
+                OnBeforeDelete?.Invoke(this, args);
 
             // Delete sync disk data for this save
             var hash = Lib.SaveGame.GetUniqueString(path);
-            var syncDiskDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
-            if (File.Exists(syncDiskDataPath))
-                File.Delete(syncDiskDataPath);
+#pragma warning disable CS0618 // Type or member is obsolete
+            // Needs to remain for API version compatibility
+            var oldSyncDiskSavePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(oldSyncDiskSavePath, args, "syncdiskdata.json");
 
-            var playerStatusDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
-            if (File.Exists(playerStatusDataPath))
-                File.Delete(playerStatusDataPath);
+#pragma warning disable CS0618 // Type or member is obsolete
+            // Needs to remain for API version compatibility
+            var oldPlayerStatusDataPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(oldPlayerStatusDataPath, args, "playerstatus.json");
+
+            // Delete entire folder and its contents
+            var dir = Lib.SaveGame.GetSaveGameDataPath(args);
+            if (Directory.Exists(dir))
+                Directory.Delete(dir, true);
         }
 
         internal void OnNewGame(bool after)

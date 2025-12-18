@@ -116,11 +116,16 @@ namespace SOD.Common.Helpers
         /// <summary>
         /// Called when a savegame is loaded.
         /// </summary>
-        /// <param name="path"></param>
-        internal void Load(string path)
+        /// <param name="args"></param>
+        internal void Load(SaveGameArgs args)
         {
-            var hash = Lib.SaveGame.GetUniqueString(path);
-            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+            var hash = Lib.SaveGame.GetUniqueString(args.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
+            // Needs to remain for API version compatibility
+            var oldSavePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            var storePath = Lib.SaveGame.MigrateOldSaveStructure(oldSavePath, args, "playerstatus.json");
 
             if (File.Exists(storePath))
             {
@@ -147,10 +152,9 @@ namespace SOD.Common.Helpers
         /// Called when a savegame is saved.
         /// </summary>
         /// <param name="path"></param>
-        internal void Save(string path)
+        internal void Save(SaveGameArgs saveGameArgs)
         {
-            var hash = Lib.SaveGame.GetUniqueString(path);
-            var storePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"playerstatus_{hash}.json");
+            var storePath = Lib.SaveGame.GetSaveGameDataPath(saveGameArgs, $"playerstatus.json");
 
             // Clean-up
             if (IllegalStatusModifierDictionary == null || IllegalStatusModifierDictionary.Count == 0)
