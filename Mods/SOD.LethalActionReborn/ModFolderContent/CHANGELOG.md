@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.5**
+- Added compatibility support for savestore migration
+
 **1.0.4**
 - Murderer and victim is now properly replaced if the person killed is one of them.
 - Added configuration option to define how many hits are needed after the citizen is KO'd to kill them.

@@ -3,6 +3,13 @@
 - Support for new workshop update
 - Added a lot more debug logging for development purposes
 - Added OnVictimPicked and OnMurdererPicked events in Lib.Gameplay
+- Added GetFromResourceCache extension method on Toolbox (replacement for some removed fields like _allCompanies)
+- Added Lib.SaveGame.GetPluginDirectoryPath
+- Reworked how mod-specific data can be stored:
+	- Lib.SaveGame.GetSavestoreDirectoryPath became obsolete
+	- Added Lib.SaveGame.MigrateOldSaveStructure for migration support of old obsolete method
+	- Added Lib.SaveGame.GetSaveGameDataPath
+	- Added Lib.SaveGame.GetPluginDataPath
 
 **2.1.0**
 - Added two new Lib.Dialog.Speak variants to improve accessibility to citizen speak

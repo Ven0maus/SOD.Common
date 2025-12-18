@@ -1,4 +1,7 @@
 # CHANGELOG
+**3.0.3**
+- Added compatibility support for savestore migration
+
 **V3.0.2**
 - Fixed The Usual Dialog not working since last game update
 
