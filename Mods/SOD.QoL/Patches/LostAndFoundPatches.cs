@@ -12,7 +12,7 @@ namespace SOD.QoL.Patches
     internal class LostAndFoundPatches
     {
         private const string _oldExpirationSaveFile = "LostAndFoundSaveData_{0}.json";
-        private const string _newExpirationSaveFile = "LostAndFoundSaveData.json";
+        private const string _newExpirationSaveFile = "sod_qol_LostAndFoundSaveData.json";
         private static ExpirationSaveData _expirationSaveData;
 
         internal static void ExpireTimedOutLafs()
