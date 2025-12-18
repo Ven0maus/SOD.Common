@@ -254,6 +254,12 @@ namespace SOD.Common.Helpers
                 if (Lib.PlayerStatus.IllegalStatusModifierDictionary != null && Lib.PlayerStatus.IllegalStatusModifierDictionary.Count > 0)
                     Player.Instance.illegalActionTimer = 1f;
             }
+
+            // Delete directory if no files remain
+            var dir = GetSaveGameDataPath(args);
+            var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            if (files.Length == 0)
+                Directory.Delete(dir);
         }
 
         internal void OnLoad(string path, bool after)
@@ -274,6 +280,12 @@ namespace SOD.Common.Helpers
             {
                 Lib.PlayerStatus.ResetStatusTracking();
             }
+
+            // Delete directory if no files remain
+            var dir = GetSaveGameDataPath(args);
+            var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
+            if (files.Length == 0)
+                Directory.Delete(dir);
         }
 
         internal void OnDelete(string path, bool after)
@@ -299,9 +311,7 @@ namespace SOD.Common.Helpers
             _ = Lib.SaveGame.MigrateOldSaveStructure(oldPlayerStatusDataPath, args, "playerstatus.json");
 
             // Delete entire folder and its contents
-            var dir = Lib.SaveGame.GetSaveGameDataPath(args);
-            if (Directory.Exists(dir))
-                Directory.Delete(dir, true);
+            Directory.Delete(Lib.SaveGame.GetSaveGameDataPath(args), true);
         }
 
         internal void OnNewGame(bool after)
