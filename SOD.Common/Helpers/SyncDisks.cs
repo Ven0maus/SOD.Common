@@ -119,13 +119,17 @@ namespace SOD.Common.Helpers
             return new SyncDiskBuilder(syncDiskName, pluginGuid, reRaiseEventsOnSaveLoad);
         }
 
-        internal void CheckForSyncDiskData(bool onLoad, string saveFilePath)
+        internal void CheckForSyncDiskData(bool onLoad, SaveGameArgs saveGameArgs)
         {
             if (onLoad)
                 InstalledSyncDisks.Clear();
 
-            var hash = Lib.SaveGame.GetUniqueString(saveFilePath);
-            var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+            var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
+            var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            var path = Lib.SaveGame.MigrateOldSaveStructure(oldFilePath, saveGameArgs, "syncdiskdata.json");
             if (onLoad && !File.Exists(path)) return;
 
             if (onLoad)
