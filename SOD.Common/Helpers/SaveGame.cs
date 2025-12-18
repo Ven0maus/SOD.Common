@@ -84,14 +84,28 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// Migrates the old savestore folder to the new savegame data path.
-        /// <br>Used specifically to support the old format in older mods.</br>
+        /// Use this method to migrate from the old save file data to the new savegame data filepath.
+        /// <br>See example usage:</br>
+        /// <example>
+        /// <code>
+        /// var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+        /// var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(
+        ///     Assembly.GetExecutingAssembly(),
+        ///     $"yourdata_{hash}.json");
+        ///
+        /// // Handles folder creation, file moving, and cleanup
+        /// var newPath = Lib.SaveGame.MigrateOldSaveStructure(
+        ///     oldFilePath,
+        ///     saveGameArgs,
+        ///     "yourdata.json");
+        /// </code>
+        /// </example>
         /// </summary>
-        /// <param name="oldFilePath"></param>
-        /// <param name="saveGameArgs"></param>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        internal string MigrateOldSaveStructure(string oldFilePath, SaveGameArgs saveGameArgs, string fileName)
+        /// <param name="oldFilePath">The old filepath with the hashed filename</param>
+        /// <param name="saveGameArgs">The savegameargs originating from the Lib.SaveGame event</param>
+        /// <param name="fileName">The new filename for your data, no longer requires hash appended.</param>
+        /// <returns>Returns the new savegame data filepath.</returns>
+        public string MigrateOldSaveStructure(string oldFilePath, SaveGameArgs saveGameArgs, string fileName)
         {
             var newPath = GetSaveGameDataPath(saveGameArgs, fileName);
             if (File.Exists(oldFilePath))
@@ -99,7 +113,7 @@ namespace SOD.Common.Helpers
 
             // Delete directory if no files remain
             var dir = Path.GetDirectoryName(oldFilePath);
-            var files = Directory.GetFiles(dir);
+            var files = Directory.GetFiles(dir, "*", SearchOption.AllDirectories);
             if (files.Length == 0)
                 Directory.Delete(dir);
 
@@ -107,7 +121,7 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// This method is obsolete.
+        /// This method is obsolete. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate to the new ways below:
         /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs, string)"/> to store savegame-specific data.</br>
         /// <br>Use <see cref="GetPluginDataPath(Assembly, string)"/> to store plugin-specific data.</br>
         /// </summary>
@@ -125,7 +139,7 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// This method is obsolete.
+        /// This method is obsolete. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate to the new ways below:
         /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs)"/> to store savegame-specific data.</br>
         /// <br>Use <see cref="GetPluginDataPath(Assembly)"/> to store plugin-specific data.</br>
         /// </summary>
@@ -139,17 +153,6 @@ namespace SOD.Common.Helpers
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
             return path;
-        }
-
-        /// <summary>
-        /// Returns the folder that contains all the save games.
-        /// </summary>
-        /// <param name="executingAssembly"></param>
-        /// <returns></returns>
-        public string GetSaveGameDirectoryPath()
-        {
-            string persistantDataPath = Application.persistentDataPath;
-            return Path.Combine(persistantDataPath, "Save");
         }
 
         /// <summary>
