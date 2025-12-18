@@ -88,6 +88,7 @@ namespace SOD.Common.Helpers
         /// <br>See example usage:</br>
         /// <example>
         /// <code>
+        /// // Old way:
         /// var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
         /// var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(
         ///     Assembly.GetExecutingAssembly(),
@@ -121,8 +122,8 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// This method is obsolete. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate to the new ways below:
-        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs, string)"/> to store savegame-specific data.</br>
+        /// This method is obsolete. 
+        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs, string)"/> to store savegame-specific data. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate.</br>
         /// <br>Use <see cref="GetPluginDataPath(Assembly, string)"/> to store plugin-specific data.</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
@@ -139,8 +140,8 @@ namespace SOD.Common.Helpers
         }
 
         /// <summary>
-        /// This method is obsolete. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate to the new ways below:
-        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs)"/> to store savegame-specific data.</br>
+        /// This method is obsolete.
+        /// <br>Use <see cref="GetSaveGameDataPath(SaveGameArgs)"/> to store savegame-specific data. Use <see cref="MigrateOldSaveStructure(string, SaveGameArgs, string)"/> to migrate.</br>
         /// <br>Use <see cref="GetPluginDataPath(Assembly)"/> to store plugin-specific data.</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
@@ -204,7 +205,7 @@ namespace SOD.Common.Helpers
 
         /// <summary>
         /// Returns a path to a folder to store plugin specific data.
-        /// <br>Path will be bepinex/plugins/yourpluginname/pluginData</br>
+        /// <br>Path will be bepinex/plugins/yourpluginname/PluginData</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
         /// <returns></returns>
@@ -218,7 +219,7 @@ namespace SOD.Common.Helpers
 
         /// <summary>
         /// Returns a path to a folder to store plugin specific data.
-        /// <br>Path will be bepinex/plugins/yourpluginname/pluginData</br>
+        /// <br>Path will be bepinex/plugins/yourpluginname/PluginData</br>
         /// </summary>
         /// <param name="executingAssembly"></param>
         /// <returns></returns>
