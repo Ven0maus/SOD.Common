@@ -35,14 +35,14 @@ namespace SOD.QoL
 
         private void SaveGame_OnAfterDelete(object sender, Common.Helpers.SaveGameArgs e)
         {
-            SideJobPatches.DeleteSaveData(e.FilePath);
-            LostAndFoundPatches.DeleteSaveData(e.FilePath);
+            SideJobPatches.DeleteSaveData(e);
+            LostAndFoundPatches.DeleteSaveData(e);
         }
 
         private void SaveGame_OnBeforeSave(object sender, Common.Helpers.SaveGameArgs e)
         {
-            SideJobPatches.SaveExpireTimes(e.FilePath);
-            LostAndFoundPatches.SaveExpireTimes(e.FilePath);
+            SideJobPatches.SaveExpireTimes(e);
+            LostAndFoundPatches.SaveExpireTimes(e);
         }
 
         private void SaveGame_OnBeforeNewGame(object sender, System.EventArgs e)
@@ -53,8 +53,8 @@ namespace SOD.QoL
 
         private void SaveGame_OnBeforeLoad(object sender, Common.Helpers.SaveGameArgs e)
         {
-            SideJobPatches.InitializeExpireTimes(e.FilePath);
-            LostAndFoundPatches.InitializeExpireTimes(e.FilePath);
+            SideJobPatches.InitializeExpireTimes(e);
+            LostAndFoundPatches.InitializeExpireTimes(e);
         }
 
         private void Time_OnMinuteChanged(object sender, Common.Helpers.TimeChangedArgs e)
