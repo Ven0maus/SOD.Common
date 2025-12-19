@@ -32,7 +32,7 @@ namespace SOD.ThreatOverhaul.Patches
                         if (actor == __instance.human || actor.isStunned || actor.isDead || actor.isAsleep || actor.ai == null) 
                             continue;
 
-                        if (Plugin.Instance.Config.IncludeSeeingThreat && !actor.Sees(newTarget) && !actor.Sees(__instance.human))
+                        if (Plugin.Instance.Config.IncludeSeeingThreat && !actor.Sees(newTarget))
                             continue;
 
                         var distance = (actor.transform.position - __instance.human.transform.position).sqrMagnitude;
@@ -82,17 +82,10 @@ namespace SOD.ThreatOverhaul.Patches
                     }
 
                     if (_remove != null)
+                    {
                         __instance.human.seesIllegal.Remove(_remove.Value.Item1);
-                }
-            }
-
-            [HarmonyPostfix]
-            internal static void Postfix(NewAIController __instance)
-            {
-                if (_remove != null)
-                {
-                    __instance.human.seesIllegal.Add(_remove.Value.Item1, _remove.Value.Item2);
-                    _remove = null;
+                        _remove = null;
+                    }
                 }
             }
         }
