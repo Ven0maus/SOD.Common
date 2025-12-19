@@ -10,7 +10,7 @@ namespace SOD.ThreatOverhaul
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.ThreatOverhaul";
         public const string PLUGIN_NAME = "ThreatOverhaul";
-        public const string PLUGIN_VERSION = "1.0.0";
+        public const string PLUGIN_VERSION = "1.0.1";
 
         public override void Load()
         {
