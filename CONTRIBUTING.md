@@ -6,6 +6,7 @@ Thank you for considering contributing to **SOD.Common**! We appreciate your eff
 
 - Fork the repository: Fork the repository to your GitHub account.
 - Create a new branch on the fork, choose a descriptive branch name that reflects the nature of your contribution.
+- Open the readme.md in the libs/il2cpp folder to understand how to compile the project properly
 - Implement your changes in the new branch, ensure that your changes adhere to the existing coding style and conventions.
 - Thoroughly test your changes to ensure they work as expected.
 - Add a brief summary of your changes to the changelog.md file located in the ModFolderContent.

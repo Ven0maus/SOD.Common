@@ -10,6 +10,7 @@
 	</RestoreAdditionalProjectSources>
 	<OutputType>Library</OutputType>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -30,10 +31,7 @@
       <HintPath>..\..\libs\il2cpp\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="AssetBundleLoader">
-      <HintPath>dependencies\AssetBundleLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="AssetsTools.NET">
-      <HintPath>dependencies\AssetsTools.NET.dll</HintPath>
+      <HintPath>..\..\libs\il2cpp\AssetBundleLoader.dll</HintPath>
     </Reference>
     <Reference Include="FMODUnity">
       <HintPath>..\..\libs\il2cpp\FMODUnity.dll</HintPath>

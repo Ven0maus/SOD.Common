@@ -10,6 +10,14 @@ namespace SOD.Common.Helpers
         internal Gameplay() { }
 
         /// <summary>
+        /// Raises when a new victim is picked by the murder controller logic.
+        /// </summary>
+        public event EventHandler<HumanPickedArgs> OnVictimPicked;
+        /// <summary>
+        /// Raises when a new murderer is picked by the murder controller logic.
+        /// </summary>
+        public event EventHandler<HumanPickedArgs> OnMurdererPicked;
+        /// <summary>
         /// Raises when a victim is reported by a civilian, and provides some arguments related to this.
         /// </summary>
         public event EventHandler<VictimReportedArgs> OnVictimReported;
@@ -72,14 +80,14 @@ namespace SOD.Common.Helpers
         /// <param name="receiver"></param>
         /// <param name="placementRule"></param>
         /// <exception cref="Exception"></exception>
-        public void AddInteractableToHouse(string interactablePresetName, NewAddress address, 
+        public void AddInteractableToHouse(string interactablePresetName, NewAddress address,
             out FurnitureLocation furnitureLocation, out Interactable interactable,
             Human belongsTo = null, Human writer = null, Human receiver = null, InteractablePreset.OwnedPlacementRule placementRule = InteractablePreset.OwnedPlacementRule.nonOwnedOnly)
         {
             if (!Toolbox.Instance.objectPresetDictionary.TryGetValue(interactablePresetName, out var preset))
                 throw new Exception($"No interactable preset exists by name \"{interactablePresetName}\".");
 
-            interactable = address.PlaceObject(preset, belongsTo, writer, receiver, out furnitureLocation, false, 
+            interactable = address.PlaceObject(preset, belongsTo, writer, receiver, out furnitureLocation, false,
                 Interactable.PassedVarType.jobID, -1, true, 0, placementRule, 0, null, false, null, null, null, "", true);
         }
 
@@ -119,21 +127,43 @@ namespace SOD.Common.Helpers
 
         internal void VictimReported(Human victim, Human reporter, Human.Death.ReportType reportType)
         {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Victim reported: ({victim.humanID}) {victim.citizenName} | Reporter: ({reporter.humanID}) {reporter.citizenName}");
             OnVictimReported?.Invoke(this, new VictimReportedArgs(victim, reporter, reportType));
         }
 
         internal void VictimKilled(MurderController.Murder murder)
         {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Victim killed: ({murder.victimID}) {murder.victim.citizenName}");
             OnVictimKilled?.Invoke(this, new VictimKilledArgs(murder));
+        }
+
+        internal void VictimPicked(Human previous, Human @new)
+        {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: New victim picked: ({@new.humanID}) {@new.citizenName}");
+            OnVictimPicked?.Invoke(this, new HumanPickedArgs(previous, @new));
+        }
+
+        internal void MurdererPicked(Human previous, Human @new)
+        {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: New murderer picked: ({@new.humanID}) {@new.citizenName}");
+            OnMurdererPicked?.Invoke(this, new HumanPickedArgs(previous, @new));
         }
 
         internal void InteractablePickedUp(Interactable interactable)
         {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Picked up interactable: ({interactable.id}) {interactable.name}");
             OnInteractablePickup?.Invoke(this, new InteractableArgs(interactable));
         }
 
         internal void InteractableDropped(Interactable interactable, bool wasThrown)
         {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: {(wasThrown ? "Threw" : "Picked up")} interactable: ({interactable.id}) {interactable.name}");
             OnInteractableDropped?.Invoke(this, new InteractableArgs(interactable, wasThrown));
         }
     }

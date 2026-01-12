@@ -48,7 +48,7 @@ namespace SOD.Common.Helpers.ObjectiveObjects
         /// </summary>
         public bool IsCustom { get; }
 
-        internal ObjectiveArgs(Objective objective, bool isCustom) 
+        internal ObjectiveArgs(Objective objective, bool isCustom)
         {
             Objective = objective;
             IsCustom = isCustom;

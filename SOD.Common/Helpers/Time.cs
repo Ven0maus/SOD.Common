@@ -169,15 +169,37 @@ namespace SOD.Common.Helpers
         internal void OnTimeChanged(TimeData previous, TimeData current)
         {
             if (previous.Minute != current.Minute)
+            {
                 OnMinuteChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+            }
             if (previous.Hour != current.Hour)
+            {
                 OnHourChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+
+                if (Plugin.InDebugMode)
+                    Plugin.Log.LogInfo($"[DebugMode]: One hour passed | \"{current}\".");
+            }
             if (previous.Day != current.Day)
+            {
                 OnDayChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+
+                if (Plugin.InDebugMode)
+                    Plugin.Log.LogInfo($"[DebugMode]: One day passed | \"{current}\".");
+            }
             if (previous.Month != current.Month)
+            {
                 OnMonthChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+
+                if (Plugin.InDebugMode)
+                    Plugin.Log.LogInfo($"[DebugMode]: One month passed | \"{current}\".");
+            }
             if (previous.Year != current.Year)
+            {
                 OnYearChanged?.Invoke(this, new TimeChangedArgs(previous, current));
+
+                if (Plugin.InDebugMode)
+                    Plugin.Log.LogInfo($"[DebugMode]: One year passed | \"{current}\".");
+            }
         }
 
         internal void OnPauseModeChanged(bool paused)
@@ -206,6 +228,10 @@ namespace SOD.Common.Helpers
 
             if (_initialized) return;
             _initialized = true;
+
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Initialized time component.");
+
             OnTimeInitialized?.Invoke(this, new TimeChangedArgs(CurrentDateTime, CurrentDateTime));
         }
 
@@ -444,9 +470,9 @@ namespace SOD.Common.Helpers
                         right.Day == 0 ? right.Day + 1 : right.Day, right.Hour, right.Minute, 0);
                     return dateLeft - dateRight;
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    Plugin.Log.LogError($"[Date information]: Left ({left}) | Right ({right})");
+                    Plugin.Log.LogError($"[Date information]: Left ({left}) | Right ({right}): {e.Message}");
                     throw;
                 }
             }

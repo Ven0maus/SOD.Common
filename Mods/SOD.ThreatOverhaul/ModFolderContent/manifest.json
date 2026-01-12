@@ -1,10 +1,10 @@
 {
   "name": "SODThreatOverhaul",
-  "version_number": "1.0.0",
+  "version_number": "1.0.1",
   "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.ThreatOverhaul",
   "description": "Complete overhaul of the threat calculation logic for citizens.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-2.0.6"
+    "Venomaus-SODCommon-2.1.1"
   ]
 }

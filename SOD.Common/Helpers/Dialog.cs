@@ -40,6 +40,9 @@ namespace SOD.Common.Helpers
         /// <param name="endsDialog"></param>
         public void Speak(Citizen citizen, Guid blockId, bool endsDialog)
         {
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Citizen ({citizen.humanID}) {citizen.citizenName} speaks blockId \"{blockId}\".");
+
             SpeakInternal(citizen, blockId.ToString(), endsDialog);
         }
 
@@ -57,6 +60,9 @@ namespace SOD.Common.Helpers
             // Add to dds cache
             if (!Lib.DdsStrings.Exists("dds.blocks", fnv))
                 Lib.DdsStrings["dds.blocks", fnv] = customText;
+
+            if (Plugin.InDebugMode)
+                Plugin.Log.LogInfo($"[DebugMode]: Citizen ({citizen.humanID}) {citizen.citizenName} speaks \"{customText}\".");
 
             SpeakInternal(citizen, fnv, endsDialog);
         }

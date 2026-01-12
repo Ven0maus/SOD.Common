@@ -59,7 +59,7 @@ namespace SOD.Common.Patches
 
                 var menus = new Lazy<Il2CppArrayBase<MenuPreset>>(Resources.FindObjectsOfTypeAll<MenuPreset>);
 
-                if (Plugin.Instance.Config.DebugMode)
+                if (Plugin.InDebugMode)
                 {
                     // Log any presets not available in the enum, so we can add them in new updates of SOD.Common incase new game updates introduce new ones.
                     var missingLocationsInEnum = menus.Value
@@ -67,7 +67,7 @@ namespace SOD.Common.Patches
                         .Except(Enum.GetValues<SyncDiskBuilder.SyncDiskSaleLocation>()
                             .Select(a => a.ToString()), StringComparer.OrdinalIgnoreCase);
                     foreach (var location in missingLocationsInEnum)
-                        Plugin.Log.LogInfo("[UpdateRequired] Missing following new sale locations in enum: " + location);
+                        Plugin.Log.LogInfo("[DebugMode]: Missing following new sale locations in enum: " + location);
                 }
 
                 // Load Sync disks into menu presets if applicable

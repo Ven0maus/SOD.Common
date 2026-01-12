@@ -119,13 +119,17 @@ namespace SOD.Common.Helpers
             return new SyncDiskBuilder(syncDiskName, pluginGuid, reRaiseEventsOnSaveLoad);
         }
 
-        internal void CheckForSyncDiskData(bool onLoad, string saveFilePath)
+        internal void CheckForSyncDiskData(bool onLoad, SaveGameArgs saveGameArgs)
         {
             if (onLoad)
                 InstalledSyncDisks.Clear();
 
-            var hash = Lib.SaveGame.GetUniqueString(saveFilePath);
-            var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+            var hash = Lib.SaveGame.GetUniqueString(saveGameArgs.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
+            var oldFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"syncdiskdata_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+
+            var path = Lib.SaveGame.MigrateOldSaveStructure(oldFilePath, saveGameArgs, "syncdiskdata.json");
             if (onLoad && !File.Exists(path)) return;
 
             if (onLoad)
@@ -167,7 +171,7 @@ namespace SOD.Common.Helpers
                             // Get real option id
                             var realOption = realOptions.Name1 != null && realOptions.Name1.Equals(option) ? realOptions.Id1 :
                                 realOptions.Name2 != null && realOptions.Name2.Equals(option) ? realOptions.Id2 : realOptions.Id3;
-                            if (realOption == null) 
+                            if (realOption == null)
                             {
                                 Plugin.Log.LogInfo($"[Skipped]: Could not find upgrade option \"{option}\" within sync disk \"{SyncDisk.GetSyncDiskNameFromPreset(disk.SyncDiskName)}\".");
                                 continue;
@@ -196,12 +200,12 @@ namespace SOD.Common.Helpers
                 }
 
                 // On save, serialize all sync disk data
-                var toBeSaved = new SyncDiskJsonData() 
-                { 
+                var toBeSaved = new SyncDiskJsonData()
+                {
                     SyncDiskData = InstalledSyncDisks.Values
                         .SelectMany(a => a)
                         .OrderBy(a => a.SyncDiskName)
-                        .ToList() 
+                        .ToList()
                 };
                 var json = JsonSerializer.Serialize(toBeSaved, new JsonSerializerOptions { WriteIndented = false });
                 File.WriteAllText(path, json);
@@ -240,6 +244,9 @@ namespace SOD.Common.Helpers
                             disks1.Add(new InstalledSyncDiskData(installArgs.SyncDisk.Preset.name, installArgs.Effect.Value.Name));
                         }
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Installed sync disk upgrade \"{installArgs.SyncDisk.Preset.name}\" | effect: \"{installArgs.Effect?.Name ?? "None"}\".");
                     break;
                 case SyncDiskEvent.OnUninstall:
                     var uninstallArgs = new SyncDiskArgs(upgrade, true, false);
@@ -270,6 +277,9 @@ namespace SOD.Common.Helpers
                         if (disks2.Count == 0)
                             InstalledSyncDisks.Remove(uninstallArgs.SyncDisk.Preset.name);
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Uninstalled sync disk upgrade \"{uninstallArgs.SyncDisk.Preset.name}\" | effect: \"{uninstallArgs.Effect?.Name ?? "None"}\".");
                     break;
                 case SyncDiskEvent.OnUpgrade:
                     var upgradeArgs = new SyncDiskArgs(upgrade);
@@ -297,6 +307,9 @@ namespace SOD.Common.Helpers
 
                         cEffect.UpgradeOptions.Add(upgradeArgs.UpgradeOption.Value.Name);
                     }
+
+                    if (Plugin.InDebugMode)
+                        Plugin.Log.LogInfo($"[DebugMode]: Upgraded sync disk \"{upgradeArgs.SyncDisk.Preset.name}\" | effect: \"{upgradeArgs.UpgradeOption?.Name ?? "None"}\".");
                     break;
                 default:
                     throw new NotSupportedException($"Invalid event: {syncDiskEvent}");

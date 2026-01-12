@@ -8,14 +8,14 @@ namespace SOD.Common.Helpers.ObjectiveObjects
         internal const string MainDictionary = "missions.postings";
 
         internal string EntryRef { get; }
-        internal string DictionaryRef 
-        { 
+        internal string DictionaryRef
+        {
             get
             {
                 if (Case.caseType == Case.CaseType.mainStory)
                     return ChapterController.Instance.loadedChapter.dictionary;
                 return MainDictionary;
-            } 
+            }
         }
 
         internal Case Case { get; }

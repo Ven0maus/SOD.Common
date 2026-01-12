@@ -1,4 +1,5 @@
 ﻿using SOD.Common;
+using SOD.Common.Helpers;
 using SOD.RelationsPlus.Objects;
 using System;
 using System.Collections;
@@ -156,19 +157,23 @@ namespace SOD.RelationsPlus
         /// <summary>
         /// Loads all citizen relation information from a save file.
         /// </summary>
-        /// <param name="relationMatrixPath"></param>
-        internal void Load(string hash)
+        /// <param name="e"></param>
+        internal void Load(SaveGameArgs e)
         {
             IsLoading = true;
+            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(relationMatrixPath, e, "sod_relationsplus_RelationsPlusData.json");
 
             // Reset for a new load
             Clear();
 
             // Relation matrix loading
-            if (File.Exists(relationMatrixPath))
+            if (File.Exists(newPath))
             {
-                var relationMatrixJson = File.ReadAllText(relationMatrixPath);
+                var relationMatrixJson = File.ReadAllText(newPath);
                 var citizenSaveData = JsonSerializer.Deserialize<CitizenSaveData>(relationMatrixJson);
 
                 // Set values
@@ -184,16 +189,20 @@ namespace SOD.RelationsPlus
         /// <summary>
         /// Saves all citizen relation information to a save file.
         /// </summary>
-        /// <param name="filePath"></param>
-        internal void Save(string hash)
+        /// <param name="e"></param>
+        internal void Save(SaveGameArgs e)
         {
+            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var relationMatrixPath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(relationMatrixPath, e, "sod_relationsplus_RelationsPlusData.json");
 
             if (!_relationMatrixes.Any())
             {
-                if (File.Exists(relationMatrixPath))
+                if (File.Exists(newPath))
                 {
-                    File.Delete(relationMatrixPath);
+                    File.Delete(newPath);
                     Plugin.Log.LogInfo("Deleted citizen relations.");
                 }
             }
@@ -208,20 +217,19 @@ namespace SOD.RelationsPlus
 
                 // Serialize to json and save
                 var citizenSaveDataJson = JsonSerializer.Serialize(saveObject, new JsonSerializerOptions { WriteIndented = false });
-                File.WriteAllText(relationMatrixPath, citizenSaveDataJson);
+                File.WriteAllText(newPath, citizenSaveDataJson);
                 Plugin.Log.LogInfo("Saved citizen relations.");
             }
         }
 
-        internal static void Delete(string hash)
+        internal static void Delete(SaveGameArgs e)
         {
+            // Support migration, but handle deletion in SOD.Common
+            var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var relationFilePath = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"RelationsPlusData_{hash}.json");
-
-            if (File.Exists(relationFilePath))
-            {
-                File.Delete(relationFilePath);
-                Plugin.Log.LogInfo("Deleted citizen relations.");
-            }
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(relationFilePath, e, "sod_relationsplus_RelationsPlusData.json");
         }
 
         /// <summary>

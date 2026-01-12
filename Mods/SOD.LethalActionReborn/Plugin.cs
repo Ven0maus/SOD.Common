@@ -16,7 +16,7 @@ namespace SOD.LethalActionReborn
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LethalActionReborn";
         public const string PLUGIN_NAME = "LethalActionReborn";
-        public const string PLUGIN_VERSION = "1.0.4";
+        public const string PLUGIN_VERSION = "1.0.5";
 
         public override void Load()
         {
@@ -48,17 +48,22 @@ namespace SOD.LethalActionReborn
 
         private void SaveGame_OnAfterDelete(object sender, Common.Helpers.SaveGameArgs e)
         {
+            // Support migration, but deletion handled by SOD.Common
             var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"lethalActioned_{hash}.txt");
-            if (File.Exists(path))
-                File.Delete(path);
+#pragma warning restore CS0618 // Type or member is obsolete
+            _ = Lib.SaveGame.MigrateOldSaveStructure(path, e, "sod_lethalactionreborn_lethalActioned.txt");
         }
 
         private void SaveGame_OnAfterSave(object sender, Common.Helpers.SaveGameArgs e)
         {
             var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"lethalActioned_{hash}.txt");
-            File.WriteAllText(path, string.Join(",", CitizenPatches.Citizen_RecieveDamage.KilledCitizens));
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(path, e, "sod_lethalactionreborn_lethalActioned.txt");
+            File.WriteAllText(newPath, string.Join(",", CitizenPatches.Citizen_RecieveDamage.KilledCitizens));
         }
 
         private void SaveGame_OnAfterLoad(object sender, Common.Helpers.SaveGameArgs e)
@@ -66,10 +71,13 @@ namespace SOD.LethalActionReborn
             CitizenPatches.Citizen_RecieveDamage.CitizenHitsTakenOnKo.Clear();
 
             var hash = Lib.SaveGame.GetUniqueString(e.FilePath);
+#pragma warning disable CS0618 // Type or member is obsolete
             var path = Lib.SaveGame.GetSavestoreDirectoryPath(Assembly.GetExecutingAssembly(), $"lethalActioned_{hash}.txt");
-            if (!File.Exists(path)) return;
+#pragma warning restore CS0618 // Type or member is obsolete
+            var newPath = Lib.SaveGame.MigrateOldSaveStructure(path, e, "sod_lethalactionreborn_lethalActioned.txt");
+            if (!File.Exists(newPath)) return;
 
-            var ids = File.ReadAllText(path)
+            var ids = File.ReadAllText(newPath)
                 .Split(new[] { ',' }, System.StringSplitOptions.RemoveEmptyEntries)
                 .Select(a => int.Parse(a))
                 .ToHashSet();

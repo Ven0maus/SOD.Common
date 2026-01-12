@@ -47,7 +47,7 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                if (!SessionData.Instance.play) return;
+                if (!SessionData.Instance.play || !SessionData.Instance.startedGame) return;
 
                 // Init time
                 if (!Lib.Time.IsInitialized)
@@ -72,6 +72,8 @@ namespace SOD.Common.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
+                if (!SessionData.Instance.play || !SessionData.Instance.startedGame) return;
+
                 Lib.Time.InitializeTime();
             }
         }

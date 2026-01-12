@@ -7,8 +7,8 @@ namespace SOD.Common.Helpers.GameplayObjects
         public Interactable Interactable { get; }
         public bool WasThrown { get; }
 
-        internal InteractableArgs(Interactable interactable, bool wasThrown = false) 
-        { 
+        internal InteractableArgs(Interactable interactable, bool wasThrown = false)
+        {
             Interactable = interactable;
             WasThrown = wasThrown;
         }

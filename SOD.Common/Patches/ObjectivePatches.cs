@@ -19,7 +19,7 @@ namespace SOD.Common.Patches
                 {
                     // If action is available, execute it
                     customObjective.OnComplete?.Invoke(__instance);
-                    
+
                     // Execute children objectives
                     if (customObjective.Children != null)
                     {

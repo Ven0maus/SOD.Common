@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.8**
+- Added compatibility support for savestore migration
+
 **1.1.7**
 - Added an evidence link from the employmentcontract to the address
 

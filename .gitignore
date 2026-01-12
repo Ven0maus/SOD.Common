@@ -1,4 +1,4 @@
-libs/
+*.dll
 *.swp
 *.*~
 project.lock.json
@@ -34,4 +34,4 @@ msbuild.wrn
 .vs/
 *.zip
 UnityProject
-libs
+Playground
