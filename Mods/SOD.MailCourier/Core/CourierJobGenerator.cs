@@ -1,7 +1,9 @@
 ﻿using SOD.Common;
+using SOD.Common.Custom;
 using SOD.Common.Extensions;
 using SOD.Common.Helpers;
 using SOD.CourierJobs.Core;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,12 +16,18 @@ namespace SOD.MailCourier.Core
     {
         private const string SAVEDATA_FILENAME = "mailcourier_savedata.json";
 
-        private static readonly Dictionary<int, CourierJob> _courierJobs = new();
+        private static readonly Dictionary<int, CourierJob> _courierJobsBySealedMail = new();
+        private static readonly Dictionary<int, List<CourierJob>> _courierJobsByMailbox = new();
 
-        private static readonly JsonSerializerOptions _serializerOptions = new()
+        private static readonly Lazy<JsonSerializerOptions> _serializerOptions = new(() =>
         {
-            WriteIndented = true
-        };
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+            options.Converters.Add(new Vector3JsonConverter());
+            return options;
+        });
 
         /// <summary>
         /// Generate a new courier job for the player.
@@ -39,8 +47,15 @@ namespace SOD.MailCourier.Core
             // Store the full address so we don't need to look it up each time
             var address = mailbox.objectRef.TryCast<NewAddress>();
             var fullAddress = address.residence.GetResidenceString() + " " + address.building.name;
+            var courierJob = new CourierJob(mailbox.id, sealedMailId, fullAddress);
 
-            _courierJobs.Add(sealedMailId, new CourierJob(mailbox.id, sealedMailId, fullAddress));
+            // Add to by sealed mail
+            _courierJobsBySealedMail.Add(sealedMailId, courierJob);
+
+            // Add to by mailbox
+            if (!_courierJobsByMailbox.TryGetValue(mailbox.id, out var jobs))
+                _courierJobsByMailbox[mailbox.id] = jobs = new List<CourierJob>();
+            jobs.Add(courierJob);
         }
 
         /// <summary>
@@ -48,12 +63,20 @@ namespace SOD.MailCourier.Core
         /// </summary>
         internal static void DestroyCourierJob(CourierJob courierJob)
         {
-            if (_courierJobs.ContainsKey(courierJob.SealedMailId))
+            if (_courierJobsBySealedMail.ContainsKey(courierJob.SealedMailId))
             {
                 var mailItem = FindSealedMail(courierJob.SealedMailId);
                 if (mailItem != null && mailItem.id > 0 && !mailItem.rem)
                     mailItem.Delete();
-                _courierJobs.Remove(courierJob.SealedMailId);
+
+                // Remove from by sealed mail
+                _courierJobsBySealedMail.Remove(courierJob.SealedMailId);
+
+                // Remove from by mailbox
+                var jobs = _courierJobsByMailbox[courierJob.MailboxId];
+                jobs.Remove(courierJob);
+                if (jobs.Count == 0)
+                    _courierJobsByMailbox.Remove(courierJob.MailboxId);
             }
         }
 
@@ -116,9 +139,20 @@ namespace SOD.MailCourier.Core
         /// </summary>
         /// <param name="sealedMailId"></param>
         /// <returns></returns>
-        internal static CourierJob FindJob(int sealedMailId)
+        internal static CourierJob FindJobBySealedMailId(int sealedMailId)
         {
-            return _courierJobs.TryGetValue(sealedMailId, out var courierJob) ? courierJob : null;
+            return _courierJobsBySealedMail.TryGetValue(sealedMailId, out var courierJob) ? courierJob : null;
+        }
+
+        /// <summary>
+        /// Find all courier jobs for a specified mailbox id.
+        /// </summary>
+        /// <param name="mailboxId"></param>
+        /// <returns></returns>
+        internal static IReadOnlyList<CourierJob> FindJobsByMailboxId(int mailboxId)
+        {
+            return _courierJobsByMailbox.TryGetValue(mailboxId, out var courierJobs) ? 
+                courierJobs : new List<CourierJob>();
         }
 
         /// <summary>
@@ -127,15 +161,24 @@ namespace SOD.MailCourier.Core
         /// <param name="saveGameArgs"></param>
         internal static void LoadFromFile(SaveGameArgs saveGameArgs)
         {
-            _courierJobs.Clear();
+            _courierJobsBySealedMail.Clear();
+            _courierJobsByMailbox.Clear();
 
             var saveGameDataPath = Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
             var filePath = Path.Combine(saveGameDataPath, SAVEDATA_FILENAME);
             if (!File.Exists(filePath)) return;
 
-            var courierJobs = JsonSerializer.Deserialize<List<CourierJob>>(filePath, _serializerOptions);
+            var courierJobs = JsonSerializer.Deserialize<List<CourierJob>>(File.ReadAllText(filePath), _serializerOptions.Value);
             foreach (var courierJob in courierJobs)
-                _courierJobs.Add(courierJob.SealedMailId, courierJob);
+            {
+                // Add to sealed mail jobs
+                _courierJobsBySealedMail.Add(courierJob.SealedMailId, courierJob);
+
+                // Add to mailbox jobs
+                if (!_courierJobsByMailbox.TryGetValue(courierJob.MailboxId, out var courierJobsMailbox))
+                    _courierJobsByMailbox[courierJob.MailboxId] = courierJobsMailbox = new List<CourierJob>();
+                courierJobsMailbox.Add(courierJob);
+            }
 
             Plugin.Log.LogInfo($"Loaded {courierJobs.Count} active player mail courier jobs.");
         }
@@ -149,7 +192,7 @@ namespace SOD.MailCourier.Core
             var saveGameDataPath = Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
             var filePath = Path.Combine(saveGameDataPath, SAVEDATA_FILENAME);
 
-            if (_courierJobs.Count == 0)
+            if (_courierJobsBySealedMail.Count == 0)
             {
                 // Cleanup any files if previous save had courier jobs
                 if (File.Exists(filePath))
@@ -157,17 +200,33 @@ namespace SOD.MailCourier.Core
                 return;
             }
 
-            var json = JsonSerializer.Serialize(_courierJobs.Values.ToList(), _serializerOptions);
+            var json = JsonSerializer.Serialize(_courierJobsBySealedMail.Values.ToList(), _serializerOptions.Value);
             File.WriteAllText(filePath, json);
 
-            Plugin.Log.LogInfo($"Saved {_courierJobs.Count} active player mail courier jobs.");
+            Plugin.Log.LogInfo($"Saved {_courierJobsBySealedMail.Count} active player mail courier jobs.");
         }
+
+        /// <summary>
+        /// The interaction action with its AIActionPreset
+        /// </summary>
+        internal static readonly FirstPersonItem.FPSInteractionAction InsertMailInteractionAction = new()
+        {
+            action = new AIActionPreset { presetName = "mail_courier_job_message", onlyAvailableWhenItemSelected = true },
+            interactionName = "mail_courier_job_message",
+            keyOverride = InteractablePreset.InteractionKey.primary
+        };
 
         /// <summary>
         /// Registers the mail courier job in the newsstands.
         /// </summary>
         internal static void RegisterMailCourierJobs()
         {
+            // Make sure to clear everything, any previous states
+            _courierJobsBySealedMail.Clear();
+            _courierJobsByMailbox.Clear();
+            _mailboxLocations = null;
+            _mailboxList = null;
+
             var newsStand = Common.Helpers.SyncDiskObjects.SyncDiskBuilder.SyncDiskSaleLocation.Newsstand.ToString();
             var newsStandMenus = Toolbox.Instance.GetFromResourceCache<MenuPreset>()
                 .Where(a => a.GetPresetName() == newsStand);
@@ -187,6 +246,7 @@ namespace SOD.MailCourier.Core
             // Register new name for it in DDS strings
             Lib.DdsStrings["evidence.names", copy.presetName] = "Sealed Mail"; // What the actual item is named when in the world
             Lib.DdsStrings["evidence.names", copy.name] = "Mail Courier Job"; // What the item is named in the news stand
+            Lib.DdsStrings["ui.interaction", "mail_courier_job_message"] = "Insert"; // New interaction to insert into mailbox
 
             // Setup interactable preset
             copy.placeAtHome = false;
@@ -198,6 +258,10 @@ namespace SOD.MailCourier.Core
             copy.retailItem = copyRetail;
             copy.summaryMessageSource = "mail_courier_job_message";
 
+            // Insert our custom action
+            InsertMailInteractionAction.action.availableWhenItemsSelected.Add(copy.fpsItem);
+            copy.fpsItem.actions.Add(InsertMailInteractionAction);
+
             // Setup retail item preset
             copyRetail.itemPreset = copy;
             copyRetail.menuCategory = RetailItemPreset.MenuCategory.none;
@@ -207,12 +271,25 @@ namespace SOD.MailCourier.Core
             copyRetail.isHot = false;
 
             // Add to game's presets
-            GameExtensions.GetResourceCacheCollection<RetailItemPreset>(Toolbox.Instance).Add(copyRetail.presetName, copyRetail);
-            Toolbox.Instance.objectPresetDictionary.Add(copy.presetName, copy);
+            GameExtensions.GetResourceCacheCollection<RetailItemPreset>(Toolbox.Instance)[copyRetail.presetName] = copyRetail;
+            Toolbox.Instance.objectPresetDictionary[copy.presetName] = copy;
 
             // Add to the top of all newsstands in the game
             foreach (var newsStandMenu in newsStandMenus)
-                newsStandMenu.itemsSold.Insert(0, copy);
+            {
+                var previousItem = newsStandMenu.itemsSold
+                    .Where(a => a.presetName == "DeliverableMailItemPreset")
+                    .FirstOrDefault();
+                if (previousItem != null)
+                {
+                    newsStandMenu.itemsSold.Remove(previousItem);
+                    newsStandMenu.itemsSold.Insert(0, copy);
+                }
+                else
+                {
+                    newsStandMenu.itemsSold.Insert(0, copy);
+                }  
+            }
 
             Plugin.Log.LogInfo("Registered mail courier job in newsstands.");
         }

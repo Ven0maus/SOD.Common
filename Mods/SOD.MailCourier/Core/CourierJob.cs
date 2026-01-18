@@ -38,7 +38,8 @@ namespace SOD.CourierJobs.Core
         {
             get
             {
-                return (int)Math.Round(75f + (Mailbox.GetWorldPosition() - PointOfOrigin).magnitude / 100f * 25f);
+                return (int)Math.Round(50f + 75f + 
+                    ((Mailbox.GetWorldPosition() - PointOfOrigin).magnitude * 0.75f));
             }
         }
 

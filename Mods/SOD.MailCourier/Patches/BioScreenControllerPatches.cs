@@ -17,7 +17,7 @@ namespace SOD.MailCourier.Patches
                     if (sealedMail != null && sealedMail.preset.summaryMessageSource != null && 
                         sealedMail.preset.summaryMessageSource == "mail_courier_job_message")
                     {
-                        var courierJob = CourierJobGenerator.FindJob(sealedMail.id);
+                        var courierJob = CourierJobGenerator.FindJobBySealedMailId(sealedMail.id);
                         if (courierJob != null)
                         {
                             __instance.summaryTextToDisplay = "Delivery address: " + courierJob.DeliveryAddressName + " Mailbox";
