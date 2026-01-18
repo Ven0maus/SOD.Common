@@ -131,6 +131,10 @@ namespace SOD.MailCourier.Core
                 if (mailItem != null && mailItem.id > 0 && !mailItem.rem)
                     mailItem.Delete();
 
+                // Remove also the route (TODO: check if this is the correct route first?)
+                if (MapController.Instance.playerRoute != null)
+                    MapController.Instance.playerRoute.Remove();
+
                 // Remove from by sealed mail
                 _courierJobsBySealedMail.Remove(courierJob.SealedMailId);
 
