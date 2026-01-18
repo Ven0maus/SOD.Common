@@ -100,7 +100,7 @@ namespace SOD.MailCourier.Core
             var currentTime = Common.Lib.Time.CurrentDateTime;
             foreach (var courierJob in _courierJobsBySealedMail.Values.ToList())
             {
-                var mail = FindSealedMail(courierJob.SealedMailId);
+                var mail = courierJob.SealedMail;
                 if (mail == null || mail.rem)
                 {
                     DestroyCourierJob(courierJob);

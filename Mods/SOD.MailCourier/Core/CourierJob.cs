@@ -59,7 +59,7 @@ namespace SOD.CourierJobs.Core
         /// The interactable for the courier job.
         /// </summary>
         [JsonIgnore]
-        internal Interactable MailItem => CourierJobGenerator.FindSealedMail(SealedMailId);
+        internal Interactable SealedMail => CourierJobGenerator.FindSealedMail(SealedMailId);
 
         // For serialization
         public CourierJob() { }
