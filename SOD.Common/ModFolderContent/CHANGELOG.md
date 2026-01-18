@@ -1,4 +1,10 @@
 # CHANGELOG
+**2.1.2**
+- Exposed GameExtensions.GetResourceCacheCollection<T>(toolbox)
+- Added Lib.Gameplay.HasOpenSlotInInventory()
+- Added Vector3JsonConverter in the SOD.Common.Custom namespace
+- Added TimeDataJsonConverter in the SOD.Common.Custom namespace
+
 **2.1.1**
 - Support for new workshop update
 - Added a lot more debug logging for development purposes

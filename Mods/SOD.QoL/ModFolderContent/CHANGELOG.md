@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.1.9**
+- Compatibility update for minor SOD.Common change 
+
 **1.1.8**
 - Added compatibility support for savestore migration
 

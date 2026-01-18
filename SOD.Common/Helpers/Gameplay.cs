@@ -125,6 +125,15 @@ namespace SOD.Common.Helpers
             return interactables.Length != 0;
         }
 
+        /// <summary>
+        /// Determines if the player has an open slot in their inventory.
+        /// </summary>
+        /// <returns></returns>
+        public bool HasOpenSlotInInventory()
+        {
+            return FirstPersonItemController.Instance.slots.Any(a => a.interactableID == -1 || a.GetInteractable() == null);
+        }
+
         internal void VictimReported(Human victim, Human reporter, Human.Death.ReportType reportType)
         {
             if (Plugin.InDebugMode)
