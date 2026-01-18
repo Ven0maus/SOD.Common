@@ -13,9 +13,6 @@ namespace SOD.CourierJobs
         [Binding(0.75f, "The percentage of the distance to travel as a bonus on top of the base reward.", "General.DistanceBonusPercentage")]
         float DistanceBonusPercentage { get; set; }
 
-        [Binding(false, "Should the target mailbox be highlighted?", "Optional.HighlightMailbox")]
-        bool HighlightMailbox { get; set; }
-
         [Binding(false, "If you already have a waypoint, should it be overwritten when accepting a new courier job?", "Optional.OverwriteExistingWaypoint")]
         bool OverwriteExistingWaypoint { get; set; }
     }
