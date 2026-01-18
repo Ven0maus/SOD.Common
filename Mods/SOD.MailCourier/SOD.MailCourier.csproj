@@ -7,6 +7,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Remove="ModFolderContent\Builds\**" />
+		<EmbeddedResource Remove="ModFolderContent\Builds\**" />
+		<None Remove="ModFolderContent\Builds\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\SOD.Common\SOD.Common.csproj" />
 	</ItemGroup>
 
