@@ -14,7 +14,7 @@ namespace SOD.MailCourier.Patches
                 if (__instance.hoveredSlot != null && __instance.isOpen)
                 {
                     Interactable sealedMail = __instance.hoveredSlot.GetInteractable();
-                    if (sealedMail != null && sealedMail.preset.summaryMessageSource != null && 
+                    if (sealedMail != null && sealedMail.preset.summaryMessageSource != null &&
                         sealedMail.preset.summaryMessageSource == "mail_courier_job_message")
                     {
                         var courierJob = CourierJobGenerator.FindJobBySealedMailId(sealedMail.id);

@@ -21,6 +21,6 @@ This deposit discourages abandoning the job and ensures commitment to completing
 
 ### Reward
 
-On delivery you will be paid immediately: (50 crow refund) + 75 crows + an extra 25% of the distance from the news stand to the delivery address.
+On delivery you will be paid immediately: (50 crow refund) + 75 crows + an extra 75% of the distance from the news stand to the delivery address.
 
 (This reward can be fully configured in the config options.)

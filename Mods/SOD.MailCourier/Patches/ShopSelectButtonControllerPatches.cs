@@ -26,7 +26,7 @@ namespace SOD.MailCourier.Patches
             internal static bool ComingFromAPurchase = false;
 
             [HarmonyPrefix]
-            internal static void Prefix(ShopSelectButtonController __instance, ref int __state) 
+            internal static void Prefix(ShopSelectButtonController __instance, ref int __state)
             {
                 if (__instance.preset == null || __instance.preset.summaryMessageSource != "mail_courier_job_message")
                     return;

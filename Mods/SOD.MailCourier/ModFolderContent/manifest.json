@@ -2,7 +2,7 @@
   "name": "SODMailCourier",
   "version_number": "1.0.0",
   "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.MailCourier",
-  "description": "Introduces a new way of earning some cash, by adding several different courier jobs.",
+  "description": "Introduces a new way of earning some cash, by allowing the player to deliver mail to mailboxes.",
   "author": "Venomaus",
   "dependencies": [
     "Venomaus-SODCommon-2.1.2"

@@ -18,6 +18,8 @@ namespace SOD.MailCourier.Core
 
         private static readonly Dictionary<int, CourierJob> _courierJobsBySealedMail = new();
         private static readonly Dictionary<int, List<CourierJob>> _courierJobsByMailbox = new();
+        private static Dictionary<int, Interactable> _mailboxLocations;
+        private static List<Interactable> _mailboxList;
 
         private static readonly Lazy<JsonSerializerOptions> _serializerOptions = new(() =>
         {
@@ -28,6 +30,16 @@ namespace SOD.MailCourier.Core
             options.Converters.Add(new Vector3JsonConverter());
             return options;
         });
+
+        /// <summary>
+        /// The interaction action with its AIActionPreset
+        /// </summary>
+        internal static readonly FirstPersonItem.FPSInteractionAction InsertMailInteractionAction = new()
+        {
+            action = new AIActionPreset { presetName = "mail_courier_job_message", onlyAvailableWhenItemSelected = true },
+            interactionName = "mail_courier_job_message",
+            keyOverride = InteractablePreset.InteractionKey.primary
+        };
 
         /// <summary>
         /// Generate a new courier job for the player.
@@ -79,9 +91,6 @@ namespace SOD.MailCourier.Core
                     _courierJobsByMailbox.Remove(courierJob.MailboxId);
             }
         }
-
-        private static Dictionary<int, Interactable> _mailboxLocations;
-        private static List<Interactable> _mailboxList;
 
         /// <summary>
         /// Finds a mailbox by id, or returns a random one from the pool if no id is specified.
@@ -151,7 +160,7 @@ namespace SOD.MailCourier.Core
         /// <returns></returns>
         internal static IReadOnlyList<CourierJob> FindJobsByMailboxId(int mailboxId)
         {
-            return _courierJobsByMailbox.TryGetValue(mailboxId, out var courierJobs) ? 
+            return _courierJobsByMailbox.TryGetValue(mailboxId, out var courierJobs) ?
                 courierJobs : new List<CourierJob>();
         }
 
@@ -205,16 +214,6 @@ namespace SOD.MailCourier.Core
 
             Plugin.Log.LogInfo($"Saved {_courierJobsBySealedMail.Count} active player mail courier jobs.");
         }
-
-        /// <summary>
-        /// The interaction action with its AIActionPreset
-        /// </summary>
-        internal static readonly FirstPersonItem.FPSInteractionAction InsertMailInteractionAction = new()
-        {
-            action = new AIActionPreset { presetName = "mail_courier_job_message", onlyAvailableWhenItemSelected = true },
-            interactionName = "mail_courier_job_message",
-            keyOverride = InteractablePreset.InteractionKey.primary
-        };
 
         /// <summary>
         /// Registers the mail courier job in the newsstands.
@@ -288,7 +287,7 @@ namespace SOD.MailCourier.Core
                 else
                 {
                     newsStandMenu.itemsSold.Insert(0, copy);
-                }  
+                }
             }
 
             Plugin.Log.LogInfo("Registered mail courier job in newsstands.");

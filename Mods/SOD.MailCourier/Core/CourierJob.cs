@@ -38,8 +38,8 @@ namespace SOD.CourierJobs.Core
         {
             get
             {
-                return (int)Math.Round(50f + 75f + 
-                    ((Mailbox.GetWorldPosition() - PointOfOrigin).magnitude * 0.75f));
+                return (int)Math.Round(Plugin.Instance.Config.InitialCost + Plugin.Instance.Config.BaseReward +
+                    ((Mailbox.GetWorldPosition() - PointOfOrigin).magnitude * Plugin.Instance.Config.DistanceBonusPercentage));
             }
         }
 

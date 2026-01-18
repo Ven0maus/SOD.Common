@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SOD.Common.Custom
 {
     /// <summary>
-    /// A custom json converter to prevent cycles in serialization.
+    /// A custom json converter for System.Text.Json to prevent cycles in serialization.
     /// </summary>
     public sealed class Vector3JsonConverter : JsonConverter<Vector3>
     {
