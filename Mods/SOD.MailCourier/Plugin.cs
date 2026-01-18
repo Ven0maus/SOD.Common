@@ -21,6 +21,13 @@ namespace SOD.CourierJobs
 
             Lib.SaveGame.OnBeforeLoad += SaveGame_OnBeforeLoad;
             Lib.SaveGame.OnBeforeSave += SaveGame_OnBeforeSave;
+            Lib.Time.OnHourChanged += Time_OnHourChanged;
+        }
+
+        private void Time_OnHourChanged(object sender, Common.Helpers.TimeChangedArgs e)
+        {
+            // Handles cleanup of dropped / deleted mails that didn't get delivered
+            CourierJobGenerator.CleanupCourierJobs();
         }
 
         private void SaveGame_OnBeforeLoad(object sender, Common.Helpers.SaveGameArgs e)

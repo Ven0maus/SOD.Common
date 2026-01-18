@@ -1,4 +1,5 @@
-﻿using SOD.MailCourier.Core;
+﻿using SOD.Common;
+using SOD.MailCourier.Core;
 using System;
 using System.Text.Json.Serialization;
 using UnityEngine;
@@ -29,6 +30,11 @@ namespace SOD.CourierJobs.Core
         /// The full delivery address in text format.
         /// </summary>
         public string DeliveryAddressName { get; set; }
+
+        /// <summary>
+        /// When the mail item was last in the player's inventory.
+        /// </summary>
+        public Common.Helpers.Time.TimeData LastTimeActive { get; set; }
 
         /// <summary>
         /// The payment for this courier job.
@@ -63,6 +69,7 @@ namespace SOD.CourierJobs.Core
             MailboxId = mailboxId;
             SealedMailId = mailItemId;
             DeliveryAddressName = deliveryAddressName;
+            LastTimeActive = Lib.Time.CurrentDateTime;
         }
     }
 }

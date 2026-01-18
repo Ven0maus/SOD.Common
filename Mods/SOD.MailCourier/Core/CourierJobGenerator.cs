@@ -1,7 +1,7 @@
-﻿using SOD.Common;
-using SOD.Common.Custom;
+﻿using SOD.Common.Custom;
 using SOD.Common.Extensions;
 using SOD.Common.Helpers;
+using SOD.CourierJobs;
 using SOD.CourierJobs.Core;
 using System;
 using System.Collections.Generic;
@@ -28,6 +28,7 @@ namespace SOD.MailCourier.Core
                 WriteIndented = true
             };
             options.Converters.Add(new Vector3JsonConverter());
+            options.Converters.Add(new TimeDataJsonConverter());
             return options;
         });
 
@@ -68,6 +69,55 @@ namespace SOD.MailCourier.Core
             if (!_courierJobsByMailbox.TryGetValue(mailbox.id, out var jobs))
                 _courierJobsByMailbox[mailbox.id] = jobs = new List<CourierJob>();
             jobs.Add(courierJob);
+
+            // Set waypoint to address if no waypoint is currently set
+            HandleRoutePlotting(address);
+        }
+
+        private static void HandleRoutePlotting(NewAddress address)
+        {
+            if (MapController.Instance.playerRoute != null)
+            {
+                if (Plugin.Instance.Config.OverwriteExistingWaypoint)
+                {
+                    MapController.Instance.playerRoute.Remove();
+                    MapController.Instance.PlotPlayerRoute(address);
+                }
+            }
+            else
+            {
+                MapController.Instance.PlotPlayerRoute(address);
+            }
+        }
+
+        /// <summary>
+        /// Removes any courier jobs that are invalid or outdated.
+        /// </summary>
+        internal static void CleanupCourierJobs()
+        {
+            if (_courierJobsBySealedMail.Count == 0) return;
+
+            var currentTime = Common.Lib.Time.CurrentDateTime;
+            foreach (var courierJob in _courierJobsBySealedMail.Values.ToList())
+            {
+                var mail = FindSealedMail(courierJob.SealedMailId);
+                if (mail == null || mail.rem)
+                {
+                    DestroyCourierJob(courierJob);
+                    continue;
+                }
+
+                // Check if mail item is in the inventory of the player, then update last time active
+                if (Common.Lib.Gameplay.HasInteractableInInventory("DeliverableMailItemPreset", out Interactable[] mails))
+                {
+                    if (mails.Any(a => a.id == courierJob.SealedMailId))
+                        courierJob.LastTimeActive = currentTime;
+                }
+
+                // When mail is outside of inventory for too long, clean it up
+                if (courierJob.LastTimeActive.AddHours(4) <= currentTime)
+                    DestroyCourierJob(courierJob);
+            }
         }
 
         /// <summary>
@@ -117,9 +167,6 @@ namespace SOD.MailCourier.Core
                         return address.residence != null;
                     }));
                 }
-
-                if (Plugin.Instance.Config.DebugMode)
-                    Plugin.Log.LogInfo("[DEBUG]: Found a total of " + _mailboxList.Count + " mailboxes.");
 
                 _mailboxLocations = _mailboxList.ToDictionary(a => a.id);
             }
@@ -173,7 +220,7 @@ namespace SOD.MailCourier.Core
             _courierJobsBySealedMail.Clear();
             _courierJobsByMailbox.Clear();
 
-            var saveGameDataPath = Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
+            var saveGameDataPath = Common.Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
             var filePath = Path.Combine(saveGameDataPath, SAVEDATA_FILENAME);
             if (!File.Exists(filePath)) return;
 
@@ -198,7 +245,7 @@ namespace SOD.MailCourier.Core
         /// <param name="saveGameArgs"></param>
         internal static void SaveToFile(SaveGameArgs saveGameArgs)
         {
-            var saveGameDataPath = Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
+            var saveGameDataPath = Common.Lib.SaveGame.GetSaveGameDataPath(saveGameArgs);
             var filePath = Path.Combine(saveGameDataPath, SAVEDATA_FILENAME);
 
             if (_courierJobsBySealedMail.Count == 0)
@@ -243,9 +290,9 @@ namespace SOD.MailCourier.Core
             copyRetail.name = copyRetail.presetName;
 
             // Register new name for it in DDS strings
-            Lib.DdsStrings["evidence.names", copy.presetName] = "Sealed Mail"; // What the actual item is named when in the world
-            Lib.DdsStrings["evidence.names", copy.name] = "Mail Courier Job"; // What the item is named in the news stand
-            Lib.DdsStrings["ui.interaction", "mail_courier_job_message"] = "Insert"; // New interaction to insert into mailbox
+            Common.Lib.DdsStrings["evidence.names", copy.presetName] = "Sealed Mail"; // What the actual item is named when in the world
+            Common.Lib.DdsStrings["evidence.names", copy.name] = "Mail Courier Job"; // What the item is named in the news stand
+            Common.Lib.DdsStrings["ui.interaction", "mail_courier_job_message"] = "Insert"; // New interaction to insert into mailbox
 
             // Setup interactable preset
             copy.placeAtHome = false;
