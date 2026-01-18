@@ -30,7 +30,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.RelationsPlus", "Mods\S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.ThreatOverhaul", "Mods\SOD.ThreatOverhaul\SOD.ThreatOverhaul.csproj", "{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.CourierJobs", "Mods\SOD.CourierJobs\SOD.CourierJobs.csproj", "{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.MailCourier", "Mods\SOD.MailCourier\SOD.MailCourier.csproj", "{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -70,7 +70,13 @@ namespace SOD.Common.Extensions
                 yield return value.TryCast<T>();
         }
 
-        private static Il2CppSystem.Collections.Generic.Dictionary<string, ScriptableObject> GetResourceCacheCollection<T>(Toolbox toolbox)
+        /// <summary>
+        /// Returns a reference to the cache container for the specific type.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="toolbox"></param>
+        /// <returns></returns>
+        public static Il2CppSystem.Collections.Generic.Dictionary<string, ScriptableObject> GetResourceCacheCollection<T>(Toolbox toolbox)
         {
             var type = Il2CppType.Of<T>();
             if (!toolbox.resourcesCache.TryGetValue(type, out var dict))

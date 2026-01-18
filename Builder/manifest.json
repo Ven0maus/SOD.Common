@@ -76,11 +76,11 @@
     },
     {
       "ProjectParentPath": "Mods",
-      "ProjectName": "SOD.CourierJobs",
+      "ProjectName": "SOD.MailCourier",
       "ModFolderName": "ModFolderContent",
       "DestinationFolderName": "Builds",
       "ExtraFiles": [
-        "bin\\Release\\net6.0\\SOD.CourierJobs.dll"
+        "bin\\Release\\net6.0\\SOD.MailCourier.dll"
       ],
       "Package": true
     }

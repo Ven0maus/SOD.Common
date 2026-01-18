@@ -8,8 +8,8 @@ namespace SOD.CourierJobs
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
-        public const string PLUGIN_GUID = "Venomaus.SOD.CourierJobs";
-        public const string PLUGIN_NAME = "CourierJobs";
+        public const string PLUGIN_GUID = "Venomaus.SOD.MailCourier";
+        public const string PLUGIN_NAME = "MailCourier";
         public const string PLUGIN_VERSION = "1.0.0";
 
         public override void Load()
