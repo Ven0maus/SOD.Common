@@ -71,23 +71,40 @@ namespace SOD.MailCourier.Core
             jobs.Add(courierJob);
 
             // Set waypoint to address if no waypoint is currently set
-            HandleRoutePlotting(address);
+            SetDestinationRoute(mailbox);
         }
 
-        private static void HandleRoutePlotting(NewAddress address)
+        /// <summary>
+        /// Sets the destination route to the specified mailbox.
+        /// </summary>
+        /// <param name="mailbox"></param>
+        internal static void SetDestinationRoute(Interactable mailbox)
         {
             if (MapController.Instance.playerRoute != null)
             {
+                if (mailbox == null)
+                {
+                    // If current plotted point is a mailbox, we unplot without care
+                    foreach (var job in _courierJobsBySealedMail.Values)
+                    {
+                        if (MapController.Instance.playerRoute.end.nodeCoord == job.Mailbox.node.nodeCoord)
+                        {
+                            MapController.Instance.playerRoute.Remove();
+                            break;
+                        }
+                    }
+                }
+
+                // Overwrite if not a mailbox
                 if (Plugin.Instance.Config.OverwriteExistingWaypoint)
                 {
-                    MapController.Instance.playerRoute.Remove();
-                    MapController.Instance.PlotPlayerRoute(address);
+                    if (MapController.Instance.playerRoute != null)
+                        MapController.Instance.playerRoute.Remove();
                 }
             }
-            else
-            {
-                MapController.Instance.PlotPlayerRoute(address);
-            }
+
+            if (mailbox != null)
+                MapController.Instance.PlotPlayerRoute(mailbox.node, true);
         }
 
         /// <summary>
@@ -133,7 +150,7 @@ namespace SOD.MailCourier.Core
 
                 // Remove also the route
                 if (MapController.Instance.playerRoute != null &&
-                    MapController.Instance.playerRoute.end.nodeCoord == courierJob.Mailbox.objectRef.TryCast<NewAddress>().GetDestinationNode().nodeCoord)
+                    MapController.Instance.playerRoute.end.nodeCoord == courierJob.Mailbox.node.nodeCoord)
                     MapController.Instance.playerRoute.Remove();
 
                 // Remove from by sealed mail
