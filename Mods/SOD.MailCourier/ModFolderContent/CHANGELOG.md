@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.3**
+- Fixed tooltip not showing of the Mail Courier Job entry in the news stand
+
 **1.0.2**
 - Improved destination route pointing to the mailbox instead of the specific residence
 - When unequipping a sealed mail the route will be unplotted (unless its not the route for the mail)

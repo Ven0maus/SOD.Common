@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using SOD.CourierJobs;
 using SOD.MailCourier.Core;
 
 namespace SOD.MailCourier.Patches
@@ -16,7 +17,7 @@ namespace SOD.MailCourier.Patches
                     return true;
 
                 __instance.tooltip.mainText = "Generates a random mail delivery mission, should you choose to accept it.";
-                return true;
+                return false;
             }
         }
 
