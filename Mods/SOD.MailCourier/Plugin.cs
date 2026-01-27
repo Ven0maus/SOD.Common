@@ -12,7 +12,7 @@ namespace SOD.CourierJobs
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.MailCourier";
         public const string PLUGIN_NAME = "MailCourier";
-        public const string PLUGIN_VERSION = "1.0.3";
+        public const string PLUGIN_VERSION = "1.0.4";
 
         public override void Load()
         {

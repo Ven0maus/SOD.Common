@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.4**
+- Fixed warning: used ScriptableObject.CreateInstance instead of new() constructor
+
 **1.0.3**
 - Fixed tooltip not showing of the Mail Courier Job entry in the news stand
 
