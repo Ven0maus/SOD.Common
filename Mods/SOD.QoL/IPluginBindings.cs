@@ -39,6 +39,9 @@ namespace SOD.QoL
     {
         [Binding(true, "Allow ending conversations with menu key", "QoL.Conversations.CanEndWithMenuKey")]
         bool EndConversationPatch { get; set; }
+
+        [Binding(true, "Allow skipping a conversation option by clicking again.", "QoL.Conversations.CanSkipConversationOption")]
+        bool EnableSkipConversationPatch { get; set; }
     }
 
     public interface IMainMenuBindings

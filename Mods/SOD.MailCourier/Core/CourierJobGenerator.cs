@@ -37,7 +37,7 @@ namespace SOD.MailCourier.Core
         /// </summary>
         internal static readonly FirstPersonItem.FPSInteractionAction InsertMailInteractionAction = new()
         {
-            action = new AIActionPreset { presetName = "mail_courier_job_message", onlyAvailableWhenItemSelected = true },
+            action = ScriptableObject.CreateInstance<AIActionPreset>(),
             interactionName = "mail_courier_job_message",
             keyOverride = InteractablePreset.InteractionKey.primary
         };
@@ -327,6 +327,8 @@ namespace SOD.MailCourier.Core
             copy.summaryMessageSource = "mail_courier_job_message";
 
             // Insert our custom action
+            InsertMailInteractionAction.action.onlyAvailableWhenItemSelected = true;
+            InsertMailInteractionAction.action.presetName = "mail_courier_job_message";
             InsertMailInteractionAction.action.availableWhenItemsSelected.Add(copy.fpsItem);
             copy.fpsItem.actions.Add(InsertMailInteractionAction);
 
