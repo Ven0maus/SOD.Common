@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
+using System;
 using System.Reflection;
 
 namespace SOD.ZeroOverhead
@@ -16,6 +17,12 @@ namespace SOD.ZeroOverhead
         {
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
+        }
+
+        public static void LogDebug(string message)
+        {
+            if (!Instance.Config.EnableDebugMode) return;
+            Log.LogMessage($"<color={ConsoleColor.DarkCyan}>[DEBUG]:</color> {message}");
         }
     }
 }

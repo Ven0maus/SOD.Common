@@ -5,6 +5,6 @@
   "description": "A lightweight performance optimization mod that reduces unnecessary CPU work, minimizes per-frame overhead, and smooths frame pacing without changing gameplay behavior.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-2.1.2"
+    "Venomaus-SODCommon-2.1.3"
   ]
 }
