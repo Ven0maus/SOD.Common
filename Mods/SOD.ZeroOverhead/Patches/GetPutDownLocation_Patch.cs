@@ -1,5 +1,5 @@
 ﻿using HarmonyLib;
-using SOD.ZeroOverhead.Framework;
+using SOD.ZeroOverhead.Framework.Profiling;
 
 namespace SOD.ZeroOverhead.Patches
 {
@@ -11,13 +11,13 @@ namespace SOD.ZeroOverhead.Patches
             [HarmonyPrefix]
             internal static void Prefix()
             {
-                ProfilingHelper.Profile(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
+                Profiler.StartProfileMethod(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
             }
 
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                ProfilingHelper.Conclude(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
+                Profiler.ConcludeMethodProfile(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation), 10);
             }
         }
     }

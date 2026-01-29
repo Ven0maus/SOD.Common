@@ -1,13 +1,14 @@
-﻿using System;
+﻿using SOD.ZeroOverhead.Framework.Pooling;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SOD.ZeroOverhead.Framework
+namespace SOD.ZeroOverhead.Framework.Caching
 {
     /// <summary>
-    /// Simple frame-based caching service
+    /// Simple frame-based cache, cleans invalid records on store, and removes invalid records on access.
     /// </summary>
-    internal class FrameCachingService<TKey, TValue>
+    public class FrameCache<TKey, TValue>
         where TKey : struct, IEquatable<TKey>
     {
         private readonly Dictionary<TKey, CacheEntry<TValue>> _cache = new();
@@ -16,7 +17,7 @@ namespace SOD.ZeroOverhead.Framework
 
         private int _lastCleanupFrame;
 
-        public FrameCachingService(int ttlFrames, int cleanupIntervalFrames = 120)
+        public FrameCache(int ttlFrames, int cleanupIntervalFrames = 120)
         {
             _ttlFrames = ttlFrames;
             _cleanupInterval = cleanupIntervalFrames;
@@ -29,6 +30,10 @@ namespace SOD.ZeroOverhead.Framework
             {
                 value = entry.Value;
                 return true;
+            }
+            else if (entry != null)
+            {
+                _cache.Remove(key);
             }
 
             value = default;
@@ -77,42 +82,11 @@ namespace SOD.ZeroOverhead.Framework
 
             SimpleListPool<TKey>.Release(toRemove);
         }
-    }
 
-    public readonly struct CacheKey : IEquatable<CacheKey>
-    {
-        public readonly int A;
-        public readonly int B;
-
-        public CacheKey(int a, int b)
+        private sealed class CacheEntry<T>
         {
-            A = a;
-            B = b;
+            public T Value;
+            public int LastFrame;
         }
-
-        public bool Equals(CacheKey other) => A == other.A && B == other.B;
-
-        public override int GetHashCode() => (A * 397) ^ B;
-
-        public override bool Equals(object obj)
-        {
-            return obj is CacheKey key && Equals(key);
-        }
-
-        public static bool operator ==(CacheKey left, CacheKey right)
-        {
-            return left.Equals(right);
-        }
-
-        public static bool operator !=(CacheKey left, CacheKey right)
-        {
-            return !(left == right);
-        }
-    }
-
-    public sealed class CacheEntry<T>
-    {
-        public T Value;
-        public int LastFrame;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace SOD.ZeroOverhead.Framework
+namespace SOD.ZeroOverhead.Framework.Pooling
 {
-    internal static class SimpleQueuePool<T>
+    public static class SimpleQueuePool<T>
     {
         private static readonly Stack<Queue<T>> _pool = new();
 
