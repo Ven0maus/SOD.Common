@@ -1,5 +1,6 @@
 ﻿using SOD.ZeroOverhead.Framework.Pooling;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -10,16 +11,16 @@ namespace SOD.ZeroOverhead.Framework.Profiling
     /// </summary>
     public static class Profiler
     {
-        private static readonly Dictionary<(Type, string), Queue<Stopwatch>> _profileRuns = new();
+        private static readonly ConcurrentDictionary<(Type, string), Queue<Stopwatch>> _profileRuns = new();
 
         /// <summary>
         /// Start a new profile for a specific action, concludes automatically after the action is finished.
         /// </summary>
         /// <param name="profileName"></param>
         /// <param name="action"></param>
-        public static void Profile(string profileName, Action action)
+        public static void Profile(Action action, string profileName = null)
         {
-            using var segment = new ProfileSegment(profileName);
+            using var segment = new ProfileSegment(profileName ?? new StackTrace().GetFrame(1).GetMethod().Nam;);
             action();
         }
 
@@ -28,9 +29,9 @@ namespace SOD.ZeroOverhead.Framework.Profiling
         /// </summary>
         /// <param name="profileName"></param>
         /// <param name="action"></param>
-        public static T Profile<T>(string profileName, Func<T> action)
+        public static T Profile<T>(Func<T> action, string profileName = null)
         {
-            using var segment = new ProfileSegment(profileName);
+            using var segment = new ProfileSegment(profileName ?? new StackTrace().GetFrame(1).GetMethod().Name);
             return action();
         }
 
