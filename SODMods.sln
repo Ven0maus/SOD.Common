@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.7.34031.279
+# Visual Studio Version 18
+VisualStudioVersion = 18.2.11415.280 d18.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SOD.QoL", "Mods\SOD.QoL\SOD.QoL.csproj", "{20529558-CA28-4AB9-B48C-7DA106D94DC2}"
 EndProject
@@ -31,6 +31,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.ThreatOverhaul", "Mods\SOD.ThreatOverhaul\SOD.ThreatOverhaul.csproj", "{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.MailCourier", "Mods\SOD.MailCourier\SOD.MailCourier.csproj", "{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SOD.ZeroOverhead", "Mods\SOD.ZeroOverhead\SOD.ZeroOverhead.csproj", "{C33209E8-77FB-F5B1-823A-FB8619BD57CC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -112,6 +114,14 @@ Global
 		{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}.Release|x64.ActiveCfg = Release|Any CPU
 		{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5}.Release|x64.Build.0 = Release|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Debug|x64.Build.0 = Debug|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Release|x64.ActiveCfg = Release|Any CPU
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +136,7 @@ Global
 		{CEA1F0B1-F666-4B91-A679-526DDDE967F4} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 		{FBA35B28-46D5-43A0-8CE4-D5F74BA3EEE8} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 		{A7FBD89B-59E4-4ED6-A513-E4A08C5C20C5} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
+		{C33209E8-77FB-F5B1-823A-FB8619BD57CC} = {E42A1F57-30D2-46D5-AE03-7E1675524E39}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {92CC1827-8FE6-4E8C-8518-DE8D0EAEE515}

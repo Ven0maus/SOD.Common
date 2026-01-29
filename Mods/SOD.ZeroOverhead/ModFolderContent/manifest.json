@@ -1,0 +1,10 @@
+{
+  "name": "SODZeroOverhead",
+  "version_number": "1.0.0",
+  "website_url": "https://github.com/Ven0maus/SOD.Common/tree/main/Mods/SOD.ZeroOverhead",
+  "description": "A lightweight performance optimization mod that reduces unnecessary CPU work, minimizes per-frame overhead, and smooths frame pacing without changing gameplay behavior.",
+  "author": "Venomaus",
+  "dependencies": [
+    "Venomaus-SODCommon-2.1.2"
+  ]
+}

@@ -83,6 +83,16 @@
         "bin\\Release\\net6.0\\SOD.MailCourier.dll"
       ],
       "Package": true
+    },
+    {
+      "ProjectParentPath": "Mods",
+      "ProjectName": "SOD.ZeroOverhead",
+      "ModFolderName": "ModFolderContent",
+      "DestinationFolderName": "Builds",
+      "ExtraFiles": [
+        "bin\\Release\\net6.0\\SOD.ZeroOverhead.dll"
+      ],
+      "Package": true
     }
   ]
 }
