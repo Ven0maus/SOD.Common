@@ -1,4 +1,9 @@
 # CHANGELOG
+**2.1.3**
+- Added color parsing to bepinex logging, you can now use custom colors example:
+Plugin.Log.LogInfo($"<color={ConsoleColor.Magenta}>your text\</color>");  
+This supports multiple colors within one log message.
+
 **2.1.2**
 - Exposed GameExtensions.GetResourceCacheCollection<T>(toolbox)
 - Added Lib.Gameplay.HasOpenSlotInInventory()
