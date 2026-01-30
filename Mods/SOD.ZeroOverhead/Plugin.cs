@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
+using SOD.ZeroOverhead.Framework.Profiling;
 using System;
 using System.Reflection;
 
@@ -15,6 +16,9 @@ namespace SOD.ZeroOverhead
 
         public override void Load()
         {
+            // Profiler is only enabled when debug mode is true
+            Profiler.Enabled = Config.EnableDebugMode;
+
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
         }

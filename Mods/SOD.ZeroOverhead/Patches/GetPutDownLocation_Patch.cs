@@ -17,7 +17,7 @@ namespace SOD.ZeroOverhead.Patches
             [HarmonyPostfix]
             internal static void Postfix()
             {
-                Profiler.ConcludeMethodProfile(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation), 10);
+                Profiler.ConcludeMethodProfile(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
             }
         }
     }
