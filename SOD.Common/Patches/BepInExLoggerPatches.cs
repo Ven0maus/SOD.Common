@@ -41,6 +41,7 @@ namespace SOD.Common.Patches
             {
                 var textContent = eventArgs.ToStringLine();
 
+                // TODO: Remove color tags from the logfile
                 // More color variety support
                 var parsedContent = ColorStringParser.Parse(textContent, eventArgs.Level.GetConsoleColor());
                 foreach (var (color, text) in parsedContent)
