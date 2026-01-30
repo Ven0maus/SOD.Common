@@ -110,7 +110,7 @@ namespace SOD.ZeroOverhead.Framework.Profiling
             queue.Enqueue(Stopwatch.StartNew());
         }
 
-        public static void ConcludeMethodProfile(Type classType, string methodName)
+        public static void ConcludeMethodProfile(Type classType, string methodName, bool debugLog = true)
         {
             if (!Enabled) return;
 
@@ -128,10 +128,13 @@ namespace SOD.ZeroOverhead.Framework.Profiling
             var stats = _stats.GetOrAdd(key, _ => new ProfileStats());
             stats.Add(sw.Elapsed.TotalMilliseconds);
 
-            string color = sw.Elapsed.TotalMilliseconds < 1 ? "green"
-                         : sw.Elapsed.TotalMilliseconds < 10 ? "yellow" : "red";
+            if (debugLog)
+            {
+                string color = sw.Elapsed.TotalMilliseconds < 1 ? "green"
+                             : sw.Elapsed.TotalMilliseconds < 10 ? "yellow" : "red";
 
-            Plugin.LogDebug($"<color={color}>[{classType.Name}.{methodName}] {sw.Elapsed.TotalMilliseconds:F3} ms (Run {stats.Count}, avg {stats.Average:F3} ms, min {stats.Min:F3} ms, max {stats.Max:F3} ms)</color>");
+                Plugin.LogDebug($"<color={color}>[{classType.Name}.{methodName}] {sw.Elapsed.TotalMilliseconds:F3} ms (Run {stats.Count}, avg {stats.Average:F3} ms, min {stats.Min:F3} ms, max {stats.Max:F3} ms)</color>");
+            }
 
             if (_frameAccumulated.Value != null)
             {
