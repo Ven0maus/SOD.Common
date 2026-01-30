@@ -3,6 +3,7 @@ using BepInEx.Logging;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace SOD.Common.Patches
@@ -54,6 +55,37 @@ namespace SOD.Common.Patches
             }
         }
 
+        [HarmonyPatch(typeof(DiskLogListener), nameof(DiskLogListener.LogEvent))]
+        internal static class DiskLogListener_LogEvent
+        {
+            private static bool? _instantFlushing;
+
+            [HarmonyPrefix]
+            internal static bool Prefix(DiskLogListener __instance, LogEventArgs eventArgs)
+            {
+                if (__instance.LogWriter == null)
+                    return false;
+
+                if (DiskLogListener.BlacklistedSources.Contains(eventArgs.Source.SourceName))
+                    return false;
+
+                var textContent = eventArgs.ToString();
+
+                // Remove color tags from the logfile
+                var originalText = ColorStringParser.StripColorTags(textContent);
+                __instance.LogWriter.WriteLine(originalText);
+
+                _instantFlushing ??= (bool)__instance.GetType()
+                    .GetProperty("InstantFlushing", BindingFlags.Instance | BindingFlags.NonPublic)
+                    .GetValue(__instance);
+
+                if (_instantFlushing.Value)
+                    __instance.LogWriter.Flush();
+
+                return false;
+            }
+        }
+
         internal static class ColorStringParser
         {
             private static readonly Regex ColorTagRegex = new(@"<color=([a-zA-Z]+)>(.*?)</color>", RegexOptions.Compiled);
@@ -94,6 +126,14 @@ namespace SOD.Common.Patches
                 }
 
                 return result;
+            }
+
+            internal static string StripColorTags(string text)
+            {
+                if (string.IsNullOrEmpty(text))
+                    return text;
+
+                return ColorTagRegex.Replace(text, "$2");
             }
         }
 
