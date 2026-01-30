@@ -136,8 +136,10 @@ namespace SOD.ZeroOverhead.Framework.Profiling
                 // Conclude and log
                 double elapsedMs = _sw.Elapsed.TotalMilliseconds;
                 string color = elapsedMs < 1 ? "green" : elapsedMs < 10 ? "yellow" : "red";
+                string log = $"{indent}<color={color}>[{_callerType.Name}.{_name}] took {elapsedMs:F3} ms</color>";
 
-                Plugin.LogDebug($"{indent}<color={color}>[{_callerType.Name}.{_name}] took {elapsedMs:F3} ms</color>");
+                // Write to wrap buffer if active
+                WriteBufferedLog(log, _depth.Value - 1);
 
                 _depth.Value--; // exit depth
             }

@@ -40,17 +40,13 @@ namespace SOD.ZeroOverhead.Framework.Profiling
 
         public string Format(int parentDepth = 0)
         {
-            string indent = new string(' ', parentDepth * 4);
-            string displayTime = _sw.Elapsed.TotalMilliseconds < 1
-                ? $"{_sw.Elapsed.TotalMilliseconds * 1000:F3} µs"
-                : $"{_sw.Elapsed.TotalMilliseconds:F3} ms";
+            string indent = new(' ', parentDepth * 4);
+            string result = $"{indent}[{_name}] took {_sw.Elapsed.TotalMilliseconds:F3} ms\n";
 
-            string result = $"{indent}[{_name}] {displayTime}\n";
-
-            foreach (var entry in _entries)
+            foreach (var (depth, log) in _entries)
             {
-                string eIndent = new string(' ', (parentDepth + entry.depth) * 4);
-                result += $"{eIndent}{entry.log}\n";
+                string eIndent = new(' ', (parentDepth + depth) * 4);
+                result += $"{eIndent}{log}\n";
             }
 
             foreach (var child in _children)
