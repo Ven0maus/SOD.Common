@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using SOD.Common;
 using SOD.Common.BepInEx;
 using SOD.ZeroOverhead.Framework.Profiling;
 using System;
@@ -19,8 +20,15 @@ namespace SOD.ZeroOverhead
             // Profiler is only enabled when debug mode is true
             Profiler.Enabled = Config.EnableDebugMode;
 
+            Lib.Time.OnMinuteChanged += Time_OnMinuteChanged;
+
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
             Log.LogInfo("Plugin is patched.");
+        }
+
+        private void Time_OnMinuteChanged(object sender, Common.Helpers.TimeChangedArgs e)
+        {
+            Profiler.LogFrameAverages();
         }
 
         public static void LogDebug(string message)

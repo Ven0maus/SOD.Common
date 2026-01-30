@@ -16,8 +16,10 @@ namespace SOD.ZeroOverhead.Framework.Profiling
         private static readonly ConcurrentDictionary<(Type, string), Queue<Stopwatch>> _runningTimers = new();
         private static readonly ConcurrentDictionary<(Type, string), ProfileStats> _stats = new();
         private static readonly AsyncLocal<Stack<ProfileLogBuffer>> _wrapStack = new();
+        private static readonly ConcurrentDictionary<(Type, string), FrameStats> _frameStats = new();
+        private static readonly AsyncLocal<Dictionary<(Type, string), double>> _frameAccumulated = new();
 
-        /// <summary>
+        /// <summary>FileName
         /// Wrap a block of code, profiling nested calls and outputting a single combined log at the end.
         /// </summary>
         public static void Wrap(string name, Action action)
@@ -64,6 +66,41 @@ namespace SOD.ZeroOverhead.Framework.Profiling
             }
         }
 
+        public static void BeginFrame()
+        {
+            if (!Enabled) return;
+            _frameAccumulated.Value = new Dictionary<(Type, string), double>();
+        }
+
+        public static void EndFrame(int logEveryNFrames = 60)
+        {
+            if (!Enabled || _frameAccumulated.Value == null)
+                return;
+
+            foreach (var kv in _frameAccumulated.Value)
+            {
+                var stats = _frameStats.GetOrAdd(kv.Key, _ => new FrameStats(logEveryNFrames));
+                stats.Add(kv.Value);
+            }
+
+            _frameAccumulated.Value = null;
+        }
+
+        public static void LogFrameAverages()
+        {
+            foreach (var kv in _frameStats)
+            {
+                var stats = kv.Value;
+
+                string color = stats.Average < 1 ? "green"
+                             : stats.Average < 5 ? "yellow" : "red";
+
+                Plugin.LogDebug(
+                    $"<color={color}>[FRAME AVG] {kv.Key.Item1.Name}.{kv.Key.Item2} " +
+                    $"avg {stats.Average:F3} ms (min {stats.Min:F3}, max {stats.Max:F3})</color>");
+            }
+        }
+
         public static void StartProfileMethod(Type classType, string methodName)
         {
             if (!Enabled) return;
@@ -78,6 +115,7 @@ namespace SOD.ZeroOverhead.Framework.Profiling
             if (!Enabled) return;
 
             var key = (classType, methodName);
+
             if (!_runningTimers.TryGetValue(key, out var queue) || queue.Count == 0)
                 return;
 
@@ -93,7 +131,13 @@ namespace SOD.ZeroOverhead.Framework.Profiling
             string color = sw.Elapsed.TotalMilliseconds < 1 ? "green"
                          : sw.Elapsed.TotalMilliseconds < 10 ? "yellow" : "red";
 
-            Plugin.LogDebug($"<color={color}>[{classType.Name}.{methodName}] took {sw.Elapsed.TotalMilliseconds:F3} ms (Run {stats.Count}, avg {stats.Average:F3} ms, min {stats.Min:F3} ms, max {stats.Max:F3} ms)</color>");
+            Plugin.LogDebug($"<color={color}>[{classType.Name}.{methodName}] {sw.Elapsed.TotalMilliseconds:F3} ms (Run {stats.Count}, avg {stats.Average:F3} ms, min {stats.Min:F3} ms, max {stats.Max:F3} ms)</color>");
+
+            if (_frameAccumulated.Value != null)
+            {
+                _frameAccumulated.Value.TryGetValue(key, out var current);
+                _frameAccumulated.Value[key] = current + sw.Elapsed.TotalMilliseconds;
+            }
         }
 
         public static void Profile(string name, Action action)
@@ -136,7 +180,7 @@ namespace SOD.ZeroOverhead.Framework.Profiling
                 // Conclude and log
                 double elapsedMs = _sw.Elapsed.TotalMilliseconds;
                 string color = elapsedMs < 1 ? "green" : elapsedMs < 10 ? "yellow" : "red";
-                string log = $"{indent}<color={color}>[{_callerType.Name}.{_name}] took {elapsedMs:F3} ms</color>";
+                string log = $"{indent}<color={color}>[{_callerType.Name}.{_name}] {elapsedMs:F3} ms</color>";
 
                 // Write to wrap buffer if active
                 WriteBufferedLog(log, _depth.Value - 1);

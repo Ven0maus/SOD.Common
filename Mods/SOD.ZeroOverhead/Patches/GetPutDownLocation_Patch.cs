@@ -11,6 +11,7 @@ namespace SOD.ZeroOverhead.Patches
             [HarmonyPrefix]
             internal static void Prefix()
             {
+                Profiler.BeginFrame();
                 Profiler.StartProfileMethod(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
             }
 
@@ -18,6 +19,7 @@ namespace SOD.ZeroOverhead.Patches
             internal static void Postfix()
             {
                 Profiler.ConcludeMethodProfile(typeof(NewGameLocation), nameof(NewGameLocation.GetPutDownLocation));
+                Profiler.EndFrame();
             }
         }
     }
