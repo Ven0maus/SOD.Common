@@ -38,6 +38,16 @@ namespace Builder
                 .Select(a => a.Path)
                 .ToArray();
 
+            var pluginDataFiles = new List<string>();
+            var pluginDataPath = Path.Combine(builder.FolderPath, "PluginData");
+            if (Directory.Exists(pluginDataPath))
+            {
+                // Also export all stored hierarchy from the plugins directory
+                var allFiles = Directory.GetFiles(pluginDataPath, "*", SearchOption.AllDirectories);
+                if (allFiles.Length > 0)
+                    pluginDataFiles.AddRange(allFiles);
+            }
+
             // Attempt to read version from r2modman manifest
             var manifestFile = fileNames
                 .Select(a =>
@@ -71,9 +81,25 @@ namespace Builder
             using (ZipArchive archive = ZipFile.Open(zipFileName, ZipArchiveMode.Create))
             {
                 // Make sure to include the DLL paths
-                foreach (var filePath in validFilePaths.Concat(builder.ExtraFiles).Distinct())
+                foreach (var filePath in validFilePaths
+                    .Concat(builder.ExtraFiles)
+                    .Concat(pluginDataFiles)
+                    .Distinct())
                 {
-                    var entryName = Path.GetFileName(filePath);
+                    string entryName;
+
+                    // Check if the file is under PluginData folder
+                    if (Path.GetFullPath(filePath).StartsWith(Path.GetFullPath(pluginDataPath) + Path.DirectorySeparatorChar))
+                    {
+                        // Keep the relative path from PluginData
+                        entryName = "BepInEx\\plugins\\" + Path.GetRelativePath(Path.GetDirectoryName(pluginDataPath), filePath).Replace('\\', '/');
+                    }
+                    else
+                    {
+                        // Flatten everything else
+                        entryName = Path.GetFileName(filePath);
+                    }
+
                     var entry = archive.CreateEntry(entryName);
 
                     using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);

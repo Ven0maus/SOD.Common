@@ -44,7 +44,7 @@
   <!-- Nugets -->
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="Castle.Core" Version="5.1.1" />
-    <None Update="BepInEx\plugins\PluginData\thunderstore_image.png">
+    <None Update="ModFolderContent\PluginData\bepinex_icon.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   <!-- Project included dll's -->
