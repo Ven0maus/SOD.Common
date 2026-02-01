@@ -11,7 +11,7 @@ namespace SOD.Common
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.Common";
         public const string PLUGIN_NAME = "SOD.Common";
-        public const string PLUGIN_VERSION = "2.1.3";
+        public const string PLUGIN_VERSION = "2.1.4";
 
         internal static bool InDebugMode => Instance != null && Instance.Config.DebugMode;
 

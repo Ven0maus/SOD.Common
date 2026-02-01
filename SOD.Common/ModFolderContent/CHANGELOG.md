@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.1.4**
+- The in-game mods page now shows the bepinex plugins.
+
 **2.1.3**
 - Added color parsing to bepinex logging, you can now use custom colors example:
 Plugin.Log.LogInfo($"<color={ConsoleColor.Magenta}>your text\</color>");  
