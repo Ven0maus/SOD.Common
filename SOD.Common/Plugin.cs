@@ -25,7 +25,7 @@ namespace SOD.Common
 
             // Apply patches
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Log.LogInfo($"<color={ConsoleColor.Magenta}>SOD.Common v{PLUGIN_VERSION} loaded successfully - stable integration.</color>");
+            Log.LogInfo($"<color={ConsoleColor.Magenta}>SOD.Common v{PLUGIN_VERSION} initialized.</color> [<color={ConsoleColor.Cyan}>Stable integration</color>]");
         }
     }
 }

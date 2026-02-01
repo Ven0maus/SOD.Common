@@ -14,8 +14,8 @@ namespace SOD.StockMarket
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.StockMarket";
-        public const string PLUGIN_NAME = "StockMarket";
-        public const string PLUGIN_VERSION = "2.0.9";
+        public const string PLUGIN_NAME = "SOD.StockMarket";
+        public const string PLUGIN_VERSION = "2.1.0";
 
         /// <summary>
         /// The stockmarket running during the game, used to do all calculations

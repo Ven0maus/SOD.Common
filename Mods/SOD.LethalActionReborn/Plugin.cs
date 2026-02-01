@@ -15,8 +15,8 @@ namespace SOD.LethalActionReborn
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LethalActionReborn";
-        public const string PLUGIN_NAME = "LethalActionReborn";
-        public const string PLUGIN_VERSION = "1.0.5";
+        public const string PLUGIN_NAME = "SOD.LethalActionReborn";
+        public const string PLUGIN_VERSION = "1.0.6";
 
         public override void Load()
         {

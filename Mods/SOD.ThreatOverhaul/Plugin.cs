@@ -9,8 +9,8 @@ namespace SOD.ThreatOverhaul
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.ThreatOverhaul";
-        public const string PLUGIN_NAME = "ThreatOverhaul";
-        public const string PLUGIN_VERSION = "1.0.1";
+        public const string PLUGIN_NAME = "SOD.ThreatOverhaul";
+        public const string PLUGIN_VERSION = "1.0.2";
 
         public override void Load()
         {

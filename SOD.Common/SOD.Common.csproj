@@ -44,6 +44,9 @@
   <!-- Nugets -->
     <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.*" IncludeAssets="compile" />
     <PackageReference Include="Castle.Core" Version="5.1.1" />
+    <None Update="BepInEx\plugins\PluginData\thunderstore_image.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   <!-- Project included dll's -->
     <None Update="UniverseLib.IL2CPP.Interop.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -68,6 +71,9 @@
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
       <HintPath>..\libs\il2cpp\UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>..\libs\il2cpp\UnityEngine.ImageConversionModule.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.PhysicsModule">
       <HintPath>..\libs\il2cpp\UnityEngine.PhysicsModule.dll</HintPath>

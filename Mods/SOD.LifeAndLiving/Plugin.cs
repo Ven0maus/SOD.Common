@@ -16,8 +16,8 @@ namespace SOD.LifeAndLiving
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
-        public const string PLUGIN_NAME = "LifeAndLiving";
-        public const string PLUGIN_VERSION = "3.0.3";
+        public const string PLUGIN_NAME = "SOD.LifeAndLiving";
+        public const string PLUGIN_VERSION = "3.0.4";
 
         public readonly Random Random = new();
 
