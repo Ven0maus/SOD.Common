@@ -12,8 +12,8 @@ namespace SOD.QoL
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.QoL";
-        public const string PLUGIN_NAME = "QoL";
-        public const string PLUGIN_VERSION = "1.2.0";
+        public const string PLUGIN_NAME = "SOD.QoL";
+        public const string PLUGIN_VERSION = "1.2.1";
 
         internal static Random Random { get; } = new Random(1337);
 

@@ -1,6 +1,7 @@
 ﻿using BepInEx;
 using SOD.Common.BepInEx;
 using SOD.Common.ConfigBindings;
+using System;
 using System.Reflection;
 
 namespace SOD.Common
@@ -10,7 +11,7 @@ namespace SOD.Common
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.Common";
         public const string PLUGIN_NAME = "SOD.Common";
-        public const string PLUGIN_VERSION = "2.1.2";
+        public const string PLUGIN_VERSION = "2.1.4";
 
         internal static bool InDebugMode => Instance != null && Instance.Config.DebugMode;
 
@@ -24,7 +25,7 @@ namespace SOD.Common
 
             // Apply patches
             Harmony.PatchAll(Assembly.GetExecutingAssembly());
-            Log.LogInfo("Plugin is patched.");
+            Log.LogInfo($"<color={ConsoleColor.Magenta}>SOD.Common v{PLUGIN_VERSION} initialized.</color> [<color={ConsoleColor.Cyan}>Stable integration</color>]");
         }
     }
 }

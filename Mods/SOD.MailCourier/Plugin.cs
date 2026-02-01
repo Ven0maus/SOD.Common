@@ -11,8 +11,8 @@ namespace SOD.CourierJobs
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.MailCourier";
-        public const string PLUGIN_NAME = "MailCourier";
-        public const string PLUGIN_VERSION = "1.0.4";
+        public const string PLUGIN_NAME = "SOD.MailCourier";
+        public const string PLUGIN_VERSION = "1.0.5";
 
         public override void Load()
         {

@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.3**
+- Fix plugin name in bepinex metadata
+
 **1.0.2**
 - Added compatibility support for savestore migration
 

@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.2.1**
+- Fix plugin name in bepinex metadata
+
 **1.2.0**
 - You can now skip conversations properly by clicking again while in dialog with an npc
 

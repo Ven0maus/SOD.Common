@@ -168,6 +168,8 @@ namespace SOD.Common.Patches
 
                 if (Lib.Dialogs.RegisteredDialogs.Any())
                     Plugin.Log.LogInfo("Loaded custom dialog dds entries.");
+
+                Lib.DdsStrings["ui.tooltips", "bepinex plugin"] = "BepInEx Plugin";
             }
         }
     }
