@@ -5,6 +5,6 @@
   "description": "Adds several Quality of Life changes to Shadows of doubt.",
   "author": "Venomaus",
   "dependencies": [
-    "Venomaus-SODCommon-2.1.2"
+    "Venomaus-SODCommon-2.1.3"
   ]
 }

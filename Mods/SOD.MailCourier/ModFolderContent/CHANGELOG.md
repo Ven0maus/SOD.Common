@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.5**
+- Fix plugin name in bepinex metadata
+
 **1.0.4**
 - Fixed warning: used ScriptableObject.CreateInstance instead of new() constructor
 

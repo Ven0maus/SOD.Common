@@ -2,6 +2,8 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Unity.IL2CPP;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UniverseLib;
 
 namespace SOD.Common.Helpers
@@ -82,6 +84,25 @@ namespace SOD.Common.Helpers
             if (throwExceptionOnNull && plugin == null)
                 throw new Exception("Unable to retrieve plugin object based on pluginInfo.");
             return plugin;
+        }
+
+        /// <summary>
+        /// Returns all loaded plugin infos.
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyDictionary<string, PluginInfo> GetAllLoadedPluginInfos()
+        {
+            return IL2CPPChainloader.Instance.Plugins;
+        }
+
+        /// <summary>
+        /// Returns all loaded plugins.
+        /// </summary>
+        /// <returns></returns>
+        public IReadOnlyDictionary<string, BasePlugin> GetAllLoadedPlugins()
+        {
+            var type = typeof(BasePlugin);
+            return IL2CPPChainloader.Instance.Plugins.ToDictionary(a => a.Key, a => (BasePlugin)a.Value.Instance.TryCast(type));
         }
 
         /// <summary>

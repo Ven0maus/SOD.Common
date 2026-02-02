@@ -1,4 +1,7 @@
 # CHANGELOG
+**1.0.2**
+- Fix plugin name in bepinex metadata
+
 **1.0.1**
 - Fixed several issues with spotting and pursueing the player
 

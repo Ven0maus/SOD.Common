@@ -1,11 +1,11 @@
 ﻿using SOD.Common;
-using SOD.Common.Helpers.DialogObjects;
 using SOD.Common.Extensions;
+using SOD.Common.Helpers.DialogObjects;
+using SOD.RelationsPlus;
+using SOD.RelationsPlus.Objects;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SOD.RelationsPlus;
-using SOD.RelationsPlus.Objects;
 
 namespace SOD.LifeAndLiving.Content.SocialRelation.Dialogs
 {
@@ -29,7 +29,7 @@ namespace SOD.LifeAndLiving.Content.SocialRelation.Dialogs
                 $"Good choice ma'am, one {_item?.Name ?? ""} coming right up!" :
                 $"Good choice, one {_item?.Name ?? ""} coming right up!";
 
-            _ = Lib.Dialogs.Builder()
+            var dialog = Lib.Dialogs.Builder()
                 .SetText("For me, the usual as always.")
                 .AddCustomResponse(customPositiveText, out _positiveResponse)
                 .AddCustomResponse(() => $"You're lucky, this {_item?.Name ?? "item"} has a {Plugin.Instance.Config.TheUsualDiscountValue}% discount!", out _positiveDiscountResponse)
@@ -42,6 +42,21 @@ namespace SOD.LifeAndLiving.Content.SocialRelation.Dialogs
                 })
                 .SetDialogLogic(new TheUsualDialog())
                 .CreateAndRegister();
+
+            if (Lib.PluginDetection.IsPluginLoaded("DialogUIRework"))
+                SupportDialogUIRework(dialog);
+        }
+
+        /// <summary>
+        /// It is very important that this is a seperate method, as it will not be compiled as part of the assembly
+        /// if it is never accessed (according to the IsPluginLoaded check, this will prevent exceptions when the mod is not used by the user.
+        /// </summary>
+        /// <param name="dialogObject"></param>
+        private static void SupportDialogUIRework(DialogObject dialogObject)
+        {
+            DialogUIRework.TabbedDialogUI.AddIDs("Transaction",
+                dialogObject.Preset.msgID
+            );
         }
 
         public bool IsDialogShown(DialogPreset preset, Citizen saysTo, SideJob jobRef)

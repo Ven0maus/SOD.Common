@@ -17,6 +17,8 @@ Put these in this folder, so the project can compile properly.
 
 ### Mod dlls required
 
-AssetBundleLoader.dll (from piepie's assetbundleloader mod)
-(install the mod, then open the mod in the plugins folder, dll should be there)
+* AssetBundleLoader.dll (from piepie's assetbundleloader mod)
+* DialogUIRework.dll (from piepie's DialogUIRework mod)
+
+(install the mod(s), then open the mod in the plugins folder, dll should be there)
 
