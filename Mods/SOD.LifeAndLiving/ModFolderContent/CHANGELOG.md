@@ -1,4 +1,7 @@
 # CHANGELOG
+**3.0.5**
+- Added support for DialogUIRework for "TheUsual" dialog option.
+
 **3.0.4**
 - Fix plugin name in bepinex metadata
 

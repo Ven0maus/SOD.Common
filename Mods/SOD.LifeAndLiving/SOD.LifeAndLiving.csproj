@@ -29,6 +29,9 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\libs\il2cpp\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="DialogUIRework">
+		  <HintPath>..\..\libs\il2cpp\DialogUIRework.dll</HintPath>
+		</Reference>
 		<Reference Include="FMODUnity">
 		  <HintPath>..\..\libs\il2cpp\FMODUnity.dll</HintPath>
 		</Reference>
