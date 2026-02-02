@@ -13,11 +13,12 @@ namespace SOD.LifeAndLiving
     [BepInPlugin(PLUGIN_GUID, PLUGIN_NAME, PLUGIN_VERSION)]
     [BepInDependency(Common.Plugin.PLUGIN_GUID)]
     [BepInDependency(RelationsPlus.Plugin.PLUGIN_GUID)]
+    [BepInDependency("DialogUIRework", BepInDependency.DependencyFlags.SoftDependency)]
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
         public const string PLUGIN_NAME = "SOD.LifeAndLiving";
-        public const string PLUGIN_VERSION = "3.0.4";
+        public const string PLUGIN_VERSION = "3.0.5";
 
         public readonly Random Random = new();
 
