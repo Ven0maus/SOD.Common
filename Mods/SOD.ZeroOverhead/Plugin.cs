@@ -12,7 +12,7 @@ namespace SOD.ZeroOverhead
     public class Plugin : PluginController<Plugin, IPluginBindings>
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.ZeroOverhead";
-        public const string PLUGIN_NAME = "ZeroOverhead";
+        public const string PLUGIN_NAME = "SOD.ZeroOverhead";
         public const string PLUGIN_VERSION = "1.0.0";
 
         public override void Load()
