@@ -13,7 +13,7 @@ namespace SOD.ThreatOverhaul.Patches
             [HarmonyPrefix]
             internal static bool Prefix(ref bool publicFauxPas, Actor newTarget)
             {
-                if (!newTarget.isPlayer || !Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
+                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
 
                 _wasPublicFauxPas = publicFauxPas;
                 publicFauxPas = false;
@@ -29,7 +29,7 @@ namespace SOD.ThreatOverhaul.Patches
 
                     foreach (Actor actor in __instance.human.currentRoom.currentOccupants)
                     {
-                        if (actor == __instance.human || actor.isStunned || actor.isDead || actor.isAsleep || actor.ai == null) 
+                        if (actor == __instance.human || actor.isStunned || actor.isDead || actor.isAsleep || actor.ai == null)
                             continue;
 
                         if (Plugin.Instance.Config.IncludeSeeingThreat && !actor.Sees(newTarget))
@@ -54,64 +54,29 @@ namespace SOD.ThreatOverhaul.Patches
             }
         }
 
-
-        [HarmonyPatch(typeof(NewAIController), nameof(NewAIController.PersuitUpdate))]
-        internal static class NewAIController_PersuitUpdate
-        {
-            private static (Actor, float)? _remove = null;
-
-            [HarmonyPrefix]
-            internal static void Prefix(NewAIController __instance)
-            {
-                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul) return;
-                if (__instance.human.seesIllegal != null && __instance.human.seesIllegal.Count > 0 && !__instance.persuit)
-                {
-                    foreach (var actor in __instance.human.seesIllegal)
-                    {
-                        var player = actor.Key.TryCast<Human>();
-                        if (player == null || !player.isPlayer) continue;
-
-                        // Check if the player is in a place that this citizen cares about
-                        bool isTargetOfInterest = IsTargetOfInterest(player, __instance.human);
-                        if (!isTargetOfInterest)
-                        {
-                            _remove = (actor.Key, actor.value);
-                        }
-
-                        break;
-                    }
-
-                    if (_remove != null)
-                    {
-                        __instance.human.seesIllegal.Remove(_remove.Value.Item1);
-                        _remove = null;
-                    }
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(NewAIController), nameof(NewAIController.InstantPersuitCheck))]
         internal static class NewAIController_InstantPersuitCheck
         {
             [HarmonyPrefix]
             internal static bool Prefix(NewAIController __instance, Actor target)
             {
-                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul || !target.isPlayer) return true;
-                
+                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
+
                 var toi = IsTargetOfInterest(target, __instance.human);
                 if (toi && Plugin.Instance.Config.EnableDebugMode)
                     Plugin.Log.LogInfo($"Instant check: " + __instance.human.GetCitizenName());
+
                 return toi;
             }
         }
 
-        private static bool IsTargetOfInterest(Actor player, Actor thirdParty)
+        private static bool IsTargetOfInterest(Actor actor, Actor thirdParty)
         {
             // Check if the player is in a place that this citizen cares about
             bool match = false;
-            if (player.currentRoom != null && player.currentRoom.belongsTo != null)
+            if (actor.currentRoom != null && actor.currentRoom.belongsTo != null)
             {
-                match = player.currentRoom.belongsTo.Any(a =>
+                match = actor.currentRoom.belongsTo.Any(a =>
                 {
                     if (DoesActorMatchModCriteria(a, thirdParty))
                         return true;
@@ -120,9 +85,9 @@ namespace SOD.ThreatOverhaul.Patches
                     return false;
                 });
             }
-            if (!match && player.currentGameLocation != null && player.currentGameLocation.thisAsAddress != null)
+            if (!match && actor.currentGameLocation != null && actor.currentGameLocation.thisAsAddress != null)
             {
-                var company = player.currentGameLocation.thisAsAddress.company;
+                var company = actor.currentGameLocation.thisAsAddress.company;
                 if (company != null)
                 {
                     // Check if janitor
@@ -139,9 +104,17 @@ namespace SOD.ThreatOverhaul.Patches
                     if (!match && company.security != null)
                         match = DoesActorMatchModCriteria(company.security, thirdParty);
 
-                    // Check employees
-                    if (!match && company.currentStaff != null)
-                        match = company.currentStaff.Any(a => a.employee != null && DoesActorMatchModCriteria(a.employee, thirdParty));
+                    // Employees
+                    foreach (var employee in company.companyRoster)
+                    {
+                        if (actor.currentRoom != null && actor.currentRoom.currentOccupants != null &&
+                            actor.currentRoom.currentOccupants.Contains(employee.employee))
+                        {
+                            match = DoesActorMatchModCriteria(employee.employee, thirdParty);
+                            if (match)
+                                break;
+                        }
+                    }
                 }
             }
             return match;
