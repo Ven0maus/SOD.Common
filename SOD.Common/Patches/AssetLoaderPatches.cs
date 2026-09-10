@@ -100,7 +100,10 @@ namespace SOD.Common.Patches
                     {
                         // Add sync disk presets to this menu preset
                         foreach (var syncDiskPreset in syncDiskPresets)
-                            menu.syncDisks.Add(syncDiskPreset);
+                        {
+                            if (!menu.syncDisks.Contains(syncDiskPreset))
+                                menu.syncDisks.Add(syncDiskPreset);
+                        }
                     }
                 }
             }
