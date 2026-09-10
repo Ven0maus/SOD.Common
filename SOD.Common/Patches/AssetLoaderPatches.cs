@@ -28,11 +28,15 @@ namespace SOD.Common.Patches
                     .ToDictionary(a => a.Key, a => a.First());
 
                 var createdSyncDiskPresets = new List<SyncDiskPreset>();
+                var allLoadedSyncDisks = Toolbox.Instance.allSyncDisks;
 
                 // Insert all the registered sync disk presets
                 foreach (var syncDisk in Lib.SyncDisks.RegisteredSyncDisks)
                 {
                     var preset = syncDisk.Preset;
+                    if (allLoadedSyncDisks.Contains(preset))
+                        continue;
+
                     createdSyncDiskPresets.Add(preset);
 
                     // Set the interactable and add it to the game
