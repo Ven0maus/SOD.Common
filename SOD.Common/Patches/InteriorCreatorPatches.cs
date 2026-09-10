@@ -39,8 +39,12 @@ namespace SOD.Common.Patches
                     _isGeneratingChunk = false;
                     if (_removedPresets != null)
                     {
+                        var allSyncDisks = Toolbox.Instance.allSyncDisks;
                         foreach (var preset in _removedPresets)
-                            Toolbox.Instance.allSyncDisks.Add(preset);
+                        {
+                            if (!allSyncDisks.Contains(preset))
+                                allSyncDisks.Add(preset);
+                        }
                         _removedPresets = null;
                     }
                 }
