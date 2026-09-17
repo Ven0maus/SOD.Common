@@ -13,7 +13,7 @@ namespace SOD.ThreatOverhaul.Patches
             [HarmonyPrefix]
             internal static bool Prefix(ref bool publicFauxPas, Actor newTarget)
             {
-                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
+                if (!newTarget.isPlayer || !Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
 
                 _wasPublicFauxPas = publicFauxPas;
                 publicFauxPas = false;
@@ -60,7 +60,7 @@ namespace SOD.ThreatOverhaul.Patches
             [HarmonyPrefix]
             internal static bool Prefix(NewAIController __instance, Actor target)
             {
-                if (!Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
+                if (!target.isPlayer || !Plugin.Instance.Config.EnableThreatCalculationOverhaul) return true;
 
                 var toi = IsTargetOfInterest(target, __instance.human);
                 if (toi && Plugin.Instance.Config.EnableDebugMode)
