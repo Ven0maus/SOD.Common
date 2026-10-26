@@ -1,20 +1,16 @@
 ﻿using HarmonyLib;
 using System;
 
-namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
+namespace SOD.LifeAndLiving.Content.EconomyRebalance
 {
     internal class GameplayControlsPatches
     {
         [HarmonyPatch(typeof(GameplayControls), nameof(GameplayControls.Awake))]
         internal class GameplayControls_Awake
         {
-            private static bool _appliedOnce = false;
-
             [HarmonyPostfix]
             internal static void Postfix(GameplayControls __instance)
             {
-                if (_appliedOnce) return;
-                _appliedOnce = true;
                 if (Plugin.Instance.Config.DisableEconomyRebalance) return;
 
                 ReduceMurderPayouts(__instance);
