@@ -3,20 +3,16 @@ using SOD.Common.Extensions;
 using System;
 using System.Linq;
 
-namespace SOD.LifeAndLiving.Patches.EconomyRebalancePatches
+namespace SOD.LifeAndLiving.Content.EconomyRebalance
 {
     internal class ToolboxPatches
     {
         [HarmonyPatch(typeof(Toolbox), nameof(Toolbox.LoadAll))]
         internal class Toolbox_LoadAll
         {
-            private static bool _appliedOnce = false;
-
             [HarmonyPostfix]
             internal static void Postfix(Toolbox __instance)
             {
-                if (_appliedOnce) return;
-                _appliedOnce = true;
                 if (Plugin.Instance.Config.DisableEconomyRebalance) return;
 
                 // Reduces job payouts from rewards by a percentage

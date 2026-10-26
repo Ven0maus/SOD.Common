@@ -1,4 +1,7 @@
 # CHANGELOG
+**3.0.6**
+- Fixed price changes not working when starting a new city while already in an ongoing game.
+
 **3.0.5**
 - Added support for DialogUIRework for "TheUsual" dialog option.
 
