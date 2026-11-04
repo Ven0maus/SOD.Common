@@ -1,4 +1,8 @@
 # CHANGELOG
+**3.0.7**
+- Fixed prices calculating based on the current preset prices causing weird price changes everytime you load a savegame.
+- Added a DebugMode config option which adds more detailed info logging when enabled about what was changed.
+
 **3.0.6**
 - Fixed price changes not working when starting a new city while already in an ongoing game.
 

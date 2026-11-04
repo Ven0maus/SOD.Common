@@ -18,9 +18,11 @@ namespace SOD.LifeAndLiving
     {
         public const string PLUGIN_GUID = "Venomaus.SOD.LifeAndLiving";
         public const string PLUGIN_NAME = "SOD.LifeAndLiving";
-        public const string PLUGIN_VERSION = "3.0.6";
+        public const string PLUGIN_VERSION = "3.0.7";
 
         public readonly Random Random = new();
+
+        private static readonly Dictionary<string, Dictionary<int, UnityEngine.Vector2>> _calculatedRewards = new();
 
         public override void Load()
         {
@@ -41,6 +43,24 @@ namespace SOD.LifeAndLiving
         {
             base.OnConfigureBindings();
             UpdateConfigFileLayout();
+        }
+
+        /// <summary>
+        /// Gets the statically cached calculated range.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="hashcode"></param>
+        /// <param name="calc"></param>
+        /// <returns></returns>
+        public static UnityEngine.Vector2 GetCalculatedRange(string key, int hashcode, Func<UnityEngine.Vector2> calc)
+        {
+            if (!_calculatedRewards.TryGetValue(key, out var rewards))
+                _calculatedRewards[key] = rewards = new Dictionary<int, UnityEngine.Vector2>();
+
+            if (!rewards.TryGetValue(hashcode, out var reward))
+                rewards[hashcode] = reward = calc.Invoke();
+
+            return reward;
         }
 
         private void SaveGame_OnBeforeDelete(object sender, Common.Helpers.SaveGameArgs e)
