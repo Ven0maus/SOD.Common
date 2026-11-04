@@ -38,7 +38,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var dialogPreset in __instance.allDialog)
                 {
-                    var cost = Plugin.GetCalculatedRange("dialog_cost", dialogPreset.GetHashCode(), () =>
+                    var cost = Plugin.GetCalculatedRange("dialog_cost", dialogPreset.presetName.GetHashCode(), () =>
                     {
                         var value = dialogPreset.cost <= 0 ? 0 : (int)(dialogPreset.cost / 100f * percentage);
 
@@ -63,7 +63,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var furniturePreset in __instance.allFurniture)
                 {
-                    var cost = Plugin.GetCalculatedRange("furniture_cost", furniturePreset.GetHashCode(), () =>
+                    var cost = Plugin.GetCalculatedRange("furniture_cost", furniturePreset.presetName.GetHashCode(), () =>
                     {
                         var value = furniturePreset.cost <= 0 ? 0 : (int)(furniturePreset.cost / 100f * percentage);
 
@@ -118,7 +118,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                     if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
                         continue;
 
-                    var price = Plugin.GetCalculatedRange("item_prices", preset.GetHashCode(), () =>
+                    var price = Plugin.GetCalculatedRange("item_prices", preset.presetName.GetHashCode(), () =>
                     {
                         if (preset.value.y <= 0)
                             return new UnityEngine.Vector2(0, 0);
@@ -186,7 +186,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                     int totalMin = 0, totalMax = 0;
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var range = Plugin.GetCalculatedRange("job_payout", resolveQuestion.GetHashCode(), () =>
+                        var range = Plugin.GetCalculatedRange("job_payout", $"{sideJob.presetName}_{resolveQuestion.name}".GetHashCode(), () =>
                         {
                             var min = Math.Max(1, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
                             var max = Math.Max(1, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));

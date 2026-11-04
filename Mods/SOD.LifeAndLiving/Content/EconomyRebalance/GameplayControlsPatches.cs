@@ -23,7 +23,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var resolveQuestion in __instance.murderResolveQuestions)
                 {
-                    var hashcode = resolveQuestion.GetHashCode();
+                    var hashcode = resolveQuestion.name.GetHashCode();
                     var range = Plugin.GetCalculatedRange("murder_payout_reward", hashcode, () =>
                     {
                         var min = Math.Max(minPayout, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
