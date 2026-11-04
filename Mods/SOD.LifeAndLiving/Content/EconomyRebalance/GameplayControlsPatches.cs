@@ -23,17 +23,36 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var resolveQuestion in __instance.murderResolveQuestions)
                 {
+                    var hashcode = resolveQuestion.name.GetHashCode();
+                    var range = Plugin.GetCalculatedRange("murder_payout_reward", hashcode, () =>
+                    {
+                        var min = Math.Max(minPayout, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
+                        var max = Math.Max(minPayout, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
+
+                        if (Plugin.Instance.Config.DebugMode)
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init murder resolve question price {resolveQuestion.name}: ({min}, {max})");
+
+                        return new UnityEngine.Vector2(min, max);
+                    });
+
                     // Reduce reward
-                    var min = Math.Max(minPayout, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
-                    var max = Math.Max(minPayout, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
-                    resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
+                    resolveQuestion.rewardRange = range;
 
                     // Increase penalty by 1/4 the reduction if applicable
                     if (resolveQuestion.penaltyRange.x > 0 && resolveQuestion.penaltyRange.y > 0)
                     {
-                        min = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.x + (int)(resolveQuestion.penaltyRange.x / 100 * (reduction / 4)));
-                        max = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.y + (int)(resolveQuestion.penaltyRange.y / 100 * (reduction / 4)));
-                        resolveQuestion.penaltyRange = new UnityEngine.Vector2(min, max);
+                        range = Plugin.GetCalculatedRange("murder_payout_penalty", hashcode, () =>
+                        {
+                            var min = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.x + (int)(resolveQuestion.penaltyRange.x / 100 * (reduction / 4)));
+                            var max = Math.Max(minPayout, (int)resolveQuestion.penaltyRange.y + (int)(resolveQuestion.penaltyRange.y / 100 * (reduction / 4)));
+
+                            if (Plugin.Instance.Config.DebugMode)
+                                Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init murder resolve question penalty price {resolveQuestion.name}: ({min}, {max})");
+
+                            return new UnityEngine.Vector2(min, max);
+                        });
+
+                        resolveQuestion.penaltyRange = range;
                     }
                     count++;
                 }

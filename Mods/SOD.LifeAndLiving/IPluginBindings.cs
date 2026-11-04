@@ -5,10 +5,13 @@ using SOD.LifeAndLiving.Bindings.SyncDiskBindings;
 
 namespace SOD.LifeAndLiving
 {
-    public interface IPluginBindings : ISideJobBindings, IMurderCaseBindings, ISpawnRateBindings, 
+    public interface IPluginBindings : ISideJobBindings, IMurderCaseBindings, ISpawnRateBindings,
         IHousingBindings, IDialogBindings, IMoneyBindings, IShopsBindings, IItemPriceBindings,
         Bindings.RelationBindings.IDialogBindings, ImRequirementBindings, ISyncDiskBindings
     {
+        [Binding(false, "When enabled, more logs will be shown in the console.", "General.DebugMode")]
+        public bool DebugMode { get; set; }
+
         [Binding(false, "Should all features of Economy Rebalance be disabled?", "General.DisableEconomyRebalance")]
         public bool DisableEconomyRebalance { get; set; }
 
