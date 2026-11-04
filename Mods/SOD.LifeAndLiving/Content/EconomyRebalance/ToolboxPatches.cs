@@ -38,9 +38,19 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var dialogPreset in __instance.allDialog)
                 {
-                    if (dialogPreset.cost > 0)
+                    var cost = Plugin.GetCalculatedRange("dialog_cost", dialogPreset.GetHashCode(), () =>
                     {
-                        dialogPreset.cost += (int)(dialogPreset.cost / 100f * percentage);
+                        var value = dialogPreset.cost <= 0 ? 0 : (int)(dialogPreset.cost / 100f * percentage);
+
+                        if (Plugin.Instance.Config.DebugMode)
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init dialog cost price {dialogPreset.presetName}: ({value})");
+
+                        return new UnityEngine.Vector2(0, value);
+                    });
+
+                    if (cost.y > 0)
+                    {
+                        dialogPreset.cost += (int)cost.y;
                         count++;
                     }
                 }
@@ -53,9 +63,19 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var furniturePreset in __instance.allFurniture)
                 {
-                    if (furniturePreset.cost > 0)
+                    var cost = Plugin.GetCalculatedRange("furniture_cost", furniturePreset.GetHashCode(), () =>
                     {
-                        furniturePreset.cost += (int)(furniturePreset.cost / 100f * percentage);
+                        var value = furniturePreset.cost <= 0 ? 0 : (int)(furniturePreset.cost / 100f * percentage);
+
+                        if (Plugin.Instance.Config.DebugMode)
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init furniture cost price {furniturePreset.presetName}: ({value})");
+
+                        return new UnityEngine.Vector2(0, value);
+                    });
+
+                    if (cost.y > 0)
+                    {
+                        furniturePreset.cost += (int)cost.y;
                         count++;
                     }
                 }
@@ -92,11 +112,16 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 foreach (var item in __instance.objectPresetDictionary)
                 {
                     var preset = item.value;
-                    if (preset != null && preset.value.y > 0)
+                    if (preset == null) continue;
+
+                    // Both these cases are hardcoded to certain values
+                    if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
+                        continue;
+
+                    var price = Plugin.GetCalculatedRange("item_prices", preset.GetHashCode(), () =>
                     {
-                        // Both these cases are hardcoded to certain values
-                        if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
-                            continue;
+                        if (preset.value.y <= 0)
+                            return new UnityEngine.Vector2(0, 0);
 
                         var percentageValueIncrease = Plugin.Instance.Config.PercentageValueIncreaseGeneral;
                         var minItemValue = Plugin.Instance.Config.MinGeneralItemValue;
@@ -134,10 +159,18 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                         // Add some random off-set to max value
                         initialMaxValue += random.Next(0, 16);
 
+                        if (Plugin.Instance.Config.DebugMode)
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init item price {preset.presetName}: ({initialMinValue}, {initialMaxValue})");
+
                         // Set value
-                        preset.value = new UnityEngine.Vector2(initialMinValue, initialMaxValue);
-                        count++;
-                    }
+                        return new UnityEngine.Vector2(initialMinValue, initialMaxValue);
+                    });
+
+                    if (price.x == 0 && price.y == 0)
+                        continue;
+
+                    preset.value = price;
+                    count++;
                 }
                 Plugin.Log.LogInfo($"Adjusted \"{count}\" item purchase prices.");
             }
@@ -153,11 +186,20 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                     int totalMin = 0, totalMax = 0;
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var min = Math.Max(1, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
-                        var max = Math.Max(1, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
-                        resolveQuestion.rewardRange = new UnityEngine.Vector2(min, max);
-                        totalMin += min;
-                        totalMax += max;
+                        var range = Plugin.GetCalculatedRange("job_payout", resolveQuestion.GetHashCode(), () =>
+                        {
+                            var min = Math.Max(1, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
+                            var max = Math.Max(1, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
+
+                            if (Plugin.Instance.Config.DebugMode)
+                                Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init sidejob \"{sideJob.presetName}\" resolve question price {resolveQuestion.name}: ({min}, {max})");
+
+                            return new UnityEngine.Vector2(min, max);
+                        });
+
+                        resolveQuestion.rewardRange = range;
+                        totalMin += (int)range.x;
+                        totalMax += (int)range.y;
                     }
 
                     // Fall-back to make side job atleast min set
