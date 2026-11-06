@@ -17,7 +17,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
         private static int _effectId;
         internal static Color Color { get; private set; }
 
-        internal static void Initialize() 
+        internal static void Initialize()
         {
             if (Plugin.Instance.Config.DisableExtraSyncDisks || !Plugin.Instance.Config.IncludeEcholocationSyncDisk) return;
 
@@ -123,7 +123,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
             if (_speechActive != speechActive || IsDirty)
             {
                 // If we didn't come from a dirty check, and there are no actors or effect not enabled we don't need to do anything
-                if (!IsDirty && (!EffectEnabled || _actorsOnCurrentCaseboard.Count == 0)) 
+                if (!IsDirty && (!EffectEnabled || _actorsOnCurrentCaseboard.Count == 0))
                     return;
 
                 // Update the latest speech state
@@ -135,7 +135,7 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
 
                 // Grab the original color when it becomes active
                 if (speechActive && !IsDirty)
-                _originalColor = __instance.activeSpeechBubble.text.color;
+                    _originalColor = __instance.activeSpeechBubble.text.color;
 
                 // Set the color of the speech bubble if we know the actor from the current case board
                 __instance.activeSpeechBubble.text.color = GetColorForActor(__instance.actor);
@@ -169,11 +169,12 @@ namespace SOD.LifeAndLiving.Content.SyncDisks
             HashSet<int> data = null;
             foreach (var caseElement in CasePanelController.Instance.activeCase.caseElements)
             {
+                if (caseElement == null || caseElement.id == null) continue;
                 if (Toolbox.Instance.TryGetEvidence(caseElement.id, out var evidence))
                 {
                     var evidenceCitizen = evidence.TryCast<EvidenceCitizen>();
                     if (evidenceCitizen == null) continue;
-                    
+
                     // Get tied keys of the caseElement
                     var tiedKeys = evidence.GetTiedKeys(caseElement.dk);
 
