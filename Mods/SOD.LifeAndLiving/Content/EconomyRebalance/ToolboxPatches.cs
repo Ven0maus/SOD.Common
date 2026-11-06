@@ -38,12 +38,13 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var dialogPreset in __instance.allDialog)
                 {
-                    var cost = Plugin.GetCalculatedRange("dialog_cost", dialogPreset.presetName.GetHashCode(), () =>
+                    var presetName = (dialogPreset.presetName ?? dialogPreset.name);
+                    var cost = Plugin.GetCalculatedRange("dialog_cost", presetName.GetHashCode(), () =>
                     {
                         var value = dialogPreset.cost <= 0 ? 0 : (int)(dialogPreset.cost / 100f * percentage);
 
                         if (Plugin.Instance.Config.DebugMode)
-                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init dialog cost price {dialogPreset.presetName}: ({value})");
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init dialog cost price {presetName}: ({value})");
 
                         return new UnityEngine.Vector2(0, value);
                     });
@@ -63,12 +64,13 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 int count = 0;
                 foreach (var furniturePreset in __instance.allFurniture)
                 {
-                    var cost = Plugin.GetCalculatedRange("furniture_cost", furniturePreset.presetName.GetHashCode(), () =>
+                    var presetName = (furniturePreset.presetName ?? furniturePreset.name);
+                    var cost = Plugin.GetCalculatedRange("furniture_cost", presetName.GetHashCode(), () =>
                     {
                         var value = furniturePreset.cost <= 0 ? 0 : (int)(furniturePreset.cost / 100f * percentage);
 
                         if (Plugin.Instance.Config.DebugMode)
-                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init furniture cost price {furniturePreset.presetName}: ({value})");
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init furniture cost price {presetName}: ({value})");
 
                         return new UnityEngine.Vector2(0, value);
                     });
@@ -114,11 +116,13 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                     var preset = item.value;
                     if (preset == null) continue;
 
+                    var presetName = (preset.presetName ?? preset.name);
+
                     // Both these cases are hardcoded to certain values
-                    if (preset.presetName.Equals("Diamond") || preset.presetName.Equals("SyncDiskUpgrade"))
+                    if (presetName.Equals("Diamond") || presetName.Equals("SyncDiskUpgrade"))
                         continue;
 
-                    var price = Plugin.GetCalculatedRange("item_prices", preset.presetName.GetHashCode(), () =>
+                    var price = Plugin.GetCalculatedRange("item_prices", presetName.GetHashCode(), () =>
                     {
                         if (preset.value.y <= 0)
                             return new UnityEngine.Vector2(0, 0);
@@ -160,7 +164,7 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                         initialMaxValue += random.Next(0, 16);
 
                         if (Plugin.Instance.Config.DebugMode)
-                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init item price {preset.presetName}: ({initialMinValue}, {initialMaxValue})");
+                            Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init item price {presetName}: ({initialMinValue}, {initialMaxValue})");
 
                         // Set value
                         return new UnityEngine.Vector2(initialMinValue, initialMaxValue);
@@ -184,15 +188,16 @@ namespace SOD.LifeAndLiving.Content.EconomyRebalance
                 foreach (var sideJob in sideJobs)
                 {
                     int totalMin = 0, totalMax = 0;
+                    var sideJobPresetName = (sideJob.presetName ?? sideJob.name);
                     foreach (var resolveQuestion in sideJob.resolveQuestions)
                     {
-                        var range = Plugin.GetCalculatedRange("job_payout", $"{sideJob.presetName}_{resolveQuestion.name}".GetHashCode(), () =>
+                        var range = Plugin.GetCalculatedRange("job_payout", $"{sideJobPresetName}_{resolveQuestion.name}".GetHashCode(), () =>
                         {
                             var min = Math.Max(1, (int)resolveQuestion.rewardRange.x - (int)(resolveQuestion.rewardRange.x / 100 * reduction));
                             var max = Math.Max(1, (int)resolveQuestion.rewardRange.y - (int)(resolveQuestion.rewardRange.y / 100 * reduction));
 
                             if (Plugin.Instance.Config.DebugMode)
-                                Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init sidejob \"{sideJob.presetName}\" resolve question price {resolveQuestion.name}: ({min}, {max})");
+                                Plugin.Log.LogInfo($"[<color={ConsoleColor.Cyan}>DEBUGMODE</color>]: Init sidejob \"{sideJobPresetName}\" resolve question price {resolveQuestion.name}: ({min}, {max})");
 
                             return new UnityEngine.Vector2(min, max);
                         });

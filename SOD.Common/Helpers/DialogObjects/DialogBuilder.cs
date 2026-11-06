@@ -20,6 +20,7 @@ namespace SOD.Common.Helpers.DialogObjects
 
             // Base preset information
             _dialogPreset.name = dialogName ?? Guid.NewGuid().ToString();
+            _dialogPreset.presetName = _dialogPreset.name;
             _dialogPreset.defaultOption = true;
             _dialogPreset.tiedToKey = Evidence.DataKey.photo;
             _dialogPreset.useSuccessTest = true;
