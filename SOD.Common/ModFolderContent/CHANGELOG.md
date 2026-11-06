@@ -1,4 +1,7 @@
 # CHANGELOG
+**2.1.6**
+- Small bugfix that now sets the presetName for new dialogs made through the DialogBuilder
+
 **2.1.5**
 - Fix duplication of sync disks when loading saves multiple times
 

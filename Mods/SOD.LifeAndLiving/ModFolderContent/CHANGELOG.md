@@ -1,4 +1,7 @@
 # CHANGELOG
+**3.0.8**
+- Bugfixes for null reference exceptions
+
 **3.0.7**
 - Fixed prices calculating based on the current preset prices causing weird price changes everytime you load a savegame.
 - Added a DebugMode config option which adds more detailed info logging when enabled about what was changed.
